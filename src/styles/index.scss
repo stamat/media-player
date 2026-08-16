@@ -54,6 +54,13 @@ media-player video {
   top: 50%;
   translate: 0 -50%;
   pointer-events: none;
+
+  // No easing on the played bar. The theme animates the fill over 250ms, which is right for
+  // a bar that jumps when a download reports in — but this one is written on every animation
+  // frame, so each write restarts a transition the previous one never finished and the fill
+  // trails a quarter second behind the thumb it is supposed to sit under. The buffered bar
+  // keeps its easing: that one really does arrive in jumps.
+  --progress-elemental-duration: 0s;
 }
 
 // The volume takes a fixed slice rather than its share: two sliders in one flex row both

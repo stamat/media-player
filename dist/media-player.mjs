@@ -1577,7 +1577,17 @@ __publicField(MediaPlayer, "properties", [
   "captionText"
 ]);
 __publicField(MediaPlayer, "formatters", {
-  time: (value) => formatTime(value)
+  time: (value) => formatTime(value),
+  /**
+   * Whole seconds, for the two nodes that draw the scrubber.
+   *
+   * The thumb and the played bar have to be given the *same* number or they disagree on
+   * screen. A range input with `step="1"` snaps what it is assigned to the **nearest**
+   * step while a bar drawn from the raw value keeps every decimal, so 3.6 is a thumb at 4
+   * beside a fill at 3.6 — a whole step apart at the worst moment, twice a second. Floor
+   * both and there is one number and nothing to disagree about.
+   */
+  floor: (value) => Number.isFinite(value) ? Math.floor(value) : value
 });
 if (typeof customElements !== "undefined" && !customElements.get("media-player")) {
   customElements.define("media-player", MediaPlayer);

@@ -300,6 +300,24 @@ describe('the clock surviving a scrub', () => {
   });
 });
 
+describe('the scrubber drawing one position rather than two', () => {
+  test('the thumb and the played bar are handed the same whole second, so they cannot disagree on screen', () => {
+    const player = mount(fakeMedia());
+    const floor = MediaPlayer.formatters.floor;
+    // A range with step="1" snaps an assignment to the NEAREST step: unfloored, 3.6 is a
+    // thumb at 4 beside a bar at 3.6, a whole step apart.
+    expect(floor(3.6)).toBe(3);
+    expect(floor(3.2)).toBe(3);
+    expect(player.formatters.floor).toBe(floor);
+  });
+
+  test('a duration the browser has not worked out yet passes through rather than becoming NaN', () => {
+    const floor = MediaPlayer.formatters.floor;
+    expect(floor(null)).toBe(null);
+    expect(floor(NaN)).toBeNaN();
+  });
+});
+
 describe('the buffered bar', () => {
   test('how far ahead the browser has loaded is seconds, so it shares a scale with the duration', () => {
     const media = fakeMedia('audio', { duration: 100 });

@@ -33,6 +33,7 @@ media-player video {
   top: 50%;
   translate: 0 -50%;
   pointer-events: none;
+  --progress-elemental-duration: 0s;
 }
 
 .media-player-volume {
