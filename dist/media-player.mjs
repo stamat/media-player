@@ -1293,8 +1293,7 @@ var MediaPlayer = class extends HgElement {
     this.isBuffering = false;
     this.posterHidden = true;
     this.playLabel = "Pause";
-    cancelAnimationFrame(this.frame);
-    this.tick();
+    this.resume();
     this.interaction("play");
     if (this.isVideo) this.showControls();
   }
@@ -1330,17 +1329,67 @@ var MediaPlayer = class extends HgElement {
     if (!this.media || !this.media.buffered.length || !this.media.duration) return;
     this.buffered = this.media.buffered.end(this.media.buffered.length - 1);
   }
-  /** Dragging the scrubber: paint the labels, do not seek until the drag ends. */
+  /**
+   * Start or restart the clock, exactly once.
+   *
+   * Cancel before scheduling, always: `tick` schedules the next frame from inside itself, so
+   * a second entry point that only called `tick` would leave two loops running and the
+   * handle to just one of them.
+   */
+  resume() {
+    cancelAnimationFrame(this.frame);
+    this.tick();
+  }
+  /**
+   * Dragging the scrubber: paint the labels, do not seek until the drag ends.
+   *
+   * The value is kept here rather than read back off the input when the drag commits. Two
+   * events end a drag and their order is not guaranteed — Chrome sends `pointerup` before
+   * `change` — and the clock restarting on the first of them writes `currentTime` straight
+   * back into `input.value`. Whichever event then read the DOM would read the clock's
+   * number instead of the one under the thumb, and the seek would go to where playback
+   * already was.
+   */
   scrub(event) {
     if (!this.media || this.isLive) return;
     cancelAnimationFrame(this.frame);
-    this.paint(Number(event.target.value));
+    this.pendingSeek = Number(event.target.value);
+    this.paint(this.pendingSeek);
   }
-  seek(event) {
-    this.seekTo(Number(event.target.value));
+  seek() {
+    this.endDrag();
+  }
+  /**
+   * A drag ended, whatever it did to the value.
+   *
+   * `change` cannot be the only way back: a thumb picked up and put down where it started
+   * fires `input` — which stopped the clock — and then no `change` at all, because the value
+   * the field ends on is the value it began on. The clock would stay stopped over playing
+   * audio until the next play or pause. Bound to `pointerup` on the document rather than the
+   * input, since a drag very often ends with the pointer somewhere else entirely.
+   */
+  endScrub() {
+    this.endDrag();
+  }
+  /**
+   * Land the drag: seek where the thumb was let go, forget it, start the clock.
+   *
+   * Both enders route here and the pending value is cleared first, so whichever of `change`
+   * and `pointerup` arrives second finds nothing to land and only restarts the clock. Two
+   * seeks from one release would be two `media-player-interaction` events for one gesture,
+   * and the second would seek to wherever the restarted clock had already written.
+   */
+  endDrag() {
+    const seconds = this.pendingSeek;
+    if (seconds === null || seconds === void 0) {
+      this.resume();
+      return;
+    }
+    this.pendingSeek = null;
+    this.seekTo(seconds);
     this.posterHidden = true;
     this.interaction("seek", this.currentTime);
-    if (!this.media.paused) this.tick();
+    this.resume();
   }
   // VOLUME
   setVolume(event) {

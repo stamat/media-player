@@ -242,6 +242,64 @@ describe('volume', () => {
   });
 });
 
+describe('the clock surviving a scrub', () => {
+  test('a thumb put back where it was picked up still lands and restarts the clock, though no change event ever fires', () => {
+    const media = fakeMedia('audio', { duration: 100 });
+    const player = mount(media);
+    media.play();
+
+    // The drag: input fires, the clock stops so it cannot fight the thumb.
+    player.scrub({ target: { value: '20' } });
+    expect(player.currentTime).toBe(20);
+
+    // Released on the value it started from, so the browser sends no `change` — only the
+    // pointerup that `endScrub` is bound to. Without it the clock never restarts and the
+    // label sits still over playing audio.
+    player.endScrub();
+    expect(media.currentTime).toBe(20);
+
+    // The clock is live again: a tick now paints whatever the media element says.
+    media.currentTime = 55;
+    player.tick();
+    expect(player.currentTime).toBe(55);
+  });
+
+  test('the drag lands where the thumb was let go, even when pointerup beats change to it', () => {
+    const media = fakeMedia('audio', { duration: 100 });
+    const player = mount(media);
+    media.play();
+
+    player.scrub({ target: { value: '80' } });
+    // Chrome's order. The clock restarting writes currentTime back into the field, so a
+    // commit that read the DOM here would seek to wherever playback was, not to 80.
+    player.endScrub();
+    player.seek({ target: { value: '3' } });
+
+    expect(media.currentTime).toBe(80);
+  });
+
+  test('the drag lands once, so releasing does not fire two seeks', () => {
+    const media = fakeMedia('audio', { duration: 100 });
+    const player = mount(media);
+    const seeks = [];
+    player.addEventListener('media-player-interaction', (e) => { if (e.detail.type === 'seek') seeks.push(e.detail.value); });
+    player.scrub({ target: { value: '40' } });
+    player.endScrub();
+    player.seek({ target: { value: '40' } });
+    expect(seeks).toHaveLength(1);
+  });
+
+  test('resuming twice does not leave two clocks running against one handle', () => {
+    const media = fakeMedia('audio', { duration: 100 });
+    const player = mount(media);
+    media.play();
+    player.resume();
+    const first = player.frame;
+    player.resume();
+    expect(player.frame).not.toBe(first);
+  });
+});
+
 describe('the buffered bar', () => {
   test('how far ahead the browser has loaded is seconds, so it shares a scale with the duration', () => {
     const media = fakeMedia('audio', { duration: 100 });

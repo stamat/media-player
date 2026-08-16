@@ -44,9 +44,11 @@ is the argument for everything below it.
       <progress-elemental bind="buffered:attr#buffer">
         <progress value="0" max="1" bind="currentTime:prop#value;duration:prop#max"></progress>
       </progress-elemental>
+      <!-- `pointerup@document` as well as `change`: a thumb picked up and put back where it
+           started fires no `change`, and the clock would stay stopped over playing audio. -->
       <input type="range" min="0" step="1" value="0" aria-label="Seek" disabled
              bind="duration:attr#max;currentTime:prop#value"
-             on="input:scrub;change:seek">
+             on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub">
     </slider-elemental>
 
     <span class="media-player-time" bind="duration|time">00:00</span>
@@ -70,7 +72,7 @@ Which runs, here, on this page:
 <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon">▶</span><span class="media-player-pause-icon">⏸</span></button>
 <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>↻</button>
 <span class="media-player-time" bind="currentTime|time">00:00</span>
-<slider-elemental class="media-player-scrubber" tooltip="thumb"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value;duration:prop#max"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="input:scrub;change:seek"></slider-elemental>
+<slider-elemental class="media-player-scrubber" tooltip="thumb"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value;duration:prop#max"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
 <span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
 <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
 <slider-elemental class="media-player-volume"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
