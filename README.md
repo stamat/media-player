@@ -36,6 +36,21 @@ and volume are [`<slider-elemental>`](https://github.com/stamat/book-of-elementa
 buffered bar is `<progress-elemental>`, and the binding is
 [hydrargyri](https://github.com/stamat/hydrargyri).
 
+## Where it comes from
+
+This is a rewrite of the media players I built at GitHub in 2022 — the ones still
+[playing on github.com today](https://github.com/readme/podcast/powering-public-goods),
+written in [Catalyst](https://github.com/github/catalyst) and TypeScript before React
+reached that part of the site. A passion project then, revitalized here.
+
+What changed in the rewrite is worth the paragraph, because it is the argument for the whole
+approach. The original needed 24 `@target` declarations to reach its own controls, and a
+`VideoPlayer extends AudioPlayer` class pair that had to talk to itself through a custom
+event because the base class owned `connectedCallback`. Here declarative binds took 16 of
+those targets, listeners on the node they belong to took 4, three were labels that turned
+out to be state rather than nodes — and one survived. The inheritance went with them: which
+media element you wrapped is read off the child, so there is one class and one tag.
+
 ## Install
 
 ```bash

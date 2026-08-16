@@ -60,6 +60,11 @@ into a config option, which is templating in JavaScript wearing a smaller hat.</
 <p>This one goes the other way. <strong>You write the controls.</strong> They are buttons and range inputs
 in your page, styled by your stylesheet, in the order you put them. The element wires them
 by name and never touches their arrangement:</p>
+<p>It is a rewrite of the media players I built at GitHub in 2022 — the ones still
+<a href="https://github.com/readme/podcast/powering-public-goods">playing on github.com today</a>,
+written in Catalyst and TypeScript before React reached that part of the site.
+<a href="https://github.com/stamat/media-player#where-it-comes-from">What changed in the rewrite</a>
+is the argument for everything below it.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">audio</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/episode.mp3&quot;</span>
          <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;

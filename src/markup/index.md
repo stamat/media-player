@@ -16,6 +16,12 @@ This one goes the other way. **You write the controls.** They are buttons and ra
 in your page, styled by your stylesheet, in the order you put them. The element wires them
 by name and never touches their arrangement:
 
+It is a rewrite of the media players I built at GitHub in 2022 — the ones still
+[playing on github.com today](https://github.com/readme/podcast/powering-public-goods),
+written in Catalyst and TypeScript before React reached that part of the site.
+[What changed in the rewrite](https://github.com/stamat/media-player#where-it-comes-from)
+is the argument for everything below it.
+
 ```html
 <media-player>
   <audio controls src="/episode.mp3"

@@ -1,0 +1,55 @@
+name: Deploy the page to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; let a queued run finish rather than cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+
+      # The site builds to the repository root, so the artifact is assembled from an
+      # explicit list rather than by uploading `.` with exclusions. A list cannot leak a
+      # file somebody forgot to exclude, and node_modules is 500 packages of it.
+      - name: Stage what the page needs
+        shell: bash
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r dist css js sample _site/
+          test -s _site/index.html
+          test -s _site/dist/media-player.min.mjs
+
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
