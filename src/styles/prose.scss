@@ -1,0 +1,21 @@
+// The one page this repository publishes, as a single stylesheet: the prose layout has no
+// head block to link a second one from, so everything the samples need is bundled here.
+
+@use "poops-docs-theme/scss/prose-only";
+@use "book-of-elementals/src/elementals/slider/index" as slider;
+@use "book-of-elementals/src/elementals/slider/theme" as slider-theme;
+@use "book-of-elementals/src/elementals/progress/index" as progress;
+@use "book-of-elementals/src/elementals/progress/theme" as progress-theme;
+@use "./index";
+@use "./theme";
+
+.sample {
+  margin-block: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border, currentcolor);
+  border-radius: var(--radius, 0.5rem);
+}
+
+.sample media-player {
+  max-width: 40rem;
+}

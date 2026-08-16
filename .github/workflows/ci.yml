@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# This workflow only reads the repository; say so, and the token can do no more.
+permissions:
+  contents: read
+
+# A new push to the same branch or pull request supersedes the run in flight.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # The only language-specific step — everything below it calls script/*.
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: script/bootstrap
+
+      - name: Lint
+        run: script/lint
+
+      - name: Test
+        run: script/test
+
+      - name: Build
+        run: script/build
+
+      # poops exits 0 when it has nothing to compile, so check the output rather
+      # than the exit code. The syntax check is the browserslist floor: dist/ is
+      # loaded straight from a CDN by consumers with no build step of their own.
+      - name: Verify build output
+        shell: bash
+        run: |
+          test -s dist/media-player.mjs
+          test -s dist/media-player.min.mjs
+          test -s dist/media-player.css
+          test -s dist/media-player-theme.css
+          test -s index.html
+          npm run lint:es

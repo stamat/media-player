@@ -1,0 +1,75 @@
+{
+  "name": "media-player",
+  "version": "0.1.0",
+  "description": "A media player you write in HTML — one custom element over the <audio> or <video> you already wrote",
+  "type": "module",
+  "main": "src/scripts/media-player.js",
+  "style": "src/styles/index.scss",
+  "exports": {
+    ".": "./src/scripts/media-player.js",
+    "./style.scss": "./src/styles/index.scss",
+    "./style.css": "./dist/media-player.css",
+    "./theme.scss": "./src/styles/theme.scss",
+    "./theme.css": "./dist/media-player-theme.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src/scripts/media-player.js",
+    "src/styles/index.scss",
+    "src/styles/theme.scss",
+    "dist/media-player.mjs",
+    "dist/media-player.min.mjs",
+    "dist/media-player.css",
+    "dist/media-player.min.css",
+    "dist/media-player-theme.css",
+    "dist/media-player-theme.min.css"
+  ],
+  "homepage": "https://stamat.github.io/media-player/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stamat/media-player.git"
+  },
+  "keywords": [
+    "media-player",
+    "audio-player",
+    "video-player",
+    "custom-elements",
+    "web-components",
+    "light-dom",
+    "accessibility",
+    "progressive-enhancement"
+  ],
+  "author": "Nikola Stamatovic <@stamat>",
+  "contributors": [],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stamat/media-player/issues"
+  },
+  "scripts": {
+    "dev": "poops",
+    "build": "poops -b",
+    "prepack": "poops -b",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "lint": "eslint . && stylelint \"src/**/*.scss\"",
+    "lint:es": "es-check --module es2020 \"dist/**/*.mjs\""
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "transform": {}
+  },
+  "dependencies": {
+    "book-of-elementals": "^0.9.0",
+    "hydrargyri": "^2.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "es-check": "^9.6.4",
+    "eslint": "^10.7.0",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.0.0",
+    "poops": "^2.5.0",
+    "poops-docs-theme": "^4.2.0",
+    "stylelint": "^17.14.1",
+    "stylelint-config-standard-scss": "^17.0.0"
+  }
+}

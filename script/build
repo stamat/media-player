@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# Compile dist/ and the one-page site into index.html.
+
+set -euo pipefail
+
+npm run build

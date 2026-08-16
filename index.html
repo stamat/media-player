@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  
+  <title>Media Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A media player you write in HTML — one custom element over the &lt;audio&gt; or &lt;video&gt; you already wrote.">
+  
+  <link rel="canonical" href="https://stamat.github.io/media-player">
+  <meta property="og:title" content="Media Player">
+<meta property="og:description" content="A media player you write in HTML — one custom element over the &lt;audio&gt; or &lt;video&gt; you already wrote.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Media Player">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Media Player","description":"A media player you write in HTML — one custom element over the \u003caudio\u003e or \u003cvideo\u003e you already wrote.","inLanguage":"en","publisher":{"@type":"Organization","name":"Media Player"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Media Player","url":"https://stamat.github.io/media-player","inLanguage":"en"}</script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%96%B6</text></svg>">
+  <link rel="stylesheet" href="./css/prose.min.css">
+  
+  
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  
+  <header class="topbar"><navbar-elemental media="(min-width: 40rem)"><div class="brand-group">
+    <a href="./" class="brand">
+      <span class="brand-mark">▶</span> media-player
+    </a>
+  </div>
+  <nav class="rail" aria-label="Site">
+    <ul><li><a href="https://www.npmjs.com/package/media-player" target="_blank" rel="noopener">npm</a></li>
+      <li data-navbar-more><button>More</button><ul></ul></li>
+    </ul>
+  </nav>
+  
+  <div class="topbar-actions">
+    <tooltip-elemental><a class="icon-btn" href="https://github.com/stamat/media-player" title="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg></a><span>GitHub</span></tooltip-elemental>
+    
+    
+    <button data-navbar-toggle aria-label="Site navigation"></button>
+    
+  </div>
+  </navbar-elemental>
+</header>
+
+
+  
+  <main class="content" id="content" tabindex="-1">
+    <article class="prose">
+      
+<h1 id="media-player">▶ media-player<a class="heading-anchor" href="#media-player" tabindex="-1" aria-hidden="true"></a></h1>
+<p>Every media player library starts by taking the player away from you. You hand over a
+<code>&lt;video&gt;</code> and a config object, and what comes back is someone else&#39;s control bar — their
+button order, their icons, their class names, their idea of where the time label goes.
+Wanting a different arrangement means learning a <code>controls</code> array, or passing an HTML string
+into a config option, which is templating in JavaScript wearing a smaller hat.</p>
+<p>This one goes the other way. <strong>You write the controls.</strong> They are buttons and range inputs
+in your page, styled by your stylesheet, in the order you put them. The element wires them
+by name and never touches their arrangement:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">audio</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/episode.mp3&quot;</span>
+         <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
+             play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
+             ended:onEnded;progress:onProgress;volumechange:onVolumeChange&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isReady:if&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>&gt;</span>▶<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>&gt;</span>⏸<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-time&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;currentTime|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span> <span class="hljs-attr">tooltip</span>=<span class="hljs-string">&quot;thumb&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span> <span class="hljs-attr">min</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;1&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Seek&quot;</span> <span class="hljs-attr">disabled</span>
+             <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration:attr#max;currentTime:prop#value&quot;</span>
+             <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;input:scrub;change:seek&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-time&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player&#x27;</span>;</code></pre>
+<p>Which runs, here, on this page:</p>
+<!-- A blank line inside a raw HTML block ends it, and markdown turns whatever is indented
+     after it into a code sample. Keep this one contiguous. -->
+<div class="sample">
+<media-player storage-key="demo">
+<audio controls src="sample/tone.wav" preload="metadata" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></audio>
+<div class="media-player-controls" bind="isReady:if">
+<button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>↺</button>
+<button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon">▶</span><span class="media-player-pause-icon">⏸</span></button>
+<button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>↻</button>
+<span class="media-player-time" bind="currentTime|time">00:00</span>
+<slider-elemental class="media-player-scrubber" tooltip="thumb"><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="input:scrub;change:seek"></slider-elemental>
+<span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
+<button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
+<slider-elemental class="media-player-volume"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
+</div>
+</media-player>
+</div><script type="module" src="dist/media-player.min.mjs"></script><p>Block the script and that block is a plain <code>&lt;audio controls&gt;</code> — which is the point, and
+worth trying with JavaScript off before taking the claim on trust.</p>
+<p>That is the whole wiring model. <code>on</code> says what fires, <code>bind</code> says where state lands, and
+both hold names — never code — so there is nothing to evaluate and nothing for a Content
+Security Policy to object to. It sits on
+<a href="https://github.com/stamat/hydrargyri">hydrargyri</a> for the binding and
+<a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a> for the sliders.</p>
+<h2 id="the-part-that-matters-most">The part that matters most<a class="heading-anchor" href="#the-part-that-matters-most" tabindex="-1" aria-hidden="true"></a></h2>
+<p><strong>Delete the <code>&lt;script&gt;</code> tag and the page still plays.</strong> The <code>controls</code> attribute you wrote
+is on the media element until the moment this element upgrades and takes over; a script that
+404s, a CDN that is down, a browser that stopped at the first parse error — all of them leave
+a working native player rather than a row of dead buttons.</p>
+<p>That is not a nice-to-have here, it is the reason the markup looks the way it does. A
+<code>&lt;media-player src=&quot;…&quot;&gt;</code> that built its own <code>&lt;audio&gt;</code> would be a player that does not exist
+until JavaScript says so.</p>
+<h2 id="one-element-both-media">One element, both media<a class="heading-anchor" href="#one-element-both-media" tabindex="-1" aria-hidden="true"></a></h2>
+<p>There is no separate audio player and video player. <code>&lt;media-player&gt;</code> reads which element you
+wrapped and turns on the video half — poster, click-to-play overlay, captions, fullscreen,
+controls that fade out while playing — only when it wrapped a <code>&lt;video&gt;</code>.</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">playsinline</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/talk.mp4&quot;</span> <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;/talk.jpg&quot;</span>
+         <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;play:onPlay;pause:onPause;progress:onProgress&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-overlay&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span>
+          <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;overlayHidden:unless&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Play&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isReady:if&quot;</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- the same controls as above, plus: --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleFullscreen&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Fullscreen&quot;</span>&gt;</span>⛶<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
+<p>Put <code>on=&quot;mousemove:showControls&quot;</code> on the <code>&lt;media-player&gt;</code> itself and the control row behaves
+the way a video player&#39;s does: up while the pointer moves, gone five seconds after it stops,
+and always up while the video is paused or something inside has focus.</p>
+<h2 id="what-it-borrows">What it borrows<a class="heading-anchor" href="#what-it-borrows" tabindex="-1" aria-hidden="true"></a></h2>
+<p>The player draws almost nothing itself. The parts that have an
+<a href="https://www.w3.org/WAI/ARIA/apg/patterns/">APG pattern</a> behind them are elementals, each
+usable on its own and documented in its own right:</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Element</th>
+<th>What it brings</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Scrubber, volume</td>
+<td><a href="https://stamat.github.io/book-of-elementals/elementals/slider.html"><code>&lt;slider-elemental&gt;</code></a></td>
+<td>a native <code>&lt;input type=&quot;range&quot;&gt;</code> and the whole APG Slider pattern — arrows, <kbd>Home</kbd>, <kbd>End</kbd>, touch, the value bubble</td>
+</tr>
+<tr>
+<td>Buffered-ahead bar</td>
+<td><a href="https://stamat.github.io/book-of-elementals/elementals/progress.html"><code>&lt;progress-elemental buffer&gt;</code></a></td>
+<td>a native <code>&lt;progress&gt;</code> with a second value beside the first</td>
+</tr>
+<tr>
+<td>Control row</td>
+<td><a href="https://stamat.github.io/book-of-elementals/elementals/toolbar.html"><code>&lt;toolbar-elemental&gt;</code></a></td>
+<td>one tab stop, arrow keys between the buttons</td>
+</tr>
+</tbody></table>
+<p>So there is no <code>role=&quot;slider&quot;</code> and no <code>aria-valuenow</code> anywhere in this element. The platform
+already says both, and saying them again is how they end up disagreeing.</p>
+<h2 id="attributes-it-writes">Attributes it writes<a class="heading-anchor" href="#attributes-it-writes" tabindex="-1" aria-hidden="true"></a></h2>
+<p>These land on the <code>&lt;media-player&gt;</code> element as CSS hooks. You do not set them — you style
+against them.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>is-ready</code></td>
+<td>metadata arrived; the duration is known and the controls are live</td>
+</tr>
+<tr>
+<td><code>is-playing</code></td>
+<td>playing — the hook the play/pause icon swap hangs on</td>
+</tr>
+<tr>
+<td><code>is-buffering</code></td>
+<td>waiting on data</td>
+</tr>
+<tr>
+<td><code>is-live</code></td>
+<td>the duration says endless stream, so there is nothing to seek</td>
+</tr>
+<tr>
+<td><code>is-video</code></td>
+<td>it wrapped a <code>&lt;video&gt;</code></td>
+</tr>
+<tr>
+<td><code>is-fullscreen</code>, <code>controls-shown</code>, <code>poster-hidden</code></td>
+<td>the video half</td>
+</tr>
+<tr>
+<td><code>has-captions</code>, <code>captions-visible</code></td>
+<td>a <code>&lt;track&gt;</code> was found; captions are on</td>
+</tr>
+<tr>
+<td><code>volume-state</code></td>
+<td><code>mute</code>, <code>mid</code> or <code>full</code>, for a three-icon volume button</td>
+</tr>
+</tbody></table>
+<p>Two you do set: <code>skip</code> is how many seconds a skip button moves (default <code>10</code>), and
+<code>storage-key</code> is the prefix for the remembered volume, mute and captions state — set it per
+player, or two players on one page will share one volume.</p>
+<h2 id="state-you-can-bind">State you can bind<a class="heading-anchor" href="#state-you-can-bind" tabindex="-1" aria-hidden="true"></a></h2>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>currentTime</code>, <code>duration</code>, <code>remaining</code></td>
+<td>seconds; pipe them through <code>|time</code> for <code>mm:ss</code></td>
+</tr>
+<tr>
+<td><code>buffered</code></td>
+<td>how far ahead the browser has loaded, <code>0</code>–<code>100</code></td>
+</tr>
+<tr>
+<td><code>volumePercent</code></td>
+<td><code>0</code>–<code>100</code>, for a volume slider&#39;s <code>value</code></td>
+</tr>
+<tr>
+<td><code>playLabel</code>, <code>muteLabel</code>, <code>captionsLabel</code></td>
+<td>what the button should say it does next</td>
+</tr>
+<tr>
+<td><code>captionText</code></td>
+<td>the active cue</td>
+</tr>
+</tbody></table>
+<h2 id="events">Events<a class="heading-anchor" href="#events" tabindex="-1" aria-hidden="true"></a></h2>
+<p><code>media-player-ready</code> when the duration is known, and <code>media-player-interaction</code> for
+everything a person did — <code>{ type, value }</code> in <code>detail</code>, where <code>type</code> is one of <code>play</code>,
+<code>pause</code>, <code>seek</code>, <code>skip-forward</code>, <code>skip-backward</code>, <code>volume</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>,
+<code>captions-on</code>, <code>captions-off</code>. Both bubble from the element, not from <code>document</code>.</p>
+<h2 id="against-the-alternatives">Against the alternatives<a class="heading-anchor" href="#against-the-alternatives" tabindex="-1" aria-hidden="true"></a></h2>
+<p>Drawn on this player&#39;s axes, which is the caveat to read it with: a row is here because this
+project has an opinion about it, and the rows it has no answer for are the ones the others
+win.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>media-player</th>
+<th><a href="https://github.com/sampotts/plyr">Plyr</a></th>
+<th><a href="https://github.com/muxinc/media-chrome">media-chrome</a></th>
+<th><a href="https://vidstack.io">Vidstack</a></th>
+<th><a href="https://videojs.com">Video.js</a></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Size, gzipped</strong></td>
+<td><strong>8.6 kB</strong></td>
+<td>32 kB</td>
+<td>42 kB</td>
+<td>40 kB</td>
+<td>196 kB</td>
+</tr>
+<tr>
+<td><strong>You write the controls</strong></td>
+<td>yes, as the only way</td>
+<td>no — a <code>controls</code> array, or an HTML string in config</td>
+<td>yes, from its components</td>
+<td>no — layouts</td>
+<td>no</td>
+</tr>
+<tr>
+<td><strong>Shadow DOM</strong></td>
+<td>never</td>
+<td>never</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td><strong>Page plays with no script</strong></td>
+<td>yes</td>
+<td>yes, if you keep <code>controls</code></td>
+<td>no — its starter <code>&lt;video&gt;</code> has none</td>
+<td>no</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><strong>Your CSS reaches every part</strong></td>
+<td>yes</td>
+<td>yes</td>
+<td>through <code>::part()</code> and the variables it chose</td>
+<td>partly</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><strong>Built from reusable primitives</strong></td>
+<td>yes — the sliders ship separately</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td><strong>YouTube, Vimeo, HLS, DASH</strong></td>
+<td><strong>no</strong></td>
+<td>YouTube, Vimeo</td>
+<td>via a provider</td>
+<td>all of them</td>
+<td>via plugins</td>
+</tr>
+<tr>
+<td><strong>Ecosystem</strong></td>
+<td>none</td>
+<td>large</td>
+<td>Mux&#39;s</td>
+<td>large</td>
+<td>the largest</td>
+</tr>
+<tr>
+<td><strong>Pick it when</strong></td>
+<td>the markup is yours and must survive without the script</td>
+<td>you want one line and a good default</td>
+<td>you want composable parts and accept a shadow root</td>
+<td>you are building an app around media</td>
+<td>you need every format and every plugin</td>
+</tr>
+</tbody></table>
+<p>Sizes are each package&#39;s browser bundle, gzipped: Plyr and Video.js as published
+(<code>dist/plyr.min.js</code>, <code>dist/video.min.js</code>), media-chrome bundled from its package entry with
+esbuild, Vidstack from <code>cdn.vidstack.io/player</code>. This one is <code>dist/media-player.min.mjs</code>,
+which carries hydrargyri and the three elementals inside it — everything the player needs
+except the stylesheets, which are another 1 kB. Every one of those numbers moves with a
+release; measure before quoting.</p>
+<p>Where this loses is the bottom of that table, and it loses there on purpose. <strong>Plyr and
+Vidstack are the right answer for YouTube and Vimeo</strong>, and Video.js for the long tail of
+formats and plugins. None of that is planned here.</p>
+<h2 id="what-it-does-not-do">What it does not do<a class="heading-anchor" href="#what-it-does-not-do" tabindex="-1" aria-hidden="true"></a></h2>
+<p>Each of these is a decision, not a gap waiting for a pull request.</p>
+<ul>
+<li><strong>Generate controls.</strong> There is no control bar to configure, because configuring one is
+the problem this exists to avoid. The sample above is the starter — copy it and delete
+what you do not want.</li>
+<li><strong>Streaming formats.</strong> HLS, DASH and the YouTube and Vimeo iframe APIs are all a
+third-party script driving an element you did not write, which is the opposite of the
+bargain here.</li>
+<li><strong>Its own keyboard map.</strong> Every control is a <code>&lt;button&gt;</code> or an <code>&lt;input type=&quot;range&quot;&gt;</code>, so
+the platform already answers <kbd>Space</kbd>, <kbd>Enter</kbd>, the arrows,
+<kbd>Home</kbd> and <kbd>End</kbd> on whichever one has focus. A player-wide
+<kbd>k</kbd>/<kbd>j</kbd>/<kbd>l</kbd> map is a second, undiscoverable set of bindings.</li>
+<li><strong>Sanitize anything.</strong> It writes text and attributes, never HTML.</li>
+</ul>
+<h2 id="install">Install<a class="heading-anchor" href="#install" tabindex="-1" aria-hidden="true"></a></h2>
+<pre><code class="hljs language-bash">npm install media-player</code></pre>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player&#x27;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;book-of-elementals/slider&#x27;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;book-of-elementals/progress&#x27;</span>;</code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player/style.css&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player/theme.css&quot;</span>&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span></code></pre>
+<p>Or from a CDN as a module, no install and no build step:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
+  <span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs&#x27;</span>;
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+<h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
+<p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> © <a href="https://github.com/stamat">Stamat</a></p>
+
+
+    </article>
+    
+    <footer class="page-footer">
+      
+      <a href="https://stamat.github.io/media-player/" target="_blank" rel="noopener">media-player</a> v0.1.0 —
+      MIT licensed. Built with <span aria-hidden="true">💩</span> <a href="https://github.com/stamat/poops" target="_blank" rel="noopener">Poops</a> and <a href="https://github.com/stamat/poops-docs-theme" target="_blank" rel="noopener">poops-docs-theme</a>.
+      
+    </footer>
+    
+  </main>
+
+  <script src="./js/prose.min.js"></script>
+</body>
+</html>

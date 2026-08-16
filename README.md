@@ -1,0 +1,65 @@
+# ▶ media-player
+
+> A media player you write in HTML — one custom element over the `<audio>` or `<video>` you already wrote.
+
+Every media player library starts by taking the player away from you: you hand over a
+`<video>` and a config object, and back comes someone else's control bar. Wanting a
+different arrangement means learning a `controls` array, or passing an HTML string into a
+config option — templating in JavaScript wearing a smaller hat.
+
+This one goes the other way. **You write the controls.** Buttons and range inputs in your
+page, styled by your stylesheet, in the order you put them. The element wires them by name:
+
+```html
+<media-player>
+  <audio controls src="/episode.mp3"
+         on="loadedmetadata:onLoaded;play:onPlay;pause:onPause;progress:onProgress"></audio>
+
+  <div class="media-player-controls" bind="isReady:if">
+    <button on="click:togglePlay" bind="playLabel:attr#aria-label">▶</button>
+    <span bind="currentTime|time">00:00</span>
+    <slider-elemental class="media-player-scrubber">
+      <input type="range" min="0" step="1" aria-label="Seek"
+             bind="duration:attr#max;currentTime:prop#value"
+             on="input:scrub;change:seek">
+    </slider-elemental>
+  </div>
+</media-player>
+```
+
+Delete the `<script>` and the page still plays: the `controls` attribute you wrote stays on
+the media element until this one upgrades and takes over.
+
+One element for both — it reads which element you wrapped and turns on the video half
+(poster, overlay, captions, fullscreen, fading controls) only for a `<video>`. The scrubber
+and volume are [`<slider-elemental>`](https://github.com/stamat/book-of-elementals), the
+buffered bar is `<progress-elemental>`, and the binding is
+[hydrargyri](https://github.com/stamat/hydrargyri).
+
+## Install
+
+```bash
+npm install media-player
+```
+
+## Everything else
+
+**<https://stamat.github.io/media-player/>** — the whole reference, the comparison against
+Plyr, media-chrome, Vidstack and Video.js, and what this deliberately does not do. There is
+no second copy of it: this README is the pitch, that page is the manual.
+
+## Development
+
+```bash
+script/bootstrap # npm ci, from a fresh clone
+script/server    # build + serve with live reload, http://localhost:4040
+script/build     # compile dist/ and index.html
+script/test      # jest
+script/lint      # eslint + stylelint (the authority; CI runs it)
+```
+
+[CONTRIBUTING.md](CONTRIBUTING.md) says what belongs here and what a pull request needs.
+
+## License
+
+[MIT](LICENSE) © [Stamat](https://github.com/stamat)

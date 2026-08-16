@@ -1,0 +1,99 @@
+// The optional look. Load it or do not — index.scss alone is a working player, and this
+// file only decides what it is painted in.
+
+// Everything here is a system colour by default, so a player dropped into a page with no
+// design system still respects light mode, dark mode, forced colours and high contrast
+// without a media query or a palette to configure.
+
+// Nothing is drawn under :not(:defined). A themed control bar whose buttons do nothing is
+// worse than an unstyled one — the browser's own player is the honest fallback, and it is
+// what shows until this element upgrades.
+
+media-player:not(:defined) .media-player-controls,
+media-player:not(:defined) .media-player-poster,
+media-player:not(:defined) .media-player-overlay {
+  display: none;
+}
+
+media-player {
+  --media-player-accent: Highlight;
+  --media-player-surface: Canvas;
+  --media-player-color: CanvasText;
+  --media-player-radius: 0.5rem;
+
+  color: var(--media-player-color);
+
+  // The elementals draw their own tracks; handing them this player's accent is what keeps
+  // the scrubber the same colour as everything around it.
+  --slider-elemental-fill: var(--media-player-accent);
+  --progress-elemental-buffer-color: color-mix(in srgb, var(--media-player-color) 30%, transparent);
+}
+
+media-player .media-player-controls {
+  padding: var(--media-player-gap);
+  border-radius: var(--media-player-radius);
+  background: var(--media-player-surface);
+}
+
+media-player button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+media-player button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+media-player button:focus-visible {
+  outline: 2px solid var(--media-player-accent);
+  outline-offset: 2px;
+}
+
+media-player svg {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: currentcolor;
+}
+
+// VIDEO
+
+// The control row floats over the picture, so it carries its own surface rather than
+// borrowing the page's — a translucent panel with the video's own colours behind it.
+
+media-player[is-video] .media-player-controls {
+  margin: var(--media-player-gap);
+  background: color-mix(in srgb, Canvas 70%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+media-player[is-video] {
+  border-radius: var(--media-player-radius);
+  background: #000;
+}
+
+.media-player-overlay {
+  color: CanvasText;
+  cursor: pointer;
+}
+
+.media-player-captions span {
+  padding: 0.25em 0.5em;
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, Canvas 80%, transparent);
+  color: CanvasText;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  media-player[is-video] .media-player-controls {
+    transition: none;
+  }
+}

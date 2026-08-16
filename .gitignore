@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors and tools
+.vscode
+.history
+.idea
+.claude
+
+node_modules/
+
+# dist/, css/ and js/ are committed: this repository is also the docs site, and
+# index.html loads them straight from here. A release ships the same files.

@@ -1,0 +1,129 @@
+// Structure only: what the player needs to be usable at all. No colours, no borders, no
+// radii — those are theme.scss, which is optional, because a player dropped into a page
+// that already has a design system should inherit it rather than fight it.
+
+// The scrubber, the volume control and the buffered bar are not drawn here either. They are
+// <slider-elemental> and <progress-elemental>, which bring their own; a page loads their
+// stylesheets beside this one.
+
+media-player {
+  display: block;
+  position: relative;
+
+  --media-player-gap: 0.5rem;
+  --media-player-fade: 0.2s;
+}
+
+media-player video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+// The control row lays itself out; the scrubber is the one part that takes the slack, so a
+// player is legible from a phone to a page-wide video without a media query.
+.media-player-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--media-player-gap);
+}
+
+.media-player-scrubber {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+// The volume takes a fixed slice rather than its share: two sliders in one flex row both
+// growing means a volume control as wide as the seek bar, which reads as two scrubbers.
+.media-player-volume {
+  flex: 0 0 6rem;
+}
+
+.media-player-time {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// One button, two icons, and the attribute says which. Doing it here rather than swapping
+// nodes in script means the markup holds both and neither is ever missing.
+media-player .media-player-pause-icon,
+media-player[is-playing] .media-player-play-icon {
+  display: none;
+}
+
+media-player[is-playing] .media-player-pause-icon,
+media-player .media-player-play-icon {
+  display: block;
+}
+
+media-player .media-player-volume-icon {
+  display: none;
+}
+
+media-player[volume-state="mute"] .media-player-volume-icon-mute,
+media-player[volume-state="mid"] .media-player-volume-icon-mid,
+media-player[volume-state="full"] .media-player-volume-icon-full {
+  display: block;
+}
+
+// VIDEO
+
+media-player[is-video] {
+  overflow: hidden;
+}
+
+media-player[is-video] .media-player-controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity var(--media-player-fade) ease;
+}
+
+// Focus inside the controls keeps them up whatever the hide timer thinks: a keyboard user
+// tabbing to the mute button must not have it fade out from under the focus ring.
+media-player[is-video][controls-shown] .media-player-controls,
+media-player[is-video] .media-player-controls:focus-within {
+  opacity: 1;
+}
+
+.media-player-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media-player-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: none;
+}
+
+.media-player-captions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 4rem;
+  pointer-events: none;
+  text-align: center;
+}
+
+// The buffering state is a hook and nothing more — a spinner is a look, and one drawn here
+// would be one every consumer has to override before drawing their own.
+media-player[is-buffering] .media-player-buffering {
+  display: block;
+}
+
+.media-player-buffering {
+  display: none;
+}
