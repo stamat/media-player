@@ -242,6 +242,36 @@ describe('volume', () => {
   });
 });
 
+describe('the buffered bar', () => {
+  test('how far ahead the browser has loaded is seconds, so it shares a scale with the duration', () => {
+    const media = fakeMedia('audio', { duration: 100 });
+    Object.defineProperty(media, 'buffered', {
+      get: () => ({ length: 1, end: () => 42 }),
+      configurable: true
+    });
+    const player = mount(media);
+    player.onProgress();
+    // Not 42% of anything — 42 seconds, which is what a <progress max="100"> wants.
+    expect(player.buffered).toBe(42);
+  });
+
+  test('a media element with nothing buffered yet leaves the bar alone rather than reading end() of nothing', () => {
+    const player = mount(fakeMedia());
+    expect(() => player.onProgress()).not.toThrow();
+  });
+
+  test('a file already buffered before the upgrade still fills its bar, though progress will never fire again', () => {
+    const media = fakeMedia('audio', { duration: 60 });
+    Object.defineProperty(media, 'buffered', {
+      get: () => ({ length: 1, end: () => 60 }),
+      configurable: true
+    });
+    // No progress event is dispatched anywhere in this test — readiness has to do it.
+    const player = mount(media);
+    expect(player.buffered).toBe(60);
+  });
+});
+
 describe('the labels a button announces itself by', () => {
   test('playing makes the button offer to pause, and pausing makes it offer to play', () => {
     const media = fakeMedia();

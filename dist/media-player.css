@@ -21,6 +21,18 @@ media-player video {
 .media-player-scrubber {
   flex: 1 1 auto;
   min-width: 0;
+  position: relative;
+  --slider-elemental-fill: transparent;
+  --slider-elemental-track: transparent;
+  --slider-elemental-thumb: currentcolor;
+}
+
+.media-player-scrubber progress-elemental {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  translate: 0 -50%;
+  pointer-events: none;
 }
 
 .media-player-volume {

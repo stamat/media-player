@@ -31,6 +31,29 @@ media-player video {
 .media-player-scrubber {
   flex: 1 1 auto;
   min-width: 0;
+  position: relative;
+
+  // The played and buffered bars are a <progress> stacked behind the range input, not the
+  // slider's own fill. An <input type="range">'s `value` is not a reflecting IDL attribute,
+  // so writing it from script changes the thumb and nothing else — no event fires and
+  // slider-elemental cannot see it, which leaves its fill frozen wherever the last real
+  // pointer left it. A <progress> reflects, so the same write lands as `value="12"` and the
+  // bar redraws. The range input stays for what it is good at: seeking, and the whole APG
+  // keyboard pattern.
+  --slider-elemental-fill: transparent;
+  --slider-elemental-track: transparent;
+
+  // The thumb defaults to the fill, and the fill is now transparent, so it has to be said
+  // again or the handle disappears along with the track it stopped drawing.
+  --slider-elemental-thumb: currentcolor;
+}
+
+.media-player-scrubber progress-elemental {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  translate: 0 -50%;
+  pointer-events: none;
 }
 
 // The volume takes a fixed slice rather than its share: two sliders in one flex row both

@@ -1221,6 +1221,7 @@ var MediaPlayer = class extends HgElement {
     this.isReady = true;
     this.isBuffering = false;
     this.syncVolume();
+    this.onProgress();
     for (const control of this.querySelectorAll("[disabled]")) control.removeAttribute("disabled");
     this.dispatchEvent(new CustomEvent("media-player-ready", { bubbles: true }));
   }
@@ -1317,9 +1318,17 @@ var MediaPlayer = class extends HgElement {
   onPlaying() {
     this.isBuffering = false;
   }
+  /**
+   * How far ahead the browser has loaded, in seconds.
+   *
+   * Seconds rather than a percentage so it shares a scale with `duration`, which is what the
+   * `<progress>` behind the scrubber is set to — two values on one `max`, which is the whole
+   * reason the buffered bar can sit behind the played one without any arithmetic in the
+   * markup.
+   */
   onProgress() {
     if (!this.media || !this.media.buffered.length || !this.media.duration) return;
-    this.buffered = this.media.buffered.end(this.media.buffered.length - 1) / this.media.duration * VOLUME_SCALE;
+    this.buffered = this.media.buffered.end(this.media.buffered.length - 1);
   }
   /** Dragging the scrubber: paint the labels, do not seek until the drag ends. */
   scrub(event) {

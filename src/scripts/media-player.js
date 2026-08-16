@@ -223,6 +223,11 @@ export class MediaPlayer extends HgElement {
     this.isReady = true;
     this.isBuffering = false;
     this.syncVolume();
+    // `progress` is the only event that reports buffering, and a small file can be fully
+    // buffered before this element upgrades — after which it never fires again and the bar
+    // would sit at zero over a file that is entirely loaded. Read it once here, the same
+    // way metadata is read once for the file that was ready first.
+    this.onProgress();
 
     // Controls the author marked `disabled` so they could not be pressed before there was
     // anything to press. The element owns the enabling, so the markup can be honest.
@@ -343,9 +348,17 @@ export class MediaPlayer extends HgElement {
     this.isBuffering = false;
   }
 
+  /**
+   * How far ahead the browser has loaded, in seconds.
+   *
+   * Seconds rather than a percentage so it shares a scale with `duration`, which is what the
+   * `<progress>` behind the scrubber is set to — two values on one `max`, which is the whole
+   * reason the buffered bar can sit behind the played one without any arithmetic in the
+   * markup.
+   */
   onProgress() {
     if (!this.media || !this.media.buffered.length || !this.media.duration) return;
-    this.buffered = (this.media.buffered.end(this.media.buffered.length - 1) / this.media.duration) * VOLUME_SCALE;
+    this.buffered = this.media.buffered.end(this.media.buffered.length - 1);
   }
 
   /** Dragging the scrubber: paint the labels, do not seek until the drag ends. */

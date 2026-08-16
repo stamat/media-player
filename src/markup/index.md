@@ -38,6 +38,12 @@ is the argument for everything below it.
     <span class="media-player-time" bind="currentTime|time">00:00</span>
 
     <slider-elemental class="media-player-scrubber" tooltip="thumb">
+      <!-- The played and buffered bars. A <progress> rather than the slider's own fill:
+           an <input type="range">'s `value` does not reflect to an attribute, so writing
+           it from script moves the thumb and nothing else. -->
+      <progress-elemental bind="buffered:attr#buffer">
+        <progress value="0" max="1" bind="currentTime:prop#value;duration:prop#max"></progress>
+      </progress-elemental>
       <input type="range" min="0" step="1" value="0" aria-label="Seek" disabled
              bind="duration:attr#max;currentTime:prop#value"
              on="input:scrub;change:seek">
@@ -64,7 +70,7 @@ Which runs, here, on this page:
 <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon">▶</span><span class="media-player-pause-icon">⏸</span></button>
 <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>↻</button>
 <span class="media-player-time" bind="currentTime|time">00:00</span>
-<slider-elemental class="media-player-scrubber" tooltip="thumb"><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="input:scrub;change:seek"></slider-elemental>
+<slider-elemental class="media-player-scrubber" tooltip="thumb"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value;duration:prop#max"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="input:scrub;change:seek"></slider-elemental>
 <span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
 <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
 <slider-elemental class="media-player-volume"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
@@ -159,7 +165,7 @@ player, or two players on one page will share one volume.
 | Key | Holds |
 | --- | --- |
 | `currentTime`, `duration`, `remaining` | seconds; pipe them through `\|time` for `mm:ss` |
-| `buffered` | how far ahead the browser has loaded, `0`–`100` |
+| `buffered` | how far ahead the browser has loaded, **in seconds** — same scale as `duration`, so it goes straight on the `<progress>`'s `buffer` |
 | `volumePercent` | `0`–`100`, for a volume slider's `value` |
 | `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next |
 | `captionText` | the active cue |
