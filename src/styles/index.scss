@@ -188,9 +188,12 @@ media-player[poster-hidden] .media-player-overlay {
   display: none;
 }
 
-// The padding clears the control row the captions would otherwise sit behind, so it is
-// measured against a two-row bar: padding, scrubber, row gap, buttons, padding. A caption
-// is the one thing on the video that must never be covered, so it is rounded up.
+// The padding clears the control row the captions would otherwise sit behind, measured
+// against the tallest that row gets: 8 padding + 13 scrubber + 8 row gap + 44 button + 8
+// padding, which is 81px under a coarse pointer where the buttons grow for the finger. A
+// fine pointer is 69px, so 88px clears both with a little left over — deliberately, because
+// a caption is the one thing on a video that must never be covered, and the row grows if an
+// author adds a control that wraps.
 .media-player-captions {
   position: absolute;
   right: 0;

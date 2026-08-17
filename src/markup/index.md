@@ -340,8 +340,10 @@ Which runs here too, over twelve seconds of NASA's Artemis II rollout.
 Video and captions are NASA's, [public domain](https://www.nasa.gov/nasa-brand-center/images-and-media/):
 the [Artemis II rollout](https://images.nasa.gov/details/KSC-20260117-MH-DNS01-0001-Artemis_II_Rollout_Timelapse_LC_39_Press_Site-M18870)
 to Launch Complex 39B on 17 January 2026. The clip is silent — it carries an audio track, but
-every sample in it is zero — which is why the mute button and the volume slider are not on
-this row; the audio player above is where they are worth trying. Its one caption cue reads
+every sample in it is zero — so the mute button and the volume slider on this row have
+nothing to act on here. They are in the sample anyway, because a video player's row is not
+complete without them and this page is where the row gets copied from; the player further
+down is where they do something. Its one caption cue reads
 `[Ambient sounds]`, which belongs to a longer cut of the same footage and is left as NASA
 wrote it: enough to prove the CC wiring, no more. The controls fade out while it plays and
 come back on the next mouse move — that is `mousemove:showControls`, below.
@@ -356,6 +358,63 @@ being pressed.
 Captions render into whatever binds `captionText`, with the track held `hidden` so the
 browser's own caption box stays out of the way — which is what leaves your stylesheet in
 charge of what captions look like.
+
+## Ten minutes, from someone else's server
+
+Twelve seconds proves the wiring and proves nothing about the seeking. A local file that
+short never buffers, and a clock reading `00:00 / 00:12` never needs the minutes it can show.
+So here is the same row over ten minutes of Big Buck Bunny, and this one is not in an editable
+frame — it is the page's own DOM, upgraded by the one module tag sitting under it. Block that
+tag and what is left is a plain `<video controls>`, which makes the claim this page opens with
+testable right here rather than in a file you have to build yourself.
+
+<!-- One line, and it has to be: the whole opening tag of an unknown element must sit on a
+     line of its own or markdown prints it instead of rendering it. Same trap as code-preview
+     above, and the reason this player's attributes are not broken up for readability. -->
+<media-player media-title="Big Buck Bunny" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+  <video controls playsinline preload="metadata" src="https://media.w3.org/2010/05/bunny/movie.mp4" poster="https://media.w3.org/2010/05/bunny/poster.png" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></video>
+  <img class="media-player-poster" src="https://media.w3.org/2010/05/bunny/poster.png" alt="" />
+  <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
+  <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
+    <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
+      <progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental>
+      <input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
+    </slider-elemental>
+    <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+    <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
+    <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
+    <span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+    <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
+    <slider-elemental class="media-player-volume" tooltip="thumb"><progress-elemental><progress value="100" max="100" bind="volumePercent:prop#value"></progress></progress-elemental><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
+    <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+  </toolbar-elemental>
+</media-player>
+
+<!-- The page's own copy. The previews above each load this inside their frame; this player is
+     in the document, so the document needs it too. One tag: the bundle carries the elementals
+     it imports, and the stylesheets are already in `prose.css`. -->
+<script type="module" src="dist/media-player.min.mjs"></script>
+
+There is no captions button on this row, because this file ships no caption track and a
+button whose handler has nothing to toggle is a lie in the shape of a control. Mute and volume
+*are* here, and unlike the Artemis clip this one has sound for them to move.
+
+What it costs is worth naming. The file is not mine — it is on
+[W3C's media server](https://media.w3.org/), so this page makes a third-party request for it,
+and `preload="metadata"` means that request happens on load rather than on your first click.
+
+Which is a deliberate choice, and the reason is the flaw in the file. It is 238 MiB laid out
+`ftyp free mdat moov` — the index is the *last* 441 KiB of it, at byte 248,773,025 — so it is
+not "fast start", and nothing can know the duration until a range request for the tail comes
+back. `preload="none"` would defer that to the first click, and the click would then look
+broken: the control row is bound `isReady:if`, readiness needs a duration, so there would be
+no row to press and nothing on screen would change for as long as the tail took to arrive.
+Fetching the index up front costs 441 KiB and buys a player that is a player before you touch
+it. The stripe march and the buffered bar then have something real to show, which a
+twelve-second local file never gives them.
+
+Attribution: *Big Buck Bunny* is © the Blender Foundation, released under
+[CC-BY 3.0](https://peach.blender.org/about/).
 
 ## What it borrows
 

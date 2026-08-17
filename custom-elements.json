@@ -189,7 +189,8 @@
             },
             {
               "kind": "method",
-              "name": "play"
+              "name": "play",
+              "description": "A rejected promise is the browser's only report that a play was refused — a gesture it\ndid not count, a source it will not decode, a load that gave up. Unhandled, it is both a\nsilent failure and an unhandled-rejection warning naming no cause, which is the worst of\nthe two options this codebase allows. Optional call on the result: a test may stub `play`\nwith something that returns nothing."
             },
             {
               "kind": "method",
@@ -227,6 +228,17 @@
                   "name": "seconds"
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "seekableSecond",
+              "parameters": [
+                {
+                  "name": "seconds"
+                }
+              ],
+              "description": "The nearest second the browser will actually accept.\n\n`duration` says how long the file is; `seekable` says how much of it this browser can\nreach, and the two part company whenever a server answers a `Range` request with the\nwhole file — a plain `python -m http.server` is the one every author meets. Writing\n`currentTime` past `seekable` is refused, so painting the requested second would leave a\nscrubber sitting where playback is not.\n\nAn empty `seekable` is \"not known yet\" rather than \"nowhere\", so the request passes\nthrough: metadata can arrive before the first range does, and clamping to zero there\nwould turn every early seek into a jump to the start. The ranges are walked rather than\nbracketed by the first and last, because a seek leaves the browser holding disjoint ones\nand the gap between two of them is not seekable however far inside the outer edges it is.",
+              "privacy": "private"
             },
             {
               "kind": "method",

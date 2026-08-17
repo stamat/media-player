@@ -60,6 +60,18 @@ for the person who wrote the code.
   44px [WCAG 2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html)
   asks for, the box only, with the icon left the size it was.
 
+- **The scrubber never claims a position the browser refused.** A seek is clamped to
+  `seekable` — what this browser can actually reach — rather than to `duration`, which is only
+  how long the file is. The two differ whenever a server answers a `Range` request with the
+  whole file, and the old behaviour drew the thumb where the seek aimed instead of where
+  playback landed. Disjoint ranges are walked rather than bracketed, so a seek into the gap a
+  previous seek left behind lands on the nearer edge of a range that exists.
+
+- **A refused play says so.** `play()` returns a promise, and a rejected one is the only report
+  a browser makes that a gesture did not count, a source will not decode, or a load gave up.
+  It used to be dropped, which made "pressing play does nothing" impossible to tell apart from
+  a slow network. It is caught and warned now, with the browser's own message.
+
 - **The parts with an APG pattern are borrowed, not rewritten.** The scrubber and volume are
   [`<slider-elemental>`](https://github.com/stamat/book-of-elementals) around a native
   `<input type="range">`, the buffered bar is `<progress-elemental buffer>`, and the control

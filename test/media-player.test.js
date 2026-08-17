@@ -129,6 +129,78 @@ describe('readiness', () => {
     document.body.appendChild(player);
     expect(button.hasAttribute('disabled')).toBe(false);
   });
+
+  test('a file whose metadata has not arrived leaves every control it was given still disabled', () => {
+    const media = fakeMedia('video', { duration: NaN });
+    const player = document.createElement('media-player');
+    const button = document.createElement('button');
+    button.setAttribute('disabled', '');
+    player.append(media, button);
+    document.body.appendChild(player);
+    expect(player.hasAttribute('is-ready')).toBe(false);
+    expect(button.hasAttribute('disabled')).toBe(true);
+  });
+
+  test('a play the browser refuses is said out loud rather than swallowed', async () => {
+    const media = fakeMedia();
+    media.play = () => Promise.reject(new Error('gesture required'));
+    const player = mount(media);
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    player.play();
+    await Promise.resolve();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('refused to play'), 'gesture required');
+    warn.mockRestore();
+  });
+});
+
+describe('seeking only where the browser can go', () => {
+  function seekableMedia(ranges) {
+    const media = fakeMedia('video', { duration: 600 });
+    Object.defineProperty(media, 'seekable', {
+      get: () => ({
+        length: ranges.length,
+        start: (i) => ranges[i][0],
+        end: (i) => ranges[i][1]
+      }),
+      configurable: true
+    });
+    return media;
+  }
+
+  test('a server that answers a range request with the whole file cannot be seeked past what it sent', () => {
+    const media = seekableMedia([[0, 90]]);
+    const player = mount(media);
+    player.seekTo(500);
+    expect(media.currentTime).toBe(90);
+  });
+
+  test('the clock is drawn where playback landed, not where the seek aimed', () => {
+    const media = seekableMedia([[0, 90]]);
+    const player = mount(media);
+    player.seekTo(500);
+    expect(player.currentTime).toBe(90);
+  });
+
+  test('a seek into the gap between two disjoint ranges lands on the nearer edge of one of them', () => {
+    const media = seekableMedia([[0, 100], [400, 600]]);
+    const player = mount(media);
+    player.seekTo(360);
+    expect(media.currentTime).toBe(400);
+  });
+
+  test('a range the browser can serve is seeked to exactly, untouched', () => {
+    const media = seekableMedia([[0, 600]]);
+    const player = mount(media);
+    player.seekTo(275);
+    expect(media.currentTime).toBe(275);
+  });
+
+  test('a browser that has not said what it can reach yet is taken at its word', () => {
+    const media = seekableMedia([]);
+    const player = mount(media);
+    player.seekTo(275);
+    expect(media.currentTime).toBe(275);
+  });
 });
 
 describe('live streams', () => {

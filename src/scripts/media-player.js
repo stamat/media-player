@@ -345,8 +345,17 @@ export class MediaPlayer extends HgElement {
 
   // PLAYBACK
 
+  /**
+   * A rejected promise is the browser's only report that a play was refused — a gesture it
+   * did not count, a source it will not decode, a load that gave up. Unhandled, it is both a
+   * silent failure and an unhandled-rejection warning naming no cause, which is the worst of
+   * the two options this codebase allows. Optional call on the result: a test may stub `play`
+   * with something that returns nothing.
+   */
   play() {
-    this.media?.play();
+    this.media?.play()?.catch((error) => {
+      console.warn('media-player: the media refused to play —', error?.message || error);
+    });
   }
 
   pause() {
@@ -391,9 +400,43 @@ export class MediaPlayer extends HgElement {
     this.posterHidden = true;
   }
 
+  /**
+   * The nearest second the browser will actually accept.
+   *
+   * `duration` says how long the file is; `seekable` says how much of it this browser can
+   * reach, and the two part company whenever a server answers a `Range` request with the
+   * whole file — a plain `python -m http.server` is the one every author meets. Writing
+   * `currentTime` past `seekable` is refused, so painting the requested second would leave a
+   * scrubber sitting where playback is not.
+   *
+   * An empty `seekable` is "not known yet" rather than "nowhere", so the request passes
+   * through: metadata can arrive before the first range does, and clamping to zero there
+   * would turn every early seek into a jump to the start. The ranges are walked rather than
+   * bracketed by the first and last, because a seek leaves the browser holding disjoint ones
+   * and the gap between two of them is not seekable however far inside the outer edges it is.
+   */
+  seekableSecond(seconds) {
+    const ranges = this.media.seekable;
+    if (!ranges || !ranges.length) return seconds;
+    let nearest = seconds;
+    let shortest = Infinity;
+    for (let i = 0; i < ranges.length; i++) {
+      const start = ranges.start(i);
+      const end = ranges.end(i);
+      if (seconds >= start && seconds <= end) return seconds;
+      const edge = seconds < start ? start : end;
+      const gap = Math.abs(seconds - edge);
+      if (gap < shortest) {
+        shortest = gap;
+        nearest = edge;
+      }
+    }
+    return nearest;
+  }
+
   seekTo(seconds) {
     if (!this.media || this.isLive) return;
-    const bounded = Math.min(Math.max(seconds, 0), this.media.duration || 0);
+    const bounded = this.seekableSecond(Math.min(Math.max(seconds, 0), this.media.duration || 0));
     this.media.currentTime = bounded;
     this.paint(bounded);
     this.updatePositionState();
