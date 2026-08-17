@@ -8,6 +8,8 @@ const browserGlobals = {
   HTMLElement: 'readonly',
   customElements: 'readonly',
   navigator: 'readonly',
+  URL: 'readonly',
+  MediaMetadata: 'readonly',
   console: 'readonly',
   localStorage: 'readonly',
   matchMedia: 'readonly',

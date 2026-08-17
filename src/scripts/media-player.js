@@ -25,6 +25,40 @@ export const CONTROLS_LINGER = 5000;
 /** How long after the last volume input before the level is persisted and announced, in milliseconds. */
 export const VOLUME_SETTLE = 500;
 
+/**
+ * The actions the OS media panel is told about.
+ *
+ * Play and pause are not among them on purpose: the browser draws and answers both with no
+ * code at all, and setting a handler *replaces* that default rather than adding to it. These
+ * four are the ones whose buttons never appear until something claims them.
+ */
+const SESSION_ACTIONS = ['seekbackward', 'seekforward', 'seekto', 'stop'];
+
+/**
+ * Which player the OS media panel currently points at.
+ *
+ * `navigator.mediaSession` belongs to the document, not to an element, so two players on one
+ * page share a single lock screen. The last to start playing claims it, and nothing releases
+ * it on pause — a panel that forgot the paused player is a pause button with no play behind
+ * it.
+ */
+let sessionOwner = null;
+
+/**
+ * An artwork URL the OS can actually fetch.
+ *
+ * The panel is drawn outside the document, so a relative path has no base to resolve
+ * against. A path that will not parse returns nothing rather than a broken image: the panel
+ * falling back to its own default is honest, a missing-image glyph on a lock screen is not.
+ */
+function absoluteUrl(value) {
+  try {
+    return new URL(value, document.baseURI).href;
+  } catch {
+    return null;
+  }
+}
+
 /** Two digits, because `1:7` is not a time and `01:07` is. */
 function pad(value) {
   return value < 10 ? `0${value}` : `${value}`;
@@ -97,6 +131,12 @@ export function volumeState(value) {
  * nothing under `:not(:defined)`, so the fallback is never a themed control bar with dead
  * buttons on it.
  *
+ * It also claims the OS media panel — lock screen, hardware media keys, headphone buttons —
+ * when playback starts. Play and pause are the browser's own and work with or without this
+ * element; what the claim adds is skip buttons moving by the same `skip` the page's buttons
+ * use, a working scrubber, and a title on the lock screen. The panel is one per document, so
+ * the last player to start is the one it points at.
+ *
  * Two limits worth knowing before you reach for them. There is no keyboard map of its own:
  * every control is a `<button>` or an `<input type="range">`, so the platform already
  * answers Space, Enter, the arrows, Home and End on whichever one has focus, and a
@@ -118,6 +158,10 @@ export function volumeState(value) {
  * @attr {boolean} captions-visible - Captions are on. Persisted; the element sets it.
  * @attr {string} volume-state - `mute`, `mid` or `full`, for the three-icon volume button. CSS hook; the element sets it.
  * @attr {number} skip - Seconds a skip button moves. Defaults to 10.
+ * @attr {string} media-title - What the OS media panel calls this. Falls back to the media element's own `title`.
+ * @attr {string} artist - Who made it, for the OS media panel.
+ * @attr {string} album - What it came from, for the OS media panel.
+ * @attr {string} artwork - Cover image for the OS media panel. Falls back to a `<video>`'s `poster`. Relative paths are resolved against the page.
  * @attr {string} storage-key - Prefix for the remembered volume, mute and captions state. Defaults to `media-player`; set it per player to keep two of them from sharing one volume.
  *
  * @cssprop {<color>} [--media-player-accent=#22c55e] - The played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring.
@@ -230,6 +274,9 @@ export class MediaPlayer extends HgElement {
     // the clock, which `tick` reduces to nothing if the move paused the media.
     if (this.isReady) {
       this.resume();
+      // A move releases the panel on the way out and no `play` fires to take it back, so a
+      // player still playing has to claim it again here or the lock screen goes quiet mid-track.
+      if (this.isPlaying) this.claimSession();
       return;
     }
 
@@ -263,6 +310,7 @@ export class MediaPlayer extends HgElement {
     cancelAnimationFrame(this.frame);
     if (this.linger) clearTimeout(this.linger);
     if (this.settle) clearTimeout(this.settle);
+    this.releaseSession();
     // Put the page back the way it was found: an element removed from the DOM should leave
     // a media element that still plays, not a controlless one.
     if (this.media && this.hadControls) this.media.controls = true;
@@ -348,6 +396,106 @@ export class MediaPlayer extends HgElement {
     const bounded = Math.min(Math.max(seconds, 0), this.media.duration || 0);
     this.media.currentTime = bounded;
     this.paint(bounded);
+    this.updatePositionState();
+  }
+
+  // THE OS MEDIA PANEL
+
+  /**
+   * Point the lock screen, the hardware media keys and the headphone buttons at this player.
+   *
+   * Claimed when playback starts rather than when the element upgrades, because the claim is
+   * a document-wide singleton and the player someone just started is the one they mean.
+   *
+   * Each action is registered on its own: a browser that does not know one throws on that
+   * call, and an unknown name should not cost the panel the buttons it does support. The
+   * ones this player cannot answer are set to `null`, which is how the spec takes a button
+   * off the panel rather than leaving it there doing nothing.
+   */
+  claimSession() {
+    if (!this.media || !('mediaSession' in navigator)) return;
+    sessionOwner = this;
+    navigator.mediaSession.metadata = this.sessionMetadata();
+
+    // Stop survives a live stream — `stop` only pauses there, which is the whole of what
+    // stopping a stream can mean — but seeking does not, so those three come off the panel.
+    const handlers = { stop: () => this.stop() };
+    if (!this.isLive) {
+      handlers.seekbackward = ({ seekOffset }) => this.seekBy(-(seekOffset || this.skipStep));
+      handlers.seekforward = ({ seekOffset }) => this.seekBy(seekOffset || this.skipStep);
+      handlers.seekto = ({ seekTime }) => this.seekTo(seekTime);
+    }
+
+    for (const action of SESSION_ACTIONS) {
+      try {
+        navigator.mediaSession.setActionHandler(action, handlers[action] ?? null);
+      } catch {
+        // An action this browser has never heard of. The rest of them still register.
+      }
+    }
+
+    this.updatePositionState();
+  }
+
+  /**
+   * What the OS panel is told this is, out of markup the author already wrote.
+   *
+   * The fallbacks are the point. A page that names its track in the media element's own
+   * `title`, or a video that already carries a `poster`, gets a populated lock screen with
+   * no new attributes at all — the four here are for what that markup cannot say.
+   *
+   * Nothing is invented from the file name. With no attributes and no poster this returns
+   * `null`, which clears the metadata and leaves the browser's own default in place: a
+   * lock screen reading `tone.wav` is worse than one reading nothing.
+   */
+  sessionMetadata() {
+    if (typeof MediaMetadata === 'undefined') return null;
+    const title = this.getAttribute('media-title') || this.media.getAttribute('title') || '';
+    const artist = this.getAttribute('artist') || '';
+    const album = this.getAttribute('album') || '';
+    const art = this.getAttribute('artwork') || (this.isVideo ? this.media.getAttribute('poster') : '');
+    const src = art ? absoluteUrl(art) : null;
+    if (!title && !artist && !album && !src) return null;
+    return new MediaMetadata({ title, artist, album, artwork: src ? [{ src }] : [] });
+  }
+
+  /**
+   * Tell the panel where the playhead is.
+   *
+   * Called at the moments the position jumps rather than from `paint`, which runs on every
+   * animation frame: the OS scrubber interpolates from the last state and the playback rate,
+   * so sixty calls a second would move the same thumb at sixty times the cost.
+   *
+   * Owning the session is also the proof that the API was there to claim, which is why there
+   * is no second feature test here. A live stream is skipped: the spec wants `Infinity` for a
+   * duration with no end, this element reports live as `0`, and a position past a zero
+   * duration is a `TypeError`.
+   */
+  updatePositionState() {
+    if (sessionOwner !== this || !this.media || this.isLive) return;
+    if (!navigator.mediaSession.setPositionState) return;
+    const duration = this.media.duration;
+    if (!Number.isFinite(duration) || duration <= 0) return;
+    navigator.mediaSession.setPositionState({
+      duration,
+      position: Math.min(Math.max(this.media.currentTime, 0), duration),
+      // Zero is a `TypeError`, and a media element that has not started can report it.
+      playbackRate: this.media.playbackRate || 1
+    });
+  }
+
+  /** Hand the panel back, so a player taken off the page stops driving the lock screen. */
+  releaseSession() {
+    if (sessionOwner !== this) return;
+    sessionOwner = null;
+    navigator.mediaSession.metadata = null;
+    for (const action of SESSION_ACTIONS) {
+      try {
+        navigator.mediaSession.setActionHandler(action, null);
+      } catch {
+        // Never registered in the first place.
+      }
+    }
   }
 
   /**
@@ -388,6 +536,7 @@ export class MediaPlayer extends HgElement {
     this.posterHidden = true;
     this.playLabel = 'Pause';
     this.resume();
+    this.claimSession();
     this.interaction('play');
     if (this.isVideo) this.showControls();
   }
@@ -397,6 +546,7 @@ export class MediaPlayer extends HgElement {
     this.isBuffering = false;
     this.playLabel = 'Play';
     cancelAnimationFrame(this.frame);
+    this.updatePositionState();
     this.interaction('pause');
     // A paused video keeps its controls: they are how you start it again.
     if (this.isVideo) {

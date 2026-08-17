@@ -79,7 +79,7 @@
         },
         {
           "kind": "class",
-          "description": "`<media-player>` custom element.\n\nOne element over the `<audio>` or `<video>` the author already wrote. Which of the two it\nis decides the video-only half — poster, overlay, captions, fullscreen, the controls that\nhide themselves — and it is read off the child rather than off a `src`, because a `src`\nattribute on the wrapper would mean no media element at all until the script arrives.\nThat is the whole bargain: the markup is the author's, `controls` on the media element is\nthe fallback, and a script that never loads leaves a working native player behind.\n\nThe controls are the author's too. There is no generated control bar and no `controls`\noption taking an HTML string — the buttons, the sliders and the labels are written in the\npage, and [hydrargyri](https://github.com/stamat/hydrargyri) wires them by name: `on` says\nwhat fires, `bind` says where state lands. Nothing here is evaluated, so a strict Content\nSecurity Policy has nothing to object to.\n\nWhat the element does not draw, it borrows. The scrubber and the volume control are\n`<slider-elemental>` around a native `<input type=\"range\">`, which is where the whole\n[APG Slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) already lives; the\nbuffered-ahead bar is `<progress-elemental buffer>`; the control row is\n`<toolbar-elemental>`. None of their keyboard handling, ARIA or focus management is\nrewritten here, which is why this element writes no `role` and no `aria-valuenow` of its\nown.\n\nDegrades honestly. No script means the `controls` attribute the author wrote is still on\nthe media element and the browser's own player is what shows. The optional theme draws\nnothing under `:not(:defined)`, so the fallback is never a themed control bar with dead\nbuttons on it.\n\nTwo limits worth knowing before you reach for them. There is no keyboard map of its own:\nevery control is a `<button>` or an `<input type=\"range\">`, so the platform already\nanswers Space, Enter, the arrows, Home and End on whichever one has focus, and a\nplayer-wide `k`/`j`/`l` map would be a second set of bindings with nothing on the page\nannouncing them. And the buffered bar is one span from the start rather than the\n`TimeRanges` list the media element holds, because `<progress>` carries one value — after\na seek it shows how far the range under the playhead reaches, not the gap behind it.",
+          "description": "`<media-player>` custom element.\n\nOne element over the `<audio>` or `<video>` the author already wrote. Which of the two it\nis decides the video-only half — poster, overlay, captions, fullscreen, the controls that\nhide themselves — and it is read off the child rather than off a `src`, because a `src`\nattribute on the wrapper would mean no media element at all until the script arrives.\nThat is the whole bargain: the markup is the author's, `controls` on the media element is\nthe fallback, and a script that never loads leaves a working native player behind.\n\nThe controls are the author's too. There is no generated control bar and no `controls`\noption taking an HTML string — the buttons, the sliders and the labels are written in the\npage, and [hydrargyri](https://github.com/stamat/hydrargyri) wires them by name: `on` says\nwhat fires, `bind` says where state lands. Nothing here is evaluated, so a strict Content\nSecurity Policy has nothing to object to.\n\nWhat the element does not draw, it borrows. The scrubber and the volume control are\n`<slider-elemental>` around a native `<input type=\"range\">`, which is where the whole\n[APG Slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) already lives; the\nbuffered-ahead bar is `<progress-elemental buffer>`; the control row is\n`<toolbar-elemental>`. None of their keyboard handling, ARIA or focus management is\nrewritten here, which is why this element writes no `role` and no `aria-valuenow` of its\nown.\n\nDegrades honestly. No script means the `controls` attribute the author wrote is still on\nthe media element and the browser's own player is what shows. The optional theme draws\nnothing under `:not(:defined)`, so the fallback is never a themed control bar with dead\nbuttons on it.\n\nIt also claims the OS media panel — lock screen, hardware media keys, headphone buttons —\nwhen playback starts. Play and pause are the browser's own and work with or without this\nelement; what the claim adds is skip buttons moving by the same `skip` the page's buttons\nuse, a working scrubber, and a title on the lock screen. The panel is one per document, so\nthe last player to start is the one it points at.\n\nTwo limits worth knowing before you reach for them. There is no keyboard map of its own:\nevery control is a `<button>` or an `<input type=\"range\">`, so the platform already\nanswers Space, Enter, the arrows, Home and End on whichever one has focus, and a\nplayer-wide `k`/`j`/`l` map would be a second set of bindings with nothing on the page\nannouncing them. And the buffered bar is one span from the start rather than the\n`TimeRanges` list the media element holds, because `<progress>` carries one value — after\na seek it shows how far the range under the playhead reaches, not the gap behind it.",
           "name": "MediaPlayer",
           "cssProperties": [
             {
@@ -236,6 +236,30 @@
                   "name": "seconds"
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "claimSession",
+              "description": "Point the lock screen, the hardware media keys and the headphone buttons at this player.\n\nClaimed when playback starts rather than when the element upgrades, because the claim is\na document-wide singleton and the player someone just started is the one they mean.\n\nEach action is registered on its own: a browser that does not know one throws on that\ncall, and an unknown name should not cost the panel the buttons it does support. The\nones this player cannot answer are set to `null`, which is how the spec takes a button\noff the panel rather than leaving it there doing nothing.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "sessionMetadata",
+              "description": "What the OS panel is told this is, out of markup the author already wrote.\n\nThe fallbacks are the point. A page that names its track in the media element's own\n`title`, or a video that already carries a `poster`, gets a populated lock screen with\nno new attributes at all — the four here are for what that markup cannot say.\n\nNothing is invented from the file name. With no attributes and no poster this returns\n`null`, which clears the metadata and leaves the browser's own default in place: a\nlock screen reading `tone.wav` is worse than one reading nothing.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "updatePositionState",
+              "description": "Tell the panel where the playhead is.\n\nCalled at the moments the position jumps rather than from `paint`, which runs on every\nanimation frame: the OS scrubber interpolates from the last state and the playback rate,\nso sixty calls a second would move the same thumb at sixty times the cost.\n\nOwning the session is also the proof that the API was there to claim, which is why there\nis no second feature test here. A live stream is skipped: the spec wants `Infinity` for a\nduration with no end, this element reports live as `0`, and a position past a zero\nduration is a `TypeError`.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "releaseSession",
+              "description": "Hand the panel back, so a player taken off the page stops driving the lock screen.",
+              "privacy": "private"
             },
             {
               "kind": "method",
@@ -584,6 +608,34 @@
               },
               "description": "Seconds a skip button moves. Defaults to 10.",
               "name": "skip"
+            },
+            {
+              "type": {
+                "text": "string"
+              },
+              "description": "What the OS media panel calls this. Falls back to the media element's own `title`.",
+              "name": "media-title"
+            },
+            {
+              "type": {
+                "text": "string"
+              },
+              "description": "Who made it, for the OS media panel.",
+              "name": "artist"
+            },
+            {
+              "type": {
+                "text": "string"
+              },
+              "description": "What it came from, for the OS media panel.",
+              "name": "album"
+            },
+            {
+              "type": {
+                "text": "string"
+              },
+              "description": "Cover image for the OS media panel. Falls back to a `<video>`'s `poster`. Relative paths are resolved against the page.",
+              "name": "artwork"
             },
             {
               "type": {

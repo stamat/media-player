@@ -1175,6 +1175,15 @@ var VOLUME_SCALE = 100;
 var VOLUME_STEP = 0.1;
 var CONTROLS_LINGER = 5e3;
 var VOLUME_SETTLE = 500;
+var SESSION_ACTIONS = ["seekbackward", "seekforward", "seekto", "stop"];
+var sessionOwner = null;
+function absoluteUrl(value) {
+  try {
+    return new URL(value, document.baseURI).href;
+  } catch {
+    return null;
+  }
+}
 function pad(value) {
   return value < 10 ? `0${value}` : `${value}`;
 }
@@ -1213,6 +1222,7 @@ var MediaPlayer = class extends HgElement {
     this.media.controls = false;
     if (this.isReady) {
       this.resume();
+      if (this.isPlaying) this.claimSession();
       return;
     }
     this.duration = 0;
@@ -1233,6 +1243,7 @@ var MediaPlayer = class extends HgElement {
     cancelAnimationFrame(this.frame);
     if (this.linger) clearTimeout(this.linger);
     if (this.settle) clearTimeout(this.settle);
+    this.releaseSession();
     if (this.media && this.hadControls) this.media.controls = true;
   }
   /**
@@ -1296,6 +1307,94 @@ var MediaPlayer = class extends HgElement {
     const bounded = Math.min(Math.max(seconds, 0), this.media.duration || 0);
     this.media.currentTime = bounded;
     this.paint(bounded);
+    this.updatePositionState();
+  }
+  // THE OS MEDIA PANEL
+  /**
+   * Point the lock screen, the hardware media keys and the headphone buttons at this player.
+   *
+   * Claimed when playback starts rather than when the element upgrades, because the claim is
+   * a document-wide singleton and the player someone just started is the one they mean.
+   *
+   * Each action is registered on its own: a browser that does not know one throws on that
+   * call, and an unknown name should not cost the panel the buttons it does support. The
+   * ones this player cannot answer are set to `null`, which is how the spec takes a button
+   * off the panel rather than leaving it there doing nothing.
+   */
+  claimSession() {
+    if (!this.media || !("mediaSession" in navigator)) return;
+    sessionOwner = this;
+    navigator.mediaSession.metadata = this.sessionMetadata();
+    const handlers = { stop: () => this.stop() };
+    if (!this.isLive) {
+      handlers.seekbackward = ({ seekOffset }) => this.seekBy(-(seekOffset || this.skipStep));
+      handlers.seekforward = ({ seekOffset }) => this.seekBy(seekOffset || this.skipStep);
+      handlers.seekto = ({ seekTime }) => this.seekTo(seekTime);
+    }
+    for (const action of SESSION_ACTIONS) {
+      try {
+        navigator.mediaSession.setActionHandler(action, handlers[action] ?? null);
+      } catch {
+      }
+    }
+    this.updatePositionState();
+  }
+  /**
+   * What the OS panel is told this is, out of markup the author already wrote.
+   *
+   * The fallbacks are the point. A page that names its track in the media element's own
+   * `title`, or a video that already carries a `poster`, gets a populated lock screen with
+   * no new attributes at all — the four here are for what that markup cannot say.
+   *
+   * Nothing is invented from the file name. With no attributes and no poster this returns
+   * `null`, which clears the metadata and leaves the browser's own default in place: a
+   * lock screen reading `tone.wav` is worse than one reading nothing.
+   */
+  sessionMetadata() {
+    if (typeof MediaMetadata === "undefined") return null;
+    const title = this.getAttribute("media-title") || this.media.getAttribute("title") || "";
+    const artist = this.getAttribute("artist") || "";
+    const album = this.getAttribute("album") || "";
+    const art = this.getAttribute("artwork") || (this.isVideo ? this.media.getAttribute("poster") : "");
+    const src = art ? absoluteUrl(art) : null;
+    if (!title && !artist && !album && !src) return null;
+    return new MediaMetadata({ title, artist, album, artwork: src ? [{ src }] : [] });
+  }
+  /**
+   * Tell the panel where the playhead is.
+   *
+   * Called at the moments the position jumps rather than from `paint`, which runs on every
+   * animation frame: the OS scrubber interpolates from the last state and the playback rate,
+   * so sixty calls a second would move the same thumb at sixty times the cost.
+   *
+   * Owning the session is also the proof that the API was there to claim, which is why there
+   * is no second feature test here. A live stream is skipped: the spec wants `Infinity` for a
+   * duration with no end, this element reports live as `0`, and a position past a zero
+   * duration is a `TypeError`.
+   */
+  updatePositionState() {
+    if (sessionOwner !== this || !this.media || this.isLive) return;
+    if (!navigator.mediaSession.setPositionState) return;
+    const duration = this.media.duration;
+    if (!Number.isFinite(duration) || duration <= 0) return;
+    navigator.mediaSession.setPositionState({
+      duration,
+      position: Math.min(Math.max(this.media.currentTime, 0), duration),
+      // Zero is a `TypeError`, and a media element that has not started can report it.
+      playbackRate: this.media.playbackRate || 1
+    });
+  }
+  /** Hand the panel back, so a player taken off the page stops driving the lock screen. */
+  releaseSession() {
+    if (sessionOwner !== this) return;
+    sessionOwner = null;
+    navigator.mediaSession.metadata = null;
+    for (const action of SESSION_ACTIONS) {
+      try {
+        navigator.mediaSession.setActionHandler(action, null);
+      } catch {
+      }
+    }
   }
   /**
    * Write the clock, the countdown and the scrubber position for one moment.
@@ -1331,6 +1430,7 @@ var MediaPlayer = class extends HgElement {
     this.posterHidden = true;
     this.playLabel = "Pause";
     this.resume();
+    this.claimSession();
     this.interaction("play");
     if (this.isVideo) this.showControls();
   }
@@ -1339,6 +1439,7 @@ var MediaPlayer = class extends HgElement {
     this.isBuffering = false;
     this.playLabel = "Play";
     cancelAnimationFrame(this.frame);
+    this.updatePositionState();
     this.interaction("pause");
     if (this.isVideo) {
       if (this.linger) clearTimeout(this.linger);

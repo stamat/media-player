@@ -389,7 +389,48 @@ against them.</p>
 </tbody></table>
 <p>Two you do set: <code>skip</code> is how many seconds a skip button moves (default <code>10</code>), and
 <code>storage-key</code> is the prefix for the remembered volume, mute and captions state — set it per
-player, or two players on one page will share one volume.</p>
+player, or two players on one page will share one volume. Four more, for what the lock
+screen shows, are in the next section.</p>
+<h2 id="on-the-lock-screen">On the lock screen<a class="heading-anchor" href="#on-the-lock-screen" tabindex="-1" aria-hidden="true"></a></h2>
+<p>Start playing and the player claims the operating system&#39;s media panel — the lock screen,
+the hardware media keys, the button on a pair of headphones. Play and pause are there with
+or without this element; every browser draws them for any media that plays. What the player
+adds is the rest: skip buttons that move by the same <code>skip</code> seconds the buttons on your page
+use, a scrubber that goes where you drop it, and a name for what is playing.</p>
+<p>The name comes out of markup you have probably already written. A <code>title</code> on the <code>&lt;audio&gt;</code>
+or <code>&lt;video&gt;</code> is what the panel calls the track, and a <code>&lt;video poster&gt;</code> is the artwork.
+Nothing is invented — with neither, the panel keeps its own default rather than showing
+<code>tone.wav</code> on your lock screen. Four attributes on <code>&lt;media-player&gt;</code> cover what that markup
+cannot say:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>media-title</code></td>
+<td>what the panel calls it; wins over the media element&#39;s <code>title</code></td>
+</tr>
+<tr>
+<td><code>artist</code></td>
+<td>who made it</td>
+</tr>
+<tr>
+<td><code>album</code></td>
+<td>what it came from</td>
+</tr>
+<tr>
+<td><code>artwork</code></td>
+<td>cover image; wins over <code>poster</code>, and a relative path is resolved against the page</td>
+</tr>
+</tbody></table>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">media-title</span>=<span class="hljs-string">&quot;Rollout&quot;</span> <span class="hljs-attr">artist</span>=<span class="hljs-string">&quot;Stamat&quot;</span> <span class="hljs-attr">artwork</span>=<span class="hljs-string">&quot;sample/cover.jpg&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">audio</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/tone.wav&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
+<p>The panel is one per document, so on a page with two players it follows whichever started
+last. A live stream gets no seek buttons, because there is nowhere on it to seek to.</p>
 <h2 id="what-the-theme-takes">What the theme takes<a class="heading-anchor" href="#what-the-theme-takes" tabindex="-1" aria-hidden="true"></a></h2>
 <p><code>theme.css</code> speaks the register Plyr made the standard: a flat compact bar, controls that
 flood with the accent under the pointer, a slim rounded track whose accent thumb appears on hover or focus,
@@ -519,7 +560,7 @@ win.</p>
 </thead>
 <tbody><tr>
 <td><strong>Size, gzipped</strong></td>
-<td><strong>8.9 kB</strong></td>
+<td><strong>9.4 kB</strong></td>
 <td>32 kB</td>
 <td>42 kB</td>
 <td>40 kB</td>

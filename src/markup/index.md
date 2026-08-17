@@ -334,7 +334,38 @@ against them.
 
 Two you do set: `skip` is how many seconds a skip button moves (default `10`), and
 `storage-key` is the prefix for the remembered volume, mute and captions state — set it per
-player, or two players on one page will share one volume.
+player, or two players on one page will share one volume. Four more, for what the lock
+screen shows, are in the next section.
+
+## On the lock screen
+
+Start playing and the player claims the operating system's media panel — the lock screen,
+the hardware media keys, the button on a pair of headphones. Play and pause are there with
+or without this element; every browser draws them for any media that plays. What the player
+adds is the rest: skip buttons that move by the same `skip` seconds the buttons on your page
+use, a scrubber that goes where you drop it, and a name for what is playing.
+
+The name comes out of markup you have probably already written. A `title` on the `<audio>`
+or `<video>` is what the panel calls the track, and a `<video poster>` is the artwork.
+Nothing is invented — with neither, the panel keeps its own default rather than showing
+`tone.wav` on your lock screen. Four attributes on `<media-player>` cover what that markup
+cannot say:
+
+| Attribute      | Holds                                                            |
+| -------------- | ---------------------------------------------------------------- |
+| `media-title`  | what the panel calls it; wins over the media element's `title`   |
+| `artist`       | who made it                                                      |
+| `album`        | what it came from                                                |
+| `artwork`      | cover image; wins over `poster`, and a relative path is resolved against the page |
+
+```html
+<media-player media-title="Rollout" artist="Stamat" artwork="sample/cover.jpg">
+  <audio controls src="sample/tone.wav"></audio>
+</media-player>
+```
+
+The panel is one per document, so on a page with two players it follows whichever started
+last. A live stream gets no seek buttons, because there is nowhere on it to seek to.
 
 ## What the theme takes
 
@@ -412,7 +443,7 @@ win.
 
 |                                    | media-player                                            | [Plyr](https://github.com/sampotts/plyr)             | [media-chrome](https://github.com/muxinc/media-chrome) | [Vidstack](https://vidstack.io)      | [Video.js](https://videojs.com)        |
 | ---------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ | ------------------------------------ | -------------------------------------- |
-| **Size, gzipped**                  | **8.9 kB**                                              | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
+| **Size, gzipped**                  | **9.4 kB**                                              | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
 | **You write the controls**         | yes, as the only way                                    | no — a `controls` array, or an HTML string in config | yes, from its components                               | no — layouts                         | no                                     |
 | **Shadow DOM**                     | never                                                   | never                                                | yes                                                    | yes                                  | no                                     |
 | **Page plays with no script**      | yes                                                     | yes, if you keep `controls`                          | no — its starter `<video>` has none                    | no                                   | yes                                    |

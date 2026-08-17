@@ -4,8 +4,9 @@
  * Covered here: the progressive-enhancement contract (native controls off on upgrade, back
  * on the way out), readiness from any of the five metadata events, live streams, the volume
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
- * track, the video controls' hide timer, the labels the buttons announce themselves by, and
- * that the surface the custom elements manifest publishes still exists on the element.
+ * track, the video controls' hide timer, the labels the buttons announce themselves by, the
+ * OS media panel against a stubbed `navigator.mediaSession`, and that the surface the custom
+ * elements manifest publishes still exists on the element.
  *
  * Deliberately not covered: fullscreen and the `cuechange` event, neither of which jsdom
  * implements — `requestFullscreen` is absent and a `<track>` never fires a cue, so a test
@@ -160,6 +161,173 @@ describe('live streams', () => {
     const before = player.frame;
     player.resume();
     expect(player.frame).toBe(before);
+  });
+});
+
+/**
+ * A stand-in for `navigator.mediaSession`, which jsdom does not implement.
+ *
+ * Handlers are stored rather than run, so a test can invoke the one the operating system
+ * would have, and every `setPositionState` call is kept because the spec throws a TypeError
+ * on a duration or a rate the element is supposed to have filtered out first.
+ */
+function stubSession() {
+  const session = {
+    metadata: null,
+    handlers: {},
+    positions: [],
+    setActionHandler(action, handler) { session.handlers[action] = handler; },
+    setPositionState(state) { session.positions.push(state); }
+  };
+  Object.defineProperty(navigator, 'mediaSession', { value: session, configurable: true });
+  globalThis.MediaMetadata = class { constructor(init) { Object.assign(this, init); } };
+  return session;
+}
+
+describe('the OS media panel', () => {
+  let session;
+
+  beforeEach(() => {
+    session = stubSession();
+  });
+
+  afterEach(() => {
+    // Players go before the stub does: removing one releases the panel, and a release that
+    // reached for an API already deleted would fail the teardown rather than the test.
+    document.body.innerHTML = '';
+    delete navigator.mediaSession;
+    delete globalThis.MediaMetadata;
+  });
+
+  test('the panel is claimed when playback starts, not when the element upgrades', () => {
+    const player = mount(fakeMedia());
+    expect(session.handlers.seekforward).toBeUndefined();
+    player.onPlay();
+    expect(typeof session.handlers.seekforward).toBe('function');
+  });
+
+  test('play and pause are left to the browser, which draws and answers them either way', () => {
+    mount(fakeMedia()).onPlay();
+    expect(session.handlers.play).toBeUndefined();
+    expect(session.handlers.pause).toBeUndefined();
+  });
+
+  test('a skip from the lock screen moves by the same seconds a skip button on the page does', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    player.setAttribute('skip', '30');
+    player.onPlay();
+    session.handlers.seekforward({});
+    expect(media.currentTime).toBe(30);
+  });
+
+  test('an offset the operating system names wins over the player\'s own', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    player.onPlay();
+    session.handlers.seekforward({ seekOffset: 5 });
+    expect(media.currentTime).toBe(5);
+  });
+
+  test('scrubbing the panel goes to the absolute time it names, not a distance from here', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    player.onPlay();
+    session.handlers.seekto({ seekTime: 42 });
+    expect(media.currentTime).toBe(42);
+  });
+
+  test('a live stream is given no seek buttons, because there is nowhere on it to seek to', () => {
+    mount(fakeMedia('audio', { duration: LIVE_DURATION })).onPlay();
+    expect(session.handlers.seekforward).toBe(null);
+    expect(session.handlers.seekbackward).toBe(null);
+    expect(session.handlers.seekto).toBe(null);
+  });
+
+  test('stop stays on a live stream, where stopping can only mean pausing', () => {
+    const media = fakeMedia('audio', { duration: LIVE_DURATION, paused: false });
+    mount(media).onPlay();
+    session.handlers.stop();
+    expect(media.paused).toBe(true);
+  });
+
+  test('a live stream writes no position, because its duration and the spec\'s disagree', () => {
+    mount(fakeMedia('audio', { duration: LIVE_DURATION })).onPlay();
+    expect(session.positions).toEqual([]);
+  });
+
+  test('the position never runs past the duration the same call reports', () => {
+    const media = fakeMedia('audio', { duration: 120 });
+    const player = mount(media);
+    player.onPlay();
+    media.currentTime = 500;
+    player.updatePositionState();
+    const last = session.positions.at(-1);
+    expect(last.position).toBe(120);
+    expect(last.playbackRate).toBeGreaterThan(0);
+  });
+
+  test('a title the author never wrote is not invented from the file name', () => {
+    mount(fakeMedia()).onPlay();
+    expect(session.metadata).toBe(null);
+  });
+
+  test('the media element\'s own title reaches the lock screen with no new markup', () => {
+    const media = fakeMedia();
+    media.setAttribute('title', 'Tone');
+    mount(media).onPlay();
+    expect(session.metadata.title).toBe('Tone');
+  });
+
+  test('a title on the wrapper wins over the one on the media element', () => {
+    const media = fakeMedia();
+    media.setAttribute('title', 'tone.wav');
+    const player = mount(media);
+    player.setAttribute('media-title', 'Rollout');
+    player.setAttribute('artist', 'Stamat');
+    player.onPlay();
+    expect(session.metadata.title).toBe('Rollout');
+    expect(session.metadata.artist).toBe('Stamat');
+  });
+
+  test('a video poster becomes the artwork, resolved against the page the panel cannot see', () => {
+    const media = fakeMedia('video');
+    media.setAttribute('poster', 'sample/rollout.jpg');
+    mount(media).onPlay();
+    expect(session.metadata.artwork).toEqual([{ src: 'http://localhost/sample/rollout.jpg' }]);
+  });
+
+  test('an artwork path that will not parse leaves the panel its own default, not a broken image', () => {
+    const player = mount(fakeMedia());
+    player.setAttribute('artwork', '//');
+    player.onPlay();
+    expect(session.metadata).toBe(null);
+  });
+
+  test('a player taken off the page stops driving the panel', () => {
+    const media = fakeMedia();
+    media.setAttribute('title', 'Tone');
+    const player = mount(media);
+    player.onPlay();
+    player.remove();
+    expect(session.metadata).toBe(null);
+    expect(session.handlers.stop).toBe(null);
+  });
+
+  test('the last player to start owns the panel, and the one before it stops writing to it', () => {
+    const first = mount(fakeMedia());
+    const second = mount(fakeMedia());
+    first.onPlay();
+    second.onPlay();
+    const written = session.positions.length;
+    first.updatePositionState();
+    expect(session.positions.length).toBe(written);
+  });
+
+  test('a browser with no Media Session API plays on rather than throwing', () => {
+    delete navigator.mediaSession;
+    const player = mount(fakeMedia());
+    expect(() => player.onPlay()).not.toThrow();
   });
 });
 

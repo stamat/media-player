@@ -21,6 +21,18 @@ for the person who wrote the code.
   mute, buffering and live-stream detection; volume, mute and captions state remembered per
   `storage-key`.
 
+- **It claims the OS media panel.** Starting playback points the lock screen, the hardware
+  media keys and the headphone buttons at the player. Play and pause were always there —
+  every browser draws them for any media that plays — so what this adds is the rest: skip
+  buttons moving by the same `skip` seconds the page's buttons use, a working scrubber
+  through `seekto`, `stop`, and a name for what is playing. The name comes out of markup you
+  already wrote, a `title` on the media element and a `<video poster>` for artwork, with new
+  `media-title`, `artist`, `album` and `artwork` attributes on `<media-player>` for what that
+  cannot say. Nothing is invented: with none of them the panel keeps its own default rather
+  than showing a file name. The panel is one per document and follows whichever player
+  started last; a live stream gets no seek buttons, and a browser without the API plays on
+  unchanged.
+
 - **The controls are the author's markup.** No generated control bar and no option that
   takes one: buttons and range inputs are written in the page and wired by name through
   [hydrargyri](https://github.com/stamat/hydrargyri) — `on` for what fires, `bind` for where
