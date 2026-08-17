@@ -72,6 +72,15 @@ media-player .media-player-controls {
   background: var(--media-player-surface);
 }
 
+// The 1.125rem glyph and this padding make a 2rem box, and a touch device gets the same
+// 2rem — no coarse-pointer branch anywhere in this sheet. That clears WCAG 2.5.8, the AA
+// minimum of 24px, and gives up 2.5.5, the AAA 44px, along with Apple's and Google's own
+// 44pt/48dp advice. Growing to 44px was tried and cost a whole row: six targets and the
+// clock come to 343px where a 393px phone gives the bar 338px, so the fullscreen button
+// wrapped to a third line, and the two rules needed to claw that back — buttons touching
+// with no gap, half the bar's side padding — bought a target size the layout could not
+// afford. An author who wants the AAA size sets `min-width`/`min-height` on
+// `.media-player-controls button` and drops a control from the row to pay for it.
 media-player button {
   display: inline-flex;
   align-items: center;
@@ -103,22 +112,6 @@ media-player .media-player-controls button {
 // the skip-play-skip trio wants to read as one transport control, not three strays.
 media-player .media-player-controls button + button {
   margin-inline-start: calc(var(--media-player-gap) * -0.75);
-}
-
-// The padding around a 1.125rem glyph makes a 2rem button, which is a comfortable mouse
-// target and an undersized finger one — WCAG 2.5.5 asks for 44px. A minimum rather than
-// more padding, so the glyph stays the size it is and only the box around it grows. The
-// cluster's negative margin goes with it: overlapping boxes hand the shared strip to
-// whichever paints last, and it is the play button in the middle that loses the edge.
-@media (pointer: coarse) {
-  media-player .media-player-controls button {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-  }
-
-  media-player .media-player-controls button + button {
-    margin-inline-start: 0;
-  }
 }
 
 // The hover is the accent filling the control, not the icon changing shade — Plyr's most
@@ -223,8 +216,12 @@ media-player[is-video] {
   background: #000;
 }
 
+// Only the top padding differs from the bar over an audio element — it is the gradient's
+// run-up, not spacing — so the other three sides stay whatever the base rule and the coarse
+// override put there. A `padding` shorthand here would freeze them at the fine-pointer
+// value and quietly cancel that override on every phone.
 media-player[is-video] .media-player-controls {
-  padding: calc(var(--media-player-gap) * 4) var(--media-player-gap) var(--media-player-gap);
+  padding-block-start: calc(var(--media-player-gap) * 4);
   border-radius: 0;
   background: linear-gradient(transparent, rgb(0 0 0 / 75%));
 }

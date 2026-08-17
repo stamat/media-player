@@ -28,11 +28,13 @@ media-player video {
   height: auto;
 }
 
-// Two rows at every width, and no media query anywhere in here: the scrubber is written
-// first in the markup and claims a whole flex line, so the buttons and the clock wrap
-// beneath it. One row cannot survive a phone — the buttons, the clock and the volume are
-// fixed-width and add up past a 375px viewport on their own, which leaves the scrubber
-// about twenty pixels of a control that exists to be dragged.
+// Two rows without a width breakpoint anywhere in here: the scrubber is written first in
+// the markup and claims a whole flex line, so the buttons and the clock wrap beneath it.
+// One row cannot survive a phone — the buttons, the clock and the volume are fixed-width
+// and add up past a 375px viewport on their own, which leaves the scrubber about twenty
+// pixels of a control that exists to be dragged. Two is the floor, not a guarantee: the
+// line under the scrubber wraps again once what it carries outgrows it, so what a row may
+// carry is bounded by what the theme sizes its buttons at.
 .media-player-controls {
   display: flex;
   flex-wrap: wrap;
@@ -188,12 +190,12 @@ media-player[poster-hidden] .media-player-overlay {
   display: none;
 }
 
-// The padding clears the control row the captions would otherwise sit behind, measured
-// against the tallest that row gets: 8 padding + 13 scrubber + 8 row gap + 44 button + 8
-// padding, which is 81px under a coarse pointer where the buttons grow for the finger. A
-// fine pointer is 69px, so 88px clears both with a little left over — deliberately, because
-// a caption is the one thing on a video that must never be covered, and the row grows if an
-// author adds a control that wraps.
+// The padding clears the control row the captions would otherwise sit behind: 8 padding +
+// 13 scrubber + 8 row gap + 32 button + 8 padding is 69px with the theme's own button size,
+// and the same on a touch device, which grows nothing. 88px clears it with a fifth to spare
+// — deliberately, because a caption is the one thing on a video that must never be covered,
+// and the row grows if an author adds a control that wraps or a taller button than the
+// theme draws.
 .media-player-captions {
   position: absolute;
   right: 0;

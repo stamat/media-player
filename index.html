@@ -68,7 +68,7 @@ in an isolated frame by <a href="https://github.com/stamat/code-preview-element"
 press <strong>Edit</strong> and what you type is what plays.</p>
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0.5rem}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">audio</span>
     <span class="hljs-attr">controls</span>
     <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/tone.wav&quot;</span>
@@ -177,10 +177,14 @@ Security Policy to object to. It sits on
 <a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a> for the sliders.</p>
 <h2 id="two-rows-and-what-a-phone-changes">Two rows, and what a phone changes<a class="heading-anchor" href="#two-rows-and-what-a-phone-changes" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The scrubber is first in that markup on purpose. <code>style.css</code> gives it a whole flex line, so
-the buttons and the clock wrap under it and the bar is two rows at every width — a phone and
-a page-wide video get the same shape, and there is no breakpoint to tune. Squeezed into one
-row instead, the fixed-width parts alone outgrow a 375px viewport and the scrubber is left
-with about twenty pixels of something meant to be dragged.</p>
+the buttons and the clock wrap under it and the bar is two rows with no breakpoint to tune —
+a phone and a page-wide video get the same shape. Squeezed into one row instead, the
+fixed-width parts alone outgrow a 375px viewport and the scrubber is left with about twenty
+pixels of something meant to be dragged.</p>
+<p>Two is the floor rather than a promise. The line under the scrubber wraps again when what it
+carries outgrows it, and the theme&#39;s buttons are 32px: the video sample&#39;s six of them and
+the clock come to 306px, which is what a 360px phone leaves. Below that they wrap to a third
+row, and the fix is to drop a control from the row or move the clock out of it.</p>
 <p>Which is also why the scrubber is moved in the markup rather than with <code>order</code>. Reordering a
 flex line visually leaves the tab sequence in the old order, and a keyboard user would read
 the bar top-to-bottom while tabbing it bottom-to-top. Put it where you want it and both agree.</p>
@@ -191,7 +195,7 @@ it goes left, everything after it goes right, and moving the clock moves the div
 written without a clock matches that rule nowhere and comes out as one cluster at the start
 — visibly wrong rather than quietly broken — and the fix is to put the same <code>auto</code> on
 whichever control should open the right-hand group.</p>
-<p>Two things change under a coarse pointer — a phone, a tablet — and both are opt-out by
+<p>One thing changes under a coarse pointer — a phone, a tablet — and it is opt-out by
 overriding the rule:</p>
 <table>
 <thead>
@@ -206,12 +210,18 @@ overriding the rule:</p>
 <td><code>style.css</code></td>
 <td>72px is not draggable by thumb, and the device has hardware volume keys that are. The mute button stays, so muting still works</td>
 </tr>
-<tr>
-<td>Buttons grow to 44px</td>
-<td><code>theme.css</code></td>
-<td>The glyph and its padding make a 32px box — fine for a mouse, under <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html">WCAG 2.5.5</a> for a finger. Only the box grows; the icon keeps its size</td>
-</tr>
 </tbody></table>
+<p>The buttons do not grow for the finger, and that is a choice with a cost. <code>theme.css</code> draws
+a 32px button on every pointer: past <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html">WCAG 2.5.8</a>,
+the AA minimum of 24px, and short of <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html">2.5.5</a>,
+the AAA 44px that Apple and Google both ask for as well. 44px was tried and the row could
+not afford it — six targets and the clock come to 343px where a 393px phone gives the bar
+338px, so the fullscreen button wrapped to a third line and clawing it back cost the gap
+between every button. If your row is short enough to pay for it, the AAA size is two
+declarations:</p>
+<pre><code class="hljs language-css"><span class="hljs-keyword">@media</span> (<span class="hljs-attribute">pointer</span>: coarse) {
+  media-player <span class="hljs-selector-class">.media-player-controls</span> <span class="hljs-selector-tag">button</span> { <span class="hljs-attribute">min-width</span>: <span class="hljs-number">2.75rem</span>; <span class="hljs-attribute">min-height</span>: <span class="hljs-number">2.75rem</span>; }
+}</code></pre>
 <h2 id="the-part-that-matters-most">The part that matters most<a class="heading-anchor" href="#the-part-that-matters-most" tabindex="-1" aria-hidden="true"></a></h2>
 <p><strong>Delete the <code>&lt;script&gt;</code> tag and the page still plays.</strong> The <code>controls</code> attribute you wrote
 is on the media element until the moment this element upgrades and takes over; a script that
@@ -226,7 +236,7 @@ wrapped and turns on the video half — poster, click-to-play overlay, captions,
 controls that fade out while playing — only when it wrapped a <code>&lt;video&gt;</code>.</p>
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0.5rem}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>
   <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>
 &gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">video</span>

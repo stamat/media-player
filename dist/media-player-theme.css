@@ -66,15 +66,6 @@ media-player .media-player-controls button + button {
   margin-inline-start: calc(var(--media-player-gap) * -0.75);
 }
 
-@media (pointer: coarse) {
-  media-player .media-player-controls button {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-  }
-  media-player .media-player-controls button + button {
-    margin-inline-start: 0;
-  }
-}
 media-player .media-player-controls button:hover,
 media-player .media-player-controls button:focus-visible,
 media-player .media-player-controls button[aria-pressed=true] {
@@ -145,7 +136,7 @@ media-player[is-video] {
 }
 
 media-player[is-video] .media-player-controls {
-  padding: calc(var(--media-player-gap) * 4) var(--media-player-gap) var(--media-player-gap);
+  padding-block-start: calc(var(--media-player-gap) * 4);
   border-radius: 0;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
 }

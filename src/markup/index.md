@@ -28,7 +28,7 @@ press **Edit** and what you type is what plays.
 
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0.5rem}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
 <media-player>
@@ -152,10 +152,15 @@ Security Policy to object to. It sits on
 ## Two rows, and what a phone changes
 
 The scrubber is first in that markup on purpose. `style.css` gives it a whole flex line, so
-the buttons and the clock wrap under it and the bar is two rows at every width — a phone and
-a page-wide video get the same shape, and there is no breakpoint to tune. Squeezed into one
-row instead, the fixed-width parts alone outgrow a 375px viewport and the scrubber is left
-with about twenty pixels of something meant to be dragged.
+the buttons and the clock wrap under it and the bar is two rows with no breakpoint to tune —
+a phone and a page-wide video get the same shape. Squeezed into one row instead, the
+fixed-width parts alone outgrow a 375px viewport and the scrubber is left with about twenty
+pixels of something meant to be dragged.
+
+Two is the floor rather than a promise. The line under the scrubber wraps again when what it
+carries outgrows it, and the theme's buttons are 32px: the video sample's six of them and
+the clock come to 306px, which is what a 360px phone leaves. Below that they wrap to a third
+row, and the fix is to drop a control from the row or move the clock out of it.
 
 Which is also why the scrubber is moved in the markup rather than with `order`. Reordering a
 flex line visually leaves the tab sequence in the old order, and a keyboard user would read
@@ -169,13 +174,27 @@ written without a clock matches that rule nowhere and comes out as one cluster a
 — visibly wrong rather than quietly broken — and the fix is to put the same `auto` on
 whichever control should open the right-hand group.
 
-Two things change under a coarse pointer — a phone, a tablet — and both are opt-out by
+One thing changes under a coarse pointer — a phone, a tablet — and it is opt-out by
 overriding the rule:
 
 | What                            | Sheet       | Why                                                                                 |
 | ------------------------------- | ----------- | ----------------------------------------------------------------------------------- |
 | The volume slider is hidden      | `style.css` | 72px is not draggable by thumb, and the device has hardware volume keys that are. The mute button stays, so muting still works |
-| Buttons grow to 44px            | `theme.css` | The glyph and its padding make a 32px box — fine for a mouse, under [WCAG 2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) for a finger. Only the box grows; the icon keeps its size |
+
+The buttons do not grow for the finger, and that is a choice with a cost. `theme.css` draws
+a 32px button on every pointer: past [WCAG 2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html),
+the AA minimum of 24px, and short of [2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html),
+the AAA 44px that Apple and Google both ask for as well. 44px was tried and the row could
+not afford it — six targets and the clock come to 343px where a 393px phone gives the bar
+338px, so the fullscreen button wrapped to a third line and clawing it back cost the gap
+between every button. If your row is short enough to pay for it, the AAA size is two
+declarations:
+
+```css
+@media (pointer: coarse) {
+  media-player .media-player-controls button { min-width: 2.75rem; min-height: 2.75rem; }
+}
+```
 
 ## The part that matters most
 
@@ -196,7 +215,7 @@ controls that fade out while playing — only when it wrapped a `<video>`.
 
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0.5rem}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
 <media-player

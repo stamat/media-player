@@ -47,18 +47,23 @@ for the person who wrote the code.
   rather than hardcoded white and slate, so dark mode and forced colours need no palette.
 
 - **A two-row bar that needs no breakpoint.** The scrubber comes first in the sample markup
-  and takes a whole flex line, so the buttons and the clock wrap beneath it at every width —
-  the same shape on a phone and on a page-wide video. It is ordered in the markup rather than
-  moved with CSS `order`, which would have left a keyboard user tabbing the bar in the
-  opposite direction from the one they read it in. The row beneath falls into two clusters —
-  the transport and its clock at the start, the rest at the end — opened by a single `auto`
+  and takes a whole flex line, so the buttons and the clock wrap beneath it without a width
+  query — the same shape on a phone and on a page-wide video. It is ordered in the markup
+  rather than moved with CSS `order`, which would have left a keyboard user tabbing the bar in
+  the opposite direction from the one they read it in. The row beneath falls into two clusters
+  — the transport and its clock at the start, the rest at the end — opened by a single `auto`
   margin on whatever follows the clock, so the clock and everything before it goes left,
-  everything after it goes right, and moving the clock moves the divide. Under a coarse
-  pointer two more things
-  give way to the finger: the volume slider is hidden — 72px is not draggable by thumb, the
-  device has volume keys, and the mute button stays — and the buttons grow from 32px to the
-  44px [WCAG 2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html)
-  asks for, the box only, with the icon left the size it was.
+  everything after it goes right, and moving the clock moves the divide. One thing gives way
+  under a coarse pointer: the volume slider is hidden — 72px is not draggable by thumb, the
+  device has volume keys, and the mute button stays. The buttons do not grow with it. They
+  are 32px on every pointer, which clears the AA minimum of
+  [WCAG 2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) and
+  gives up the AAA 44px of
+  [2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html) — a
+  deliberate trade, because 44px buttons put the row 6px past what a 393px phone gives the
+  bar and wrapped the fullscreen button to a third line. At 32px the video sample's six
+  buttons and clock measure 306px and hold two rows down to a 360px phone; `theme.css`
+  documents the two declarations that buy the AAA size back for a shorter row.
 
 - **The scrubber never claims a position the browser refused.** A seek is clamped to
   `seekable` — what this browser can actually reach — rather than to `duration`, which is only
