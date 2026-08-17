@@ -22,11 +22,20 @@ it was written in Catalyst and TypeScript, before the React era.
 Now it is given a new life as open source, dogfooding [hydrargyri](https://github.com/stamat/hydrargyri) and
 [book-of-elementals](https://github.com/stamat/book-of-elementals).
 
+The sample below is not a picture of one. It is the page's only copy of that markup, rendered
+in an isolated frame by [`<code-preview>`](https://github.com/stamat/code-preview-element) —
+press **Edit** and what you type is what plays.
+
+<!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
+     whole opening tag sits on a line of its own. Broken over four, the page prints it. -->
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+
 ```html
 <media-player>
   <audio
     controls
-    src="/episode.mp3"
+    src="sample/tone.wav"
+    preload="metadata"
     on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
              play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
              ended:onEnded;progress:onProgress;volumechange:onVolumeChange"
@@ -37,9 +46,18 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
     aria-label="Playback"
     bind="isReady:if"
   >
+    <!-- Lucide, inline. The sample is the page's only copy of this markup, so the icons a
+         reader sees above are the icons the sample carries — swap them for yours and the
+         preview swaps with them. -->
+    <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    </button>
     <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled>
-      <span class="media-player-play-icon">▶</span>
-      <span class="media-player-pause-icon">⏸</span>
+      <span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span>
+      <span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span>
+    </button>
+    <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
     </button>
 
     <slider-elemental
@@ -78,37 +96,48 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
       <span bind="currentTime|time">00:00</span> /
       <span bind="duration|time">00:00</span>
     </span>
+
+    <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled>
+      <span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span>
+      <span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span>
+      <span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span>
+    </button>
+
+    <slider-elemental class="media-player-volume" tooltip="thumb">
+      <progress-elemental>
+        <progress value="100" max="100" bind="volumePercent:prop#value"></progress>
+      </progress-elemental>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        aria-label="Volume"
+        disabled
+        bind="volumePercent:prop#value"
+        on="input:setVolume"
+      />
+    </slider-elemental>
   </toolbar-elemental>
 </media-player>
 ```
+
+</code-preview>
 
 ```js
 import 'media-player';
 ```
 
-Which runs, here, on this page:
+<!-- The `-hljs` build, not the small one: this page's fences are highlighted at build time
+     and it ships no runtime highlighter, so without the bundled copy the code would keep the
+     colour it was baked with and stop recolouring the moment a reader typed. -->
+<script src="js/code-preview-hljs.min.js" defer></script>
 
-<!-- A blank line inside a raw HTML block ends it, and markdown turns whatever is indented
-     after it into a code sample. Keep this one contiguous. -->
-<div class="sample">
-<media-player storage-key="demo">
-<audio controls src="sample/tone.wav" preload="metadata" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></audio>
-<toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
-<button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-<button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
-<button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
-<slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
-<span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
-<button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
-<slider-elemental class="media-player-volume" tooltip="thumb"><progress-elemental><progress value="100" max="100" bind="volumePercent:prop#value"></progress></progress-elemental><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
-</toolbar-elemental>
-</media-player>
-</div>
-
-<script type="module" src="dist/media-player.min.mjs"></script>
-
-Block the script and that block is a plain `<audio controls>` — which is the point, and
-worth trying with JavaScript off before taking the claim on trust.
+Block the script and that markup is a plain `<audio controls>` — which is the point, and
+worth trying with JavaScript off before taking the claim on trust. Not on this page, though:
+the preview above is itself a custom element, so with scripting off there is nothing here but
+the code block it was built from. Paste the sample into a file of your own and the claim is
+one browser setting from proof.
 
 That is the whole wiring model. `on` says what fires, `bind` says where state lands, and
 both hold names — never code — so there is nothing to evaluate and nothing for a Content
@@ -133,6 +162,10 @@ There is no separate audio player and video player. `<media-player>` reads which
 wrapped and turns on the video half — poster, click-to-play overlay, captions, fullscreen,
 controls that fade out while playing — only when it wrapped a `<video>`.
 
+<!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
+     whole opening tag sits on a line of its own. Broken over four, the page prints it. -->
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+
 ```html
 <media-player
   on="mousemove:showControls;fullscreenchange@document:onFullscreenChange"
@@ -140,15 +173,16 @@ controls that fade out while playing — only when it wrapped a `<video>`.
   <video
     controls
     playsinline
-    src="/talk.mp4"
-    poster="/talk.jpg"
+    preload="metadata"
+    src="sample/rollout.mp4"
+    poster="sample/rollout.jpg"
     on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
         play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
         ended:onEnded;progress:onProgress;volumechange:onVolumeChange"
   >
     <track
       kind="captions"
-      src="/talk.en.vtt"
+      src="sample/rollout.en.vtt"
       srclang="en"
       label="English"
       on="cuechange:onCue"
@@ -158,7 +192,7 @@ controls that fade out while playing — only when it wrapped a `<video>`.
   <!-- Both go when playback starts: the element sets `poster-hidden` and the stylesheet
        takes them off. The overlay leaves entirely rather than fading, so an invisible
        button is never sitting over the controls swallowing their clicks. -->
-  <img class="media-player-poster" src="/talk.jpg" alt="" />
+  <img class="media-player-poster" src="sample/rollout.jpg" alt="" />
   <button
     class="media-player-overlay"
     on="click:togglePlay"
@@ -174,16 +208,61 @@ controls that fade out while playing — only when it wrapped a `<video>`.
     aria-label="Playback"
     bind="isReady:if"
   >
-    <!-- the same controls as above, plus two toggles. The label stays put and
-         `aria-pressed` carries the state — which is also the hook the theme keeps the
-         hover flood on. `|pressed` turns the bind's boolean into ARIA's "true"/"false". -->
+    <!-- Play, scrubber and clock are the audio player's, unchanged — nothing about them
+         knows which element it wrapped. -->
+    <!-- Lucide, inline. The sample is the page's only copy of this markup, so the icons a
+         reader sees above are the icons the sample carries — swap them for yours and the
+         preview swaps with them. -->
+    <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    </button>
+    <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled>
+      <span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span>
+      <span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span>
+    </button>
+    <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+    </button>
+
+    <slider-elemental
+      class="media-player-scrubber"
+      tooltip="thumb track"
+      bind="timeFormatter:prop#format"
+    >
+      <progress-elemental bind="buffered:attr#buffer">
+        <progress
+          value="0"
+          max="1"
+          bind="currentTime:prop#value|floor;duration:prop#max|floor"
+        ></progress>
+      </progress-elemental>
+      <input
+        type="range"
+        min="0"
+        step="1"
+        value="0"
+        aria-label="Seek"
+        disabled
+        bind="duration:attr#max|floor;currentTime:prop#value|floor"
+        on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
+      />
+    </slider-elemental>
+
+    <span class="media-player-time">
+      <span bind="currentTime|time">00:00</span> /
+      <span bind="duration|time">00:00</span>
+    </span>
+
+    <!-- The two a video adds. The label stays put and `aria-pressed` carries the state —
+         which is also the hook the theme keeps the hover flood on. `|pressed` turns the
+         bind's boolean into ARIA's "true"/"false". -->
     <button
       on="click:toggleCaptions"
       aria-label="Captions"
       bind="captionsVisible:attr#aria-pressed|pressed"
       disabled
     >
-      CC
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
     </button>
     <button
       on="click:toggleFullscreen"
@@ -191,39 +270,21 @@ controls that fade out while playing — only when it wrapped a `<video>`.
       bind="isFullscreen:attr#aria-pressed|pressed"
       disabled
     >
-      ⛶
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
     </button>
   </toolbar-elemental>
 </media-player>
 ```
 
-Which runs here too, over twelve seconds of NASA's Artemis II rollout:
+</code-preview>
 
-<div class="sample">
-<media-player storage-key="demo-video" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
-<video controls playsinline preload="metadata" src="sample/rollout.mp4" poster="sample/rollout.jpg" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"><track kind="captions" src="sample/rollout.en.vtt" srclang="en" label="English" on="cuechange:onCue" /></video>
-<img class="media-player-poster" src="sample/rollout.jpg" alt="" />
-<button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
-<div class="media-player-captions" bind="captionText:if"><span bind="captionText"></span></div>
-<toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
-<button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-<button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
-<button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
-<slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
-<span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
-<button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
-<slider-elemental class="media-player-volume" tooltip="thumb"><progress-elemental><progress value="100" max="100" bind="volumePercent:prop#value"></progress></progress-elemental><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
-<button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg></button>
-<button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
-</toolbar-elemental>
-</media-player>
-</div>
+Which runs here too, over twelve seconds of NASA's Artemis II rollout.
 
 Video and captions are NASA's, [public domain](https://www.nasa.gov/nasa-brand-center/images-and-media/):
 the [Artemis II rollout](https://images.nasa.gov/details/KSC-20260117-MH-DNS01-0001-Artemis_II_Rollout_Timelapse_LC_39_Press_Site-M18870)
 to Launch Complex 39B on 17 January 2026. The clip is silent — it carries an audio track, but
-every sample in it is zero — so the volume and mute buttons here move a level with nothing
-behind it; the audio player above is where they are worth trying. Its one caption cue reads
+every sample in it is zero — which is why the mute button and the volume slider are not on
+this row; the audio player above is where they are worth trying. Its one caption cue reads
 `[Ambient sounds]`, which belongs to a longer cut of the same footage and is left as NASA
 wrote it: enough to prove the CC wiring, no more. The controls fade out while it plays and
 come back on the next mouse move — that is `mousemove:showControls`, below.

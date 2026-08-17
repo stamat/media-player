@@ -45,7 +45,9 @@ script/lint      # eslint + stylelint
 
 The library is one file, `src/scripts/media-player.js`, with its test in `test/`.
 `src/markup/index.md` is the whole site and builds to `index.html` at the repository root;
-`dist/`, `css/` and `js/` are built and committed, because the page loads them from here.
+`dist/`, `css/` and `js/` are built and committed, because the page loads them from here —
+`js/code-preview-hljs.min.js` among them, copied out of `node_modules` by the build rather
+than compiled, because the live samples need it and no CDN should be in the way.
 
 ## Pull requests
 

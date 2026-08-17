@@ -14,13 +14,14 @@
 @use "./index";
 @use "./theme";
 
-.sample {
-  margin-block: 2rem;
-  padding: 1.5rem;
-  border: 1px solid var(--border, currentcolor);
-  border-radius: var(--radius, 0.5rem);
-}
+// The live samples' frame. Only the element's own stylesheet — its hljs token colours are a
+// second, optional file, and the docs theme already paints those classes.
+@use "code-preview-element/dist/code-preview.css";
 
-.sample media-player {
-  max-width: 40rem;
+// A sample carrying its own icons is a tall block, and a preview scrolled off the top while
+// its markup is read is the one thing the element exists to prevent. The cap is on the code,
+// never on the frame: the preview sizes itself from what it rendered.
+.prose code-preview pre {
+  overflow: auto;
+  max-height: 32rem;
 }

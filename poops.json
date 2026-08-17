@@ -46,6 +46,10 @@
       "justMinified": true
     }
   }],
+  "copy": {
+    "in": "node_modules/code-preview-element/dist/code-preview-hljs.min.js",
+    "out": "js"
+  },
   "markup": {
     "in": "src/markup",
     "out": ".",
@@ -59,8 +63,8 @@
         "url": "https://stamat.github.io/media-player",
         "repo": "https://github.com/stamat/media-player",
         "branch": "main",
-        "links": [
-          { "title": "npm", "url": "https://www.npmjs.com/package/media-player" }
+        "iconLinks": [
+          { "title": "npm", "url": "https://www.npmjs.com/package/media-player", "icon": "npm" }
         ],
         "theme": "light"
       }
