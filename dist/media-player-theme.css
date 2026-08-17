@@ -66,6 +66,15 @@ media-player .media-player-controls button + button {
   margin-inline-start: calc(var(--media-player-gap) * -0.75);
 }
 
+@media (pointer: coarse) {
+  media-player .media-player-controls button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+  media-player .media-player-controls button + button {
+    margin-inline-start: 0;
+  }
+}
 media-player .media-player-controls button:hover,
 media-player .media-player-controls button:focus-visible,
 media-player .media-player-controls button[aria-pressed=true] {
@@ -97,26 +106,6 @@ media-player slider-elemental > input[type=range] {
 
 media-player slider-elemental > input[type=range]:disabled {
   cursor: default;
-}
-
-media-player slider-elemental > input[type=range]::-webkit-slider-thumb {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-media-player slider-elemental > input[type=range]::-moz-range-thumb {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-media-player slider-elemental:hover > input[type=range]::-webkit-slider-thumb,
-media-player slider-elemental:focus-within > input[type=range]::-webkit-slider-thumb {
-  opacity: 1;
-}
-
-media-player slider-elemental:hover > input[type=range]::-moz-range-thumb,
-media-player slider-elemental:focus-within > input[type=range]::-moz-range-thumb {
-  opacity: 1;
 }
 
 media-player .media-player-time {
@@ -210,12 +199,6 @@ media-player[is-video] .media-player-controls {
     animation: none;
   }
   .media-player-overlay:empty::before {
-    transition: none;
-  }
-  media-player slider-elemental > input[type=range]::-webkit-slider-thumb {
-    transition: none;
-  }
-  media-player slider-elemental > input[type=range]::-moz-range-thumb {
     transition: none;
   }
 }

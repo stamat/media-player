@@ -18,12 +18,13 @@ media-player video {
 
 .media-player-controls {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--media-player-gap);
 }
 
 .media-player-scrubber {
-  flex: 1 1 auto;
+  flex: 1 1 100%;
   min-width: 0;
 }
 
@@ -49,9 +50,18 @@ media-player video {
   flex: 0 0 4.5rem;
 }
 
+@media (pointer: coarse) {
+  .media-player-volume {
+    display: none;
+  }
+}
 .media-player-time {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.media-player-time + * {
+  margin-inline-start: auto;
 }
 
 media-player .media-player-pause-icon,
@@ -127,7 +137,7 @@ media-player[poster-hidden] .media-player-overlay {
   left: 0;
   display: flex;
   justify-content: center;
-  padding-bottom: 4rem;
+  padding-bottom: 5.5rem;
   pointer-events: none;
   text-align: center;
 }

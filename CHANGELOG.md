@@ -41,10 +41,24 @@ for the person who wrote the code.
 
 - **The look is optional.** Structure and look ship as separate stylesheets, the way the
   elementals do: `style.css` alone is a working player, and `theme.css` brings the flat
-  compact bar, the accent flooding a button on hover, the slim track whose thumb appears on
-  hover or focus, the video gradient with its centred play chip, a stripe march while
+  compact bar, the accent flooding a button on hover, the slim track with its accent thumb,
+  the video gradient with its centred play chip, a stripe march while
   buffering and a scrubber that hides on a live stream — in `Canvas` and `CanvasText`
   rather than hardcoded white and slate, so dark mode and forced colours need no palette.
+
+- **A two-row bar that needs no breakpoint.** The scrubber comes first in the sample markup
+  and takes a whole flex line, so the buttons and the clock wrap beneath it at every width —
+  the same shape on a phone and on a page-wide video. It is ordered in the markup rather than
+  moved with CSS `order`, which would have left a keyboard user tabbing the bar in the
+  opposite direction from the one they read it in. The row beneath falls into two clusters —
+  the transport and its clock at the start, the rest at the end — opened by a single `auto`
+  margin on whatever follows the clock, so the clock and everything before it goes left,
+  everything after it goes right, and moving the clock moves the divide. Under a coarse
+  pointer two more things
+  give way to the finger: the volume slider is hidden — 72px is not draggable by thumb, the
+  device has volume keys, and the mute button stays — and the buttons grow from 32px to the
+  44px [WCAG 2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html)
+  asks for, the box only, with the icon left the size it was.
 
 - **The parts with an APG pattern are borrowed, not rewritten.** The scrubber and volume are
   [`<slider-elemental>`](https://github.com/stamat/book-of-elementals) around a native

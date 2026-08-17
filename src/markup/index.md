@@ -46,20 +46,10 @@ press **Edit** and what you type is what plays.
     aria-label="Playback"
     bind="isReady:if"
   >
-    <!-- Lucide, inline. The sample is the page's only copy of this markup, so the icons a
-         reader sees above are the icons the sample carries — swap them for yours and the
-         preview swaps with them. -->
-    <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>
-      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-    </button>
-    <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled>
-      <span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span>
-      <span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span>
-    </button>
-    <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>
-      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
-    </button>
-
+    <!-- First, and the stylesheet counts on it: the scrubber takes a whole flex line, so
+         everything after it in this markup falls to the row below. Written here rather than
+         moved with `order`, which would leave a keyboard user tabbing the row bottom-to-top
+         while reading it top-to-bottom. -->
     <slider-elemental
       class="media-player-scrubber"
       tooltip="thumb track"
@@ -91,6 +81,20 @@ press **Edit** and what you type is what plays.
         on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
       />
     </slider-elemental>
+
+    <!-- Lucide, inline. The sample is the page's only copy of this markup, so the icons a
+         reader sees above are the icons the sample carries — swap them for yours and the
+         preview swaps with them. -->
+    <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    </button>
+    <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled>
+      <span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span>
+      <span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span>
+    </button>
+    <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+    </button>
 
     <span class="media-player-time">
       <span bind="currentTime|time">00:00</span> /
@@ -144,6 +148,34 @@ both hold names — never code — so there is nothing to evaluate and nothing f
 Security Policy to object to. It sits on
 [hydrargyri](https://github.com/stamat/hydrargyri) for the binding and
 [book-of-elementals](https://github.com/stamat/book-of-elementals) for the sliders.
+
+## Two rows, and what a phone changes
+
+The scrubber is first in that markup on purpose. `style.css` gives it a whole flex line, so
+the buttons and the clock wrap under it and the bar is two rows at every width — a phone and
+a page-wide video get the same shape, and there is no breakpoint to tune. Squeezed into one
+row instead, the fixed-width parts alone outgrow a 375px viewport and the scrubber is left
+with about twenty pixels of something meant to be dragged.
+
+Which is also why the scrubber is moved in the markup rather than with `order`. Reordering a
+flex line visually leaves the tab sequence in the old order, and a keyboard user would read
+the bar top-to-bottom while tabbing it bottom-to-top. Put it where you want it and both agree.
+
+The row under it falls into two clusters — the transport with its clock at the start,
+everything else at the end. What opens the gap is a single `margin-inline-start: auto` on
+whatever follows the clock, so the arrangement stays yours: the clock and everything before
+it goes left, everything after it goes right, and moving the clock moves the divide. A row
+written without a clock matches that rule nowhere and comes out as one cluster at the start
+— visibly wrong rather than quietly broken — and the fix is to put the same `auto` on
+whichever control should open the right-hand group.
+
+Two things change under a coarse pointer — a phone, a tablet — and both are opt-out by
+overriding the rule:
+
+| What                            | Sheet       | Why                                                                                 |
+| ------------------------------- | ----------- | ----------------------------------------------------------------------------------- |
+| The volume slider is hidden      | `style.css` | 72px is not draggable by thumb, and the device has hardware volume keys that are. The mute button stays, so muting still works |
+| Buttons grow to 44px            | `theme.css` | The glyph and its padding make a 32px box — fine for a mouse, under [WCAG 2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) for a finger. Only the box grows; the icon keeps its size |
 
 ## The part that matters most
 
@@ -208,22 +240,11 @@ controls that fade out while playing — only when it wrapped a `<video>`.
     aria-label="Playback"
     bind="isReady:if"
   >
-    <!-- Play, scrubber and clock are the audio player's, unchanged — nothing about them
-         knows which element it wrapped. -->
-    <!-- Lucide, inline. The sample is the page's only copy of this markup, so the icons a
-         reader sees above are the icons the sample carries — swap them for yours and the
-         preview swaps with them. -->
-    <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>
-      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-    </button>
-    <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled>
-      <span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span>
-      <span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span>
-    </button>
-    <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>
-      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
-    </button>
-
+    <!-- Every control the audio player has, carried over whole — none of them knows which
+         element it wrapped, and a video needs its sound turned down as much as a podcast
+         does. Captions and fullscreen are the only two this row adds. The scrubber leads
+         here for the same reason it does there: it takes a whole flex line, so the buttons
+         fall to the row beneath it. -->
     <slider-elemental
       class="media-player-scrubber"
       tooltip="thumb track"
@@ -248,10 +269,46 @@ controls that fade out while playing — only when it wrapped a `<video>`.
       />
     </slider-elemental>
 
+    <!-- Lucide, inline. The sample is the page's only copy of this markup, so the icons a
+         reader sees above are the icons the sample carries — swap them for yours and the
+         preview swaps with them. -->
+    <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    </button>
+    <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled>
+      <span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span>
+      <span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span>
+    </button>
+    <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+    </button>
+
     <span class="media-player-time">
       <span bind="currentTime|time">00:00</span> /
       <span bind="duration|time">00:00</span>
     </span>
+
+    <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled>
+      <span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span>
+      <span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span>
+      <span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span>
+    </button>
+
+    <slider-elemental class="media-player-volume" tooltip="thumb">
+      <progress-elemental>
+        <progress value="100" max="100" bind="volumePercent:prop#value"></progress>
+      </progress-elemental>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        aria-label="Volume"
+        disabled
+        bind="volumePercent:prop#value"
+        on="input:setVolume"
+      />
+    </slider-elemental>
 
     <!-- The two a video adds. The label stays put and `aria-pressed` carries the state —
          which is also the hook the theme keeps the hover flood on. `|pressed` turns the
@@ -370,7 +427,7 @@ last. A live stream gets no seek buttons, because there is nowhere on it to seek
 ## What the theme takes
 
 `theme.css` speaks the register Plyr made the standard: a flat compact bar, controls that
-flood with the accent under the pointer, a slim rounded track whose accent thumb appears on hover or focus,
+flood with the accent under the pointer, a slim rounded track carrying an accent thumb,
 video controls on a bottom gradient with a centred play chip. Where Plyr hardcodes white
 and slate, this sheet uses `Canvas` and `CanvasText`, so the same look follows the page
 into dark mode and forced colours. What it takes from you are custom properties — the

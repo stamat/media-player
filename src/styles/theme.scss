@@ -1,6 +1,6 @@
 // The optional look, in the register Plyr made the standard for web players: a flat
 // compact bar, controls that fill with the accent under the pointer, a slim rounded track
-// whose accent thumb waits for a pointer or for focus, video controls on a bottom gradient. Where Plyr hardcodes
+// carrying an accent thumb, video controls on a bottom gradient. Where Plyr hardcodes
 // white and slate, this sheet uses `Canvas` and `CanvasText`, so the same look follows the
 // page into dark mode and forced colours without a palette to configure.
 
@@ -105,6 +105,22 @@ media-player .media-player-controls button + button {
   margin-inline-start: calc(var(--media-player-gap) * -0.75);
 }
 
+// The padding around a 1.125rem glyph makes a 2rem button, which is a comfortable mouse
+// target and an undersized finger one — WCAG 2.5.5 asks for 44px. A minimum rather than
+// more padding, so the glyph stays the size it is and only the box around it grows. The
+// cluster's negative margin goes with it: overlapping boxes hand the shared strip to
+// whichever paints last, and it is the play button in the middle that loses the edge.
+@media (pointer: coarse) {
+  media-player .media-player-controls button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  media-player .media-player-controls button + button {
+    margin-inline-start: 0;
+  }
+}
+
 // The hover is the accent filling the control, not the icon changing shade — Plyr's most
 // recognisable move. A toggle that is on keeps the flood: `aria-pressed` is the state the
 // button already announces, so it is the hook the paint hangs on too. Scoped to the row:
@@ -147,30 +163,6 @@ media-player slider-elemental > input[type="range"] {
 
 media-player slider-elemental > input[type="range"]:disabled {
   cursor: default;
-}
-
-// The thumb keeps out of sight until the slider is engaged — pointer over it, or focus in
-// it. Focus counts as engaged or a keyboard user scrubs blind, which would be a state
-// traded away for looks. One rule per engine: a selector list with an unknown vendor
-// pseudo drops the whole rule.
-media-player slider-elemental > input[type="range"]::-webkit-slider-thumb {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-media-player slider-elemental > input[type="range"]::-moz-range-thumb {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-media-player slider-elemental:hover > input[type="range"]::-webkit-slider-thumb,
-media-player slider-elemental:focus-within > input[type="range"]::-webkit-slider-thumb {
-  opacity: 1;
-}
-
-media-player slider-elemental:hover > input[type="range"]::-moz-range-thumb,
-media-player slider-elemental:focus-within > input[type="range"]::-moz-range-thumb {
-  opacity: 1;
 }
 
 media-player .media-player-time {
@@ -298,14 +290,6 @@ media-player[is-video] .media-player-controls {
   }
 
   .media-player-overlay:empty::before {
-    transition: none;
-  }
-
-  media-player slider-elemental > input[type="range"]::-webkit-slider-thumb {
-    transition: none;
-  }
-
-  media-player slider-elemental > input[type="range"]::-moz-range-thumb {
     transition: none;
   }
 }

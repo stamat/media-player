@@ -28,16 +28,20 @@ media-player video {
   height: auto;
 }
 
-// The control row lays itself out; the scrubber is the one part that takes the slack, so a
-// player is legible from a phone to a page-wide video without a media query.
+// Two rows at every width, and no media query anywhere in here: the scrubber is written
+// first in the markup and claims a whole flex line, so the buttons and the clock wrap
+// beneath it. One row cannot survive a phone — the buttons, the clock and the volume are
+// fixed-width and add up past a 375px viewport on their own, which leaves the scrubber
+// about twenty pixels of a control that exists to be dragged.
 .media-player-controls {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--media-player-gap);
 }
 
 .media-player-scrubber {
-  flex: 1 1 auto;
+  flex: 1 1 100%;
   min-width: 0;
 }
 
@@ -82,9 +86,28 @@ media-player video {
   flex: 0 0 4.5rem;
 }
 
+// A 72px slider is not draggable with a thumb, and a phone has hardware volume keys that
+// are — so the slider goes and the mute button, which is a target either way, stays. Keyed
+// on the primary pointer: a laptop with a touchscreen still reports `fine` and keeps it.
+@media (pointer: coarse) {
+  .media-player-volume {
+    display: none;
+  }
+}
+
 .media-player-time {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+// Two clusters on the row under the scrubber: the transport and its clock at the start,
+// everything else at the end. One auto margin on whatever follows the clock opens the gap —
+// `justify-content: space-between` would spread all six controls evenly instead of splitting
+// them in two. The split rides the clock's position in the markup rather than a class of its
+// own, so moving the clock moves the divide; a row written without one matches nothing here
+// and lands as a single cluster at the start, which is wrong-looking rather than broken.
+.media-player-time + * {
+  margin-inline-start: auto;
 }
 
 // One button, two icons, and the attribute says which. Doing it here rather than swapping
@@ -165,6 +188,9 @@ media-player[poster-hidden] .media-player-overlay {
   display: none;
 }
 
+// The padding clears the control row the captions would otherwise sit behind, so it is
+// measured against a two-row bar: padding, scrubber, row gap, buttons, padding. A caption
+// is the one thing on the video that must never be covered, so it is rounded up.
 .media-player-captions {
   position: absolute;
   right: 0;
@@ -172,7 +198,7 @@ media-player[poster-hidden] .media-player-overlay {
   left: 0;
   display: flex;
   justify-content: center;
-  padding-bottom: 4rem;
+  padding-bottom: 5.5rem;
   pointer-events: none;
   text-align: center;
 }
