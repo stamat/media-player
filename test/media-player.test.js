@@ -456,6 +456,9 @@ describe('the labels a button announces itself by', () => {
     player.onVolumeChange();
     expect(player.muteLabel).toBe('Unmute');
     expect(player.volumeState).toBe('mute');
+    // What the volume slider and the <progress> behind it are both bound to — the bar only
+    // redraws because this lands at zero.
+    expect(player.volumePercent).toBe(0);
   });
 });
 

@@ -39,15 +39,19 @@ media-player video {
 .media-player-scrubber {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+// The played and buffered bars — and the volume level — are a <progress> stacked behind
+// the range input, not the slider's own fill. An <input type="range">'s `value` is not a
+// reflecting IDL attribute and fires no event when written from script, so slider-elemental
+// cannot see the write and its fill stays frozen wherever the last real pointer left it:
+// the clock while playing, the volume when a mute lands. A <progress> reflects, so the same
+// write redraws the bar. The range input stays for what it is good at — seeking, setting a
+// level, and the whole APG keyboard pattern.
+.media-player-scrubber,
+.media-player-volume {
   position: relative;
 
-  // The played and buffered bars are a <progress> stacked behind the range input, not the
-  // slider's own fill. An <input type="range">'s `value` is not a reflecting IDL attribute,
-  // so writing it from script changes the thumb and nothing else — no event fires and
-  // slider-elemental cannot see it, which leaves its fill frozen wherever the last real
-  // pointer left it. A <progress> reflects, so the same write lands as `value="12"` and the
-  // bar redraws. The range input stays for what it is good at: seeking, and the whole APG
-  // keyboard pattern.
   --slider-elemental-fill: transparent;
   --slider-elemental-track: transparent;
 
@@ -56,18 +60,19 @@ media-player video {
   --slider-elemental-thumb: currentcolor;
 }
 
-.media-player-scrubber progress-elemental {
+.media-player-scrubber progress-elemental,
+.media-player-volume progress-elemental {
   position: absolute;
   inset-inline: 0;
   top: 50%;
   translate: 0 -50%;
   pointer-events: none;
 
-  // No easing on the played bar. The theme animates the fill over 250ms, which is right for
-  // a bar that jumps when a download reports in — but this one is written on every animation
-  // frame, so each write restarts a transition the previous one never finished and the fill
-  // trails a quarter second behind the thumb it is supposed to sit under. The buffered bar
-  // keeps its easing: that one really does arrive in jumps.
+  // No easing. These bars are written per animation frame or per input tick, and each write
+  // restarts a transition the previous one never finished, so an eased fill trails a
+  // quarter second behind the thumb it is supposed to sit under. One duration eases both of
+  // a progress-elemental's bars, so the buffered bar gives its easing up with the played
+  // one — a loss, since that one really does arrive in jumps.
   --progress-elemental-duration: 0s;
 }
 

@@ -25,13 +25,18 @@ media-player video {
 .media-player-scrubber {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.media-player-scrubber,
+.media-player-volume {
   position: relative;
   --slider-elemental-fill: transparent;
   --slider-elemental-track: transparent;
   --slider-elemental-thumb: currentcolor;
 }
 
-.media-player-scrubber progress-elemental {
+.media-player-scrubber progress-elemental,
+.media-player-volume progress-elemental {
   position: absolute;
   inset-inline: 0;
   top: 50%;

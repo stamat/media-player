@@ -100,7 +100,7 @@ Which runs, here, on this page:
 <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
 <span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
 <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
-<slider-elemental class="media-player-volume"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
+<slider-elemental class="media-player-volume"><progress-elemental><progress value="100" max="100" bind="volumePercent:prop#value"></progress></progress-elemental><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
 </toolbar-elemental>
 </media-player>
 </div>
@@ -187,6 +187,35 @@ controls that fade out while playing — only when it wrapped a `<video>`.
 </media-player>
 ```
 
+Which runs here too, over twelve seconds of NASA's Artemis II rollout:
+
+<div class="sample">
+<media-player storage-key="demo-video" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+<video controls playsinline preload="metadata" src="sample/rollout.mp4" poster="sample/rollout.jpg" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"><track kind="captions" src="sample/rollout.en.vtt" srclang="en" label="English" on="cuechange:onCue" /></video>
+<img class="media-player-poster" src="sample/rollout.jpg" alt="" />
+<button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
+<div class="media-player-captions" bind="captionText:if"><span bind="captionText"></span></div>
+<toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
+<button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>↺</button>
+<button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon">▶</span><span class="media-player-pause-icon">⏸</span></button>
+<button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>↻</button>
+<span class="media-player-time" bind="currentTime|time">00:00</span>
+<slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
+<span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
+<button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
+<slider-elemental class="media-player-volume"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
+<button on="click:toggleCaptions" bind="captionsLabel:attr#aria-label" disabled>CC</button>
+<button on="click:toggleFullscreen" aria-label="Fullscreen" disabled>⛶</button>
+</toolbar-elemental>
+</media-player>
+</div>
+
+Video and captions are NASA's, [public domain](https://www.nasa.gov/nasa-brand-center/images-and-media/):
+the [Artemis II rollout](https://images.nasa.gov/details/KSC-20260117-MH-DNS01-0001-Artemis_II_Rollout_Timelapse_LC_39_Press_Site-M18870)
+to Launch Complex 39B on 17 January 2026. The one caption cue reads `[Ambient sounds]`, so the CC
+button proves the wiring rather than putting on a show. The controls fade out while it plays
+and come back on the next mouse move — that is `mousemove:showControls`, below.
+
 The two handlers on the `<media-player>` itself are the video half's housekeeping.
 `mousemove:showControls` is what makes the control row behave the way a video player's does:
 up while the pointer moves, gone five seconds after it stops, and always up while the video
@@ -239,7 +268,7 @@ player, or two players on one page will share one volume.
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `currentTime`, `duration`, `remaining`    | seconds; pipe them through `\|time` for `mm:ss`                                                                                     |
 | `buffered`                                | how far ahead the browser has loaded, **in seconds** — same scale as `duration`, so it goes straight on the `<progress>`'s `buffer` |
-| `volumePercent`                           | `0`–`100`, for a volume slider's `value`                                                                                            |
+| `volumePercent`                           | `0`–`100`, for a volume slider's `value` — and for the `<progress>` behind it, which is what redraws when a mute lands from script  |
 | `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next                                                                                             |
 | `captionText`                             | the active cue                                                                                                                      |
 
