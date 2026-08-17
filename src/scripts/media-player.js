@@ -124,6 +124,7 @@ export function volumeState(value) {
  * @cssprop {<color>} [--media-player-accent=Highlight] - The played part of the scrubber, and the focus ring.
  * @cssprop {<color>} [--media-player-surface=Canvas] - Behind the control row.
  * @cssprop {<color>} [--media-player-color=CanvasText] - Icons and labels on it.
+ * @cssprop {<length>} [--media-player-radius=0.5rem] - The control row's corners, and the video's.
  * @cssprop {<length>} [--media-player-gap=0.5rem] - Between controls.
  * @cssprop {<time>} [--media-player-fade=0.2s] - How long the video controls take to fade out.
  *

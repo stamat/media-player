@@ -166,7 +166,9 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
     <span class="hljs-attr">playsinline</span>
     <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/talk.mp4&quot;</span>
     <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;/talk.jpg&quot;</span>
-    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;play:onPlay;pause:onPause;progress:onProgress&quot;</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
+        play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
+        ended:onEnded;progress:onProgress;volumechange:onVolumeChange&quot;</span>
   &gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">track</span>
       <span class="hljs-attr">kind</span>=<span class="hljs-string">&quot;captions&quot;</span>
@@ -231,9 +233,12 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
 </media-player>
 </div><p>Video and captions are NASA&#39;s, <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/">public domain</a>:
 the <a href="https://images.nasa.gov/details/KSC-20260117-MH-DNS01-0001-Artemis_II_Rollout_Timelapse_LC_39_Press_Site-M18870">Artemis II rollout</a>
-to Launch Complex 39B on 17 January 2026. The one caption cue reads <code>[Ambient sounds]</code>, so the CC
-button proves the wiring rather than putting on a show. The controls fade out while it plays
-and come back on the next mouse move — that is <code>mousemove:showControls</code>, below.</p>
+to Launch Complex 39B on 17 January 2026. The clip is silent — it carries an audio track, but
+every sample in it is zero — so the volume and mute buttons here move a level with nothing
+behind it; the audio player above is where they are worth trying. Its one caption cue reads
+<code>[Ambient sounds]</code>, which belongs to a longer cut of the same footage and is left as NASA
+wrote it: enough to prove the CC wiring, no more. The controls fade out while it plays and
+come back on the next mouse move — that is <code>mousemove:showControls</code>, below.</p>
 <p>The two handlers on the <code>&lt;media-player&gt;</code> itself are the video half&#39;s housekeeping.
 <code>mousemove:showControls</code> is what makes the control row behave the way a video player&#39;s does:
 up while the pointer moves, gone five seconds after it stops, and always up while the video
@@ -323,6 +328,49 @@ against them.</p>
 <p>Two you do set: <code>skip</code> is how many seconds a skip button moves (default <code>10</code>), and
 <code>storage-key</code> is the prefix for the remembered volume, mute and captions state — set it per
 player, or two players on one page will share one volume.</p>
+<h2 id="what-the-theme-takes">What the theme takes<a class="heading-anchor" href="#what-the-theme-takes" tabindex="-1" aria-hidden="true"></a></h2>
+<p><code>theme.css</code> is painted entirely in system colours, so light mode, dark mode, forced colours
+and high contrast are answered before you configure anything. What it takes from you are
+custom properties — the first four live in the theme, the last two in the structure sheet:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Paints</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--media-player-accent</code></td>
+<td><code>Highlight</code></td>
+<td>the played part of the scrubber, the focus ring</td>
+</tr>
+<tr>
+<td><code>--media-player-surface</code></td>
+<td><code>Canvas</code></td>
+<td>behind the control row</td>
+</tr>
+<tr>
+<td><code>--media-player-color</code></td>
+<td><code>CanvasText</code></td>
+<td>icons, labels, and the buffered bar&#39;s tint</td>
+</tr>
+<tr>
+<td><code>--media-player-radius</code></td>
+<td><code>0.5rem</code></td>
+<td>the control row&#39;s corners, and the video&#39;s</td>
+</tr>
+<tr>
+<td><code>--media-player-gap</code></td>
+<td><code>0.5rem</code></td>
+<td>between controls</td>
+</tr>
+<tr>
+<td><code>--media-player-fade</code></td>
+<td><code>0.2s</code></td>
+<td>how long the video controls take to fade out</td>
+</tr>
+</tbody></table>
 <h2 id="state-you-can-bind">State you can bind<a class="heading-anchor" href="#state-you-can-bind" tabindex="-1" aria-hidden="true"></a></h2>
 <table>
 <thead>
@@ -350,6 +398,10 @@ player, or two players on one page will share one volume.</p>
 <tr>
 <td><code>captionText</code></td>
 <td>the active cue</td>
+</tr>
+<tr>
+<td><code>timeFormatter</code></td>
+<td>the <code>formatTime</code> function itself — hand it to the scrubber&#39;s <code>prop#format</code> and the value bubble reads <code>01:12</code> instead of <code>72</code></td>
 </tr>
 </tbody></table>
 <p>Beside <code>togglePlay</code>, <code>stop</code>, the skips and the sliders&#39; handlers, two more answer <code>on=</code> for
@@ -512,10 +564,15 @@ bar, so its sheet loads beside this one.</p>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
   <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/progress/theme.css&quot;</span>
 /&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span></code></pre>
-<p>Or from a CDN as a module, no install and no build step:</p>
+<p>Or from a CDN as a module, no install and no build step — the stylesheets come the same
+way, from each package&#39;s <code>dist/</code>:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
   <span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs&#x27;</span>;
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.css&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/slider.min.css&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/progress.min.css&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/toolbar.min.css&quot;</span>&gt;</span></code></pre>
 <h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
 <p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> © <a href="https://github.com/stamat">Stamat</a></p>
 

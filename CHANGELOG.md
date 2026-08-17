@@ -17,8 +17,9 @@ for the person who wrote the code.
   already in the page. Which of the two it wrapped decides the video half — poster, overlay,
   captions, fullscreen and controls that fade while playing — read off the child element
   rather than off a `src`, so there is never a moment where the page has no media element in
-  it. Play, pause, skip, seek, volume, mute, buffering and live-stream detection; volume,
-  mute and captions state remembered per `storage-key`.
+  it. Play, pause, stop, skip, seek, volume — slider or `volumeUp`/`volumeDown` buttons —
+  mute, buffering and live-stream detection; volume, mute and captions state remembered per
+  `storage-key`.
 
 - **The controls are the author's markup.** No generated control bar and no option that
   takes one: buttons and range inputs are written in the page and wired by name through

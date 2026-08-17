@@ -142,7 +142,9 @@ controls that fade out while playing — only when it wrapped a `<video>`.
     playsinline
     src="/talk.mp4"
     poster="/talk.jpg"
-    on="loadedmetadata:onLoaded;play:onPlay;pause:onPause;progress:onProgress"
+    on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
+        play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
+        ended:onEnded;progress:onProgress;volumechange:onVolumeChange"
   >
     <track
       kind="captions"
@@ -212,9 +214,12 @@ Which runs here too, over twelve seconds of NASA's Artemis II rollout:
 
 Video and captions are NASA's, [public domain](https://www.nasa.gov/nasa-brand-center/images-and-media/):
 the [Artemis II rollout](https://images.nasa.gov/details/KSC-20260117-MH-DNS01-0001-Artemis_II_Rollout_Timelapse_LC_39_Press_Site-M18870)
-to Launch Complex 39B on 17 January 2026. The one caption cue reads `[Ambient sounds]`, so the CC
-button proves the wiring rather than putting on a show. The controls fade out while it plays
-and come back on the next mouse move — that is `mousemove:showControls`, below.
+to Launch Complex 39B on 17 January 2026. The clip is silent — it carries an audio track, but
+every sample in it is zero — so the volume and mute buttons here move a level with nothing
+behind it; the audio player above is where they are worth trying. Its one caption cue reads
+`[Ambient sounds]`, which belongs to a longer cut of the same footage and is left as NASA
+wrote it: enough to prove the CC wiring, no more. The controls fade out while it plays and
+come back on the next mouse move — that is `mousemove:showControls`, below.
 
 The two handlers on the `<media-player>` itself are the video half's housekeeping.
 `mousemove:showControls` is what makes the control row behave the way a video player's does:
@@ -263,6 +268,21 @@ Two you do set: `skip` is how many seconds a skip button moves (default `10`), a
 `storage-key` is the prefix for the remembered volume, mute and captions state — set it per
 player, or two players on one page will share one volume.
 
+## What the theme takes
+
+`theme.css` is painted entirely in system colours, so light mode, dark mode, forced colours
+and high contrast are answered before you configure anything. What it takes from you are
+custom properties — the first four live in the theme, the last two in the structure sheet:
+
+| Property                 | Default      | Paints                                            |
+| ------------------------ | ------------ | ------------------------------------------------- |
+| `--media-player-accent`  | `Highlight`  | the played part of the scrubber, the focus ring   |
+| `--media-player-surface` | `Canvas`     | behind the control row                            |
+| `--media-player-color`   | `CanvasText` | icons, labels, and the buffered bar's tint        |
+| `--media-player-radius`  | `0.5rem`     | the control row's corners, and the video's        |
+| `--media-player-gap`     | `0.5rem`     | between controls                                  |
+| `--media-player-fade`    | `0.2s`       | how long the video controls take to fade out      |
+
 ## State you can bind
 
 | Key                                       | Holds                                                                                                                               |
@@ -272,6 +292,7 @@ player, or two players on one page will share one volume.
 | `volumePercent`                           | `0`–`100`, for a volume slider's `value` — and for the `<progress>` behind it, which is what redraws when a mute lands from script  |
 | `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next                                                                                             |
 | `captionText`                             | the active cue                                                                                                                      |
+| `timeFormatter`                           | the `formatTime` function itself — hand it to the scrubber's `prop#format` and the value bubble reads `01:12` instead of `72`       |
 
 Beside `togglePlay`, `stop`, the skips and the sliders' handlers, two more answer `on=` for
 a volume UI without a slider: `volumeUp` and `volumeDown`, one tenth of full per press.
@@ -386,12 +407,17 @@ bar, so its sheet loads beside this one.
 /><!-- optional -->
 ```
 
-Or from a CDN as a module, no install and no build step:
+Or from a CDN as a module, no install and no build step — the stylesheets come the same
+way, from each package's `dist/`:
 
 ```html
 <script type="module">
   import 'https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs';
 </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/slider.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/progress.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/toolbar.min.css">
 ```
 
 ## License
