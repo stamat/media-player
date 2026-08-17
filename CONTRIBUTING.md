@@ -25,8 +25,8 @@ probably for a different library.
 - **No creating the media element.** A `src` on the wrapper would mean no media element at
   all until the script arrives. The author writes the `<audio>` or `<video>`, with
   `controls` on it, and that is the fallback.
-- **No player-wide keyboard map** until it can be discoverable. See the `ponytail:` note in
-  the source.
+- **No player-wide keyboard map** until it can be discoverable. See the `NOTE:`
+  above `MediaPlayer` in `src/scripts/media-player.js`, which carries the trigger.
 
 ## Getting set up
 

@@ -97,14 +97,13 @@ export function volumeState(value) {
  * nothing under `:not(:defined)`, so the fallback is never a themed control bar with dead
  * buttons on it.
  *
- * ponytail: no keyboard map of its own. Every control is a `<button>` or an
- * `<input type="range">`, so the platform already answers Space, Enter, the arrows, Home
- * and End on whichever one has focus. A player-wide map — `k`, `j`, `l`, `f`, `m` on the
- * host — is a second, undiscoverable set of bindings and wants its own pass.
- *
- * ponytail: the buffered bar is one span from the start, not the `TimeRanges` list the
- * media element actually holds. That is what a scrubber draws anyway; multiple spans want
- * their own element.
+ * Two limits worth knowing before you reach for them. There is no keyboard map of its own:
+ * every control is a `<button>` or an `<input type="range">`, so the platform already
+ * answers Space, Enter, the arrows, Home and End on whichever one has focus, and a
+ * player-wide `k`/`j`/`l` map would be a second set of bindings with nothing on the page
+ * announcing them. And the buffered bar is one span from the start rather than the
+ * `TimeRanges` list the media element holds, because `<progress>` carries one value — after
+ * a seek it shows how far the range under the playhead reaches, not the gap behind it.
  *
  * @attr {boolean} is-ready - Metadata has arrived and the duration is known. CSS hook; the element sets it.
  * @attr {boolean} is-playing - The media is playing. CSS hook for the play/pause icon swap; the element sets it.
@@ -134,6 +133,13 @@ export function volumeState(value) {
  *
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/slider/
  */
+
+// NOTE: the two limits in the doc above are deferrals, not permanent refusals, and the
+// doc is consumer-facing so it carries no triggers. The keyboard map comes back when the
+// bindings can be discoverable — a visible key list, or a player with no control row, where
+// there is no focused control to answer in the first place. The multi-span buffered bar
+// comes back when a scrubber has to draw the hole seeking leaves in a long stream, and it
+// arrives as an element in book-of-elementals rather than a change here.
 export class MediaPlayer extends HgElement {
   static attributes = [
     'is-ready',
