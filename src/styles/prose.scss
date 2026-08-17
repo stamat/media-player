@@ -6,6 +6,11 @@
 @use "book-of-elementals/src/elementals/slider/theme" as slider-theme;
 @use "book-of-elementals/src/elementals/progress/index" as progress;
 @use "book-of-elementals/src/elementals/progress/theme" as progress-theme;
+
+// Structure only for the toolbar: its theme draws a border and its own button chrome, and
+// the player's theme already gives the row a surface — a border around a surface is two
+// looks on one bar.
+@use "book-of-elementals/src/elementals/toolbar/index" as toolbar;
 @use "./index";
 @use "./theme";
 

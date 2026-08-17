@@ -59,19 +59,26 @@ Wanting a different arrangement means learning a <code>controls</code> array, or
 into a config option, which is templating in JavaScript wearing a smaller hat.</p>
 <p>This one goes the other way. <strong>You write the controls.</strong> They are buttons and range inputs
 in your page, styled by your stylesheet, in the order you put them. The element wires them
-by name and never touches their arrangement:</p>
-<p>It is a rewrite of the media players I built at GitHub in 2022 — the ones still
-<a href="https://github.com/readme/podcast/powering-public-goods">playing on github.com today</a>,
-written in Catalyst and TypeScript before React reached that part of the site.
-<a href="https://github.com/stamat/media-player#where-it-comes-from">What changed in the rewrite</a>
-is the argument for everything below it.</p>
+by name and never touches their arrangement.</p>
+<p>It is a rewrite of the media player I built at GitHub in 2022 as a passion project — the one still
+<a href="https://github.com/readme/podcast/powering-public-goods">playing on long forgotten github.com pages</a>,
+it was written in Catalyst and TypeScript, before the React era.
+Now it is given a new life as open source, dogfooding <a href="https://github.com/stamat/hydrargyri">hydrargyri</a> and
+<a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a>.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">audio</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/episode.mp3&quot;</span>
-         <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
+  <span class="hljs-tag">&lt;<span class="hljs-name">audio</span>
+    <span class="hljs-attr">controls</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/episode.mp3&quot;</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
              play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
-             ended:onEnded;progress:onProgress;volumechange:onVolumeChange&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>
+             ended:onEnded;progress:onProgress;volumechange:onVolumeChange&quot;</span>
+  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>
 
-  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isReady:if&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">toolbar-elemental</span>
+    <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span>
+    <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Playback&quot;</span>
+    <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isReady:if&quot;</span>
+  &gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>&gt;</span>▶<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>&gt;</span>⏸<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
@@ -79,34 +86,49 @@ is the argument for everything below it.</p>
 
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-time&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;currentTime|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
 
-    <span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span> <span class="hljs-attr">tooltip</span>=<span class="hljs-string">&quot;thumb track&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;timeFormatter:prop#format&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span>
+      <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span>
+      <span class="hljs-attr">tooltip</span>=<span class="hljs-string">&quot;thumb track&quot;</span>
+      <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;timeFormatter:prop#format&quot;</span>
+    &gt;</span>
       <span class="hljs-comment">&lt;!-- The played and buffered bars. A &lt;progress&gt; rather than the slider&#x27;s own fill:
            an &lt;input type=&quot;range&quot;&gt;&#x27;s `value` does not reflect to an attribute, so writing
            it from script moves the thumb and nothing else. --&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">progress-elemental</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;buffered:attr#buffer&quot;</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">progress</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">max</span>=<span class="hljs-string">&quot;1&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;currentTime:prop#value|floor;duration:prop#max|floor&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">progress</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">progress</span>
+          <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0&quot;</span>
+          <span class="hljs-attr">max</span>=<span class="hljs-string">&quot;1&quot;</span>
+          <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;currentTime:prop#value|floor;duration:prop#max|floor&quot;</span>
+        &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">progress</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">progress-elemental</span>&gt;</span>
       <span class="hljs-comment">&lt;!-- `|floor` on both nodes, which is the whole trick: a `step=&quot;1&quot;` range snaps what it
            is assigned to the nearest step, so an unfloored 3.6 is a thumb at 4 beside a bar
            at 3.6. One floored number, and they step together.
            `pointerup@document` as well as `change`: a thumb picked up and put back where it
            started fires no `change`, and the clock would stay stopped over playing audio. --&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span> <span class="hljs-attr">min</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;1&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Seek&quot;</span> <span class="hljs-attr">disabled</span>
-             <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration:attr#max|floor;currentTime:prop#value|floor&quot;</span>
-             <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+        <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span>
+        <span class="hljs-attr">min</span>=<span class="hljs-string">&quot;0&quot;</span>
+        <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;1&quot;</span>
+        <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Seek&quot;</span>
+        <span class="hljs-attr">disabled</span>
+        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration:attr#max|floor;currentTime:prop#value|floor&quot;</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub&quot;</span>
+      /&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
 
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-time&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">toolbar-elemental</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
-<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player&#x27;</span>;</code></pre>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player&quot;</span>;</code></pre>
 <p>Which runs, here, on this page:</p>
 <!-- A blank line inside a raw HTML block ends it, and markdown turns whatever is indented
      after it into a code sample. Keep this one contiguous. -->
 <div class="sample">
 <media-player storage-key="demo">
 <audio controls src="sample/tone.wav" preload="metadata" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></audio>
-<div class="media-player-controls" bind="isReady:if">
+<toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
 <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>↺</button>
 <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon">▶</span><span class="media-player-pause-icon">⏸</span></button>
 <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>↻</button>
@@ -115,7 +137,7 @@ is the argument for everything below it.</p>
 <span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
 <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
 <slider-elemental class="media-player-volume"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
-</div>
+</toolbar-elemental>
 </media-player>
 </div><script type="module" src="dist/media-player.min.mjs"></script><p>Block the script and that block is a plain <code>&lt;audio controls&gt;</code> — which is the point, and
 worth trying with JavaScript off before taking the claim on trust.</p>
@@ -136,21 +158,66 @@ until JavaScript says so.</p>
 <p>There is no separate audio player and video player. <code>&lt;media-player&gt;</code> reads which element you
 wrapped and turns on the video half — poster, click-to-play overlay, captions, fullscreen,
 controls that fade out while playing — only when it wrapped a <code>&lt;video&gt;</code>.</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">playsinline</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/talk.mp4&quot;</span> <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;/talk.jpg&quot;</span>
-         <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;play:onPlay;pause:onPause;progress:onProgress&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>
+  <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>
+&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
+    <span class="hljs-attr">controls</span>
+    <span class="hljs-attr">playsinline</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/talk.mp4&quot;</span>
+    <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;/talk.jpg&quot;</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;play:onPlay;pause:onPause;progress:onProgress&quot;</span>
+  &gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">track</span>
+      <span class="hljs-attr">kind</span>=<span class="hljs-string">&quot;captions&quot;</span>
+      <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/talk.en.vtt&quot;</span>
+      <span class="hljs-attr">srclang</span>=<span class="hljs-string">&quot;en&quot;</span>
+      <span class="hljs-attr">label</span>=<span class="hljs-string">&quot;English&quot;</span>
+      <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;cuechange:onCue&quot;</span>
+    /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
 
-  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-overlay&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span>
-          <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;overlayHidden:unless&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Play&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-comment">&lt;!-- Both go when playback starts: the element sets `poster-hidden` and the stylesheet
+       takes them off. The overlay leaves entirely rather than fading, so an invisible
+       button is never sitting over the controls swallowing their clicks. --&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-poster&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/talk.jpg&quot;</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">&quot;&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+    <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-overlay&quot;</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span>
+    <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Play&quot;</span>
+  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
 
-  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isReady:if&quot;</span>&gt;</span>
-    <span class="hljs-comment">&lt;!-- the same controls as above, plus: --&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleFullscreen&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Fullscreen&quot;</span>&gt;</span>⛶<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-captions&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;captionText:if&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;captionText&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">toolbar-elemental</span>
+    <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span>
+    <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Playback&quot;</span>
+    <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isReady:if&quot;</span>
+  &gt;</span>
+    <span class="hljs-comment">&lt;!-- the same controls as above, plus: --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+      <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleCaptions&quot;</span>
+      <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;captionsLabel:attr#aria-label&quot;</span>
+      <span class="hljs-attr">disabled</span>
+    &gt;</span>
+      CC
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleFullscreen&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Fullscreen&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+      ⛶
+    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">toolbar-elemental</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
-<p>Put <code>on=&quot;mousemove:showControls&quot;</code> on the <code>&lt;media-player&gt;</code> itself and the control row behaves
-the way a video player&#39;s does: up while the pointer moves, gone five seconds after it stops,
-and always up while the video is paused or something inside has focus.</p>
+<p>The two handlers on the <code>&lt;media-player&gt;</code> itself are the video half&#39;s housekeeping.
+<code>mousemove:showControls</code> is what makes the control row behave the way a video player&#39;s does:
+up while the pointer moves, gone five seconds after it stops, and always up while the video
+is paused or something inside has focus. <code>fullscreenchange@document:onFullscreenChange</code>
+keeps <code>is-fullscreen</code> honest when <kbd>Escape</kbd> leaves fullscreen without the button
+being pressed.</p>
+<p>Captions render into whatever binds <code>captionText</code>, with the track held <code>hidden</code> so the
+browser&#39;s own caption box stays out of the way — which is what leaves your stylesheet in
+charge of what captions look like.</p>
 <h2 id="what-it-borrows">What it borrows<a class="heading-anchor" href="#what-it-borrows" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The player draws almost nothing itself. The parts that have an
 <a href="https://www.w3.org/WAI/ARIA/apg/patterns/">APG pattern</a> behind them are elementals, each
@@ -260,7 +327,9 @@ player, or two players on one page will share one volume.</p>
 <p><code>media-player-ready</code> when the duration is known, and <code>media-player-interaction</code> for
 everything a person did — <code>{ type, value }</code> in <code>detail</code>, where <code>type</code> is one of <code>play</code>,
 <code>pause</code>, <code>seek</code>, <code>skip-forward</code>, <code>skip-backward</code>, <code>volume</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>,
-<code>captions-on</code>, <code>captions-off</code>. Both bubble from the element, not from <code>document</code>.</p>
+<code>captions-on</code>, <code>captions-off</code>. Both bubble from the element, not from <code>document</code>.
+A <code>fullscreen</code> event says which way in <code>value</code> — <code>true</code> entering, <code>false</code> leaving — and a
+volume drag settles into one <code>volume</code> event, not one per pixel.</p>
 <h2 id="against-the-alternatives">Against the alternatives<a class="heading-anchor" href="#against-the-alternatives" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Drawn on this player&#39;s axes, which is the caveat to read it with: a row is here because this
 project has an opinion about it, and the rows it has no answer for are the ones the others
@@ -278,7 +347,7 @@ win.</p>
 </thead>
 <tbody><tr>
 <td><strong>Size, gzipped</strong></td>
-<td><strong>8.6 kB</strong></td>
+<td><strong>8.8 kB</strong></td>
 <td>32 kB</td>
 <td>42 kB</td>
 <td>40 kB</td>
@@ -353,8 +422,8 @@ win.</p>
 (<code>dist/plyr.min.js</code>, <code>dist/video.min.js</code>), media-chrome bundled from its package entry with
 esbuild, Vidstack from <code>cdn.vidstack.io/player</code>. This one is <code>dist/media-player.min.mjs</code>,
 which carries hydrargyri and the three elementals inside it — everything the player needs
-except the stylesheets, which are another 1 kB. Every one of those numbers moves with a
-release; measure before quoting.</p>
+except the stylesheets: its own are another 1.4 kB, and the elementals&#39; about 2.5 kB more
+with their themes. Every one of those numbers moves with a release; measure before quoting.</p>
 <p>Where this loses is the bottom of that table, and it loses there on purpose. <strong>Plyr and
 Vidstack are the right answer for YouTube and Vimeo</strong>, and Video.js for the long tail of
 formats and plugins. None of that is planned here.</p>
@@ -375,14 +444,30 @@ the platform already answers <kbd>Space</kbd>, <kbd>Enter</kbd>, the arrows,
 </ul>
 <h2 id="install">Install<a class="heading-anchor" href="#install" tabindex="-1" aria-hidden="true"></a></h2>
 <pre><code class="hljs language-bash">npm install media-player</code></pre>
-<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player&#x27;</span>;
-<span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;book-of-elementals/slider&#x27;</span>;
-<span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;book-of-elementals/progress&#x27;</span>;</code></pre>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player/style.css&quot;</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player/theme.css&quot;</span>&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span></code></pre>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player&quot;</span>;</code></pre>
+<p>The elementals ride along — importing <code>media-player</code> defines the slider, the progress bar
+and the toolbar too. Their stylesheets do not: each elemental draws its own track, thumb or
+bar, so its sheet loads beside this one.</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player/style.css&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/slider/style.css&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/progress/style.css&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/toolbar/style.css&quot;</span> /&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player/theme.css&quot;</span>
+/&gt;</span><span class="hljs-comment">&lt;!-- the look; optional --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/slider/theme.css&quot;</span>
+/&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/progress/theme.css&quot;</span>
+/&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span></code></pre>
 <p>Or from a CDN as a module, no install and no build step:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-  <span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs&#x27;</span>;
+  <span class="hljs-keyword">import</span> <span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs&quot;</span>;
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 <h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
 <p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> © <a href="https://github.com/stamat">Stamat</a></p>

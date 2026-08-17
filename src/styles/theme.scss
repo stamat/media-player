@@ -26,7 +26,7 @@ media-player {
   // The elementals draw their own tracks; handing them this player's accent is what keeps
   // the scrubber the same colour as everything around it.
   --slider-elemental-fill: var(--media-player-accent);
-  --progress-elemental-buffer-color: color-mix(in srgb, var(--media-player-color) 30%, transparent);
+  --progress-elemental-buffer-fill: color-mix(in srgb, var(--media-player-color) 30%, transparent);
 }
 
 media-player .media-player-controls {

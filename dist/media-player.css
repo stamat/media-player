@@ -6,6 +6,10 @@ media-player {
   --media-player-fade: 0.2s;
 }
 
+media-player [hidden] {
+  display: none !important;
+}
+
 media-player video {
   display: block;
   width: 100%;
@@ -69,6 +73,11 @@ media-player[is-video] {
   overflow: hidden;
 }
 
+media-player[is-fullscreen] video {
+  height: 100%;
+  object-fit: contain;
+}
+
 media-player[is-video] .media-player-controls {
   position: absolute;
   right: 0;
@@ -99,6 +108,11 @@ media-player[is-video] .media-player-controls:focus-within {
   justify-content: center;
   border: 0;
   background: none;
+}
+
+media-player[poster-hidden] .media-player-poster,
+media-player[poster-hidden] .media-player-overlay {
+  display: none;
 }
 
 .media-player-captions {

@@ -19,6 +19,9 @@ export const VOLUME_SCALE = 100;
 /** How long the video controls stay up after the pointer stops moving, in milliseconds. */
 export const CONTROLS_LINGER = 5000;
 
+/** How long after the last volume input before the level is persisted and announced, in milliseconds. */
+export const VOLUME_SETTLE = 500;
+
 /** Two digits, because `1:7` is not a time and `01:07` is. */
 function pad(value) {
   return value < 10 ? `0${value}` : `${value}`;
@@ -41,17 +44,18 @@ export function formatTime(seconds) {
 }
 
 /**
- * Volume rounded to one decimal, with the ends snapped shut.
+ * Volume with the ends snapped shut.
  *
  * A slider that reads `0.97` at its top never sets the media element to `1`, so "full" is a
  * state the author can see on the track but never in `volumeState` — the snap is what makes
- * the mute and full icons reachable by dragging.
+ * the mute and full icons reachable by dragging. Only the ends: rounding the middle would
+ * quantise the slider, and the `volumePercent` write-back would drag the thumb to the
+ * rounded value in the middle of the drag that set it.
  */
 export function clampVolume(value) {
-  const rounded = Math.round(value * 10) / 10;
-  if (rounded > 0.9) return 1;
-  if (rounded < 0.1) return 0;
-  return rounded;
+  if (value > 0.9) return 1;
+  if (value < 0.1) return 0;
+  return value;
 }
 
 /** Which of the three volume icons the level is asking for. */
@@ -221,6 +225,7 @@ export class MediaPlayer extends HgElement {
   disconnected() {
     cancelAnimationFrame(this.frame);
     if (this.linger) clearTimeout(this.linger);
+    if (this.settle) clearTimeout(this.settle);
     // Put the page back the way it was found: an element removed from the DOM should leave
     // a media element that still plays, not a controlless one.
     if (this.media && this.hadControls) this.media.controls = true;
@@ -270,11 +275,13 @@ export class MediaPlayer extends HgElement {
   }
 
   skipForward() {
+    if (!this.media || this.isLive) return;
     this.seekBy(this.skipStep);
     this.interaction('skip-forward', this.skipStep);
   }
 
   skipBackward() {
+    if (!this.media || this.isLive) return;
     this.seekBy(-this.skipStep);
     this.interaction('skip-backward', this.skipStep);
   }
@@ -315,11 +322,12 @@ export class MediaPlayer extends HgElement {
    *
    * `timeupdate` fires about four times a second, which is visibly steppy under a moving
    * thumb, so the position comes off an animation frame while playing and the listener is
-   * not used at all. Cancelled on pause, so a paused player costs nothing.
+   * not used at all. Cancelled on pause, and never scheduled for a live stream — there is
+   * no clock to paint, and a loop that painted nothing would still run at sixty a second.
    */
   tick() {
-    if (!this.media || this.media.paused) return;
-    if (!this.isLive) this.paint(this.media.currentTime);
+    if (!this.media || this.media.paused || this.isLive) return;
+    this.paint(this.media.currentTime);
     this.frame = requestAnimationFrame(() => this.tick());
   }
 
@@ -455,9 +463,21 @@ export class MediaPlayer extends HgElement {
 
   // VOLUME
 
+  /**
+   * The volume slider, per `input` event.
+   *
+   * The level is applied immediately — the sound has to follow the thumb — but persisting
+   * and announcing wait for the drag to settle: `input` fires for every pixel, and a
+   * localStorage write per pixel is a synchronous disk touch dozens of times a second.
+   */
   setVolume(event) {
-    this.applyVolume(Number(event.target.value) / VOLUME_SCALE);
-    this.interaction('volume', this.media?.volume);
+    this.applyVolume(Number(event.target.value) / VOLUME_SCALE, false);
+    clearTimeout(this.settle);
+    this.settle = setTimeout(() => {
+      if (!this.media) return;
+      this.rememberVolume(this.media.volume);
+      this.interaction('volume', this.media.volume);
+    }, VOLUME_SETTLE);
   }
 
   applyVolume(value, remember = true) {
@@ -466,10 +486,17 @@ export class MediaPlayer extends HgElement {
     this.media.muted = volume === 0;
     this.media.volume = volume;
     if (volume > 0) this.lastVolume = volume;
-    if (remember) {
-      this.store('volume', volume);
-      this.store('muted', volume === 0);
-    }
+    if (remember) this.rememberVolume(volume);
+  }
+
+  /**
+   * Persist the level and the flag as two entries, and never store a zero level: muting
+   * writes `muted` and leaves `volume` at what it was, so a reload restores the mute and
+   * unmuting after it returns to the old level rather than jumping to full.
+   */
+  rememberVolume(volume) {
+    if (volume > 0) this.store('volume', volume);
+    this.store('muted', volume === 0);
   }
 
   toggleMute() {
@@ -541,8 +568,11 @@ export class MediaPlayer extends HgElement {
   toggleFullscreen() {
     if (!this.isVideo) return;
 
-    if (document.fullscreenElement) {
+    // `=== this`, not truthy: when something else on the page holds fullscreen, the answer
+    // is to ask for this element — the browser swaps them — not to close the other one.
+    if (document.fullscreenElement === this) {
       document.exitFullscreen();
+      this.interaction('fullscreen', false);
       return;
     }
 
@@ -550,7 +580,7 @@ export class MediaPlayer extends HgElement {
     else if (this.media.webkitEnterFullscreen) this.media.webkitEnterFullscreen();
     else return;
 
-    this.interaction('fullscreen');
+    this.interaction('fullscreen', true);
   }
 
   onFullscreenChange() {

@@ -1173,6 +1173,7 @@ define("toolbar-elemental", ToolbarElemental);
 var LIVE_DURATION = 2 ** 32;
 var VOLUME_SCALE = 100;
 var CONTROLS_LINGER = 5e3;
+var VOLUME_SETTLE = 500;
 function pad(value) {
   return value < 10 ? `0${value}` : `${value}`;
 }
@@ -1185,10 +1186,9 @@ function formatTime(seconds) {
   return hrs > 0 ? `${pad(hrs)}:${pad(mins)}:${pad(secs)}` : `${pad(mins)}:${pad(secs)}`;
 }
 function clampVolume(value) {
-  const rounded = Math.round(value * 10) / 10;
-  if (rounded > 0.9) return 1;
-  if (rounded < 0.1) return 0;
-  return rounded;
+  if (value > 0.9) return 1;
+  if (value < 0.1) return 0;
+  return value;
 }
 function volumeState(value) {
   if (value < 0.1) return "mute";
@@ -1224,6 +1224,7 @@ var MediaPlayer = class extends HgElement {
   disconnected() {
     cancelAnimationFrame(this.frame);
     if (this.linger) clearTimeout(this.linger);
+    if (this.settle) clearTimeout(this.settle);
     if (this.media && this.hadControls) this.media.controls = true;
   }
   /**
@@ -1256,10 +1257,12 @@ var MediaPlayer = class extends HgElement {
     else this.pause();
   }
   skipForward() {
+    if (!this.media || this.isLive) return;
     this.seekBy(this.skipStep);
     this.interaction("skip-forward", this.skipStep);
   }
   skipBackward() {
+    if (!this.media || this.isLive) return;
     this.seekBy(-this.skipStep);
     this.interaction("skip-backward", this.skipStep);
   }
@@ -1295,11 +1298,12 @@ var MediaPlayer = class extends HgElement {
    *
    * `timeupdate` fires about four times a second, which is visibly steppy under a moving
    * thumb, so the position comes off an animation frame while playing and the listener is
-   * not used at all. Cancelled on pause, so a paused player costs nothing.
+   * not used at all. Cancelled on pause, and never scheduled for a live stream — there is
+   * no clock to paint, and a loop that painted nothing would still run at sixty a second.
    */
   tick() {
-    if (!this.media || this.media.paused) return;
-    if (!this.isLive) this.paint(this.media.currentTime);
+    if (!this.media || this.media.paused || this.isLive) return;
+    this.paint(this.media.currentTime);
     this.frame = requestAnimationFrame(() => this.tick());
   }
   // HANDLERS THE MARKUP NAMES
@@ -1419,9 +1423,21 @@ var MediaPlayer = class extends HgElement {
     this.resume();
   }
   // VOLUME
+  /**
+   * The volume slider, per `input` event.
+   *
+   * The level is applied immediately — the sound has to follow the thumb — but persisting
+   * and announcing wait for the drag to settle: `input` fires for every pixel, and a
+   * localStorage write per pixel is a synchronous disk touch dozens of times a second.
+   */
   setVolume(event) {
-    this.applyVolume(Number(event.target.value) / VOLUME_SCALE);
-    this.interaction("volume", this.media?.volume);
+    this.applyVolume(Number(event.target.value) / VOLUME_SCALE, false);
+    clearTimeout(this.settle);
+    this.settle = setTimeout(() => {
+      if (!this.media) return;
+      this.rememberVolume(this.media.volume);
+      this.interaction("volume", this.media.volume);
+    }, VOLUME_SETTLE);
   }
   applyVolume(value, remember = true) {
     if (!this.media) return;
@@ -1429,10 +1445,16 @@ var MediaPlayer = class extends HgElement {
     this.media.muted = volume === 0;
     this.media.volume = volume;
     if (volume > 0) this.lastVolume = volume;
-    if (remember) {
-      this.store("volume", volume);
-      this.store("muted", volume === 0);
-    }
+    if (remember) this.rememberVolume(volume);
+  }
+  /**
+   * Persist the level and the flag as two entries, and never store a zero level: muting
+   * writes `muted` and leaves `volume` at what it was, so a reload restores the mute and
+   * unmuting after it returns to the old level rather than jumping to full.
+   */
+  rememberVolume(volume) {
+    if (volume > 0) this.store("volume", volume);
+    this.store("muted", volume === 0);
   }
   toggleMute() {
     if (!this.media) return;
@@ -1492,14 +1514,15 @@ var MediaPlayer = class extends HgElement {
    */
   toggleFullscreen() {
     if (!this.isVideo) return;
-    if (document.fullscreenElement) {
+    if (document.fullscreenElement === this) {
       document.exitFullscreen();
+      this.interaction("fullscreen", false);
       return;
     }
     if (this.requestFullscreen) this.requestFullscreen();
     else if (this.media.webkitEnterFullscreen) this.media.webkitEnterFullscreen();
     else return;
-    this.interaction("fullscreen");
+    this.interaction("fullscreen", true);
   }
   onFullscreenChange() {
     this.isFullscreen = document.fullscreenElement === this;
@@ -1626,6 +1649,7 @@ export {
   LIVE_DURATION,
   MediaPlayer,
   VOLUME_SCALE,
+  VOLUME_SETTLE,
   clampVolume,
   media_player_default as default,
   formatTime,

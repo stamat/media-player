@@ -14,6 +14,14 @@ media-player {
   --media-player-fade: 0.2s;
 }
 
+// hydrargyri's `if` and `unless` binds hide a node by toggling its `hidden` attribute, and
+// any author rule that sets `display` — the flex on the control row below — outranks the
+// browser's own `[hidden] { display: none }`, because author styles always beat the UA
+// sheet. Restated here with weight, so `hidden` means hidden whatever layout the node has.
+media-player [hidden] {
+  display: none !important;
+}
+
 media-player video {
   display: block;
   width: 100%;
@@ -102,6 +110,13 @@ media-player[is-video] {
   overflow: hidden;
 }
 
+// Fullscreen hands the element the whole viewport; the video keeps its ratio inside it
+// rather than stretching to `fill`, which is what a bare `height: 100%` would do.
+media-player[is-fullscreen] video {
+  height: 100%;
+  object-fit: contain;
+}
+
 media-player[is-video] .media-player-controls {
   position: absolute;
   right: 0;
@@ -134,6 +149,15 @@ media-player[is-video] .media-player-controls:focus-within {
   justify-content: center;
   border: 0;
   background: none;
+}
+
+// The element sets `poster-hidden` once playback has started; the poster and the
+// click-to-play overlay are the two things covering the picture until then, so both go
+// together — `display`, not opacity, because a button that is invisible but still over the
+// video would swallow every click meant for the controls.
+media-player[poster-hidden] .media-player-poster,
+media-player[poster-hidden] .media-player-overlay {
+  display: none;
 }
 
 .media-player-captions {

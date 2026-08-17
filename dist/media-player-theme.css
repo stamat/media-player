@@ -12,7 +12,7 @@ media-player {
   --media-player-radius: 0.5rem;
   color: var(--media-player-color);
   --slider-elemental-fill: var(--media-player-accent);
-  --progress-elemental-buffer-color: color-mix(in srgb, var(--media-player-color) 30%, transparent);
+  --progress-elemental-buffer-fill: color-mix(in srgb, var(--media-player-color) 30%, transparent);
 }
 
 media-player .media-player-controls {

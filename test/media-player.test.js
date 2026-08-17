@@ -3,17 +3,19 @@
  *
  * Covered here: the progressive-enhancement contract (native controls off on upgrade, back
  * on the way out), readiness from any of the five metadata events, live streams, the volume
- * arithmetic and its persistence, and the labels the buttons announce themselves by.
+ * arithmetic and its persistence, captions toggling and its persistence around a stubbed
+ * track, the video controls' hide timer, and the labels the buttons announce themselves by.
  *
- * Deliberately not covered: fullscreen and `cuechange`, neither of which jsdom implements —
- * `requestFullscreen` is absent and a `<track>` never fires a cue, so a test here would only
- * assert that the stub was called. The animation-frame clock is not covered either: what it
- * guarantees is smoothness, and a test of `requestAnimationFrame` under fake timers proves
- * the timer works rather than that the thumb moves. Both want a browser.
+ * Deliberately not covered: fullscreen and the `cuechange` event, neither of which jsdom
+ * implements — `requestFullscreen` is absent and a `<track>` never fires a cue, so a test
+ * here would only assert that the stub was called. The animation-frame clock is not covered
+ * either: what it guarantees is smoothness, and a test of `requestAnimationFrame` under
+ * fake timers proves the timer works rather than that the thumb moves. All three want a
+ * browser.
  */
 
 import { jest } from '@jest/globals';
-import { MediaPlayer, formatTime, clampVolume, volumeState, LIVE_DURATION } from '../src/scripts/media-player.js';
+import { MediaPlayer, formatTime, clampVolume, volumeState, LIVE_DURATION, CONTROLS_LINGER, VOLUME_SETTLE } from '../src/scripts/media-player.js';
 
 /**
  * A media element jsdom will tolerate.
@@ -126,6 +128,24 @@ describe('live streams', () => {
     player.seekTo(30);
     expect(media.currentTime).toBe(0);
   });
+
+  test('skipping a live stream neither moves nor claims to', () => {
+    const media = fakeMedia('audio', { duration: LIVE_DURATION });
+    const player = mount(media);
+    const seen = [];
+    player.addEventListener('media-player-interaction', (e) => seen.push(e.detail.type));
+    player.skipForward();
+    expect(media.currentTime).toBe(0);
+    expect(seen).toEqual([]);
+  });
+
+  test('a live stream schedules no animation frames, because there is no clock to paint', () => {
+    const media = fakeMedia('audio', { duration: LIVE_DURATION, paused: false });
+    const player = mount(media);
+    const before = player.frame;
+    player.resume();
+    expect(player.frame).toBe(before);
+  });
 });
 
 describe('which element it wrapped', () => {
@@ -192,6 +212,11 @@ describe('volume', () => {
     expect(clampVolume(0.5)).toBe(0.5);
   });
 
+  test('the middle of the range is not quantised, so the write-back cannot yank the thumb mid-drag', () => {
+    expect(clampVolume(0.43)).toBe(0.43);
+    expect(clampVolume(0.67)).toBe(0.67);
+  });
+
   test('the three icons split the range where a listener would say quiet, middling and loud', () => {
     expect(volumeState(0)).toBe('mute');
     expect(volumeState(0.3)).toBe('mid');
@@ -239,6 +264,41 @@ describe('volume', () => {
     const player = mount(fakeMedia());
     expect(() => player.applyVolume(0.5)).not.toThrow();
     setItem.mockRestore();
+  });
+
+  test('a mute survives a reload, and unmuting after it returns to the old level rather than full blast', () => {
+    const player = mount(fakeMedia());
+    player.applyVolume(0.4);
+    player.toggleMute();
+    player.remove();
+    document.body.innerHTML = '';
+
+    const media = fakeMedia();
+    const revisit = mount(media);
+    expect(media.muted).toBe(true);
+    revisit.toggleMute();
+    expect(media.volume).toBe(0.4);
+  });
+
+  test('a volume drag persists and announces once it settles, not once per pixel', () => {
+    jest.useFakeTimers();
+    const media = fakeMedia();
+    const player = mount(media);
+    const setItem = jest.spyOn(Storage.prototype, 'setItem');
+    const volumes = [];
+    player.addEventListener('media-player-interaction', (e) => { if (e.detail.type === 'volume') volumes.push(e.detail.value); });
+
+    player.setVolume({ target: { value: '30' } });
+    player.setVolume({ target: { value: '60' } });
+    expect(media.volume).toBe(0.6); // the sound follows the thumb immediately
+    expect(setItem).not.toHaveBeenCalled();
+    expect(volumes).toEqual([]);
+
+    jest.advanceTimersByTime(VOLUME_SETTLE);
+    expect(volumes).toEqual([0.6]);
+    expect(localStorage.getItem('media-player-volume')).toBe('0.6');
+    setItem.mockRestore();
+    jest.useRealTimers();
   });
 });
 
@@ -396,6 +456,75 @@ describe('the labels a button announces itself by', () => {
     player.onVolumeChange();
     expect(player.muteLabel).toBe('Unmute');
     expect(player.volumeState).toBe('mute');
+  });
+});
+
+/**
+ * A `<track>` jsdom will tolerate: the element exists but its `track` property does not,
+ * so the TextTrack half is a plain object holding the one field the player writes.
+ */
+function fakeTrack() {
+  const track = document.createElement('track');
+  Object.defineProperty(track, 'track', { value: { mode: 'disabled' }, configurable: true });
+  return track;
+}
+
+describe('captions', () => {
+  test('a track inside the media element is what makes a captions button worth showing', () => {
+    const media = fakeMedia('video');
+    media.appendChild(fakeTrack());
+    const player = mount(media);
+    expect(player.hasAttribute('has-captions')).toBe(true);
+  });
+
+  test('toggling captions flips the label, the track mode and the remembered choice', () => {
+    const media = fakeMedia('video');
+    const track = fakeTrack();
+    media.appendChild(track);
+    const player = mount(media);
+
+    player.toggleCaptions();
+    expect(player.captionsLabel).toBe('Disable captions');
+    expect(track.track.mode).toBe('hidden'); // hidden, not showing: the element renders the cue itself
+    expect(localStorage.getItem('media-player-captions')).toBe('true');
+
+    player.toggleCaptions();
+    expect(player.captionsLabel).toBe('Enable captions');
+    expect(track.track.mode).toBe('disabled');
+  });
+
+  test('captions left on last visit come back on, without writing the choice again', () => {
+    localStorage.setItem('media-player-captions', 'true');
+    const media = fakeMedia('video');
+    const track = fakeTrack();
+    media.appendChild(track);
+    const setItem = jest.spyOn(Storage.prototype, 'setItem');
+    const player = mount(media);
+    expect(player.hasAttribute('captions-visible')).toBe(true);
+    expect(track.track.mode).toBe('hidden');
+    expect(setItem).not.toHaveBeenCalled();
+    setItem.mockRestore();
+  });
+});
+
+describe('video controls that hide themselves', () => {
+  test('the controls go away once the pointer has stopped this long, but only while playing', () => {
+    jest.useFakeTimers();
+    const player = mount(fakeMedia('video', { paused: false }));
+    player.showControls();
+    expect(player.hasAttribute('controls-shown')).toBe(true);
+    jest.advanceTimersByTime(CONTROLS_LINGER);
+    expect(player.hasAttribute('controls-shown')).toBe(false);
+    jest.useRealTimers();
+  });
+
+  test('a paused video keeps its controls up: they are how you start it again', () => {
+    jest.useFakeTimers();
+    const player = mount(fakeMedia('video', { paused: true }));
+    player.showControls();
+    jest.advanceTimersByTime(CONTROLS_LINGER * 2);
+    expect(player.hasAttribute('controls-shown')).toBe(true);
+    jest.useRealTimers();
   });
 });
 
