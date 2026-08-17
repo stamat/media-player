@@ -1172,6 +1172,7 @@ define("toolbar-elemental", ToolbarElemental);
 // src/scripts/media-player.js
 var LIVE_DURATION = 2 ** 32;
 var VOLUME_SCALE = 100;
+var VOLUME_STEP = 0.1;
 var CONTROLS_LINGER = 5e3;
 var VOLUME_SETTLE = 500;
 function pad(value) {
@@ -1205,8 +1206,15 @@ var MediaPlayer = class extends HgElement {
     this.isVideo = this.media.tagName === "VIDEO";
     this.frame = 0;
     this.linger = null;
+    if (this.isVideo) {
+      this.noFullscreen = !(document.fullscreenEnabled || this.media.webkitEnterFullscreen);
+    }
     this.hadControls = this.media.controls;
     this.media.controls = false;
+    if (this.isReady) {
+      this.resume();
+      return;
+    }
     this.duration = 0;
     this.currentTime = 0;
     this.remaining = 0;
@@ -1255,6 +1263,13 @@ var MediaPlayer = class extends HgElement {
     if (!this.media) return;
     if (this.media.paused) this.play();
     else this.pause();
+  }
+  /** Pause and go home. `seekTo` refuses both halves for a live stream, so there it only pauses. */
+  stop() {
+    if (!this.media) return;
+    this.pause();
+    this.seekTo(0);
+    this.interaction("stop");
   }
   skipForward() {
     if (!this.media || this.isLive) return;
@@ -1355,10 +1370,22 @@ var MediaPlayer = class extends HgElement {
    * `<progress>` behind the scrubber is set to — two values on one `max`, which is the whole
    * reason the buffered bar can sit behind the played one without any arithmetic in the
    * markup.
+   *
+   * The range the playhead sits in, not the first or the furthest: after a seek the browser
+   * holds disjoint ranges, and either end would lie — the first stops behind the playhead,
+   * the last draws a bar over a gap playback has not crossed. When the playhead is between
+   * ranges the bar keeps its last value rather than guessing.
    */
   onProgress() {
-    if (!this.media || !this.media.buffered.length || !this.media.duration) return;
-    this.buffered = this.media.buffered.end(this.media.buffered.length - 1);
+    if (!this.media || !this.media.duration) return;
+    const ranges = this.media.buffered;
+    const at = this.media.currentTime;
+    for (let i = 0; i < ranges.length; i++) {
+      if (ranges.start(i) <= at && at <= ranges.end(i)) {
+        this.buffered = ranges.end(i);
+        return;
+      }
+    }
   }
   /**
    * Start or restart the clock, exactly once.
@@ -1438,6 +1465,26 @@ var MediaPlayer = class extends HgElement {
       this.rememberVolume(this.media.volume);
       this.interaction("volume", this.media.volume);
     }, VOLUME_SETTLE);
+  }
+  volumeUp() {
+    this.stepVolume(1);
+  }
+  volumeDown() {
+    this.stepVolume(-1);
+  }
+  /**
+   * One press of a dedicated volume button — for a UI without a slider.
+   *
+   * From muted it climbs from zero in steps rather than jumping back to the remembered
+   * level: a button press promises a small change. The step equals the mute threshold, so
+   * the first press up is audible and the last press down is silence, with no dead press
+   * at either end.
+   */
+  stepVolume(direction) {
+    if (!this.media) return;
+    const current = this.media.muted ? 0 : this.media.volume;
+    this.applyVolume(current + direction * VOLUME_STEP);
+    this.interaction(direction > 0 ? "volume-up" : "volume-down", this.media.volume);
   }
   applyVolume(value, remember = true) {
     if (!this.media) return;
@@ -1600,6 +1647,7 @@ __publicField(MediaPlayer, "attributes", [
   "is-live",
   "is-video",
   "is-fullscreen",
+  "no-fullscreen",
   "controls-shown",
   "poster-hidden",
   "has-captions",
@@ -1650,6 +1698,7 @@ export {
   MediaPlayer,
   VOLUME_SCALE,
   VOLUME_SETTLE,
+  VOLUME_STEP,
   clampVolume,
   media_player_default as default,
   formatTime,

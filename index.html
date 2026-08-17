@@ -308,6 +308,10 @@ against them.</p>
 <td>the video half</td>
 </tr>
 <tr>
+<td><code>no-fullscreen</code></td>
+<td>fullscreen has no door to open — an iframe without <code>allow=&quot;fullscreen&quot;</code> is the common way; hide your fullscreen button on it</td>
+</tr>
+<tr>
 <td><code>has-captions</code>, <code>captions-visible</code></td>
 <td>a <code>&lt;track&gt;</code> was found; captions are on</td>
 </tr>
@@ -348,13 +352,31 @@ player, or two players on one page will share one volume.</p>
 <td>the active cue</td>
 </tr>
 </tbody></table>
+<p>Beside <code>togglePlay</code>, <code>stop</code>, the skips and the sliders&#39; handlers, two more answer <code>on=</code> for
+a volume UI without a slider: <code>volumeUp</code> and <code>volumeDown</code>, one tenth of full per press.</p>
+<h2 id="labels-in-another-language">Labels in another language<a class="heading-anchor" href="#labels-in-another-language" tabindex="-1" aria-hidden="true"></a></h2>
+<p><code>playLabel</code>, <code>muteLabel</code> and <code>captionsLabel</code> speak English. To localize, skip the bind and
+let the button name itself from its content — the attribute hooks already swap which half is
+visible, and <code>display: none</code> takes the hidden half out of the accessible name with it:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>&gt;</span>▶<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;</span>Pusti<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>&gt;</span>⏸<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;</span>Pauziraj<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></code></pre>
+<p><code>visually-hidden</code> is your utility class — every design system carries one. The same swap
+hangs on <code>volume-state</code> for the mute button and <code>captions-visible</code> for the captions one:
+two spans and one <code>display</code> rule of your own.</p>
 <h2 id="events">Events<a class="heading-anchor" href="#events" tabindex="-1" aria-hidden="true"></a></h2>
 <p><code>media-player-ready</code> when the duration is known, and <code>media-player-interaction</code> for
 everything a person did — <code>{ type, value }</code> in <code>detail</code>, where <code>type</code> is one of <code>play</code>,
-<code>pause</code>, <code>seek</code>, <code>skip-forward</code>, <code>skip-backward</code>, <code>volume</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>,
-<code>captions-on</code>, <code>captions-off</code>. Both bubble from the element, not from <code>document</code>.
-A <code>fullscreen</code> event says which way in <code>value</code> — <code>true</code> entering, <code>false</code> leaving — and a
-volume drag settles into one <code>volume</code> event, not one per pixel.</p>
+<code>pause</code>, <code>stop</code>, <code>seek</code>, <code>skip-forward</code>, <code>skip-backward</code>, <code>volume</code>, <code>volume-up</code>,
+<code>volume-down</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>, <code>captions-on</code>, <code>captions-off</code>. Both bubble
+from the element, not from <code>document</code>. A <code>fullscreen</code> event says which way in <code>value</code> —
+<code>true</code> entering, <code>false</code> leaving — and a volume drag settles into one <code>volume</code> event, not
+one per pixel.</p>
 <h2 id="against-the-alternatives">Against the alternatives<a class="heading-anchor" href="#against-the-alternatives" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Drawn on this player&#39;s axes, which is the caveat to read it with: a row is here because this
 project has an opinion about it, and the rows it has no answer for are the ones the others

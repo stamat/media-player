@@ -255,6 +255,7 @@ against them.
 | `is-live`                                          | the duration says endless stream, so there is nothing to seek     |
 | `is-video`                                         | it wrapped a `<video>`                                            |
 | `is-fullscreen`, `controls-shown`, `poster-hidden` | the video half                                                    |
+| `no-fullscreen`                                    | fullscreen has no door to open — an iframe without `allow="fullscreen"` is the common way; hide your fullscreen button on it |
 | `has-captions`, `captions-visible`                 | a `<track>` was found; captions are on                            |
 | `volume-state`                                     | `mute`, `mid` or `full`, for a three-icon volume button           |
 
@@ -272,14 +273,39 @@ player, or two players on one page will share one volume.
 | `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next                                                                                             |
 | `captionText`                             | the active cue                                                                                                                      |
 
+Beside `togglePlay`, `stop`, the skips and the sliders' handlers, two more answer `on=` for
+a volume UI without a slider: `volumeUp` and `volumeDown`, one tenth of full per press.
+
+## Labels in another language
+
+`playLabel`, `muteLabel` and `captionsLabel` speak English. To localize, skip the bind and
+let the button name itself from its content — the attribute hooks already swap which half is
+visible, and `display: none` takes the hidden half out of the accessible name with it:
+
+```html
+<button on="click:togglePlay" disabled>
+  <span class="media-player-play-icon">
+    <span aria-hidden="true">▶</span> <span class="visually-hidden">Pusti</span>
+  </span>
+  <span class="media-player-pause-icon">
+    <span aria-hidden="true">⏸</span> <span class="visually-hidden">Pauziraj</span>
+  </span>
+</button>
+```
+
+`visually-hidden` is your utility class — every design system carries one. The same swap
+hangs on `volume-state` for the mute button and `captions-visible` for the captions one:
+two spans and one `display` rule of your own.
+
 ## Events
 
 `media-player-ready` when the duration is known, and `media-player-interaction` for
 everything a person did — `{ type, value }` in `detail`, where `type` is one of `play`,
-`pause`, `seek`, `skip-forward`, `skip-backward`, `volume`, `mute`, `unmute`, `fullscreen`,
-`captions-on`, `captions-off`. Both bubble from the element, not from `document`.
-A `fullscreen` event says which way in `value` — `true` entering, `false` leaving — and a
-volume drag settles into one `volume` event, not one per pixel.
+`pause`, `stop`, `seek`, `skip-forward`, `skip-backward`, `volume`, `volume-up`,
+`volume-down`, `mute`, `unmute`, `fullscreen`, `captions-on`, `captions-off`. Both bubble
+from the element, not from `document`. A `fullscreen` event says which way in `value` —
+`true` entering, `false` leaving — and a volume drag settles into one `volume` event, not
+one per pixel.
 
 ## Against the alternatives
 
