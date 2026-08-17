@@ -1,0 +1,696 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/scripts/media-player.js",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "LIVE_DURATION",
+          "description": "A duration this long is a live stream rather than a file.\n\nBrowsers disagree on what they report for an endless stream — some say `Infinity`, some\nsay a number near 2^32 — so the test is a threshold rather than an equality."
+        },
+        {
+          "kind": "variable",
+          "name": "VOLUME_SCALE",
+          "type": {
+            "text": "number"
+          },
+          "default": "100",
+          "description": "Where the volume slider and the media element disagree: one counts to 100, one to 1."
+        },
+        {
+          "kind": "variable",
+          "name": "VOLUME_STEP",
+          "type": {
+            "text": "number"
+          },
+          "default": "0.1",
+          "description": "How much one press of a volume button moves, as a share of full."
+        },
+        {
+          "kind": "variable",
+          "name": "CONTROLS_LINGER",
+          "type": {
+            "text": "number"
+          },
+          "default": "5000",
+          "description": "How long the video controls stay up after the pointer stops moving, in milliseconds."
+        },
+        {
+          "kind": "variable",
+          "name": "VOLUME_SETTLE",
+          "type": {
+            "text": "number"
+          },
+          "default": "500",
+          "description": "How long after the last volume input before the level is persisted and announced, in milliseconds."
+        },
+        {
+          "kind": "function",
+          "name": "formatTime",
+          "parameters": [
+            {
+              "name": "seconds"
+            }
+          ],
+          "description": "Seconds as `mm:ss`, or `hh:mm:ss` once there is an hour to show.\n\nThe hour segment appears rather than sitting at `00:` all through a three minute song:\na label that changes width is cheaper to read than one that is permanently wrong about\nhow long the thing is."
+        },
+        {
+          "kind": "function",
+          "name": "clampVolume",
+          "parameters": [
+            {
+              "name": "value"
+            }
+          ],
+          "description": "Volume with the ends snapped shut.\n\nA slider that reads `0.97` at its top never sets the media element to `1`, so \"full\" is a\nstate the author can see on the track but never in `volumeState` — the snap is what makes\nthe mute and full icons reachable by dragging. Only the ends: rounding the middle would\nquantise the slider, and the `volumePercent` write-back would drag the thumb to the\nrounded value in the middle of the drag that set it."
+        },
+        {
+          "kind": "function",
+          "name": "volumeState",
+          "parameters": [
+            {
+              "name": "value"
+            }
+          ],
+          "description": "Which of the three volume icons the level is asking for."
+        },
+        {
+          "kind": "class",
+          "description": "`<media-player>` custom element.\n\nOne element over the `<audio>` or `<video>` the author already wrote. Which of the two it\nis decides the video-only half — poster, overlay, captions, fullscreen, the controls that\nhide themselves — and it is read off the child rather than off a `src`, because a `src`\nattribute on the wrapper would mean no media element at all until the script arrives.\nThat is the whole bargain: the markup is the author's, `controls` on the media element is\nthe fallback, and a script that never loads leaves a working native player behind.\n\nThe controls are the author's too. There is no generated control bar and no `controls`\noption taking an HTML string — the buttons, the sliders and the labels are written in the\npage, and [hydrargyri](https://github.com/stamat/hydrargyri) wires them by name: `on` says\nwhat fires, `bind` says where state lands. Nothing here is evaluated, so a strict Content\nSecurity Policy has nothing to object to.\n\nWhat the element does not draw, it borrows. The scrubber and the volume control are\n`<slider-elemental>` around a native `<input type=\"range\">`, which is where the whole\n[APG Slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) already lives; the\nbuffered-ahead bar is `<progress-elemental buffer>`; the control row is\n`<toolbar-elemental>`. None of their keyboard handling, ARIA or focus management is\nrewritten here, which is why this element writes no `role` and no `aria-valuenow` of its\nown.\n\nDegrades honestly. No script means the `controls` attribute the author wrote is still on\nthe media element and the browser's own player is what shows. The optional theme draws\nnothing under `:not(:defined)`, so the fallback is never a themed control bar with dead\nbuttons on it.\n\nponytail: no keyboard map of its own. Every control is a `<button>` or an\n`<input type=\"range\">`, so the platform already answers Space, Enter, the arrows, Home\nand End on whichever one has focus. A player-wide map — `k`, `j`, `l`, `f`, `m` on the\nhost — is a second, undiscoverable set of bindings and wants its own pass.\n\nponytail: the buffered bar is one span from the start, not the `TimeRanges` list the\nmedia element actually holds. That is what a scrubber draws anyway; multiple spans want\ntheir own element.",
+          "name": "MediaPlayer",
+          "cssProperties": [
+            {
+              "type": {
+                "text": "<color>"
+              },
+              "description": "The played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring.",
+              "name": "--media-player-accent",
+              "default": "#22c55e"
+            },
+            {
+              "type": {
+                "text": "<color>"
+              },
+              "description": "What sits on the accent: the flooded button's glyph, the chip's triangle. Change it with the accent.",
+              "name": "--media-player-accent-ink",
+              "default": "#fff"
+            },
+            {
+              "type": {
+                "text": "<color>"
+              },
+              "description": "Behind the control row.",
+              "name": "--media-player-surface",
+              "default": "Canvas"
+            },
+            {
+              "type": {
+                "text": "<color>"
+              },
+              "description": "Icons and labels on it.",
+              "name": "--media-player-color",
+              "default": "CanvasText"
+            },
+            {
+              "type": {
+                "text": "<length>"
+              },
+              "description": "The control row's corners, and the video's.",
+              "name": "--media-player-radius",
+              "default": "0.5rem"
+            },
+            {
+              "type": {
+                "text": "<length>"
+              },
+              "description": "Between controls.",
+              "name": "--media-player-gap",
+              "default": "0.5rem"
+            },
+            {
+              "type": {
+                "text": "<time>"
+              },
+              "description": "How long the video controls take to fade out.",
+              "name": "--media-player-fade",
+              "default": "0.2s"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "attributes",
+              "type": {
+                "text": "array"
+              },
+              "static": true,
+              "default": "[ 'is-ready', 'is-playing', 'is-buffering', 'is-live', 'is-video', 'is-fullscreen', 'no-fullscreen', 'controls-shown', 'poster-hidden', 'has-captions', 'captions-visible', 'volume-state', 'skip' ]",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "properties",
+              "type": {
+                "text": "array"
+              },
+              "static": true,
+              "default": "[ 'currentTime', 'remaining', 'duration', 'buffered', 'volumePercent', 'playLabel', 'muteLabel', 'captionsLabel', 'captionText', 'timeFormatter' ]",
+              "description": "State that never reaches the DOM.\n\n`currentTime` moves sixty times a second while playing. Reflected to an attribute that\nwould be sixty `setAttribute` calls a second, every one of them waking anything watching\nthe subtree — so the values that move fast live here, and only the flags CSS needs are\nattributes.",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "formatters",
+              "type": {
+                "text": "object"
+              },
+              "static": true,
+              "default": "{ time: (value) => formatTime(value), /** * Whole seconds, for the two nodes that draw the scrubber. * * The thumb and the played bar have to be given the *same* number or they disagree on * screen. A range input with `step=\"1\"` snaps what it is assigned to the **nearest** * step while a bar drawn from the raw value keeps every decimal, so 3.6 is a thumb at 4 * beside a fill at 3.6 — a whole step apart at the worst moment, twice a second. Floor * both and there is one number and nothing to disagree about. */ floor: (value) => (Number.isFinite(value) ? Math.floor(value) : value), /** * For `attr#aria-pressed` binds on toggle buttons. ARIA wants the literal strings * \"true\" and \"false\" — a raw boolean bind would write an empty attribute for true and * remove it for false, and a removed `aria-pressed` reads as \"not a toggle at all\". */ pressed: (value) => (value ? 'true' : 'false') }",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "connected",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "disconnected",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "loaded",
+              "description": "Metadata has arrived. Idempotent, because five different events mean it.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "play"
+            },
+            {
+              "kind": "method",
+              "name": "pause"
+            },
+            {
+              "kind": "method",
+              "name": "togglePlay"
+            },
+            {
+              "kind": "method",
+              "name": "stop",
+              "description": "Pause and go home. `seekTo` refuses both halves for a live stream, so there it only pauses."
+            },
+            {
+              "kind": "method",
+              "name": "skipForward"
+            },
+            {
+              "kind": "method",
+              "name": "skipBackward"
+            },
+            {
+              "kind": "field",
+              "name": "skipStep",
+              "description": "Seconds a skip button moves — the `skip` attribute, or ten.",
+              "readonly": true,
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "seekBy",
+              "parameters": [
+                {
+                  "name": "seconds"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "seekTo",
+              "parameters": [
+                {
+                  "name": "seconds"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "paint",
+              "parameters": [
+                {
+                  "name": "seconds"
+                }
+              ],
+              "description": "Write the clock, the countdown and the scrubber position for one moment.\n\nOne method rather than a setter each, because the three have to agree: a scrubber at\n1:03 beside a label reading 1:04 is the kind of wrong that looks like a rounding bug\nand is actually two code paths.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "tick",
+              "description": "The playing clock.\n\n`timeupdate` fires about four times a second, which is visibly steppy under a moving\nthumb, so the position comes off an animation frame while playing and the listener is\nnot used at all. Cancelled on pause, and never scheduled for a live stream — there is\nno clock to paint, and a loop that painted nothing would still run at sixty a second.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "onLoaded"
+            },
+            {
+              "kind": "method",
+              "name": "onPlay"
+            },
+            {
+              "kind": "method",
+              "name": "onPause"
+            },
+            {
+              "kind": "method",
+              "name": "onEnded",
+              "description": "Playback reached the end.\n\nThe clock is painted here rather than left where the last animation frame put it. That\nframe ran some fraction of a second before the end and the scrubber floors to whole\nseconds, so a track that finished would leave the thumb a step short of the end it just\nreached — the one position a listener is certain about, and the one it got wrong."
+            },
+            {
+              "kind": "method",
+              "name": "onWaiting"
+            },
+            {
+              "kind": "method",
+              "name": "onPlaying"
+            },
+            {
+              "kind": "method",
+              "name": "onProgress",
+              "description": "How far ahead the browser has loaded, in seconds.\n\nSeconds rather than a percentage so it shares a scale with `duration`, which is what the\n`<progress>` behind the scrubber is set to — two values on one `max`, which is the whole\nreason the buffered bar can sit behind the played one without any arithmetic in the\nmarkup.\n\nThe range the playhead sits in, not the first or the furthest: after a seek the browser\nholds disjoint ranges, and either end would lie — the first stops behind the playhead,\nthe last draws a bar over a gap playback has not crossed. When the playhead is between\nranges the bar keeps its last value rather than guessing."
+            },
+            {
+              "kind": "method",
+              "name": "resume",
+              "description": "Start or restart the clock, exactly once.\n\nCancel before scheduling, always: `tick` schedules the next frame from inside itself, so\na second entry point that only called `tick` would leave two loops running and the\nhandle to just one of them.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "scrub",
+              "parameters": [
+                {
+                  "name": "event"
+                }
+              ],
+              "description": "Dragging the scrubber: paint the labels, do not seek until the drag ends.\n\nThe value is kept here rather than read back off the input when the drag commits. Two\nevents end a drag and their order is not guaranteed — Chrome sends `pointerup` before\n`change` — and the clock restarting on the first of them writes `currentTime` straight\nback into `input.value`. Whichever event then read the DOM would read the clock's\nnumber instead of the one under the thumb, and the seek would go to where playback\nalready was."
+            },
+            {
+              "kind": "method",
+              "name": "seek"
+            },
+            {
+              "kind": "method",
+              "name": "endScrub",
+              "description": "A drag ended, whatever it did to the value.\n\n`change` cannot be the only way back: a thumb picked up and put down where it started\nfires `input` — which stopped the clock — and then no `change` at all, because the value\nthe field ends on is the value it began on. The clock would stay stopped over playing\naudio until the next play or pause. Bound to `pointerup` on the document rather than the\ninput, since a drag very often ends with the pointer somewhere else entirely."
+            },
+            {
+              "kind": "method",
+              "name": "endDrag",
+              "description": "Land the drag: seek where the thumb was let go, forget it, start the clock.\n\nBoth enders route here and the pending value is cleared first, so whichever of `change`\nand `pointerup` arrives second finds nothing to land and only restarts the clock. Two\nseeks from one release would be two `media-player-interaction` events for one gesture,\nand the second would seek to wherever the restarted clock had already written.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "setVolume",
+              "parameters": [
+                {
+                  "name": "event"
+                }
+              ],
+              "description": "The volume slider, per `input` event.\n\nThe level is applied immediately — the sound has to follow the thumb — but persisting\nand announcing wait for the drag to settle: `input` fires for every pixel, and a\nlocalStorage write per pixel is a synchronous disk touch dozens of times a second."
+            },
+            {
+              "kind": "method",
+              "name": "volumeUp"
+            },
+            {
+              "kind": "method",
+              "name": "volumeDown"
+            },
+            {
+              "kind": "method",
+              "name": "stepVolume",
+              "parameters": [
+                {
+                  "name": "direction"
+                }
+              ],
+              "description": "One press of a dedicated volume button — for a UI without a slider.\n\nFrom muted it climbs from zero in steps rather than jumping back to the remembered\nlevel: a button press promises a small change. The step equals the mute threshold, so\nthe first press up is audible and the last press down is silence, with no dead press\nat either end.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "applyVolume",
+              "parameters": [
+                {
+                  "name": "value"
+                },
+                {
+                  "name": "remember",
+                  "default": "true"
+                }
+              ],
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "rememberVolume",
+              "parameters": [
+                {
+                  "name": "volume"
+                }
+              ],
+              "description": "Persist the level and the flag as two entries, and never store a zero level: muting\nwrites `muted` and leaves `volume` at what it was, so a reload restores the mute and\nunmuting after it returns to the old level rather than jumping to full.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "toggleMute"
+            },
+            {
+              "kind": "method",
+              "name": "syncVolume",
+              "description": "The DOM's volume back into the controls.\n\nBound to `volumechange` as well as called directly, because the media element is not the\nonly thing that can move it — an OS media key and a devtools poke both land here, and a\nslider that disagrees with the sound coming out is worse than no slider.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "onVolumeChange"
+            },
+            {
+              "kind": "method",
+              "name": "onCue",
+              "parameters": [
+                {
+                  "name": "event"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "toggleCaptions"
+            },
+            {
+              "kind": "method",
+              "name": "setCaptions",
+              "parameters": [
+                {
+                  "name": "visible"
+                },
+                {
+                  "name": "remember",
+                  "default": "true"
+                }
+              ],
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "toggleFullscreen",
+              "description": "Fullscreen, by feature test rather than by browser.\n\niPhone Safari has never allowed an arbitrary element to go fullscreen; what it has is\n`webkitEnterFullscreen` on the video element itself, which takes the video over natively\nand leaves these controls behind. Asking the element what it can do — rather than asking\nthe user agent string who it is — is the version that keeps working when the answer\nchanges."
+            },
+            {
+              "kind": "method",
+              "name": "onFullscreenChange"
+            },
+            {
+              "kind": "method",
+              "name": "showControls",
+              "description": "Show the controls, and start the clock that takes them away again.\n\nA paused video keeps them: the timer is only started while something is playing, so a\nplayer sitting paused never hides the button that would start it."
+            },
+            {
+              "kind": "field",
+              "name": "storageKey",
+              "description": "The prefix for remembered values — `storage-key`, or one shared by every player.",
+              "readonly": true,
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "store",
+              "parameters": [
+                {
+                  "name": "key"
+                },
+                {
+                  "name": "value"
+                }
+              ],
+              "description": "Remember a value, if the browser will have it.\n\n`localStorage` throws rather than returning anything in a Safari private window and\nunder a cookie policy that blocks storage. Remembering the volume is a nicety; taking\nthe page down over it is not, so the failure is swallowed here and nowhere else.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "read",
+              "parameters": [
+                {
+                  "name": "key"
+                }
+              ],
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "restore",
+              "description": "Volume, mute and captions from last time.\n\nNothing is written back while restoring: `applyVolume` would otherwise store the value\nit just read, and a player that never got a real volume set on it would keep rewriting\nthe same entry on every page load.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "interaction",
+              "parameters": [
+                {
+                  "name": "type"
+                },
+                {
+                  "name": "value",
+                  "default": "null"
+                }
+              ],
+              "description": "Something was pressed, dragged or toggled. One event, so a page can log all of it.",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "name": "media-player-ready",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Metadata has arrived; the duration is known and the controls are live."
+            },
+            {
+              "name": "media-player-interaction",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Something was pressed, dragged or toggled. `detail` is `{ type, value }`."
+            }
+          ],
+          "attributes": [
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Metadata has arrived and the duration is known. CSS hook; the element sets it.",
+              "name": "is-ready"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The media is playing. CSS hook for the play/pause icon swap; the element sets it.",
+              "name": "is-playing"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Waiting on data. CSS hook for a spinner; the element sets it.",
+              "name": "is-buffering"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The duration says this is an endless stream, so there is nothing to seek. CSS hook; the element sets it.",
+              "name": "is-live"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The wrapped element is a `<video>`. CSS hook; the element sets it.",
+              "name": "is-video"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "CSS hook; the element sets it.",
+              "name": "is-fullscreen"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Fullscreen has no door to open here — an iframe without `allow=\"fullscreen\"` is the common way. CSS hook for hiding the button that would do nothing; the element sets it.",
+              "name": "no-fullscreen"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The video controls are up. CSS hook; the element sets it.",
+              "name": "controls-shown"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The poster has been played past. CSS hook; the element sets it.",
+              "name": "poster-hidden"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "A `<track>` was found, so a captions button is worth showing. CSS hook; the element sets it.",
+              "name": "has-captions"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Captions are on. Persisted; the element sets it.",
+              "name": "captions-visible"
+            },
+            {
+              "type": {
+                "text": "string"
+              },
+              "description": "`mute`, `mid` or `full`, for the three-icon volume button. CSS hook; the element sets it.",
+              "name": "volume-state"
+            },
+            {
+              "type": {
+                "text": "number"
+              },
+              "description": "Seconds a skip button moves. Defaults to 10.",
+              "name": "skip"
+            },
+            {
+              "type": {
+                "text": "string"
+              },
+              "description": "Prefix for the remembered volume, mute and captions state. Defaults to `media-player`; set it per player to keep two of them from sharing one volume.",
+              "name": "storage-key"
+            }
+          ],
+          "superclass": {
+            "name": "HgElement",
+            "package": "hydrargyri"
+          },
+          "tagName": "media-player",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LIVE_DURATION",
+          "declaration": {
+            "name": "LIVE_DURATION",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "VOLUME_SCALE",
+          "declaration": {
+            "name": "VOLUME_SCALE",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "VOLUME_STEP",
+          "declaration": {
+            "name": "VOLUME_STEP",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "CONTROLS_LINGER",
+          "declaration": {
+            "name": "CONTROLS_LINGER",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "VOLUME_SETTLE",
+          "declaration": {
+            "name": "VOLUME_SETTLE",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "formatTime",
+          "declaration": {
+            "name": "formatTime",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "clampVolume",
+          "declaration": {
+            "name": "clampVolume",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "volumeState",
+          "declaration": {
+            "name": "volumeState",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "MediaPlayer",
+          "declaration": {
+            "name": "MediaPlayer",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "media-player",
+          "declaration": {
+            "name": "MediaPlayer",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "MediaPlayer",
+            "module": "src/scripts/media-player.js"
+          }
+        }
+      ]
+    }
+  ]
+}

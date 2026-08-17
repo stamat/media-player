@@ -4,7 +4,8 @@
  * Covered here: the progressive-enhancement contract (native controls off on upgrade, back
  * on the way out), readiness from any of the five metadata events, live streams, the volume
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
- * track, the video controls' hide timer, and the labels the buttons announce themselves by.
+ * track, the video controls' hide timer, the labels the buttons announce themselves by, and
+ * that the surface the custom elements manifest publishes still exists on the element.
  *
  * Deliberately not covered: fullscreen and the `cuechange` event, neither of which jsdom
  * implements — `requestFullscreen` is absent and a `<track>` never fires a cue, so a test
@@ -628,4 +629,13 @@ describe('interaction events', () => {
 
 test('the class is exported and defined under its tag', () => {
   expect(customElements.get('media-player')).toBe(MediaPlayer);
+});
+
+test('every name the manifest publishes as public API is still a method on the element', async () => {
+  // A rename here fails nothing on its own: the old name stays in the allow-list, the
+  // renamed method matches nothing, and it silently turns private — dropping out of every
+  // editor that reads the manifest, with the build still green.
+  const { PUBLIC } = await import('../custom-elements-manifest.config.mjs');
+  const missing = [...PUBLIC].filter((name) => typeof MediaPlayer.prototype[name] !== 'function');
+  expect(missing).toEqual([]);
 });

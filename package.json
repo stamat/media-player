@@ -5,15 +5,18 @@
   "type": "module",
   "main": "src/scripts/media-player.js",
   "style": "src/styles/index.scss",
+  "customElements": "custom-elements.json",
   "exports": {
     ".": "./src/scripts/media-player.js",
     "./style.scss": "./src/styles/index.scss",
     "./style.css": "./dist/media-player.css",
     "./theme.scss": "./src/styles/theme.scss",
     "./theme.css": "./dist/media-player-theme.css",
+    "./custom-elements.json": "./custom-elements.json",
     "./package.json": "./package.json"
   },
   "files": [
+    "custom-elements.json",
     "src/scripts/media-player.js",
     "src/styles/index.scss",
     "src/styles/theme.scss",
@@ -47,8 +50,8 @@
   },
   "scripts": {
     "dev": "poops",
-    "build": "poops -b",
-    "prepack": "poops -b",
+    "build": "poops -b && cem analyze",
+    "prepack": "npm run build",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "eslint . && stylelint \"src/**/*.scss\"",
     "lint:es": "es-check --module es2020 \"dist/**/*.mjs\""
@@ -62,6 +65,7 @@
     "hydrargyri": "^2.1.1"
   },
   "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
     "@eslint/js": "^10.0.1",
     "es-check": "^9.6.4",
     "eslint": "^10.7.0",

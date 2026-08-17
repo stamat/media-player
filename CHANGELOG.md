@@ -39,3 +39,10 @@ for the person who wrote the code.
   `<input type="range">`, the buffered bar is `<progress-elemental buffer>`, and the control
   row is `<toolbar-elemental>`. This element writes no `role` and no `aria-valuenow` of its
   own.
+
+- **A custom elements manifest, generated on every build.** `custom-elements.json` ships in
+  the package and is named by the `customElements` field, so an editor or a docs generator
+  can read the attributes, the events and the custom properties without this page open
+  beside it. Only what the samples name is public in it — `togglePlay`, the skips, the
+  sliders' handlers and the media listeners; the machinery behind them is marked private
+  rather than dropped, so nothing offers you `endDrag`.

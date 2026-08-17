@@ -435,6 +435,19 @@ way, from each package's `dist/`:
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/toolbar.min.css">
 ```
 
+## What editors read
+
+The package ships a
+[custom elements manifest](https://github.com/webcomponents/custom-elements-manifest) as
+`custom-elements.json`, named by the `customElements` field in `package.json` and generated
+from the element's source on every build. It carries what this page carries — the
+attributes, the two events, the seven custom properties — and marks everything the samples
+do not name as private, so an editor offering completions offers `togglePlay` and not
+`endDrag`.
+
+What any given editor does with it is its own business, and none of it is required to use
+the element: the manifest is a description, not a runtime.
+
 ## License
 
 [MIT](https://github.com/stamat/media-player/blob/main/LICENSE) © [Stamat](https://github.com/stamat).

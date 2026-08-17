@@ -591,6 +591,16 @@ way, from each package&#39;s <code>dist/</code>:</p>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/slider.min.css&quot;</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/progress.min.css&quot;</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/toolbar.min.css&quot;</span>&gt;</span></code></pre>
+<h2 id="what-editors-read">What editors read<a class="heading-anchor" href="#what-editors-read" tabindex="-1" aria-hidden="true"></a></h2>
+<p>The package ships a
+<a href="https://github.com/webcomponents/custom-elements-manifest">custom elements manifest</a> as
+<code>custom-elements.json</code>, named by the <code>customElements</code> field in <code>package.json</code> and generated
+from the element&#39;s source on every build. It carries what this page carries — the
+attributes, the two events, the seven custom properties — and marks everything the samples
+do not name as private, so an editor offering completions offers <code>togglePlay</code> and not
+<code>endDrag</code>.</p>
+<p>What any given editor does with it is its own business, and none of it is required to use
+the element: the manifest is a description, not a runtime.</p>
 <h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
 <p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> © <a href="https://github.com/stamat">Stamat</a>.
 The icons in the samples are <a href="https://lucide.dev">Lucide</a>, ISC.</p>

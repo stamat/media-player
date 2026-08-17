@@ -138,6 +138,17 @@ media-player svg {
   transition: stroke 0.3s ease, fill 0.3s ease, color 0.3s ease;
 }
 
+// A range input's default cursor is the arrow, which reads as decoration next to buttons
+// that all say pointer. Disabled follows the buttons' rule for the same reason: nothing to
+// grab until metadata arrives.
+media-player slider-elemental > input[type="range"] {
+  cursor: pointer;
+}
+
+media-player slider-elemental > input[type="range"]:disabled {
+  cursor: default;
+}
+
 // The thumb keeps out of sight until the slider is engaged — pointer over it, or focus in
 // it. Focus counts as engaged or a keyboard user scrubs blind, which would be a state
 // traded away for looks. One rule per engine: a selector list with an unknown vendor
