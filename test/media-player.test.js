@@ -84,6 +84,20 @@ describe('the progressive-enhancement contract', () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no <audio> or <video>'));
     warn.mockRestore();
   });
+
+  test('a player moved elsewhere in the page keeps its duration and takes the native controls back off', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    expect(player.duration).toBe(120);
+
+    const aside = document.createElement('aside');
+    document.body.appendChild(aside);
+    aside.appendChild(player); // one move: disconnected puts the controls back, connected runs again
+
+    expect(player.duration).toBe(120);
+    expect(player.isReady).toBe(true);
+    expect(media.controls).toBe(false);
+  });
 });
 
 describe('readiness', () => {
@@ -162,6 +176,16 @@ describe('which element it wrapped', () => {
     expect(() => player.toggleFullscreen()).not.toThrow();
     expect(player.hasAttribute('is-fullscreen')).toBe(false);
   });
+
+  test('where no fullscreen door will open, the element says so where CSS can hide the button', () => {
+    // jsdom implements no Fullscreen API at all, which makes it the blocked case for free —
+    // the same shape as an iframe without allow="fullscreen".
+    const video = mount(fakeMedia('video'));
+    expect(video.hasAttribute('no-fullscreen')).toBe(true);
+    // Audio has no fullscreen half, so it makes no claim either way.
+    const audio = mount(fakeMedia('audio'));
+    expect(audio.hasAttribute('no-fullscreen')).toBe(false);
+  });
 });
 
 describe('time', () => {
@@ -193,6 +217,20 @@ describe('time', () => {
     player.seekTo(90);
     player.seekBy(30);
     expect(media.currentTime).toBe(100);
+  });
+
+  test('stop is a pause that goes home: playback halts and the clock reads zero', () => {
+    const media = fakeMedia('audio', { duration: 100 });
+    const player = mount(media);
+    media.play();
+    player.seekTo(40);
+    const seen = [];
+    player.addEventListener('media-player-interaction', (e) => seen.push(e.detail.type));
+    player.stop();
+    expect(media.paused).toBe(true);
+    expect(media.currentTime).toBe(0);
+    expect(player.currentTime).toBe(0);
+    expect(seen).toEqual(['stop']);
   });
 
   test('the skip attribute is what a skip button moves, and a nonsense one falls back to ten', () => {
@@ -264,6 +302,24 @@ describe('volume', () => {
     const player = mount(fakeMedia());
     expect(() => player.applyVolume(0.5)).not.toThrow();
     setItem.mockRestore();
+  });
+
+  test('volume buttons step by a tenth, silent at the bottom and full at the top with no dead press', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    player.applyVolume(0.5);
+    player.volumeDown();
+    expect(media.volume).toBe(0.4);
+    player.applyVolume(0.1);
+    player.volumeDown();
+    expect(media.volume).toBe(0); // the last press down is silence
+    expect(media.muted).toBe(true);
+    player.volumeUp();
+    expect(media.volume).toBe(0.1); // and the first press up is audible again
+    expect(media.muted).toBe(false);
+    player.applyVolume(0.9);
+    player.volumeUp();
+    expect(media.volume).toBe(1); // the end snap closes the top
   });
 
   test('a mute survives a reload, and unmuting after it returns to the old level rather than full blast', () => {
@@ -409,7 +465,7 @@ describe('the buffered bar', () => {
   test('how far ahead the browser has loaded is seconds, so it shares a scale with the duration', () => {
     const media = fakeMedia('audio', { duration: 100 });
     Object.defineProperty(media, 'buffered', {
-      get: () => ({ length: 1, end: () => 42 }),
+      get: () => ({ length: 1, start: () => 0, end: () => 42 }),
       configurable: true
     });
     const player = mount(media);
@@ -426,12 +482,30 @@ describe('the buffered bar', () => {
   test('a file already buffered before the upgrade still fills its bar, though progress will never fire again', () => {
     const media = fakeMedia('audio', { duration: 60 });
     Object.defineProperty(media, 'buffered', {
-      get: () => ({ length: 1, end: () => 60 }),
+      get: () => ({ length: 1, start: () => 0, end: () => 60 }),
       configurable: true
     });
     // No progress event is dispatched anywhere in this test — readiness has to do it.
     const player = mount(media);
     expect(player.buffered).toBe(60);
+  });
+
+  test('the bar follows the range the playhead is in, not the furthest one a seek left behind', () => {
+    const media = fakeMedia('audio', { duration: 100 });
+    Object.defineProperty(media, 'buffered', {
+      get: () => ({ length: 2, start: (i) => [0, 40][i], end: (i) => [10, 70][i] }),
+      configurable: true
+    });
+    const player = mount(media);
+    expect(player.buffered).toBe(10); // playhead at 0, in the first range
+
+    media.currentTime = 50;
+    player.onProgress();
+    expect(player.buffered).toBe(70); // in the second range now, and its end is the truth
+
+    media.currentTime = 20;
+    player.onProgress();
+    expect(player.buffered).toBe(70); // in the gap between them: keep the last bar, do not guess
   });
 });
 

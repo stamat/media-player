@@ -16,6 +16,9 @@ export const LIVE_DURATION = 2 ** 32;
 /** Where the volume slider and the media element disagree: one counts to 100, one to 1. */
 export const VOLUME_SCALE = 100;
 
+/** How much one press of a volume button moves, as a share of full. */
+export const VOLUME_STEP = 0.1;
+
 /** How long the video controls stay up after the pointer stops moving, in milliseconds. */
 export const CONTROLS_LINGER = 5000;
 
@@ -109,6 +112,7 @@ export function volumeState(value) {
  * @attr {boolean} is-live - The duration says this is an endless stream, so there is nothing to seek. CSS hook; the element sets it.
  * @attr {boolean} is-video - The wrapped element is a `<video>`. CSS hook; the element sets it.
  * @attr {boolean} is-fullscreen - CSS hook; the element sets it.
+ * @attr {boolean} no-fullscreen - Fullscreen has no door to open here — an iframe without `allow="fullscreen"` is the common way. CSS hook for hiding the button that would do nothing; the element sets it.
  * @attr {boolean} controls-shown - The video controls are up. CSS hook; the element sets it.
  * @attr {boolean} poster-hidden - The poster has been played past. CSS hook; the element sets it.
  * @attr {boolean} has-captions - A `<track>` was found, so a captions button is worth showing. CSS hook; the element sets it.
@@ -136,6 +140,7 @@ export class MediaPlayer extends HgElement {
     'is-live',
     'is-video',
     'is-fullscreen',
+    'no-fullscreen',
     'controls-shown',
     'poster-hidden',
     'has-captions',
@@ -191,10 +196,27 @@ export class MediaPlayer extends HgElement {
     this.frame = 0;
     this.linger = null;
 
+    // Present only when no fullscreen door will open — an iframe without
+    // `allow="fullscreen"` is the common way to get here — so a stylesheet can hide the
+    // button that would silently do nothing.
+    if (this.isVideo) {
+      this.noFullscreen = !(document.fullscreenEnabled || this.media.webkitEnterFullscreen);
+    }
+
     // The author writes `controls` so the page works before this runs; taking it off is the
     // first thing the upgrade does, and the last thing undone if the element is removed.
     this.hadControls = this.media.controls;
     this.media.controls = false;
+
+    // A move in the DOM is a disconnect and a connect, and hydrargyri runs this method on
+    // both connects. A player that was already ready keeps its state: resetting it here
+    // would wedge the duration at zero, because `loaded` cannot run twice — so a reconnect
+    // only takes the controls back off (undone just above by `disconnected`) and restarts
+    // the clock, which `tick` reduces to nothing if the move paused the media.
+    if (this.isReady) {
+      this.resume();
+      return;
+    }
 
     this.duration = 0;
     this.currentTime = 0;
@@ -272,6 +294,14 @@ export class MediaPlayer extends HgElement {
     if (!this.media) return;
     if (this.media.paused) this.play();
     else this.pause();
+  }
+
+  /** Pause and go home. `seekTo` refuses both halves for a live stream, so there it only pauses. */
+  stop() {
+    if (!this.media) return;
+    this.pause();
+    this.seekTo(0);
+    this.interaction('stop');
   }
 
   skipForward() {
@@ -388,10 +418,22 @@ export class MediaPlayer extends HgElement {
    * `<progress>` behind the scrubber is set to — two values on one `max`, which is the whole
    * reason the buffered bar can sit behind the played one without any arithmetic in the
    * markup.
+   *
+   * The range the playhead sits in, not the first or the furthest: after a seek the browser
+   * holds disjoint ranges, and either end would lie — the first stops behind the playhead,
+   * the last draws a bar over a gap playback has not crossed. When the playhead is between
+   * ranges the bar keeps its last value rather than guessing.
    */
   onProgress() {
-    if (!this.media || !this.media.buffered.length || !this.media.duration) return;
-    this.buffered = this.media.buffered.end(this.media.buffered.length - 1);
+    if (!this.media || !this.media.duration) return;
+    const ranges = this.media.buffered;
+    const at = this.media.currentTime;
+    for (let i = 0; i < ranges.length; i++) {
+      if (ranges.start(i) <= at && at <= ranges.end(i)) {
+        this.buffered = ranges.end(i);
+        return;
+      }
+    }
   }
 
   /**
@@ -478,6 +520,29 @@ export class MediaPlayer extends HgElement {
       this.rememberVolume(this.media.volume);
       this.interaction('volume', this.media.volume);
     }, VOLUME_SETTLE);
+  }
+
+  volumeUp() {
+    this.stepVolume(1);
+  }
+
+  volumeDown() {
+    this.stepVolume(-1);
+  }
+
+  /**
+   * One press of a dedicated volume button — for a UI without a slider.
+   *
+   * From muted it climbs from zero in steps rather than jumping back to the remembered
+   * level: a button press promises a small change. The step equals the mute threshold, so
+   * the first press up is audible and the last press down is silence, with no dead press
+   * at either end.
+   */
+  stepVolume(direction) {
+    if (!this.media) return;
+    const current = this.media.muted ? 0 : this.media.volume;
+    this.applyVolume(current + direction * VOLUME_STEP);
+    this.interaction(direction > 0 ? 'volume-up' : 'volume-down', this.media.volume);
   }
 
   applyVolume(value, remember = true) {
