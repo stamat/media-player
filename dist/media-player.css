@@ -46,7 +46,7 @@ media-player video {
 }
 
 .media-player-volume {
-  flex: 0 0 6rem;
+  flex: 0 0 4.5rem;
 }
 
 .media-player-time {

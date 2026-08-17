@@ -24,7 +24,11 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
     on="loadedmetadata:onLoaded;play:onPlay;pause:onPause;progress:onProgress"
   ></audio>
 
-  <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
+  <toolbar-elemental
+    class="media-player-controls"
+    aria-label="Playback"
+    bind="isReady:if"
+  >
     <button on="click:togglePlay" bind="playLabel:attr#aria-label">▶</button>
     <span bind="currentTime|time">00:00</span>
     <slider-elemental class="media-player-scrubber">

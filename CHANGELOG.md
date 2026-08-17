@@ -27,6 +27,13 @@ for the person who wrote the code.
   state lands. The `controls` attribute the author wrote stays on the media element until
   the element upgrades, so a script that never loads leaves a working native player.
 
+- **The look is optional.** Structure and look ship as separate stylesheets, the way the
+  elementals do: `style.css` alone is a working player, and `theme.css` brings the flat
+  compact bar, the accent flooding a button on hover, the slim track whose thumb appears on
+  hover or focus, the video gradient with its centred play chip, a stripe march while
+  buffering and a scrubber that hides on a live stream — in `Canvas` and `CanvasText`
+  rather than hardcoded white and slate, so dark mode and forced colours need no palette.
+
 - **The parts with an APG pattern are borrowed, not rewritten.** The scrubber and volume are
   [`<slider-elemental>`](https://github.com/stamat/book-of-elementals) around a native
   `<input type="range">`, the buffered bar is `<progress-elemental buffer>`, and the control

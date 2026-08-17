@@ -461,6 +461,16 @@ describe('the scrubber drawing one position rather than two', () => {
   });
 });
 
+describe('toggle buttons', () => {
+  test('a toggle speaks ARIA: pressed is the string "true" or "false", never a bare boolean or a missing attribute', () => {
+    const pressed = MediaPlayer.formatters.pressed;
+    expect(pressed(true)).toBe('true');
+    expect(pressed(false)).toBe('false');
+    // An absent boolean attribute reads null through the bind, and null must still say "false".
+    expect(pressed(null)).toBe('false');
+  });
+});
+
 describe('the buffered bar', () => {
   test('how far ahead the browser has loaded is seconds, so it shares a scale with the duration', () => {
     const media = fakeMedia('audio', { duration: 100 });

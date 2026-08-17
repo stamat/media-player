@@ -1,9 +1,8 @@
-// The optional look. Load it or do not — index.scss alone is a working player, and this
-// file only decides what it is painted in.
-
-// Everything here is a system colour by default, so a player dropped into a page with no
-// design system still respects light mode, dark mode, forced colours and high contrast
-// without a media query or a palette to configure.
+// The optional look, in the register Plyr made the standard for web players: a flat
+// compact bar, controls that fill with the accent under the pointer, a slim rounded track
+// whose accent thumb waits for a pointer or for focus, video controls on a bottom gradient. Where Plyr hardcodes
+// white and slate, this sheet uses `Canvas` and `CanvasText`, so the same look follows the
+// page into dark mode and forced colours without a palette to configure.
 
 // Nothing is drawn under :not(:defined). A themed control bar whose buttons do nothing is
 // worse than an unstyled one — the browser's own player is the honest fallback, and it is
@@ -16,16 +15,54 @@ media-player:not(:defined) .media-player-overlay {
 }
 
 media-player {
-  --media-player-accent: Highlight;
+  --media-player-accent: #22c55e;
+
+  // What sits on the accent — the flooded button's glyph, the chip's triangle. Its own
+  // knob because the accent is one: whoever changes the accent has to be able to change
+  // the ink with it, or a light accent ends up carrying light glyphs.
+  --media-player-accent-ink: #fff;
   --media-player-surface: Canvas;
   --media-player-color: CanvasText;
   --media-player-radius: 0.5rem;
 
   color: var(--media-player-color);
+}
 
-  // The elementals draw their own tracks; handing them this player's accent is what keeps
-  // the scrubber the same colour as everything around it.
+// The handoff to the elementals, on the elements and not on `media-player`: their themes
+// declare every knob's default directly on the bare element, and a custom property set on
+// the element always beats one inherited from an ancestor — a handoff written on the
+// wrapper reads as though it works and silently does not. Neutrals are mixed from
+// `--media-player-color`, which the video half swaps to white, and every track and bar
+// re-mixes with it.
+media-player slider-elemental {
   --slider-elemental-fill: var(--media-player-accent);
+  --slider-elemental-track: color-mix(in srgb, var(--media-player-color) 15%, transparent);
+  --slider-elemental-track-size: 0.5rem;
+  --slider-elemental-thumb-size: 0.8125rem;
+  --slider-elemental-focus-width: 3px;
+  --slider-elemental-focus-color: color-mix(in srgb, var(--media-player-accent) 50%, transparent);
+
+  // The value bubble as a small light card, the way Plyr draws its tooltip. Literal
+  // system colours, not the `--media-player-*` pair: the video half swaps
+  // `--media-player-color` to white, and a bubble following one half of its pairing is
+  // white text on a white card.
+  --slider-elemental-tooltip-surface: Canvas;
+  --slider-elemental-tooltip-color: CanvasText;
+  --slider-elemental-tooltip-radius: 5px;
+}
+
+// Outranks the structure sheet's thumb fallback (a class selector), which exists so a
+// thumb over a transparent fill stays visible without this theme. The accent, so a resting
+// thumb reads as the rounded end of the fill it sits on.
+media-player .media-player-scrubber,
+media-player .media-player-volume {
+  --slider-elemental-thumb: var(--media-player-accent);
+}
+
+media-player progress-elemental {
+  --progress-elemental-fill: var(--media-player-accent);
+  --progress-elemental-height: 0.5rem;
+  --progress-elemental-track: color-mix(in srgb, var(--media-player-color) 15%, transparent);
   --progress-elemental-buffer-fill: color-mix(in srgb, var(--media-player-color) 30%, transparent);
 }
 
@@ -39,17 +76,45 @@ media-player button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem;
+  padding: 0.4375rem;
   border: 0;
-  border-radius: 0.25rem;
+  border-radius: 4px;
   background: none;
   color: inherit;
   cursor: pointer;
+
+  // One clock for the flood and the glyph. `background-color`, not the `background`
+  // shorthand: the shorthand puts every background longhand on the transition, and the
+  // colour then waits on interpolations that have nowhere to go.
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-media-player button:disabled {
-  opacity: 0.5;
-  cursor: default;
+// Square, and never squeezed: a crowded video row would otherwise flex-shrink the buttons
+// into ovals before the scrubber gives up a pixel. Scoped to the row, because the overlay
+// is a button too — a full-cover button handed `aspect-ratio: 1` becomes a square as wide
+// as the video, dragging its centred chip toward the bottom edge.
+media-player .media-player-controls button {
+  flex: none;
+  aspect-ratio: 1;
+}
+
+// Consecutive buttons cluster: the row's gap is right between a button and a slider or a
+// label, and too much between two buttons whose padding already holds their glyphs apart —
+// the skip-play-skip trio wants to read as one transport control, not three strays.
+media-player .media-player-controls button + button {
+  margin-inline-start: calc(var(--media-player-gap) * -0.75);
+}
+
+// The hover is the accent filling the control, not the icon changing shade — Plyr's most
+// recognisable move. A toggle that is on keeps the flood: `aria-pressed` is the state the
+// button already announces, so it is the hook the paint hangs on too. Scoped to the row:
+// the overlay is a button covering the whole video, and flooding that is a green screen —
+// its own hover is the chip growing, further down.
+media-player .media-player-controls button:hover,
+media-player .media-player-controls button:focus-visible,
+media-player .media-player-controls button[aria-pressed="true"] {
+  background: var(--media-player-accent);
+  color: var(--media-player-accent-ink);
 }
 
 media-player button:focus-visible {
@@ -57,43 +122,179 @@ media-player button:focus-visible {
   outline-offset: 2px;
 }
 
+media-player button:disabled {
+  background: none;
+  color: color-mix(in srgb, var(--media-player-color) 45%, transparent);
+  cursor: default;
+}
+
+// Size only — no fill or stroke, so both filled icon sets and stroke sets (the samples use
+// Lucide) keep the colour handling they carry in their own attributes. The transition puts
+// the glyph's paint on the same clock as the button's flood, whichever attribute carries it.
 media-player svg {
   display: block;
-  width: 1.5rem;
-  height: 1.5rem;
-  fill: currentcolor;
+  width: 1.125rem;
+  height: 1.125rem;
+  transition: stroke 0.3s ease, fill 0.3s ease, color 0.3s ease;
+}
+
+// The thumb keeps out of sight until the slider is engaged — pointer over it, or focus in
+// it. Focus counts as engaged or a keyboard user scrubs blind, which would be a state
+// traded away for looks. One rule per engine: a selector list with an unknown vendor
+// pseudo drops the whole rule.
+media-player slider-elemental > input[type="range"]::-webkit-slider-thumb {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+media-player slider-elemental > input[type="range"]::-moz-range-thumb {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+media-player slider-elemental:hover > input[type="range"]::-webkit-slider-thumb,
+media-player slider-elemental:focus-within > input[type="range"]::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+media-player slider-elemental:hover > input[type="range"]::-moz-range-thumb,
+media-player slider-elemental:focus-within > input[type="range"]::-moz-range-thumb {
+  opacity: 1;
+}
+
+media-player .media-player-time {
+  font-size: 0.8125rem;
+}
+
+// BUFFERING
+
+// A stripe march over the track while data is short. Drawn on the scrubber's ::before with
+// the buffered bar's own geometry; it carries no z-index, so the played and buffered bars
+// — positioned, later in the tree — paint over it and the stripes show only on the part of
+// the track nothing has reached yet.
+@keyframes media-player-buffering {
+  from { background-position: 0 0; }
+
+  to { background-position: 25px 0; }
+}
+
+media-player[is-buffering] .media-player-scrubber::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  translate: 0 -50%;
+  height: 0.5rem;
+  border-radius: 999px;
+  background-image:
+    linear-gradient(
+      -45deg,
+      color-mix(in srgb, var(--media-player-color) 15%, transparent) 25%,
+      transparent 25% 50%,
+      color-mix(in srgb, var(--media-player-color) 15%, transparent) 50% 75%,
+      transparent 75%
+    );
+  background-size: 25px 25px;
+  animation: media-player-buffering 1s linear infinite;
+  pointer-events: none;
+}
+
+// LIVE
+
+// A live stream has nothing to seek; hide the scrubber rather than show a dead one.
+// `visibility`, not `display`: the row keeps its layout, so the controls do not shuffle
+// when a stream identifies itself.
+media-player[is-live] .media-player-scrubber {
+  visibility: hidden;
 }
 
 // VIDEO
 
-// The control row floats over the picture, so it carries its own surface rather than
-// borrowing the page's — a translucent panel with the video's own colours behind it.
-
-media-player[is-video] .media-player-controls {
-  margin: var(--media-player-gap);
-  background: color-mix(in srgb, Canvas 70%, transparent);
-  backdrop-filter: blur(8px);
-}
-
+// Plyr's video bar: no panel, a gradient rising from the bottom edge, white ink. Swapping
+// `--media-player-color` to white here is what re-mixes every neutral — tracks, buffer,
+// time, disabled buttons — for the dark ground; nothing else needs saying twice.
 media-player[is-video] {
+  --media-player-color: #fff;
+
   border-radius: var(--media-player-radius);
   background: #000;
 }
 
+media-player[is-video] .media-player-controls {
+  padding: calc(var(--media-player-gap) * 4) var(--media-player-gap) var(--media-player-gap);
+  border-radius: 0;
+  background: linear-gradient(transparent, rgb(0 0 0 / 75%));
+}
+
+// The big centred play chip over a paused video — Plyr's overlaid control. Drawn with
+// pseudo-elements only on an overlay the author left empty, so a button given its own icon
+// is left alone. The structure sheet centres the overlay's content; the triangle rides on
+// absolute centring of its own, nudged right the way every play triangle optically wants.
 .media-player-overlay {
-  color: CanvasText;
+  color: #fff;
   cursor: pointer;
 }
 
+.media-player-overlay:empty::before {
+  content: "";
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--media-player-accent);
+  box-shadow: 0 1px 1px rgb(35 40 47 / 15%);
+  transition: scale 0.3s ease;
+}
+
+// The same Lucide play the samples put on the row's play button, as a mask — the chip and
+// the small button agree on one triangle. A mask rather than markup, because the overlay
+// has to stay empty for the chip to draw at all.
+.media-player-overlay:empty::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: var(--media-player-accent-ink);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.media-player-overlay:empty:hover::before {
+  scale: 1.1;
+}
+
+// Captions the way every player draws them: white on translucent black, whatever the
+// page's theme — they sit on video, not on the page.
 .media-player-captions span {
   padding: 0.25em 0.5em;
   border-radius: 0.25rem;
-  background: color-mix(in srgb, Canvas 80%, transparent);
-  color: CanvasText;
+  background: rgb(0 0 0 / 80%);
+  color: #fff;
 }
 
 @media (prefers-reduced-motion: reduce) {
   media-player[is-video] .media-player-controls {
+    transition: none;
+  }
+
+  media-player button {
+    transition: none;
+  }
+
+  media-player[is-buffering] .media-player-scrubber::before {
+    animation: none;
+  }
+
+  .media-player-overlay:empty::before {
+    transition: none;
+  }
+
+  media-player slider-elemental > input[type="range"]::-webkit-slider-thumb {
+    transition: none;
+  }
+
+  media-player slider-elemental > input[type="range"]::-moz-range-thumb {
     transition: none;
   }
 }

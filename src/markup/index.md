@@ -42,8 +42,6 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
       <span class="media-player-pause-icon">⏸</span>
     </button>
 
-    <span class="media-player-time" bind="currentTime|time">00:00</span>
-
     <slider-elemental
       class="media-player-scrubber"
       tooltip="thumb track"
@@ -76,7 +74,10 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
       />
     </slider-elemental>
 
-    <span class="media-player-time" bind="duration|time">00:00</span>
+    <span class="media-player-time">
+      <span bind="currentTime|time">00:00</span> /
+      <span bind="duration|time">00:00</span>
+    </span>
   </toolbar-elemental>
 </media-player>
 ```
@@ -93,13 +94,12 @@ Which runs, here, on this page:
 <media-player storage-key="demo">
 <audio controls src="sample/tone.wav" preload="metadata" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></audio>
 <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
-<button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>↺</button>
-<button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon">▶</span><span class="media-player-pause-icon">⏸</span></button>
-<button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>↻</button>
-<span class="media-player-time" bind="currentTime|time">00:00</span>
+<button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+<button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
+<button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
 <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
-<span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
-<button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
+<span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+<button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
 <slider-elemental class="media-player-volume"><progress-elemental><progress value="100" max="100" bind="volumePercent:prop#value"></progress></progress-elemental><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
 </toolbar-elemental>
 </media-player>
@@ -174,15 +174,23 @@ controls that fade out while playing — only when it wrapped a `<video>`.
     aria-label="Playback"
     bind="isReady:if"
   >
-    <!-- the same controls as above, plus: -->
+    <!-- the same controls as above, plus two toggles. The label stays put and
+         `aria-pressed` carries the state — which is also the hook the theme keeps the
+         hover flood on. `|pressed` turns the bind's boolean into ARIA's "true"/"false". -->
     <button
       on="click:toggleCaptions"
-      bind="captionsLabel:attr#aria-label"
+      aria-label="Captions"
+      bind="captionsVisible:attr#aria-pressed|pressed"
       disabled
     >
       CC
     </button>
-    <button on="click:toggleFullscreen" aria-label="Fullscreen" disabled>
+    <button
+      on="click:toggleFullscreen"
+      aria-label="Fullscreen"
+      bind="isFullscreen:attr#aria-pressed|pressed"
+      disabled
+    >
       ⛶
     </button>
   </toolbar-elemental>
@@ -198,16 +206,15 @@ Which runs here too, over twelve seconds of NASA's Artemis II rollout:
 <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
 <div class="media-player-captions" bind="captionText:if"><span bind="captionText"></span></div>
 <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
-<button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled>↺</button>
-<button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon">▶</span><span class="media-player-pause-icon">⏸</span></button>
-<button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>↻</button>
-<span class="media-player-time" bind="currentTime|time">00:00</span>
+<button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+<button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
+<button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
 <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
-<span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
-<button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
+<span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+<button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
 <slider-elemental class="media-player-volume"><progress-elemental><progress value="100" max="100" bind="volumePercent:prop#value"></progress></progress-elemental><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
-<button on="click:toggleCaptions" bind="captionsLabel:attr#aria-label" disabled>CC</button>
-<button on="click:toggleFullscreen" aria-label="Fullscreen" disabled>⛶</button>
+<button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg></button>
+<button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
 </toolbar-elemental>
 </media-player>
 </div>
@@ -270,18 +277,22 @@ player, or two players on one page will share one volume.
 
 ## What the theme takes
 
-`theme.css` is painted entirely in system colours, so light mode, dark mode, forced colours
-and high contrast are answered before you configure anything. What it takes from you are
-custom properties — the first four live in the theme, the last two in the structure sheet:
+`theme.css` speaks the register Plyr made the standard: a flat compact bar, controls that
+flood with the accent under the pointer, a slim rounded track whose accent thumb appears on hover or focus,
+video controls on a bottom gradient with a centred play chip. Where Plyr hardcodes white
+and slate, this sheet uses `Canvas` and `CanvasText`, so the same look follows the page
+into dark mode and forced colours. What it takes from you are custom properties — the
+first four live in the theme, the last two in the structure sheet:
 
-| Property                 | Default      | Paints                                            |
-| ------------------------ | ------------ | ------------------------------------------------- |
-| `--media-player-accent`  | `Highlight`  | the played part of the scrubber, the focus ring   |
-| `--media-player-surface` | `Canvas`     | behind the control row                            |
-| `--media-player-color`   | `CanvasText` | icons, labels, and the buffered bar's tint        |
-| `--media-player-radius`  | `0.5rem`     | the control row's corners, and the video's        |
-| `--media-player-gap`     | `0.5rem`     | between controls                                  |
-| `--media-player-fade`    | `0.2s`       | how long the video controls take to fade out      |
+| Property                 | Default      | Paints                                          |
+| ------------------------ | ------------ | ----------------------------------------------- |
+| `--media-player-accent`  | `#22c55e`    | the played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring |
+| `--media-player-accent-ink` | `#fff`    | what sits on the accent — the flooded button's glyph, the chip's triangle; change it with the accent |
+| `--media-player-surface` | `Canvas`     | behind the control row, and the value bubble    |
+| `--media-player-color`   | `CanvasText` | labels, and every neutral mixed from it — tracks, the buffered bar, disabled buttons; the video half swaps it to white and everything re-mixes |
+| `--media-player-radius`  | `0.5rem`     | the control row's corners, and the video's      |
+| `--media-player-gap`     | `0.5rem`     | between controls                                |
+| `--media-player-fade`    | `0.2s`       | how long the video controls take to fade out    |
 
 ## State you can bind
 
@@ -296,6 +307,10 @@ custom properties — the first four live in the theme, the last two in the stru
 
 Beside `togglePlay`, `stop`, the skips and the sliders' handlers, two more answer `on=` for
 a volume UI without a slider: `volumeUp` and `volumeDown`, one tenth of full per press.
+
+Three formatters pipe a bind: `|time` writes seconds as a clock, `|floor` a whole number,
+and `|pressed` a boolean as the literal `"true"`/`"false"` that a toggle's `aria-pressed`
+wants — the captions and fullscreen buttons in the video sample are wired with it.
 
 ## Labels in another language
 
@@ -350,7 +365,7 @@ Sizes are each package's browser bundle, gzipped: Plyr and Video.js as published
 (`dist/plyr.min.js`, `dist/video.min.js`), media-chrome bundled from its package entry with
 esbuild, Vidstack from `cdn.vidstack.io/player`. This one is `dist/media-player.min.mjs`,
 which carries hydrargyri and the three elementals inside it — everything the player needs
-except the stylesheets: its own are another 1.4 kB, and the elementals' about 2.5 kB more
+except the stylesheets: its own are another 2 kB, and the elementals' about 2.5 kB more
 with their themes. Every one of those numbers moves with a release; measure before quoting.
 
 Where this loses is the bottom of that table, and it loses there on purpose. **Plyr and
@@ -422,4 +437,5 @@ way, from each package's `dist/`:
 
 ## License
 
-[MIT](https://github.com/stamat/media-player/blob/main/LICENSE) © [Stamat](https://github.com/stamat)
+[MIT](https://github.com/stamat/media-player/blob/main/LICENSE) © [Stamat](https://github.com/stamat).
+The icons in the samples are [Lucide](https://lucide.dev), ISC.

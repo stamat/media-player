@@ -121,7 +121,8 @@ export function volumeState(value) {
  * @attr {number} skip - Seconds a skip button moves. Defaults to 10.
  * @attr {string} storage-key - Prefix for the remembered volume, mute and captions state. Defaults to `media-player`; set it per player to keep two of them from sharing one volume.
  *
- * @cssprop {<color>} [--media-player-accent=Highlight] - The played part of the scrubber, and the focus ring.
+ * @cssprop {<color>} [--media-player-accent=#22c55e] - The played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring.
+ * @cssprop {<color>} [--media-player-accent-ink=#fff] - What sits on the accent: the flooded button's glyph, the chip's triangle. Change it with the accent.
  * @cssprop {<color>} [--media-player-surface=Canvas] - Behind the control row.
  * @cssprop {<color>} [--media-player-color=CanvasText] - Icons and labels on it.
  * @cssprop {<length>} [--media-player-radius=0.5rem] - The control row's corners, and the video's.
@@ -183,7 +184,14 @@ export class MediaPlayer extends HgElement {
      * beside a fill at 3.6 — a whole step apart at the worst moment, twice a second. Floor
      * both and there is one number and nothing to disagree about.
      */
-    floor: (value) => (Number.isFinite(value) ? Math.floor(value) : value)
+    floor: (value) => (Number.isFinite(value) ? Math.floor(value) : value),
+
+    /**
+     * For `attr#aria-pressed` binds on toggle buttons. ARIA wants the literal strings
+     * "true" and "false" — a raw boolean bind would write an empty attribute for true and
+     * remove it for false, and a removed `aria-pressed` reads as "not a toggle at all".
+     */
+    pressed: (value) => (value ? 'true' : 'false')
   };
 
   connected() {

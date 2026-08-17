@@ -79,7 +79,7 @@ media-player video {
 // The volume takes a fixed slice rather than its share: two sliders in one flex row both
 // growing means a volume control as wide as the seek bar, which reads as two scrubbers.
 .media-player-volume {
-  flex: 0 0 6rem;
+  flex: 0 0 4.5rem;
 }
 
 .media-player-time {

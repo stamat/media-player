@@ -1686,7 +1686,13 @@ __publicField(MediaPlayer, "formatters", {
    * beside a fill at 3.6 — a whole step apart at the worst moment, twice a second. Floor
    * both and there is one number and nothing to disagree about.
    */
-  floor: (value) => Number.isFinite(value) ? Math.floor(value) : value
+  floor: (value) => Number.isFinite(value) ? Math.floor(value) : value,
+  /**
+   * For `attr#aria-pressed` binds on toggle buttons. ARIA wants the literal strings
+   * "true" and "false" — a raw boolean bind would write an empty attribute for true and
+   * remove it for false, and a removed `aria-pressed` reads as "not a toggle at all".
+   */
+  pressed: (value) => value ? "true" : "false"
 });
 if (typeof customElements !== "undefined" && !customElements.get("media-player")) {
   customElements.define("media-player", MediaPlayer);
