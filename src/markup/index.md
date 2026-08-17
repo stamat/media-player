@@ -82,7 +82,7 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
 ```
 
 ```js
-import "media-player";
+import 'media-player';
 ```
 
 Which runs, here, on this page:
@@ -203,7 +203,7 @@ Which runs here too, over twelve seconds of NASA's Artemis II rollout:
 <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
 <span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
 <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
-<slider-elemental class="media-player-volume"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
+<slider-elemental class="media-player-volume"><progress-elemental><progress value="100" max="100" bind="volumePercent:prop#value"></progress></progress-elemental><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>
 <button on="click:toggleCaptions" bind="captionsLabel:attr#aria-label" disabled>CC</button>
 <button on="click:toggleFullscreen" aria-label="Fullscreen" disabled>⛶</button>
 </toolbar-elemental>
@@ -333,7 +333,7 @@ npm install media-player
 ```
 
 ```js
-import "media-player";
+import 'media-player';
 ```
 
 The elementals ride along — importing `media-player` defines the slider, the progress bar
@@ -364,7 +364,7 @@ Or from a CDN as a module, no install and no build step:
 
 ```html
 <script type="module">
-  import "https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs";
+  import 'https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs';
 </script>
 ```
 
