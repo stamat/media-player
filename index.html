@@ -79,7 +79,7 @@ is the argument for everything below it.</p>
 
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-time&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;currentTime|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
 
-    <span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span> <span class="hljs-attr">tooltip</span>=<span class="hljs-string">&quot;thumb track&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;timeFormatter:prop#format&quot;</span>&gt;</span>
       <span class="hljs-comment">&lt;!-- The played and buffered bars. A &lt;progress&gt; rather than the slider&#x27;s own fill:
            an &lt;input type=&quot;range&quot;&gt;&#x27;s `value` does not reflect to an attribute, so writing
            it from script moves the thumb and nothing else. --&gt;</span>
@@ -111,7 +111,7 @@ is the argument for everything below it.</p>
 <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon">▶</span><span class="media-player-pause-icon">⏸</span></button>
 <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled>↻</button>
 <span class="media-player-time" bind="currentTime|time">00:00</span>
-<slider-elemental class="media-player-scrubber"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
+<slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format"><progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental><input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"></slider-elemental>
 <span class="media-player-time media-player-duration" bind="duration|time">00:00</span>
 <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute">🔇</span><span class="media-player-volume-icon media-player-volume-icon-mid">🔉</span><span class="media-player-volume-icon media-player-volume-icon-full">🔊</span></button>
 <slider-elemental class="media-player-volume"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume"></slider-elemental>

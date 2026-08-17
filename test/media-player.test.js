@@ -300,6 +300,33 @@ describe('the clock surviving a scrub', () => {
   });
 });
 
+describe('the end of the track', () => {
+  test('a track that finished leaves the scrubber at the end it reached, not a step short of it', () => {
+    const media = fakeMedia('audio', { duration: 100 });
+    const player = mount(media);
+    // Where the last animation frame left it: a fraction short, and floored to a whole
+    // second by the scrubber, so the thumb would stop one step from the end.
+    player.paint(99.87);
+    player.onEnded();
+    expect(player.currentTime).toBe(100);
+    expect(player.remaining).toBe(0);
+  });
+
+  test('a live stream that ends has no end to move the thumb to', () => {
+    const player = mount(fakeMedia('audio', { duration: LIVE_DURATION }));
+    expect(() => player.onEnded()).not.toThrow();
+    expect(player.currentTime).toBe(0);
+  });
+});
+
+describe('the value bubble', () => {
+  test('the scrubber hands its slider a time formatter, so the bubble reads a clock and not a count', () => {
+    const player = mount(fakeMedia());
+    expect(player.timeFormatter).toBe(formatTime);
+    expect(player.timeFormatter(72)).toBe('01:12');
+  });
+});
+
 describe('the scrubber drawing one position rather than two', () => {
   test('the thumb and the played bar are handed the same whole second, so they cannot disagree on screen', () => {
     const player = mount(fakeMedia());

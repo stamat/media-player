@@ -99,11 +99,6 @@ export function volumeState(value) {
  * media element actually holds. That is what a scrubber draws anyway; multiple spans want
  * their own element.
  *
- * ponytail: no value bubble on the scrubber. `<slider-elemental>`'s bubble prints the raw
- * number, and a scrubber's bubble has to say `01:12` — there is no formatting hook to give
- * it one. A time bubble wants a formatter on the slider itself, which is a change to
- * book-of-elementals rather than something to work around here.
- *
  * @attr {boolean} is-ready - Metadata has arrived and the duration is known. CSS hook; the element sets it.
  * @attr {boolean} is-playing - The media is playing. CSS hook for the play/pause icon swap; the element sets it.
  * @attr {boolean} is-buffering - Waiting on data. CSS hook for a spinner; the element sets it.
@@ -162,7 +157,8 @@ export class MediaPlayer extends HgElement {
     'playLabel',
     'muteLabel',
     'captionsLabel',
-    'captionText'
+    'captionText',
+    'timeFormatter'
   ];
 
   static formatters = {
@@ -204,6 +200,11 @@ export class MediaPlayer extends HgElement {
     this.playLabel = 'Play';
     this.muteLabel = 'Mute';
     this.captionsLabel = 'Enable captions';
+    // Handed to the scrubber's `<slider-elemental>` through a `prop#format` bind, so the
+    // value bubble reads `01:12` rather than `72`. A property rather than a `querySelector`
+    // and an assignment: the markup says which slider gets it, and this element keeps its
+    // one reference.
+    this.timeFormatter = formatTime;
 
     this.track = this.media.querySelector('track');
     if (this.track) this.hasCaptions = true;
@@ -351,7 +352,16 @@ export class MediaPlayer extends HgElement {
     }
   }
 
+  /**
+   * Playback reached the end.
+   *
+   * The clock is painted here rather than left where the last animation frame put it. That
+   * frame ran some fraction of a second before the end and the scrubber floors to whole
+   * seconds, so a track that finished would leave the thumb a step short of the end it just
+   * reached — the one position a listener is certain about, and the one it got wrong.
+   */
   onEnded() {
+    if (!this.isLive && this.media) this.paint(this.media.duration);
     this.pause();
   }
 

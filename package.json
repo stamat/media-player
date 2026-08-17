@@ -58,7 +58,7 @@
     "transform": {}
   },
   "dependencies": {
-    "book-of-elementals": "^0.9.0",
+    "book-of-elementals": "^0.10.0",
     "hydrargyri": "^2.1.1"
   },
   "devDependencies": {

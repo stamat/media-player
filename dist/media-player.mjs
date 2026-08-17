@@ -693,6 +693,7 @@ var SliderElemental = class extends ElementBase {
     this.onTooltipUp = this.onTooltipUp.bind(this);
     this.tooltipX = null;
     this.tooltipElement = null;
+    this.format = null;
     this.dragging = -1;
     this.addEventListener("input", this.onInput, true);
     this.form = this.closest("form");
@@ -915,14 +916,30 @@ var SliderElemental = class extends ElementBase {
     }
     let at = m.ratios[over];
     let text = over < 0 ? "" : m.inputs[over].value;
+    let value = over < 0 ? 0 : Number(m.inputs[over].value);
     if (over < 0) {
       at = alongTrack(x, m.rect.left, m.rect.width, m.thumb, m.rtl);
-      text = String(snapToStep(m.min + at * (m.max - m.min), m.min, m.max, stepOf(m.inputs[0])));
+      value = snapToStep(m.min + at * (m.max - m.min), m.min, m.max, stepOf(m.inputs[0]));
+      text = String(value);
     }
     bubble.dataset.tooltip = on;
-    bubble.textContent = text;
+    bubble.textContent = this.formatValue(value, text);
     bubble.style.setProperty("--slider-elemental-at", at);
     bubble.hidden = false;
+  }
+  /**
+   * What the bubble says for a value, once `format` has had it.
+   *
+   * `fallback` is the browser's own spelling of the same number and is what shows whenever
+   * there is no formatter, so an element nobody has assigned one to reads exactly as it did
+   * before this hook existed. A formatter returning nothing falls back too - a bubble that
+   * went blank because a function forgot a `return` looks like a broken element rather than
+   * a bug in the page.
+   */
+  formatValue(value, fallback) {
+    if (typeof this.format !== "function") return fallback;
+    const formatted = this.format(value, this);
+    return formatted === void 0 || formatted === null ? fallback : String(formatted);
   }
   /**
    * A press on the track, which stacked inputs would otherwise eat: the one on top covers
@@ -1198,6 +1215,7 @@ var MediaPlayer = class extends HgElement {
     this.playLabel = "Play";
     this.muteLabel = "Mute";
     this.captionsLabel = "Enable captions";
+    this.timeFormatter = formatTime;
     this.track = this.media.querySelector("track");
     if (this.track) this.hasCaptions = true;
     this.restore();
@@ -1308,7 +1326,16 @@ var MediaPlayer = class extends HgElement {
       this.controlsShown = true;
     }
   }
+  /**
+   * Playback reached the end.
+   *
+   * The clock is painted here rather than left where the last animation frame put it. That
+   * frame ran some fraction of a second before the end and the scrubber floors to whole
+   * seconds, so a track that finished would leave the thumb a step short of the end it just
+   * reached — the one position a listener is certain about, and the one it got wrong.
+   */
   onEnded() {
+    if (!this.isLive && this.media) this.paint(this.media.duration);
     this.pause();
   }
   onWaiting() {
@@ -1574,7 +1601,8 @@ __publicField(MediaPlayer, "properties", [
   "playLabel",
   "muteLabel",
   "captionsLabel",
-  "captionText"
+  "captionText",
+  "timeFormatter"
 ]);
 __publicField(MediaPlayer, "formatters", {
   time: (value) => formatTime(value),
