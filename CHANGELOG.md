@@ -130,4 +130,10 @@ for the person who wrote the code.
   can read the attributes, the events and the custom properties without this page open
   beside it. Only what the samples name is public in it — `togglePlay`, the skips, the
   sliders' handlers and the media listeners; the machinery behind them is marked private
-  rather than dropped, so nothing offers you `endDrag`.
+  rather than dropped, so nothing offers you `endDrag`. The samples on the page read the same
+  file: their Options tab is generated from it, one knob per authored attribute and one per
+  custom property, which is the argument for shipping the ecosystem's format rather than
+  inventing one — the controls cannot describe an element the package no longer has. The
+  twelve attributes the element writes for itself carry an `x-code-preview` key marking them
+  hidden there, since a knob spliced into the markup would not survive the next `play`; the
+  key is namespaced, the schema allows it, and every other tool ignores it.

@@ -33,3 +33,13 @@
   overflow: auto;
   max-height: 32rem;
 }
+
+// The Big Buck Bunny player is the page's own DOM rather than a frame's, which is the whole
+// point of it — and it costs the spacing every framed sample gets for free, since prose
+// stylesheets give an unknown element no block margin and `<code-preview>` brings its own.
+// The same 1.75rem it brings, so the two read as one kind of block in one flow. Scoped to
+// `.prose` and therefore not to the frames: their document has no such wrapper, and inside
+// one the padding in `head=` is what holds the sample off the edges.
+.prose media-player {
+  margin-block: 1.75rem;
+}

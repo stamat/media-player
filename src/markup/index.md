@@ -24,7 +24,13 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
 
 The sample below is not a picture of one. It is the page's only copy of that markup, rendered
 in an isolated frame by [`<code-preview>`](https://github.com/stamat/code-preview-element) —
-press **Edit** and what you type is what plays.
+press **Edit** and what you type is what plays. The **Options** tab beside it is the same
+`custom-elements.json` this package ships, turned into controls: the six attributes an author
+writes and the seven custom properties the theme takes, each with what the manifest says its
+type is. An attribute knob rewrites the markup above it, so the code tab stays the truth; a
+custom property is not part of the sample, so it writes a rule into the frame and prints that
+rule for you to copy. The twelve attributes the element writes for itself are left out — a
+knob spliced into the markup would not survive the next `play`.
 
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it.
@@ -32,7 +38,7 @@ press **Edit** and what you type is what plays.
      honest rather than tidy: 1.5rem a side renders it 48px narrower than the page a reader
      would paste this markup onto, which is enough to wrap the video row to a third line on
      a phone and show a defect the markup does not have. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+<code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
 <media-player>
@@ -295,6 +301,11 @@ import "media-player";
      colour it was baked with and stop recolouring the moment a reader typed. -->
 <script src="js/code-preview-hljs.min.js" defer></script>
 
+<!-- The options panel, a second bundle carrying no copy of the element. It is what turns the
+     `manifest` on the previews above into controls; without it that attribute is inert and
+     the samples render exactly as they did. -->
+<script src="js/code-preview-options.min.js" defer></script>
+
 Block the script and that markup is a plain `<audio controls>` — which is the point, and
 worth trying with JavaScript off before taking the claim on trust. Not on this page, though:
 the preview above is itself a custom element, so with scripting off there is nothing here but
@@ -383,7 +394,7 @@ controls that fade out while playing — only when it wrapped a `<video>`.
      honest rather than tidy: 1.5rem a side renders it 48px narrower than the page a reader
      would paste this markup onto, which is enough to wrap the video row to a third line on
      a phone and show a defect the markup does not have. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+<code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
 <media-player
@@ -1009,7 +1020,7 @@ and slate, this sheet uses `Canvas` and `CanvasText`, so the same look follows t
 into dark mode and forced colours. It reaches one thing it does not own: the caret comes off
 a `<tooltip-elemental>` bubble inside a player, because a row of buttons a few pixels apart
 is not ambiguous about which one a bubble points at. What it takes from you are custom
-properties — the first four live in the theme, the last two in the structure sheet:
+properties — the first five live in the theme, the last two in the structure sheet:
 
 | Property                    | Default      | Paints                                                                                                                                         |
 | --------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1197,6 +1208,13 @@ from the element's source on every build. It carries what this page carries — 
 attributes, the two events, the seven custom properties — and marks everything the samples
 do not name as private, so an editor offering completions offers `togglePlay` and not
 `endDrag`.
+
+The samples at the top of this page read it too. Their **Options** tab is generated from
+this file and nothing else, which is the reason to ship one rather than invent a format: the
+knobs cannot describe an element this page no longer has. What the panel leaves out is in
+the file as well, under an `x-code-preview` key the schema permits and every other tool
+ignores — the twelve CSS hooks stay documented for a stylesheet and are marked hidden for
+the panel, because they are the element's to write and not an author's.
 
 What any given editor does with it is its own business, and none of it is required to use
 the element: the manifest is a description, not a runtime.

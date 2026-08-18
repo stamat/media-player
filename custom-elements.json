@@ -545,84 +545,120 @@
                 "text": "boolean"
               },
               "description": "Metadata has arrived and the duration is known. CSS hook; the element sets it.",
-              "name": "is-ready"
+              "name": "is-ready",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "The media is playing. CSS hook for the play/pause icon swap; the element sets it.",
-              "name": "is-playing"
+              "name": "is-playing",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "Waiting on data. CSS hook for a spinner; the element sets it.",
-              "name": "is-buffering"
+              "name": "is-buffering",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "The duration says this is an endless stream, so there is nothing to seek. CSS hook; the element sets it.",
-              "name": "is-live"
+              "name": "is-live",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "The wrapped element is a `<video>`. CSS hook; the element sets it.",
-              "name": "is-video"
+              "name": "is-video",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "CSS hook; the element sets it.",
-              "name": "is-fullscreen"
+              "name": "is-fullscreen",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "Fullscreen has no door to open here — an iframe without `allow=\"fullscreen\"` is the common way. CSS hook for hiding the button that would do nothing; the element sets it.",
-              "name": "no-fullscreen"
+              "name": "no-fullscreen",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "The video controls are up. CSS hook; the element sets it.",
-              "name": "controls-shown"
+              "name": "controls-shown",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "The poster has been played past. CSS hook; the element sets it.",
-              "name": "poster-hidden"
+              "name": "poster-hidden",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "A `<track>` was found, so a captions button is worth showing. CSS hook; the element sets it.",
-              "name": "has-captions"
+              "name": "has-captions",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "boolean"
               },
               "description": "Captions are on. Persisted; the element sets it.",
-              "name": "captions-visible"
+              "name": "captions-visible",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {
                 "text": "string"
               },
               "description": "`mute`, `mid` or `full`, for the three-icon volume button. CSS hook; the element sets it.",
-              "name": "volume-state"
+              "name": "volume-state",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {

@@ -65,14 +65,20 @@ Now it is given a new life as open source, dogfooding <a href="https://github.co
 <a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a>.</p>
 <p>The sample below is not a picture of one. It is the page&#39;s only copy of that markup, rendered
 in an isolated frame by <a href="https://github.com/stamat/code-preview-element"><code>&lt;code-preview&gt;</code></a> —
-press <strong>Edit</strong> and what you type is what plays.</p>
+press <strong>Edit</strong> and what you type is what plays. The <strong>Options</strong> tab beside it is the same
+<code>custom-elements.json</code> this package ships, turned into controls: the six attributes an author
+writes and the seven custom properties the theme takes, each with what the manifest says its
+type is. An attribute knob rewrites the markup above it, so the code tab stays the truth; a
+custom property is not part of the sample, so it writes a rule into the frame and prints that
+rule for you to copy. The twelve attributes the element writes for itself are left out — a
+knob spliced into the markup would not survive the next <code>play</code>.</p>
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it.
      The frame's own padding drops to nothing on a narrow screen. That keeps the sample
      honest rather than tidy: 1.5rem a side renders it 48px narrower than the page a reader
      would paste this markup onto, which is enough to wrap the video row to a third line on
      a phone and show a defect the markup does not have. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
+<code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">audio</span>
     <span class="hljs-attr">controls</span>
     <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/tone.wav&quot;</span>
@@ -323,7 +329,10 @@ press <strong>Edit</strong> and what you type is what plays.</p>
 <!-- The `-hljs` build, not the small one: this page's fences are highlighted at build time
      and it ships no runtime highlighter, so without the bundled copy the code would keep the
      colour it was baked with and stop recolouring the moment a reader typed. -->
-<script src="js/code-preview-hljs.min.js" defer></script><p>Block the script and that markup is a plain <code>&lt;audio controls&gt;</code> — which is the point, and
+<script src="js/code-preview-hljs.min.js" defer></script><!-- The options panel, a second bundle carrying no copy of the element. It is what turns the
+     `manifest` on the previews above into controls; without it that attribute is inert and
+     the samples render exactly as they did. -->
+<script src="js/code-preview-options.min.js" defer></script><p>Block the script and that markup is a plain <code>&lt;audio controls&gt;</code> — which is the point, and
 worth trying with JavaScript off before taking the claim on trust. Not on this page, though:
 the preview above is itself a custom element, so with scripting off there is nothing here but
 the code block it was built from. Paste the sample into a file of your own and the claim is
@@ -404,7 +413,7 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
      honest rather than tidy: 1.5rem a side renders it 48px narrower than the page a reader
      would paste this markup onto, which is enough to wrap the video row to a third line on
      a phone and show a defect the markup does not have. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>
+<code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>
   <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>
 &gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
@@ -1082,7 +1091,7 @@ and slate, this sheet uses <code>Canvas</code> and <code>CanvasText</code>, so t
 into dark mode and forced colours. It reaches one thing it does not own: the caret comes off
 a <code>&lt;tooltip-elemental&gt;</code> bubble inside a player, because a row of buttons a few pixels apart
 is not ambiguous about which one a bubble points at. What it takes from you are custom
-properties — the first four live in the theme, the last two in the structure sheet:</p>
+properties — the first five live in the theme, the last two in the structure sheet:</p>
 <table>
 <thead>
 <tr>
@@ -1366,6 +1375,12 @@ from the element&#39;s source on every build. It carries what this page carries 
 attributes, the two events, the seven custom properties — and marks everything the samples
 do not name as private, so an editor offering completions offers <code>togglePlay</code> and not
 <code>endDrag</code>.</p>
+<p>The samples at the top of this page read it too. Their <strong>Options</strong> tab is generated from
+this file and nothing else, which is the reason to ship one rather than invent a format: the
+knobs cannot describe an element this page no longer has. What the panel leaves out is in
+the file as well, under an <code>x-code-preview</code> key the schema permits and every other tool
+ignores — the twelve CSS hooks stay documented for a stylesheet and are marked hidden for
+the panel, because they are the element&#39;s to write and not an author&#39;s.</p>
 <p>What any given editor does with it is its own business, and none of it is required to use
 the element: the manifest is a description, not a runtime.</p>
 <h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
