@@ -21,8 +21,6 @@ media-player slider-elemental {
   --slider-elemental-thumb-size: 0.8125rem;
   --slider-elemental-focus-width: 3px;
   --slider-elemental-focus-color: color-mix(in srgb, var(--media-player-accent) 50%, transparent);
-  --slider-elemental-tooltip-surface: Canvas;
-  --slider-elemental-tooltip-color: CanvasText;
   --slider-elemental-tooltip-radius: 5px;
 }
 
@@ -123,6 +121,16 @@ media-player[is-buffering] .media-player-scrubber::before {
   background-size: 25px 25px;
   animation: media-player-buffering 1s linear infinite;
   pointer-events: none;
+}
+
+media-player .media-player-scrubber {
+  margin-left: 0.4375rem;
+  margin-right: 0.4375rem;
+}
+
+media-player tooltip-elemental:defined > [role=tooltip]::before,
+media-player tooltip-elemental:defined > [role=tooltip]::after {
+  content: none;
 }
 
 media-player[is-live] .media-player-scrubber {

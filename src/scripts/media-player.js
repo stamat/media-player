@@ -2,6 +2,7 @@ import { HgElement } from 'hydrargyri';
 import 'book-of-elementals/slider';
 import 'book-of-elementals/progress';
 import 'book-of-elementals/toolbar';
+import 'book-of-elementals/tooltip';
 
 /**
  * A duration this long is a live stream rather than a file.
@@ -103,6 +104,40 @@ export function volumeState(value) {
 }
 
 /**
+ * Fields whose own letters a key press belongs to.
+ *
+ * A comment box under a player is the ordinary case, not the exotic one, and a `k` typed
+ * into it must reach it. The excluded input types answer arrows and Space and nothing
+ * alphabetic, so a range or a checkbox with focus is still a fair place to press a key.
+ */
+const TYPING_FIELDS =
+  'input:not([type=range],[type=checkbox],[type=radio],[type=button],[type=submit],[type=reset]),textarea,select';
+
+/** Is this key being typed into something, rather than pressed at the player? */
+function isTyping(node) {
+  return !!node && node.nodeType === 1 && (node.isContentEditable || node.matches(TYPING_FIELDS));
+}
+
+/**
+ * The element actually holding focus, walked through any open shadow root.
+ *
+ * A `keydown` is retargeted at a shadow boundary, so a `<textarea>` inside a web component
+ * arrives at the document as the component itself and reads as no field at all. Bound
+ * page-wide that is the difference between a `k` typed into someone's comment box and a `k`
+ * that pauses the video, so the focused element is asked for as well — walked in, because
+ * `activeElement` is retargeted exactly the same way at every level.
+ *
+ * A closed root reports its host and cannot be walked into, so a text field inside one is
+ * invisible here and its letters are taken. Nothing in the platform says otherwise; a page
+ * that has one wants the focused binding rather than the page-wide one.
+ */
+function focusedElement() {
+  let node = document.activeElement;
+  while (node && node.shadowRoot && node.shadowRoot.activeElement) node = node.shadowRoot.activeElement;
+  return node;
+}
+
+/**
  * `<media-player>` custom element.
  *
  * One element over the `<audio>` or `<video>` the author already wrote. Which of the two it
@@ -137,13 +172,20 @@ export function volumeState(value) {
  * use, a working scrubber, and a title on the lock screen. The panel is one per document, so
  * the last player to start is the one it points at.
  *
- * Two limits worth knowing before you reach for them. There is no keyboard map of its own:
- * every control is a `<button>` or an `<input type="range">`, so the platform already
- * answers Space, Enter, the arrows, Home and End on whichever one has focus, and a
- * player-wide `k`/`j`/`l` map would be a second set of bindings with nothing on the page
- * announcing them. And the buffered bar is one span from the start rather than the
- * `TimeRanges` list the media element holds, because `<progress>` carries one value — after
- * a seek it shows how far the range under the playhead reaches, not the gap behind it.
+ * The keys are the markup as well. A `key="k"` on a control the author already wrote is the
+ * whole binding — the player finds that control and clicks it — and an `on=` naming
+ * `onKeyDown` is what makes it listen at all. So there is no second list of bindings to keep
+ * in step with the buttons and none to announce separately: the key names an action a
+ * visible control already names. Which `keydown` it is bound to is the whole of the scope —
+ * `keydown:onKeyDown` answers while focus is inside the player, `keydown@document:onKeyDown`
+ * answers anywhere on the page, and the page-wide form is what a shortcut usually means.
+ * Nothing is bound by default, and the arrows, Home and End are left where they already
+ * work — the toolbar walks the row with them and every slider answers them.
+ *
+ * One limit worth knowing before you reach for it. The buffered bar is one span from the
+ * start rather than the `TimeRanges` list the media element holds, because `<progress>`
+ * carries one value — after a seek it shows how far the range under the playhead reaches,
+ * not the gap behind it.
  *
  * @attr {boolean} is-ready - Metadata has arrived and the duration is known. CSS hook; the element sets it.
  * @attr {boolean} is-playing - The media is playing. CSS hook for the play/pause icon swap; the element sets it.
@@ -178,12 +220,17 @@ export function volumeState(value) {
  * @see https://www.w3.org/WAI/ARIA/apg/patterns/slider/
  */
 
-// NOTE: the two limits in the doc above are deferrals, not permanent refusals, and the
-// doc is consumer-facing so it carries no triggers. The keyboard map comes back when the
-// bindings can be discoverable — a visible key list, or a player with no control row, where
-// there is no focused control to answer in the first place. The multi-span buffered bar
-// comes back when a scrubber has to draw the hole seeking leaves in a long stream, and it
-// arrives as an element in book-of-elementals rather than a change here.
+// NOTE: the limit in the doc above is a deferral, not a permanent refusal, and the doc is
+// consumer-facing so it carries no trigger. The multi-span buffered bar comes back when a
+// scrubber has to draw the hole seeking leaves in a long stream, and it arrives as an
+// element in book-of-elementals rather than a change here.
+//
+// `key` on a control is deliberately the only keyboard surface: it cannot reach an action
+// with no button, which leaves `volumeUp`/`volumeDown` unreachable for a player whose volume
+// is a slider, and a player drawn with no control row at all unreachable entirely. The
+// attribute mapping a key straight to a method — `keys="k:togglePlay"` on the player — is
+// what covers those, and it comes back when a player without a control row actually exists
+// to need it, because that is the case where there is no visible name for the key to borrow.
 export class MediaPlayer extends HgElement {
   static attributes = [
     'is-ready',
@@ -709,6 +756,43 @@ export class MediaPlayer extends HgElement {
     this.posterHidden = true;
     this.interaction('seek', this.currentTime);
     this.resume();
+  }
+
+  /**
+   * A key pressed inside the player presses the control that claims it.
+   *
+   * The map is the markup: `key="k"` goes on the button the author already wrote, and this
+   * finds that button and clicks it. So a key can never name an action that no visible
+   * control names, there is no second list to keep in step with the first, and a `disabled`
+   * button ignores its key with no code here — the platform declines to dispatch a click on
+   * one. The whole thing is opt-in twice over: no `on=` naming this means no listener at all,
+   * and no `key` on anything means nothing to find. Nothing here knows which of the two
+   * scopes it was bound in: `keydown@document:onKeyDown` hands it presses from anywhere on
+   * the page and the lookup is the same one, which is why a page-wide binding still cannot
+   * reach an action no control on this player names.
+   *
+   * Letters, in practice. `toolbar-elemental` walks the control row with the arrows and
+   * Home/End and every `<input type="range">` here answers them too, so binding an arrow
+   * would be taking a key back off the control that already answers it. Modified presses are
+   * left alone because they belong to the browser, and an already-handled one because
+   * whatever handled it got there first.
+   */
+  onKeyDown(event) {
+    if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (isTyping(event.target) || isTyping(focusedElement())) return;
+
+    const pressed = event.key.toLowerCase();
+    const control = Array.from(this.querySelectorAll('[key]')).find(
+      (node) => node.getAttribute('key').toLowerCase() === pressed
+    );
+    if (!control) return;
+
+    event.preventDefault();
+    control.click();
+    // A key is use, and use is what keeps a video's row up. Without this the controls fade
+    // out from under someone driving by keyboard, which reads as a player that stopped
+    // listening — while every key still works.
+    if (this.isVideo) this.showControls();
   }
 
   // VOLUME

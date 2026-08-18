@@ -11,6 +11,14 @@
 // the player's theme already gives the row a surface — a border around a surface is two
 // looks on one bar.
 @use "book-of-elementals/src/elementals/toolbar/index" as toolbar;
+
+// The tooltip takes its theme as well as its structure, unlike the toolbar above: the
+// element's own sheet only places the bubble, so without the theme there is unpainted text
+// floating over the row rather than a bubble. Nothing here draws one, and nothing should —
+// a tooltip is the one box that has to be legible over whatever it covers, which is what
+// that sheet already solves with `Canvas` and `CanvasText`.
+@use "book-of-elementals/src/elementals/tooltip/index" as tooltip;
+@use "book-of-elementals/src/elementals/tooltip/theme" as tooltip-theme;
 @use "./index";
 @use "./theme";
 

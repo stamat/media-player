@@ -42,12 +42,12 @@ media-player slider-elemental {
   --slider-elemental-focus-width: 3px;
   --slider-elemental-focus-color: color-mix(in srgb, var(--media-player-accent) 50%, transparent);
 
-  // The value bubble as a small light card, the way Plyr draws its tooltip. Literal
-  // system colours, not the `--media-player-*` pair: the video half swaps
-  // `--media-player-color` to white, and a bubble following one half of its pairing is
-  // white text on a white card.
-  --slider-elemental-tooltip-surface: Canvas;
-  --slider-elemental-tooltip-color: CanvasText;
+  // The value bubble's two colours are the elemental's own — white on a dark page, black on
+  // a light one, which is what `<tooltip-elemental>` does with the bubbles on the buttons
+  // beside it. Naming them here at all is what used to make the two kinds of bubble on one
+  // row disagree, and it also outranked that sheet's `forced-colors` branch, where the pair
+  // has to turn back the right way up or the bubble is a solid block where the mode expects
+  // a page. Only the radius is ours, to match the buttons.
   --slider-elemental-tooltip-radius: 5px;
 }
 
@@ -193,6 +193,24 @@ media-player[is-buffering] .media-player-scrubber::before {
   background-size: 25px 25px;
   animation: media-player-buffering 1s linear infinite;
   pointer-events: none;
+}
+
+media-player .media-player-scrubber {
+  margin-left: 0.4375rem;
+  margin-right: 0.4375rem;
+}
+
+// TOOLTIPS
+
+// No caret on the bubbles round the controls. A control row is a line of buttons a few
+// pixels apart, so a caret is pointing at a target nothing was ambiguous about — and the
+// player this is a rewrite of drew a plain rounded box too. `content: none` rather than a
+// zero caret: the size is a border width, and zeroing it still leaves the rim's own
+// `border-width` behind as a nub. `:defined` is in the selector to outweigh the elemental's
+// own rule, which carries it and would otherwise win on specificity.
+media-player tooltip-elemental:defined > [role="tooltip"]::before,
+media-player tooltip-elemental:defined > [role="tooltip"]::after {
+  content: none;
 }
 
 // LIVE

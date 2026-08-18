@@ -97,19 +97,22 @@ media-player video {
   }
 }
 
+// Two clusters on the row under the scrubber: the transport and its clock at the start,
+// everything else at the end. One auto margin opens the gap — `justify-content:
+// space-between` would spread all six controls evenly instead of splitting them in two. The
+// split rides the clock's position in the markup rather than a class of its own, so moving
+// the clock moves the divide; a row written without one matches nothing here and lands as a
+// single cluster at the start, which is wrong-looking rather than broken.
+
+// The margin sits on the clock rather than on what follows it, which is where the same rule
+// used to put it: a button wrapped in `<tooltip-elemental>` is not the flex item any more —
+// that element is `display: contents`, so the box a margin has to land on is a child of the
+// sibling and not the sibling. Spending the space on the clock's own end edge needs to know
+// nothing about what comes after it.
 .media-player-time {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-}
-
-// Two clusters on the row under the scrubber: the transport and its clock at the start,
-// everything else at the end. One auto margin on whatever follows the clock opens the gap —
-// `justify-content: space-between` would spread all six controls evenly instead of splitting
-// them in two. The split rides the clock's position in the markup rather than a class of its
-// own, so moving the clock moves the divide; a row written without one matches nothing here
-// and lands as a single cluster at the start, which is wrong-looking rather than broken.
-.media-player-time + * {
-  margin-inline-start: auto;
+  margin-inline-end: auto;
 }
 
 // One button, two icons, and the attribute says which. Doing it here rather than swapping

@@ -25,8 +25,11 @@ probably for a different library.
 - **No creating the media element.** A `src` on the wrapper would mean no media element at
   all until the script arrives. The author writes the `<audio>` or `<video>`, with
   `controls` on it, and that is the fallback.
-- **No player-wide keyboard map** until it can be discoverable. See the `NOTE:`
-  above `MediaPlayer` in `src/scripts/media-player.js`, which carries the trigger.
+- **No keyboard binding that is not on a control.** A key is written as `key="k"` on the
+  author's own button and presses it, so every binding has a visible thing naming it. An
+  attribute mapping a key straight to a method is the undiscoverable version and stays
+  refused for now — see the `NOTE:` above `MediaPlayer` in `src/scripts/media-player.js`,
+  which carries the trigger that would bring it back.
 
 ## Getting set up
 

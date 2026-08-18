@@ -34,7 +34,8 @@ export const PUBLIC = new Set([
   'onProgress',
   'onVolumeChange',
   'onCue',
-  'onFullscreenChange'
+  'onFullscreenChange',
+  'onKeyDown'
 ]);
 
 export default {

@@ -48,6 +48,11 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
 Delete the `<script>` and the page still plays: the `controls` attribute you wrote stays on
 the media element until this one upgrades and takes over.
 
+Keyboard shortcuts are the same idea. `key="k"` on your button is the whole binding, and
+`on="keydown@document:onKeyDown"` on the player is what makes the page answer it — so a
+shortcut can never name an action no visible control names. Nothing is bound by default;
+bind `keydown:onKeyDown` instead and the keys only answer while focus is inside the player.
+
 One element for both — it reads which element you wrapped and turns on the video half
 (poster, overlay, captions, fullscreen, fading controls) only for a `<video>`. The scrubber
 and volume are [`<slider-elemental>`](https://github.com/stamat/book-of-elementals), the

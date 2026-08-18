@@ -5,6 +5,7 @@ const browserGlobals = {
   document: 'readonly',
   Event: 'readonly',
   CustomEvent: 'readonly',
+  KeyboardEvent: 'readonly',
   HTMLElement: 'readonly',
   customElements: 'readonly',
   navigator: 'readonly',

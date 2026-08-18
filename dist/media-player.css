@@ -58,10 +58,7 @@ media-player video {
 .media-player-time {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-}
-
-.media-player-time + * {
-  margin-inline-start: auto;
+  margin-inline-end: auto;
 }
 
 media-player .media-player-pause-icon,

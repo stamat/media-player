@@ -39,6 +39,48 @@ for the person who wrote the code.
   state lands. The `controls` attribute the author wrote stays on the media element until
   the element upgrades, so a script that never loads leaves a working native player.
 
+- **Keys the buttons carry.** Write `key="k"` on a control you already wrote and an `on=`
+  naming `onKeyDown` on the player, and <kbd>k</kbd> clicks that control — everything hanging
+  off its `on=` firing as though it had been pressed. The binding lives on the button rather
+  than in a map, so there is no second list to keep in step with the first and nothing to
+  announce separately from the buttons; a disabled button ignores its key the same way it
+  ignores a click. Which `keydown` you bind is the whole of the scope:
+  `keydown:onKeyDown` answers while focus is inside the player, and
+  `keydown@document:onKeyDown` answers anywhere on the page — the form a shortcut usually
+  means, at the price of the page giving those letters up, and of two players so bound both
+  answering one press. Neither is a default and no sample on the page turns one on, because a
+  page-wide <kbd>k</kbd> is the page's call and not this element's. Presses that are somebody
+  else's are left where they are: the arrows, <kbd>Home</kbd> and <kbd>End</kbd> belong to the
+  sliders and the control row, a modified press to the browser, and a key typed into a text
+  field, a `<select>` or anything `contenteditable` to what is being typed into — including
+  one inside an open shadow root, which a `keydown` reports as the component rather than the
+  field, so the focused element is consulted as well as the event's target. A *closed* root
+  offers no way in and its letters are taken; a page with one wants the focused binding.
+
+- **Tooltips on the controls.** The samples wrap each button in `<tooltip-elemental>`, so
+  hovering or focusing one says what it does — and it is where a `<kbd>` naming a key goes on
+  a page that binds one. Hover and focus each hold the bubble open, <kbd>Escape</kbd>
+  dismisses it per
+  [WCAG 1.4.13](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html),
+  and touch is ignored outright rather than half-handled — nothing essential belongs in a
+  tooltip. The play and mute bubbles bind `playLabel` and `muteLabel`, the same state the
+  buttons announce themselves by, so what is read and what is heard cannot drift. The button
+  keeps its `aria-label`, so the bubble is a description and the control stays named with or
+  without it. Importing `media-player` defines the element; its stylesheet and theme join the
+  install list, and unlike the other elementals it is the theme that paints the bubble at all.
+
+- **Both kinds of bubble now agree.** The scrubber's value bubble is the page's two colours
+  swapped — white on a dark page, black on a light one — which is what `<tooltip-elemental>`
+  was already doing on the buttons beside it; it used to be a light card either way. The fix
+  was to stop overriding the slider's own two colours in `theme.css`, which had also been
+  outranking that sheet's `forced-colors` branch, where the pair has to turn back the right
+  way up. The caret comes off a bubble inside a player at the same time: a row of buttons
+  a few pixels apart is not ambiguous about which one it points at, and the player this
+  rewrites drew a plain rounded box too. One more CSS change: the control row's two clusters
+  are split by `margin-inline-end: auto` on the clock rather than an auto margin on whatever
+  followed the clock, because a button wrapped in a tooltip is no longer the flex item — the
+  wrapper is `display: contents`, and a margin on it lands on no box.
+
 - **The look is optional.** Structure and look ship as separate stylesheets, the way the
   elementals do: `style.css` alone is a working player, and `theme.css` brings the flat
   compact bar, the accent flooding a button on hover, the slim track with its accent thumb,
@@ -52,8 +94,8 @@ for the person who wrote the code.
   rather than moved with CSS `order`, which would have left a keyboard user tabbing the bar in
   the opposite direction from the one they read it in. The row beneath falls into two clusters
   — the transport and its clock at the start, the rest at the end — opened by a single `auto`
-  margin on whatever follows the clock, so the clock and everything before it goes left,
-  everything after it goes right, and moving the clock moves the divide. One thing gives way
+  margin on the clock's end edge, so the clock and everything before it goes left, everything
+  after it goes right, and moving the clock moves the divide. One thing gives way
   under a coarse pointer: the volume slider is hidden — 72px is not draggable by thumb, the
   device has volume keys, and the mute button stays. The buttons do not grow with it. They
   are 32px on every pointer, which clears the AA minimum of

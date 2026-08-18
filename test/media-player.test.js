@@ -5,8 +5,9 @@
  * on the way out), readiness from any of the five metadata events, live streams, the volume
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
  * track, the video controls' hide timer, the labels the buttons announce themselves by, the
- * OS media panel against a stubbed `navigator.mediaSession`, and that the surface the custom
- * elements manifest publishes still exists on the element.
+ * keys a control claims and the presses that are somebody else's, the OS media panel against
+ * a stubbed `navigator.mediaSession`, and that the surface the custom elements manifest
+ * publishes still exists on the element.
  *
  * Deliberately not covered: fullscreen and the `cuechange` event, neither of which jsdom
  * implements — `requestFullscreen` is absent and a `<track>` never fires a cue, so a test
@@ -856,6 +857,134 @@ describe('video controls that hide themselves', () => {
   });
 });
 
+describe('keys the markup claims', () => {
+  /**
+   * A player with one keyed button, wired the way an author would wire it.
+   *
+   * The `keydown` binding is written here rather than assumed: no `on="keydown:onKeyDown"`
+   * in the page means no listener, which is half of what makes the map opt-in.
+   */
+  function keyed(media = fakeMedia(), key = 'k') {
+    const player = mount(media);
+    const button = document.createElement('button');
+    button.setAttribute('key', key);
+    const presses = [];
+    button.addEventListener('click', () => presses.push(key));
+    player.appendChild(button);
+    player.addEventListener('keydown', (event) => player.onKeyDown(event));
+    return { player, button, presses };
+  }
+
+  function press(node, key, init = {}) {
+    const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init });
+    node.dispatchEvent(event);
+    return event;
+  }
+
+  test('a key presses the control that claims it, and nothing claims a key no control names', () => {
+    const { player, presses } = keyed();
+    press(player, 'k');
+    expect(presses).toEqual(['k']);
+    press(player, 'q');
+    expect(presses).toEqual(['k']); // 'q' is on no button, so it is not the player's key
+  });
+
+  test('the key answers however it was typed, capital or not', () => {
+    const { player, presses } = keyed();
+    press(player, 'K');
+    expect(presses).toEqual(['k']);
+  });
+
+  test('a claimed key is taken off the page; an unclaimed one is left alone', () => {
+    const { player } = keyed();
+    expect(press(player, 'k').defaultPrevented).toBe(true);
+    expect(press(player, 'q').defaultPrevented).toBe(false);
+  });
+
+  test('a key typed into a field belongs to the field, not to the player', () => {
+    const { player, presses } = keyed();
+    const input = document.createElement('input');
+    player.appendChild(input);
+    press(input, 'k');
+    expect(presses).toEqual([]);
+  });
+
+  test('a key typed into a field inside a web component belongs to it too', () => {
+    // The press arrives at the document as the component, not as the textarea inside it —
+    // shadow retargeting — so a guard reading only the target would take this letter off
+    // somebody's comment box. Page-wide is where it matters, which is how this is bound.
+    const { player, presses } = keyed();
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const field = document.createElement('textarea');
+    host.attachShadow({ mode: 'open' }).appendChild(field);
+    field.focus();
+    const listener = (event) => player.onKeyDown(event);
+    document.addEventListener('keydown', listener);
+    press(host, 'k');
+    document.removeEventListener('keydown', listener);
+    expect(presses).toEqual([]);
+  });
+
+  test('a slider still answers the player keys: it wants the arrows, not the letters', () => {
+    const { player, presses } = keyed();
+    const range = document.createElement('input');
+    range.type = 'range';
+    player.appendChild(range);
+    press(range, 'k');
+    expect(presses).toEqual(['k']);
+  });
+
+  test('a modified press belongs to the browser', () => {
+    const { player, presses } = keyed();
+    press(player, 'k', { ctrlKey: true });
+    press(player, 'k', { metaKey: true });
+    press(player, 'k', { altKey: true });
+    expect(presses).toEqual([]);
+  });
+
+  test('a disabled control ignores its key, the same way it ignores a click', () => {
+    const { player, button, presses } = keyed();
+    button.disabled = true;
+    press(player, 'k');
+    expect(presses).toEqual([]);
+  });
+
+  test('a key outside the player never reaches it', () => {
+    const { presses } = keyed();
+    const outside = document.createElement('button');
+    document.body.appendChild(outside);
+    press(outside, 'k');
+    expect(presses).toEqual([]);
+  });
+
+  test('bound page-wide, a press from anywhere still finds the control', () => {
+    // What `on="keydown@document:onKeyDown"` relies on: hydrargyri puts the listener on the
+    // document and the handler stays this element's, so the press it hands over has a target
+    // outside the player and the lookup has to work from it all the same.
+    const { player, presses } = keyed();
+    const elsewhere = document.createElement('button');
+    document.body.appendChild(elsewhere);
+    // Taken off again by hand: `document` outlives the `innerHTML` reset between tests, and
+    // a listener left on it would answer presses in every test that follows this one.
+    const listener = (event) => player.onKeyDown(event);
+    document.addEventListener('keydown', listener);
+    press(elsewhere, 'k');
+    document.removeEventListener('keydown', listener);
+    expect(presses).toEqual(['k']);
+  });
+
+  test('a key brings a faded video row back, the way moving the pointer does', () => {
+    jest.useFakeTimers();
+    const { player } = keyed(fakeMedia('video', { paused: false }));
+    jest.advanceTimersByTime(CONTROLS_LINGER);
+    expect(player.hasAttribute('controls-shown')).toBe(false);
+    press(player, 'k');
+    expect(player.hasAttribute('controls-shown')).toBe(true);
+    jest.useRealTimers();
+  });
+});
+
 describe('interaction events', () => {
   test('a press says what it was and what it did, on the element rather than on the document', () => {
     const media = fakeMedia();
@@ -869,6 +998,15 @@ describe('interaction events', () => {
 
 test('the class is exported and defined under its tag', () => {
   expect(customElements.get('media-player')).toBe(MediaPlayer);
+});
+
+test('importing the player defines every element its samples are written with', () => {
+  // Each of these is one `import` at the top of the module and nothing else refers to it, so
+  // dropping one breaks no test and throws no error — it leaves an undefined tag in the
+  // page, which looks like a styling bug rather than a missing script.
+  const missing = ['slider-elemental', 'progress-elemental', 'toolbar-elemental', 'tooltip-elemental']
+    .filter((tag) => !customElements.get(tag));
+  expect(missing).toEqual([]);
 });
 
 test('every name the manifest publishes as public API is still a method on the element', async () => {

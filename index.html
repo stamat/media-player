@@ -126,31 +126,185 @@ press <strong>Edit</strong> and what you type is what plays.</p>
     <span class="hljs-comment">&lt;!-- Lucide, inline. The sample is the page&#x27;s only copy of this markup, so the icons a
          reader sees above are the icons the sample carries — swap them for yours and the
          preview swaps with them. --&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipBackward&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip backward 10 seconds&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 3v5h5&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">rect</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;14&quot;</span> <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;3&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;18&quot;</span> <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;1&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">rect</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;3&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;18&quot;</span> <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;1&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipForward&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip forward 10 seconds&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 3v5h-5&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipBackward&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip backward 10 seconds&quot;</span>
+        <span class="hljs-attr">disabled</span>
+      &gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+          <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+          <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+          <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+          <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+          <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+          <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+          <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+          <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+        &gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 3v5h5&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Skip backward<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z&quot;</span>
+            /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">rect</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;14&quot;</span>
+              <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;3&quot;</span>
+              <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;5&quot;</span>
+              <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;18&quot;</span>
+              <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;1&quot;</span>
+            /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">rect</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;5&quot;</span>
+              <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;3&quot;</span>
+              <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;5&quot;</span>
+              <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;18&quot;</span>
+              <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;1&quot;</span>
+            /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel&quot;</span>&gt;</span>Play<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipForward&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip forward 10 seconds&quot;</span>
+        <span class="hljs-attr">disabled</span>
+      &gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+          <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+          <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+          <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+          <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+          <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+          <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+          <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+          <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+        &gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 3v5h-5&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Skip forward<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
 
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-time&quot;</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;currentTime|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span> /
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
 
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleMute&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;muteLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-mute&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">&quot;22&quot;</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">&quot;16&quot;</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">&quot;9&quot;</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">&quot;15&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">&quot;16&quot;</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">&quot;22&quot;</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">&quot;9&quot;</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">&quot;15&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-mid&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 9a5 5 0 0 1 0 6&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-full&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 9a5 5 0 0 1 0 6&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M19.364 18.364a9 9 0 0 0 0-12.728&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleMute&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;muteLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-mute&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>
+            /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">&quot;22&quot;</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">&quot;16&quot;</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">&quot;9&quot;</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">&quot;15&quot;</span> /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">&quot;16&quot;</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">&quot;22&quot;</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">&quot;9&quot;</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">&quot;15&quot;</span> /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-mid&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>
+            /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 9a5 5 0 0 1 0 6&quot;</span> /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-full&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>
+            /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 9a5 5 0 0 1 0 6&quot;</span> /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M19.364 18.364a9 9 0 0 0 0-12.728&quot;</span> /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;muteLabel&quot;</span>&gt;</span>Mute<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
 
     <span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume&quot;</span> <span class="hljs-attr">tooltip</span>=<span class="hljs-string">&quot;thumb&quot;</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">progress-elemental</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">progress</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;100&quot;</span> <span class="hljs-attr">max</span>=<span class="hljs-string">&quot;100&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;volumePercent:prop#value&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">progress</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">progress</span>
+          <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;100&quot;</span>
+          <span class="hljs-attr">max</span>=<span class="hljs-string">&quot;100&quot;</span>
+          <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;volumePercent:prop#value&quot;</span>
+        &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">progress</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">progress-elemental</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
         <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span>
@@ -165,7 +319,7 @@ press <strong>Edit</strong> and what you type is what plays.</p>
     <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">toolbar-elemental</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
-</code-preview><pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player&#x27;</span>;</code></pre>
+</code-preview><pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player&quot;</span>;</code></pre>
 <!-- The `-hljs` build, not the small one: this page's fences are highlighted at build time
      and it ships no runtime highlighter, so without the bundled copy the code would keep the
      colour it was baked with and stop recolouring the moment a reader typed. -->
@@ -193,12 +347,15 @@ row, and the fix is to drop a control from the row or move the clock out of it.<
 flex line visually leaves the tab sequence in the old order, and a keyboard user would read
 the bar top-to-bottom while tabbing it bottom-to-top. Put it where you want it and both agree.</p>
 <p>The row under it falls into two clusters — the transport with its clock at the start,
-everything else at the end. What opens the gap is a single <code>margin-inline-start: auto</code> on
-whatever follows the clock, so the arrangement stays yours: the clock and everything before
-it goes left, everything after it goes right, and moving the clock moves the divide. A row
-written without a clock matches that rule nowhere and comes out as one cluster at the start
-— visibly wrong rather than quietly broken — and the fix is to put the same <code>auto</code> on
-whichever control should open the right-hand group.</p>
+everything else at the end. What opens the gap is a single <code>margin-inline-end: auto</code> on the
+clock, so the arrangement stays yours: the clock and everything before it goes left,
+everything after it goes right, and moving the clock moves the divide. It sits on the clock
+rather than on the control after it because a button wrapped in <code>&lt;tooltip-elemental&gt;</code> is not
+the flex item any more — that element is <code>display: contents</code> — and a margin on the wrapper
+would land on a box that does not exist. A row written without a clock matches that rule
+nowhere and comes out as one cluster at the start — visibly wrong rather than quietly broken
+— and the fix is to put the same <code>auto</code> on whichever control should close the left-hand
+group.</p>
 <p>One thing changes under a coarse pointer — a phone, a tablet — and it is opt-out by
 overriding the rule:</p>
 <table>
@@ -224,7 +381,10 @@ not afford it — six targets and the clock come to 343px where a 393px phone gi
 between every button. If your row is short enough to pay for it, the AAA size is two
 declarations:</p>
 <pre><code class="hljs language-css"><span class="hljs-keyword">@media</span> (<span class="hljs-attribute">pointer</span>: coarse) {
-  media-player <span class="hljs-selector-class">.media-player-controls</span> <span class="hljs-selector-tag">button</span> { <span class="hljs-attribute">min-width</span>: <span class="hljs-number">2.75rem</span>; <span class="hljs-attribute">min-height</span>: <span class="hljs-number">2.75rem</span>; }
+  media-player <span class="hljs-selector-class">.media-player-controls</span> <span class="hljs-selector-tag">button</span> {
+    <span class="hljs-attribute">min-width</span>: <span class="hljs-number">2.75rem</span>;
+    <span class="hljs-attribute">min-height</span>: <span class="hljs-number">2.75rem</span>;
+  }
 }</code></pre>
 <h2 id="the-part-that-matters-most">The part that matters most<a class="heading-anchor" href="#the-part-that-matters-most" tabindex="-1" aria-hidden="true"></a></h2>
 <p><strong>Delete the <code>&lt;script&gt;</code> tag and the page still plays.</strong> The <code>controls</code> attribute you wrote
@@ -317,31 +477,185 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
     <span class="hljs-comment">&lt;!-- Lucide, inline. The sample is the page&#x27;s only copy of this markup, so the icons a
          reader sees above are the icons the sample carries — swap them for yours and the
          preview swaps with them. --&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipBackward&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip backward 10 seconds&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 3v5h5&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">rect</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;14&quot;</span> <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;3&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;18&quot;</span> <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;1&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">rect</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;3&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;18&quot;</span> <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;1&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipForward&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip forward 10 seconds&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 3v5h-5&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipBackward&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip backward 10 seconds&quot;</span>
+        <span class="hljs-attr">disabled</span>
+      &gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+          <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+          <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+          <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+          <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+          <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+          <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+          <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+          <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+        &gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 3v5h5&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Skip backward<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z&quot;</span>
+            /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">rect</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;14&quot;</span>
+              <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;3&quot;</span>
+              <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;5&quot;</span>
+              <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;18&quot;</span>
+              <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;1&quot;</span>
+            /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">rect</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;5&quot;</span>
+              <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;3&quot;</span>
+              <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;5&quot;</span>
+              <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;18&quot;</span>
+              <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;1&quot;</span>
+            /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel&quot;</span>&gt;</span>Play<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipForward&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip forward 10 seconds&quot;</span>
+        <span class="hljs-attr">disabled</span>
+      &gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+          <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+          <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+          <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+          <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+          <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+          <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+          <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+          <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+        &gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 3v5h-5&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Skip forward<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
 
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-time&quot;</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;currentTime|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span> /
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
 
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleMute&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;muteLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-mute&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">&quot;22&quot;</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">&quot;16&quot;</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">&quot;9&quot;</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">&quot;15&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">&quot;16&quot;</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">&quot;22&quot;</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">&quot;9&quot;</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">&quot;15&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-mid&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 9a5 5 0 0 1 0 6&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-full&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 9a5 5 0 0 1 0 6&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M19.364 18.364a9 9 0 0 0 0-12.728&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleMute&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;muteLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-mute&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>
+            /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">&quot;22&quot;</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">&quot;16&quot;</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">&quot;9&quot;</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">&quot;15&quot;</span> /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">line</span> <span class="hljs-attr">x1</span>=<span class="hljs-string">&quot;16&quot;</span> <span class="hljs-attr">x2</span>=<span class="hljs-string">&quot;22&quot;</span> <span class="hljs-attr">y1</span>=<span class="hljs-string">&quot;9&quot;</span> <span class="hljs-attr">y2</span>=<span class="hljs-string">&quot;15&quot;</span> /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-mid&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>
+            /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 9a5 5 0 0 1 0 6&quot;</span> /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume-icon media-player-volume-icon-full&quot;</span>
+          &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+            <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+            <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+            <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+            <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+            <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+            <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+            <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+            <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+            <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span>
+              <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+              <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z&quot;</span>
+            /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 9a5 5 0 0 1 0 6&quot;</span> /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M19.364 18.364a9 9 0 0 0 0-12.728&quot;</span> /&gt;</span>&lt;/svg
+        &gt;<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;muteLabel&quot;</span>&gt;</span>Mute<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
 
     <span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-volume&quot;</span> <span class="hljs-attr">tooltip</span>=<span class="hljs-string">&quot;thumb&quot;</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">progress-elemental</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">progress</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;100&quot;</span> <span class="hljs-attr">max</span>=<span class="hljs-string">&quot;100&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;volumePercent:prop#value&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">progress</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">progress</span>
+          <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;100&quot;</span>
+          <span class="hljs-attr">max</span>=<span class="hljs-string">&quot;100&quot;</span>
+          <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;volumePercent:prop#value&quot;</span>
+        &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">progress</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">progress-elemental</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
         <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span>
@@ -358,22 +672,58 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
     <span class="hljs-comment">&lt;!-- The two a video adds. The label stays put and `aria-pressed` carries the state —
          which is also the hook the theme keeps the hover flood on. `|pressed` turns the
          bind&#x27;s boolean into ARIA&#x27;s &quot;true&quot;/&quot;false&quot;. --&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
-      <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleCaptions&quot;</span>
-      <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Captions&quot;</span>
-      <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;captionsVisible:attr#aria-pressed|pressed&quot;</span>
-      <span class="hljs-attr">disabled</span>
-    &gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">rect</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;18&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;14&quot;</span> <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;3&quot;</span> <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">ry</span>=<span class="hljs-string">&quot;2&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M7 15h4M15 15h2M7 11h2M13 11h4&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
-      <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleFullscreen&quot;</span>
-      <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Fullscreen&quot;</span>
-      <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isFullscreen:attr#aria-pressed|pressed&quot;</span>
-      <span class="hljs-attr">disabled</span>
-    &gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M8 3H5a2 2 0 0 0-2 2v3&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 8V5a2 2 0 0 0-2-2h-3&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 16v3a2 2 0 0 0 2 2h3&quot;</span>/&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 21h3a2 2 0 0 0 2-2v-3&quot;</span>/&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleCaptions&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Captions&quot;</span>
+        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;captionsVisible:attr#aria-pressed|pressed&quot;</span>
+        <span class="hljs-attr">disabled</span>
+      &gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+          <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+          <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+          <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+          <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+          <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+          <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+          <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+          <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+        &gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">rect</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;18&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;14&quot;</span> <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;3&quot;</span> <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">ry</span>=<span class="hljs-string">&quot;2&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M7 15h4M15 15h2M7 11h2M13 11h4&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;captionsLabel&quot;</span>&gt;</span>Enable captions<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleFullscreen&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Fullscreen&quot;</span>
+        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isFullscreen:attr#aria-pressed|pressed&quot;</span>
+        <span class="hljs-attr">disabled</span>
+      &gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
+          <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
+          <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
+          <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
+          <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
+          <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
+          <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
+          <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
+          <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
+          <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
+        &gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M8 3H5a2 2 0 0 0-2 2v3&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 8V5a2 2 0 0 0-2-2h-3&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M3 16v3a2 2 0 0 0 2 2h3&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16 21h3a2 2 0 0 0 2-2v-3&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Fullscreen<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">toolbar-elemental</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
 </code-preview><p>Which runs here too, over twelve seconds of NASA&#39;s Artemis II rollout.</p>
@@ -392,7 +742,8 @@ come back on the next mouse move — that is <code>mousemove:showControls</code>
 up while the pointer moves, gone five seconds after it stops, and always up while the video
 is paused or something inside has focus. <code>fullscreenchange@document:onFullscreenChange</code>
 keeps <code>is-fullscreen</code> honest when <kbd>Escape</kbd> leaves fullscreen without the button
-being pressed.</p>
+being pressed. A third would bind the keyboard — <a href="#keys-the-buttons-carry">Keys the buttons carry</a>,
+below — which no sample on this page switches on.</p>
 <p>Captions render into whatever binds <code>captionText</code>, with the track held <code>hidden</code> so the
 browser&#39;s own caption box stays out of the way — which is what leaves your stylesheet in
 charge of what captions look like.</p>
@@ -415,13 +766,28 @@ testable right here rather than in a file you have to build yourself.</p>
       <progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental>
       <input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
     </slider-elemental>
-    <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-    <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
-    <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
+    <tooltip-elemental>
+      <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+      <span>Skip backward</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
+      <span bind="playLabel">Play</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
+      <span>Skip forward</span>
+    </tooltip-elemental>
     <span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
-    <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
+    <tooltip-elemental>
+      <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
+      <span bind="muteLabel">Mute</span>
+    </tooltip-elemental>
     <slider-elemental class="media-player-volume" tooltip="thumb"><progress-elemental><progress value="100" max="100" bind="volumePercent:prop#value"></progress></progress-elemental><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
-    <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+    <tooltip-elemental>
+      <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+      <span>Fullscreen</span>
+    </tooltip-elemental>
   </toolbar-elemental>
 </media-player><!-- The page's own copy. The previews above each load this inside their frame; this player is
      in the document, so the document needs it too. One tag: the bundle carries the elementals
@@ -470,9 +836,153 @@ usable on its own and documented in its own right:</p>
 <td><a href="https://stamat.github.io/book-of-elementals/elementals/toolbar.html"><code>&lt;toolbar-elemental&gt;</code></a></td>
 <td>one tab stop, arrow keys between the buttons</td>
 </tr>
+<tr>
+<td>Button tooltips</td>
+<td><a href="https://stamat.github.io/book-of-elementals/elementals/tooltip.html"><code>&lt;tooltip-elemental&gt;</code></a></td>
+<td>hover and focus both, <kbd>Escape</kbd> to dismiss per <a href="https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html">WCAG 1.4.13</a>, and no half-handled touch</td>
+</tr>
 </tbody></table>
 <p>So there is no <code>role=&quot;slider&quot;</code> and no <code>aria-valuenow</code> anywhere in this element. The platform
 already says both, and saying them again is how they end up disagreeing.</p>
+<h2 id="keys-the-buttons-carry">Keys the buttons carry<a class="heading-anchor" href="#keys-the-buttons-carry" tabindex="-1" aria-hidden="true"></a></h2>
+<p>Every control here is a <code>&lt;button&gt;</code> or an <code>&lt;input type=&quot;range&quot;&gt;</code>, so whichever one has focus
+already answers <kbd>Space</kbd>, <kbd>Enter</kbd>, the arrows, <kbd>Home</kbd> and
+<kbd>End</kbd> with no help from this element. What that leaves missing is the key that works
+without tabbing to anything first — and the reason this player went without one for so long
+is that a <kbd>k</kbd> nobody can see is a binding nobody can find.</p>
+<p>So it is not a map. The key goes on the control it presses, and the player is told to listen:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;keydown@document:onKeyDown&quot;</span>&gt;</span>
+  …
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipBackward&quot;</span>
+    <span class="hljs-attr">key</span>=<span class="hljs-string">&quot;j&quot;</span>
+    <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip backward 10 seconds&quot;</span>
+    <span class="hljs-attr">disabled</span>
+  &gt;</span>
+    …
+  <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span>
+    <span class="hljs-attr">key</span>=<span class="hljs-string">&quot;k&quot;</span>
+    <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span>
+    <span class="hljs-attr">disabled</span>
+  &gt;</span>
+    …
+  <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipForward&quot;</span>
+    <span class="hljs-attr">key</span>=<span class="hljs-string">&quot;l&quot;</span>
+    <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Skip forward 10 seconds&quot;</span>
+    <span class="hljs-attr">disabled</span>
+  &gt;</span>
+    …
+  <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleMute&quot;</span>
+    <span class="hljs-attr">key</span>=<span class="hljs-string">&quot;m&quot;</span>
+    <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;muteLabel:attr#aria-label&quot;</span>
+    <span class="hljs-attr">disabled</span>
+  &gt;</span>
+    …
+  <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
+<p><code>key</code> is what a press looks for: <kbd>k</kbd> clicks the button carrying <code>key=&quot;k&quot;</code>, and
+everything hanging off that button&#39;s <code>on=</code> fires as though it had been pressed. Case does not
+matter, <kbd>K</kbd> presses the same button.</p>
+<p>Two things follow from the key living on the button rather than in a list somewhere:</p>
+<ul>
+<li><strong>A key can only name an action a control already names.</strong> There is nothing to document
+apart from the buttons and nothing to drift from them. Showing a binding is then a matter
+of showing it on the button it belongs to — a <code>&lt;kbd&gt;k&lt;/kbd&gt;</code> in the button&#39;s tooltip, or
+<code>[key]::after { content: attr(key) }</code> in your own stylesheet, which needs no markup at all.</li>
+<li><strong>A disabled button ignores its key,</strong> because a disabled button ignores a click. Nothing
+answers before <code>is-ready</code>.</li>
+</ul>
+<h3 id="which-keydown-you-bind-is-the-whole-scope">Which keydown you bind is the whole scope<a class="heading-anchor" href="#which-keydown-you-bind-is-the-whole-scope" tabindex="-1" aria-hidden="true"></a></h3>
+<p><code>on=</code> says where the listener goes, so the reach of the keys is one attribute and not an
+option:</p>
+<table>
+<thead>
+<tr>
+<th>Written as</th>
+<th>Answers</th>
+<th>Costs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>nothing</td>
+<td>nothing — there is no listener</td>
+<td>none, and this is the default</td>
+</tr>
+<tr>
+<td><code>on=&quot;keydown:onKeyDown&quot;</code></td>
+<td>while focus is inside the player</td>
+<td>the reader has to tab or click into the player first, which for a keyboard shortcut is most of the point gone</td>
+</tr>
+<tr>
+<td><code>on=&quot;keydown@document:onKeyDown&quot;</code></td>
+<td>anywhere on the page</td>
+<td>the page gives up those keys, and two players both bound this way both answer one press</td>
+</tr>
+</tbody></table>
+<p>The last one is what a shortcut usually means, and it is the one to write on a page built
+around a single player — an episode page, a video page. hydrargyri puts the listener on
+<code>document</code> and takes it off when the element leaves the DOM, so nothing outlives the player
+it belongs to. What it cannot do is share: two players bound page-wide both hear the same
+<kbd>k</kbd> and both press their own play button. With more than one on a page, bind the
+focused form, or bind the page-wide form on exactly one of them.</p>
+<p>No sample on this page binds either, and the reason is the page: three players and several
+thousand words of prose is precisely where a page-wide <kbd>k</kbd> is somebody else&#39;s key.
+Copy a sample and the decision is yours to make once, in markup.</p>
+<h3 id="what-a-press-has-to-get-past-first">What a press has to get past first<a class="heading-anchor" href="#what-a-press-has-to-get-past-first" tabindex="-1" aria-hidden="true"></a></h3>
+<table>
+<thead>
+<tr>
+<th>Press</th>
+<th>Who it belongs to</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>The arrows, <kbd>Home</kbd>, <kbd>End</kbd></td>
+<td>the sliders and the control row, which answer them already</td>
+</tr>
+<tr>
+<td>Anything with <kbd>Ctrl</kbd>, <kbd>⌘</kbd> or <kbd>Alt</kbd> held</td>
+<td>the browser</td>
+</tr>
+<tr>
+<td>A key typed into a text field, a <code>&lt;select&gt;</code> or anything <code>contenteditable</code></td>
+<td>whatever is being typed into — a comment box under a player is the ordinary case, not the odd one. Found through an open shadow root too, since a <code>keydown</code> reports the component rather than the field inside it</td>
+</tr>
+<tr>
+<td>A key already handled by something else</td>
+<td>whatever called <code>preventDefault</code> first</td>
+</tr>
+</tbody></table>
+<p>A press that gets past all four and finds a <code>key</code> is taken off the page with
+<code>preventDefault</code>, which is the part to weigh before binding <code>@document</code>: a letter the player
+claims is a letter the page no longer sees. One field it cannot see is one inside a <em>closed</em>
+shadow root — the platform reports the component and offers no way in, so its letters are
+taken. A page with one of those wants the focused binding.</p>
+<h2 id="tooltips-on-the-controls">Tooltips on the controls<a class="heading-anchor" href="#tooltips-on-the-controls" tabindex="-1" aria-hidden="true"></a></h2>
+<p>The bubbles in the samples are <code>&lt;tooltip-elemental&gt;</code> wrapped round each button, which is
+where hover, focus, <kbd>Escape</kbd> to dismiss and the decision to ignore touch outright
+already live. Two of them bind rather than say: the play and mute bubbles carry <code>playLabel</code>
+and <code>muteLabel</code>, the same state the buttons announce themselves by, so the words in the
+bubble and the words a screen reader hears cannot drift apart.</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+    …
+  <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel&quot;</span>&gt;</span>Play<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span></code></pre>
+<p>The button keeps its <code>aria-label</code>, so the bubble is a description rather than the name and
+the control is named with or without it. Importing <code>media-player</code> defines the tooltip along
+with the rest, so the part a page can miss is the stylesheet — and unlike the other
+elementals it is the <em>theme</em> that paints the bubble at all, which the install list says
+beside it. <code>theme.css</code> then takes the caret back off the bubbles inside a player: a row of
+buttons a few pixels apart is not ambiguous about which one a bubble belongs to, and the
+player this is a rewrite of drew a plain rounded box too.</p>
 <h2 id="attributes-it-writes">Attributes it writes<a class="heading-anchor" href="#attributes-it-writes" tabindex="-1" aria-hidden="true"></a></h2>
 <p>These land on the <code>&lt;media-player&gt;</code> element as CSS hooks. You do not set them — you style
 against them.</p>
@@ -569,8 +1079,10 @@ last. A live stream gets no seek buttons, because there is nowhere on it to seek
 flood with the accent under the pointer, a slim rounded track carrying an accent thumb,
 video controls on a bottom gradient with a centred play chip. Where Plyr hardcodes white
 and slate, this sheet uses <code>Canvas</code> and <code>CanvasText</code>, so the same look follows the page
-into dark mode and forced colours. What it takes from you are custom properties — the
-first four live in the theme, the last two in the structure sheet:</p>
+into dark mode and forced colours. It reaches one thing it does not own: the caret comes off
+a <code>&lt;tooltip-elemental&gt;</code> bubble inside a player, because a row of buttons a few pixels apart
+is not ambiguous about which one a bubble points at. What it takes from you are custom
+properties — the first four live in the theme, the last two in the structure sheet:</p>
 <table>
 <thead>
 <tr>
@@ -592,7 +1104,7 @@ first four live in the theme, the last two in the structure sheet:</p>
 <tr>
 <td><code>--media-player-surface</code></td>
 <td><code>Canvas</code></td>
-<td>behind the control row, and the value bubble</td>
+<td>behind the control row</td>
 </tr>
 <tr>
 <td><code>--media-player-color</code></td>
@@ -662,7 +1174,8 @@ visible, and <code>display: none</code> takes the hidden half out of the accessi
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>&gt;</span>▶<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;</span>Pusti<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>&gt;</span>⏸<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;</span>Pauziraj<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>&gt;</span>⏸<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;</span>Pauziraj<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></code></pre>
 <p><code>visually-hidden</code> is your utility class — every design system carries one. The same swap
@@ -782,22 +1295,27 @@ what you do not want.</li>
 <li><strong>Streaming formats.</strong> HLS, DASH and the YouTube and Vimeo iframe APIs are all a
 third-party script driving an element you did not write, which is the opposite of the
 bargain here.</li>
-<li><strong>Its own keyboard map.</strong> Every control is a <code>&lt;button&gt;</code> or an <code>&lt;input type=&quot;range&quot;&gt;</code>, so
-the platform already answers <kbd>Space</kbd>, <kbd>Enter</kbd>, the arrows,
-<kbd>Home</kbd> and <kbd>End</kbd> on whichever one has focus. A player-wide
-<kbd>k</kbd>/<kbd>j</kbd>/<kbd>l</kbd> map is a second, undiscoverable set of bindings.</li>
+<li><strong>Keep a keyboard map of its own.</strong> <code>key</code> on a button is the whole of it, and that is the
+refusal rather than a shortcut around one: the key presses a control the page already
+shows, already names and already disables. An attribute mapping a key straight to a method
+would reach further — <code>volumeUp</code> and <code>volumeDown</code> have no button in these samples, so no
+key either — at the price of a second set of bindings with nothing on the page announcing
+them, which is the half worth refusing.</li>
 <li><strong>Sanitize anything.</strong> It writes text and attributes, never HTML.</li>
 </ul>
 <h2 id="install">Install<a class="heading-anchor" href="#install" tabindex="-1" aria-hidden="true"></a></h2>
 <pre><code class="hljs language-bash">npm install media-player</code></pre>
-<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player&#x27;</span>;</code></pre>
-<p>The elementals ride along — importing <code>media-player</code> defines the slider, the progress bar
-and the toolbar too. Their stylesheets do not: each elemental draws its own track, thumb or
-bar, so its sheet loads beside this one.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player&quot;</span>;</code></pre>
+<p>The elementals ride along — importing <code>media-player</code> defines the slider, the progress bar,
+the toolbar and the tooltip too. Their stylesheets do not: each elemental draws its own
+track, thumb, bar or bubble, so its sheet loads beside this one. The tooltip is the one
+whose theme is not really optional: its own sheet places the bubble and leaves the painting
+to the theme, so without it there is unpainted text over the control row.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player/style.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/slider/style.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/progress/style.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/toolbar/style.css&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/tooltip/style.css&quot;</span> /&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
@@ -810,16 +1328,36 @@ bar, so its sheet loads beside this one.</p>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
   <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/progress/theme.css&quot;</span>
-/&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span></code></pre>
+/&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/tooltip/theme.css&quot;</span>
+/&gt;</span><span class="hljs-comment">&lt;!-- optional, but a bubble nothing paints is text over the row --&gt;</span></code></pre>
 <p>Or from a CDN as a module, no install and no build step — the stylesheets come the same
 way, from each package&#39;s <code>dist/</code>:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-  <span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs&#x27;</span>;
+  <span class="hljs-keyword">import</span> <span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs&quot;</span>;
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.css&quot;</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/slider.min.css&quot;</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/progress.min.css&quot;</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/toolbar.min.css&quot;</span>&gt;</span></code></pre>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.css&quot;</span>
+/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/slider.min.css&quot;</span>
+/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/progress.min.css&quot;</span>
+/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/toolbar.min.css&quot;</span>
+/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
+  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/tooltip.min.css&quot;</span>
+/&gt;</span></code></pre>
 <h2 id="what-editors-read">What editors read<a class="heading-anchor" href="#what-editors-read" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The package ships a
 <a href="https://github.com/webcomponents/custom-elements-manifest">custom elements manifest</a> as
