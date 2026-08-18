@@ -27,8 +27,12 @@ in an isolated frame by [`<code-preview>`](https://github.com/stamat/code-previe
 press **Edit** and what you type is what plays.
 
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
-     whole opening tag sits on a line of its own. Broken over four, the page prints it. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0.5rem}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+     whole opening tag sits on a line of its own. Broken over four, the page prints it.
+     The frame's own padding drops to nothing on a narrow screen. That keeps the sample
+     honest rather than tidy: 1.5rem a side renders it 48px narrower than the page a reader
+     would paste this markup onto, which is enough to wrap the video row to a third line on
+     a phone and show a defect the markup does not have. -->
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
 <media-player>
@@ -214,8 +218,12 @@ wrapped and turns on the video half — poster, click-to-play overlay, captions,
 controls that fade out while playing — only when it wrapped a `<video>`.
 
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
-     whole opening tag sits on a line of its own. Broken over four, the page prints it. -->
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0.5rem}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+     whole opening tag sits on a line of its own. Broken over four, the page prints it.
+     The frame's own padding drops to nothing on a narrow screen. That keeps the sample
+     honest rather than tidy: 1.5rem a side renders it 48px narrower than the page a reader
+     would paste this markup onto, which is enough to wrap the video row to a third line on
+     a phone and show a defect the markup does not have. -->
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
 <media-player
