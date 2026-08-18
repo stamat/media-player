@@ -11,6 +11,8 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-08-18
+
 ### Added
 
 - **`<media-player>`, the first cut.** One custom element over the `<audio>` or `<video>`
