@@ -818,6 +818,98 @@ it. The stripe march and the buffered bar then have something real to show, whic
 twelve-second local file never gives them.</p>
 <p>Attribution: <em>Big Buck Bunny</em> is © the Blender Foundation, released under
 <a href="https://peach.blender.org/about/">CC-BY 3.0</a>.</p>
+<h2 id="a-background-loop-and-the-one-button-it-owes-you">A background loop, and the one button it owes you<a class="heading-anchor" href="#a-background-loop-and-the-one-button-it-owes-you" tabindex="-1" aria-hidden="true"></a></h2>
+<p>A video behind a headline is not a player. Nothing on it is meant to be pressed — no
+scrubber, no clock, no volume on a track that is silent — and the markup for it is four
+attributes the platform answered on its own long before this element existed:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">autoplay</span> <span class="hljs-attr">muted</span> <span class="hljs-attr">loop</span> <span class="hljs-attr">playsinline</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.mp4&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span></code></pre>
+<p><code>muted</code> is the condition every browser puts on autoplay rather than a stylistic choice:
+without it the loop never starts. <code>playsinline</code> is what keeps iOS from taking the whole
+screen the moment it does.</p>
+<p>So the honest first answer is that a background video does not need this element. What it
+needs is the one thing those four attributes cannot say: <strong>motion that runs longer than five
+seconds has to be stoppable</strong> —
+<a href="https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html">WCAG 2.2.2 Pause, Stop, Hide</a>
+— and a twelve-second loop is past that line the second time it plays. That is one button,
+and wiring one button is the smallest thing <code>&lt;media-player&gt;</code> does.</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;video-background&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
+    <span class="hljs-attr">autoplay</span>
+    <span class="hljs-attr">muted</span>
+    <span class="hljs-attr">loop</span>
+    <span class="hljs-attr">playsinline</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.mp4&quot;</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause&quot;</span>
+  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+    <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;video-background-toggle&quot;</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span>
+    <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span>
+    <span class="hljs-attr">disabled</span>
+  &gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
+<p>Four handler names and no more. <code>loadedmetadata</code> and <code>canplay</code> route to <code>onLoaded</code>, which is
+what takes <code>disabled</code> off the button once there is something to press; <code>play</code> and <code>pause</code>
+keep <code>playLabel</code> and the <code>is-playing</code> attribute honest, and those two are the accessible name
+and the icon swap. The two icon spans carry the same class names as the play button further
+up the page, because the rule that swaps them is in <code>style.css</code> and asks nothing of
+where the button sits. Every other handler in the samples above drives a control this one
+does not have.</p>
+<pre><code class="hljs language-css"><span class="hljs-selector-class">.hero</span> {
+  <span class="hljs-attribute">position</span>: relative;
+  <span class="hljs-attribute">isolation</span>: isolate;
+}
+
+<span class="hljs-selector-class">.hero</span> <span class="hljs-selector-class">.video-background</span> {
+  <span class="hljs-attribute">position</span>: absolute;
+  <span class="hljs-attribute">inset</span>: <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-selector-class">.hero</span> <span class="hljs-selector-class">.video-background</span> <span class="hljs-selector-tag">video</span> {
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">100%</span>;
+  <span class="hljs-attribute">object-fit</span>: cover;
+}
+
+<span class="hljs-selector-class">.hero-content</span> {
+  <span class="hljs-attribute">position</span>: relative;
+}
+
+<span class="hljs-selector-class">.video-background-toggle</span> {
+  <span class="hljs-attribute">position</span>: absolute;
+  <span class="hljs-attribute">right</span>: <span class="hljs-number">1rem</span>;
+  <span class="hljs-attribute">bottom</span>: <span class="hljs-number">1rem</span>;
+}</code></pre>
+<p><code>media-player</code> is already <code>display: block; position: relative</code> and <code>media-player[is-video]</code>
+already clips, so what a background adds is the crop — <code>height: 100%</code> and <code>object-fit: cover</code>
+over the <code>width: 100%</code> the stylesheet sets. There is no <code>z-index: -1</code> anywhere in that, on
+purpose: the toggle is a child of the player, and a player pushed behind the page takes its
+own button with it. The content is written after the player and positioned, which is enough
+to paint it on top — and it is also what decides the collision, so keep the toggle in a
+corner your text does not reach.</p>
+<p>Two things it costs, both worth knowing before pasting it.</p>
+<p><strong>The lock screen.</strong> <code>play:onPlay</code> claims the OS media panel; it is the same handler as
+everywhere else on this page and it does not know this video is wallpaper. Leave
+<code>media-title</code>, <code>artist</code>, <code>album</code> and <code>artwork</code> off and there is nothing to name it with, so
+the metadata is cleared rather than set. <code>poster</code> is the one to watch: a <code>&lt;video poster&gt;</code> is
+read as artwork, so a background video that carries one puts a picture on the panel with no
+title beside it.</p>
+<p><strong>No <code>controls</code>, which is where this page&#39;s own rule bends.</strong> Every other sample writes
+<code>controls</code> on the media element so that a blocked script leaves a working native player
+behind. Here there is nothing for a control bar to be the fallback <em>for</em> — a scrubber across
+your hero is not what you meant — so the button carries <code>disabled</code> in the markup instead, and
+a page whose script never ran shows a control that is visibly unavailable rather than one
+that silently does nothing. The loop still plays; <code>autoplay</code> is the browser&#39;s and owes this
+element nothing. What that leaves is motion with no way to stop it on a page with no
+JavaScript, and if that matters for yours, the markup that survives is a <code>&lt;video controls&gt;</code>
+with no <code>autoplay</code> — a different design, not this one with a flag flipped.</p>
+<p>Nothing here reads <code>prefers-reduced-motion</code>, this element included: <code>autoplay</code> is an
+attribute and no media query reaches it. The button is the mechanism WCAG asks for, and a
+page that wants the preference honoured on top of it starts the video from its own script
+rather than from the attribute.</p>
 <h2 id="what-it-borrows">What it borrows<a class="heading-anchor" href="#what-it-borrows" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The player draws almost nothing itself. The parts that have an
 <a href="https://www.w3.org/WAI/ARIA/apg/patterns/">APG pattern</a> behind them are elementals, each

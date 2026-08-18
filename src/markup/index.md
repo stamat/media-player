@@ -820,6 +820,117 @@ twelve-second local file never gives them.
 Attribution: _Big Buck Bunny_ is © the Blender Foundation, released under
 [CC-BY 3.0](https://peach.blender.org/about/).
 
+## A background loop, and the one button it owes you
+
+A video behind a headline is not a player. Nothing on it is meant to be pressed — no
+scrubber, no clock, no volume on a track that is silent — and the markup for it is four
+attributes the platform answered on its own long before this element existed:
+
+```html
+<video autoplay muted loop playsinline src="sample/rollout.mp4"></video>
+```
+
+`muted` is the condition every browser puts on autoplay rather than a stylistic choice:
+without it the loop never starts. `playsinline` is what keeps iOS from taking the whole
+screen the moment it does.
+
+So the honest first answer is that a background video does not need this element. What it
+needs is the one thing those four attributes cannot say: **motion that runs longer than five
+seconds has to be stoppable** —
+[WCAG 2.2.2 Pause, Stop, Hide](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html)
+— and a twelve-second loop is past that line the second time it plays. That is one button,
+and wiring one button is the smallest thing `<media-player>` does.
+
+```html
+<media-player class="video-background">
+  <video
+    autoplay
+    muted
+    loop
+    playsinline
+    src="sample/rollout.mp4"
+    on="loadedmetadata:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause"
+  ></video>
+
+  <button
+    class="video-background-toggle"
+    on="click:togglePlay"
+    bind="playLabel:attr#aria-label"
+    disabled
+  >
+    <span class="media-player-play-icon">…</span>
+    <span class="media-player-pause-icon">…</span>
+  </button>
+</media-player>
+```
+
+Four handler names and no more. `loadedmetadata` and `canplay` route to `onLoaded`, which is
+what takes `disabled` off the button once there is something to press; `play` and `pause`
+keep `playLabel` and the `is-playing` attribute honest, and those two are the accessible name
+and the icon swap. The two icon spans carry the same class names as the play button further
+up the page, because the rule that swaps them is in `style.css` and asks nothing of
+where the button sits. Every other handler in the samples above drives a control this one
+does not have.
+
+```css
+.hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero .video-background {
+  position: absolute;
+  inset: 0;
+}
+
+.hero .video-background video {
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-content {
+  position: relative;
+}
+
+.video-background-toggle {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+}
+```
+
+`media-player` is already `display: block; position: relative` and `media-player[is-video]`
+already clips, so what a background adds is the crop — `height: 100%` and `object-fit: cover`
+over the `width: 100%` the stylesheet sets. There is no `z-index: -1` anywhere in that, on
+purpose: the toggle is a child of the player, and a player pushed behind the page takes its
+own button with it. The content is written after the player and positioned, which is enough
+to paint it on top — and it is also what decides the collision, so keep the toggle in a
+corner your text does not reach.
+
+Two things it costs, both worth knowing before pasting it.
+
+**The lock screen.** `play:onPlay` claims the OS media panel; it is the same handler as
+everywhere else on this page and it does not know this video is wallpaper. Leave
+`media-title`, `artist`, `album` and `artwork` off and there is nothing to name it with, so
+the metadata is cleared rather than set. `poster` is the one to watch: a `<video poster>` is
+read as artwork, so a background video that carries one puts a picture on the panel with no
+title beside it.
+
+**No `controls`, which is where this page's own rule bends.** Every other sample writes
+`controls` on the media element so that a blocked script leaves a working native player
+behind. Here there is nothing for a control bar to be the fallback _for_ — a scrubber across
+your hero is not what you meant — so the button carries `disabled` in the markup instead, and
+a page whose script never ran shows a control that is visibly unavailable rather than one
+that silently does nothing. The loop still plays; `autoplay` is the browser's and owes this
+element nothing. What that leaves is motion with no way to stop it on a page with no
+JavaScript, and if that matters for yours, the markup that survives is a `<video controls>`
+with no `autoplay` — a different design, not this one with a flag flipped.
+
+Nothing here reads `prefers-reduced-motion`, this element included: `autoplay` is an
+attribute and no media query reaches it. The button is the mechanism WCAG asks for, and a
+page that wants the preference honoured on top of it starts the video from its own script
+rather than from the attribute.
+
 ## What it borrows
 
 The player draws almost nothing itself. The parts that have an
