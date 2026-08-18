@@ -30,7 +30,7 @@
       <span class="brand-mark">▶</span> media-player
     </a>
   </div>
-  <div class="topbar-actions"><tooltip-elemental><a class="icon-btn" href="https://www.npmjs.com/package/media-player" title="npm" target="_blank" rel="noopener"><span aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z"></path></svg></span></a><span>npm</span></tooltip-elemental>
+  <div class="topbar-actions"><tooltip-elemental><a class="icon-btn" href="https://www.npmjs.com/package/media-player-element" title="npm" target="_blank" rel="noopener"><span aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z"></path></svg></span></a><span>npm</span></tooltip-elemental>
     <tooltip-elemental><a class="icon-btn" href="https://github.com/stamat/media-player" title="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg></a><span>GitHub</span></tooltip-elemental>
     
     <switch-elemental class="switch-elemental-small switch-elemental-thin" checked-if="[data-theme=dark]">
@@ -325,7 +325,7 @@ knob spliced into the markup would not survive the next <code>play</code>.</p>
     <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">toolbar-elemental</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
-</code-preview><pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player&quot;</span>;</code></pre>
+</code-preview><pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player-element&quot;</span>;</code></pre>
 <!-- The `-hljs` build, not the small one: this page's fences are highlighted at build time
      and it ships no runtime highlighter, so without the bundled copy the code would keep the
      colour it was baked with and stop recolouring the moment a reader typed. -->
@@ -1313,14 +1313,14 @@ them, which is the half worth refusing.</li>
 <li><strong>Sanitize anything.</strong> It writes text and attributes, never HTML.</li>
 </ul>
 <h2 id="install">Install<a class="heading-anchor" href="#install" tabindex="-1" aria-hidden="true"></a></h2>
-<pre><code class="hljs language-bash">npm install media-player</code></pre>
-<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player&quot;</span>;</code></pre>
-<p>The elementals ride along — importing <code>media-player</code> defines the slider, the progress bar,
+<pre><code class="hljs language-bash">npm install media-player-element</code></pre>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player-element&quot;</span>;</code></pre>
+<p>The elementals ride along — importing <code>media-player-element</code> defines the slider, the progress bar,
 the toolbar and the tooltip too. Their stylesheets do not: each elemental draws its own
 track, thumb, bar or bubble, so its sheet loads beside this one. The tooltip is the one
 whose theme is not really optional: its own sheet places the bubble and leaves the painting
 to the theme, so without it there is unpainted text over the control row.</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player/style.css&quot;</span> /&gt;</span>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/style.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/slider/style.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/progress/style.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/toolbar/style.css&quot;</span> /&gt;</span>
@@ -1328,7 +1328,7 @@ to the theme, so without it there is unpainted text over the control row.</p>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player/theme.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/theme.css&quot;</span>
 /&gt;</span><span class="hljs-comment">&lt;!-- the look; optional --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
@@ -1345,11 +1345,11 @@ to the theme, so without it there is unpainted text over the control row.</p>
 <p>Or from a CDN as a module, no install and no build step — the stylesheets come the same
 way, from each package&#39;s <code>dist/</code>:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-  <span class="hljs-keyword">import</span> <span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs&quot;</span>;
+  <span class="hljs-keyword">import</span> <span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element/dist/media-player.min.mjs&quot;</span>;
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element/dist/media-player.min.css&quot;</span>
 /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>

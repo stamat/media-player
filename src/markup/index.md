@@ -293,7 +293,7 @@ knob spliced into the markup would not survive the next `play`.
 </code-preview>
 
 ```js
-import "media-player";
+import "media-player-element";
 ```
 
 <!-- The `-hljs` build, not the small one: this page's fences are highlighted at build time
@@ -1132,21 +1132,21 @@ Each of these is a decision, not a gap waiting for a pull request.
 ## Install
 
 ```bash
-npm install media-player
+npm install media-player-element
 ```
 
 ```js
-import "media-player";
+import "media-player-element";
 ```
 
-The elementals ride along — importing `media-player` defines the slider, the progress bar,
+The elementals ride along — importing `media-player-element` defines the slider, the progress bar,
 the toolbar and the tooltip too. Their stylesheets do not: each elemental draws its own
 track, thumb, bar or bubble, so its sheet loads beside this one. The tooltip is the one
 whose theme is not really optional: its own sheet places the bubble and leaves the painting
 to the theme, so without it there is unpainted text over the control row.
 
 ```html
-<link rel="stylesheet" href="media-player/style.css" />
+<link rel="stylesheet" href="media-player-element/style.css" />
 <link rel="stylesheet" href="book-of-elementals/slider/style.css" />
 <link rel="stylesheet" href="book-of-elementals/progress/style.css" />
 <link rel="stylesheet" href="book-of-elementals/toolbar/style.css" />
@@ -1154,7 +1154,7 @@ to the theme, so without it there is unpainted text over the control row.
 
 <link
   rel="stylesheet"
-  href="media-player/theme.css"
+  href="media-player-element/theme.css"
 /><!-- the look; optional -->
 <link
   rel="stylesheet"
@@ -1175,11 +1175,11 @@ way, from each package's `dist/`:
 
 ```html
 <script type="module">
-  import "https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.mjs";
+  import "https://cdn.jsdelivr.net/npm/media-player-element/dist/media-player.min.mjs";
 </script>
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/media-player/dist/media-player.min.css"
+  href="https://cdn.jsdelivr.net/npm/media-player-element/dist/media-player.min.css"
 />
 <link
   rel="stylesheet"

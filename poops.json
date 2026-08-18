@@ -67,7 +67,7 @@
         "repo": "https://github.com/stamat/media-player",
         "branch": "main",
         "iconLinks": [
-          { "title": "npm", "url": "https://www.npmjs.com/package/media-player", "icon": "npm" }
+          { "title": "npm", "url": "https://www.npmjs.com/package/media-player-element", "icon": "npm" }
         ]
       }
     }

@@ -1,4 +1,4 @@
-# ▶ media-player [![npm version](https://img.shields.io/npm/v/media-player)](https://www.npmjs.com/package/media-player) [![ci](https://img.shields.io/github/actions/workflow/status/stamat/media-player/ci.yml?branch=main&label=ci)](https://github.com/stamat/media-player/actions/workflows/ci.yml) [![license mit](https://img.shields.io/badge/license-MIT-green)](https://github.com/stamat/media-player/blob/main/LICENSE)
+# ▶ media-player [![npm version](https://img.shields.io/npm/v/media-player-element)](https://www.npmjs.com/package/media-player-element) [![ci](https://img.shields.io/github/actions/workflow/status/stamat/media-player/ci.yml?branch=main&label=ci)](https://github.com/stamat/media-player/actions/workflows/ci.yml) [![license mit](https://img.shields.io/badge/license-MIT-green)](https://github.com/stamat/media-player/blob/main/LICENSE)
 
 > A media player you write in HTML — one custom element over the `<audio>` or `<video>` you already wrote.
 
@@ -72,7 +72,7 @@ media element you wrapped is read off the child, so there is one class and one t
 ## Install
 
 ```bash
-npm install media-player
+npm install media-player-element
 ```
 
 ## Everything else
