@@ -61,19 +61,19 @@
     "transform": {}
   },
   "dependencies": {
-    "book-of-elementals": "^0.10.0",
+    "book-of-elementals": "^0.11.1",
     "hydrargyri": "^2.1.1"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@eslint/js": "^10.0.1",
-    "code-preview-element": "^3.0.0",
+    "code-preview-element": "^3.0.2",
     "es-check": "^9.6.4",
     "eslint": "^10.7.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.0.0",
     "poops": "^2.5.0",
-    "poops-docs-theme": "^4.2.0",
+    "poops-docs-theme": "^4.3.0",
     "stylelint": "^17.14.1",
     "stylelint-config-standard-scss": "^17.0.0"
   }
