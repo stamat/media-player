@@ -75,6 +75,9 @@ media element you wrapped is read off the child, so there is one class and one t
 npm install media-player-element
 ```
 
+Stylesheets are separate — a structure sheet, an optional `media-player-theme.css` for the look, and one
+per elemental. The [manual](https://stamat.github.io/media-player/#install) lists them.
+
 ## Everything else
 
 **<https://stamat.github.io/media-player/>** — the whole reference, the comparison against
