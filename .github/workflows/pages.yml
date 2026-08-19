@@ -34,10 +34,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p _site
-          cp index.html _site/
+          cp index.html custom-elements.json _site/
           cp -r dist css js sample _site/
           test -s _site/index.html
           test -s _site/dist/media-player.min.mjs
+          test -s _site/custom-elements.json
 
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
