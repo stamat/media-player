@@ -11,6 +11,8 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-20
+
 ### Added
 
 - **The media element wires itself.** The ten `on=` pairs every sample carried on its
