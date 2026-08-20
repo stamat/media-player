@@ -1,4 +1,4 @@
-# ▶ media-player [![npm version](https://img.shields.io/npm/v/media-player-element)](https://www.npmjs.com/package/media-player-element) [![ci](https://img.shields.io/github/actions/workflow/status/stamat/media-player/ci.yml?branch=main&label=ci)](https://github.com/stamat/media-player/actions/workflows/ci.yml) [![license mit](https://img.shields.io/badge/license-MIT-green)](https://github.com/stamat/media-player/blob/main/LICENSE)
+# ▶ media-player [![npm version](https://img.shields.io/npm/v/media-player-element)](https://www.npmjs.com/package/media-player-element) [![ci](https://img.shields.io/github/actions/workflow/status/stamat/media-player/ci.yml?branch=main&label=ci)](https://github.com/stamat/media-player/actions/workflows/ci.yml) [![gzip size](https://img.badgesize.io/stamat/media-player/main/dist/media-player.min.mjs?compression=gzip&label=gzip)](https://github.com/stamat/media-player/blob/main/dist/media-player.min.mjs) [![license mit](https://img.shields.io/badge/license-MIT-green)](https://github.com/stamat/media-player/blob/main/LICENSE)
 
 > A media player you write in HTML — one custom element over the `<audio>` or `<video>` you already wrote.
 

@@ -61,6 +61,13 @@ for the person who wrote the code.
   entry duplicating what a button could carry is still the undiscoverable version and still
   gets refused.
 
+- **The README wears the gzip size, measured by a machine.** The hand-quoted number has
+  been wrong twice now — the comparison table said 11.4 kB while the bundle on `main` was
+  already 12.2 — so the badge row gains a shield that gzips `dist/media-player.min.mjs`
+  straight off the branch and moves with every commit. The table's number is corrected and
+  stays hand-measured, because its five players have to be measured one way; its
+  measure-before-quoting warning stands.
+
 ### Changed
 
 - **The sample players are Tab stops now.** They carried `tabindex="-1"`, which takes a
