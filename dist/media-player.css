@@ -24,26 +24,17 @@ media-player video {
 }
 
 .media-player-scrubber {
+  position: relative;
   flex: 1 1 100%;
   min-width: 0;
 }
 
-.media-player-scrubber,
-.media-player-volume {
-  position: relative;
-  --slider-elemental-fill: transparent;
-  --slider-elemental-track: transparent;
-  --slider-elemental-thumb: currentcolor;
-}
-
-.media-player-scrubber progress-elemental,
-.media-player-volume progress-elemental {
+.media-player-scrubber progress-elemental {
   position: absolute;
-  inset-inline: 0;
+  inset-inline: calc(var(--slider-elemental-thumb-size, 1rem) / 2);
   top: 50%;
   translate: 0 -50%;
   pointer-events: none;
-  --progress-elemental-duration: 0s;
 }
 
 .media-player-volume {

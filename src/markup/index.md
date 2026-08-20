@@ -58,19 +58,18 @@ knob spliced into the markup would not survive the next `play`.
       tooltip="thumb track"
       bind="timeFormatter:prop#format"
     >
-      <!-- The played and buffered bars. A <progress> rather than the slider's own fill:
-           an <input type="range">'s `value` does not reflect to an attribute, so writing
-           it from script moves the thumb and nothing else. -->
-      <progress-elemental bind="buffered:attr#buffer">
+      <!-- The buffered bar, behind the input. Only the buffered bar: the played fill is
+           the slider's own, which the element catches up itself after every scripted
+           write — a range input fires no event for one. -->
+      <progress-elemental>
         <progress
           value="0"
           max="1"
-          bind="currentTime:prop#value|floor;duration:prop#max|floor"
+          bind="buffered:prop#value;duration:prop#max"
         ></progress>
       </progress-elemental>
-      <!-- `|floor` on both nodes, which is the whole trick: a `step="1"` range snaps what it
-           is assigned to the nearest step, so an unfloored 3.6 is a thumb at 4 beside a bar
-           at 3.6. One floored number, and they step together.
+      <!-- `|floor` hands the input whole seconds: a `step="1"` range snaps to the nearest
+           step, so an unfloored 3.6 is a thumb at 4 beside a clock reading 00:03.
            `pointerup@document` as well as `change`: a thumb picked up and put back where it
            started fires no `change`, and the clock would stay stopped over playing audio. -->
       <input
@@ -261,13 +260,6 @@ knob spliced into the markup would not survive the next `play`.
     </tooltip-elemental>
 
     <slider-elemental class="media-player-volume" tooltip="thumb">
-      <progress-elemental>
-        <progress
-          value="100"
-          max="100"
-          bind="volumePercent:prop#value"
-        ></progress>
-      </progress-elemental>
       <input
         type="range"
         min="0"
@@ -438,11 +430,11 @@ controls that fade out while playing — only when it wrapped a `<video>`.
       tooltip="thumb track"
       bind="timeFormatter:prop#format"
     >
-      <progress-elemental bind="buffered:attr#buffer">
+      <progress-elemental>
         <progress
           value="0"
           max="1"
-          bind="currentTime:prop#value|floor;duration:prop#max|floor"
+          bind="buffered:prop#value;duration:prop#max"
         ></progress>
       </progress-elemental>
       <input
@@ -638,13 +630,6 @@ controls that fade out while playing — only when it wrapped a `<video>`.
     </tooltip-elemental>
 
     <slider-elemental class="media-player-volume" tooltip="thumb">
-      <progress-elemental>
-        <progress
-          value="100"
-          max="100"
-          bind="volumePercent:prop#value"
-        ></progress>
-      </progress-elemental>
       <input
         type="range"
         min="0"
@@ -761,7 +746,7 @@ testable right here rather than in a file you have to build yourself.
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
     <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
-      <progress-elemental bind="buffered:attr#buffer"><progress value="0" max="1" bind="currentTime:prop#value|floor;duration:prop#max|floor"></progress></progress-elemental>
+      <progress-elemental><progress value="0" max="1" bind="buffered:prop#value;duration:prop#max"></progress></progress-elemental>
       <input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
     </slider-elemental>
     <tooltip-elemental>
@@ -781,7 +766,7 @@ testable right here rather than in a file you have to build yourself.
       <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
       <span bind="muteLabel">Mute</span>
     </tooltip-elemental>
-    <slider-elemental class="media-player-volume" tooltip="thumb"><progress-elemental><progress value="100" max="100" bind="volumePercent:prop#value"></progress></progress-elemental><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
+    <slider-elemental class="media-player-volume" tooltip="thumb"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
     <tooltip-elemental>
       <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       <span>Fullscreen</span>
@@ -928,7 +913,7 @@ usable on its own and documented in its own right:
 | Part               | Element                                                                                               | What it brings                                                                                                                                                              |
 | ------------------ | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Scrubber, volume   | [`<slider-elemental>`](https://stamat.github.io/book-of-elementals/elementals/slider.html)            | a native `<input type="range">` and the whole APG Slider pattern — arrows, <kbd>Home</kbd>, <kbd>End</kbd>, touch, the value bubble                                         |
-| Buffered-ahead bar | [`<progress-elemental buffer>`](https://stamat.github.io/book-of-elementals/elementals/progress.html) | a native `<progress>` with a second value beside the first                                                                                                                  |
+| Buffered-ahead bar | [`<progress-elemental>`](https://stamat.github.io/book-of-elementals/elementals/progress.html)        | a native `<progress>` whose fill CSS can place — here it carries the buffered edge, on the duration's own scale                                                             |
 | Control row        | [`<toolbar-elemental>`](https://stamat.github.io/book-of-elementals/elementals/toolbar.html)          | one tab stop, arrow keys between the buttons                                                                                                                                |
 | Button tooltips    | [`<tooltip-elemental>`](https://stamat.github.io/book-of-elementals/elementals/tooltip.html)          | hover and focus both, <kbd>Escape</kbd> to dismiss per [WCAG 1.4.13](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html), and no half-handled touch |
 
@@ -1232,8 +1217,8 @@ which is the pair of them behind one control.
 | Key                                       | Holds                                                                                                                               |
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `currentTime`, `duration`, `remaining`    | seconds; pipe them through `\|time` for `mm:ss`                                                                                     |
-| `buffered`                                | how far ahead the browser has loaded, **in seconds** — same scale as `duration`, so it goes straight on the `<progress>`'s `buffer` |
-| `volumePercent`                           | `0`–`100`, for a volume slider's `value` — and for the `<progress>` behind it, which is what redraws when a mute lands from script  |
+| `buffered`                                | how far ahead the browser has loaded, **in seconds** — same scale as `duration`, so it goes straight on the `<progress>`'s `value`  |
+| `volumePercent`                           | `0`–`100`, for a volume slider's `value`                                                                                            |
 | `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next                                                                                             |
 | `captionText`                             | the active cue                                                                                                                      |
 | `timeFormatter`                           | the `formatTime` function itself — hand it to the scrubber's `prop#format` and the value bubble reads `01:12` instead of `72`       |

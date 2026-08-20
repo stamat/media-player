@@ -24,16 +24,10 @@ media-player slider-elemental {
   --slider-elemental-tooltip-radius: 5px;
 }
 
-media-player .media-player-scrubber,
-media-player .media-player-volume {
-  --slider-elemental-thumb: var(--media-player-accent);
-}
-
 media-player progress-elemental {
-  --progress-elemental-fill: var(--media-player-accent);
+  --progress-elemental-fill: color-mix(in srgb, var(--media-player-color) 30%, transparent);
   --progress-elemental-height: 0.5rem;
-  --progress-elemental-track: color-mix(in srgb, var(--media-player-color) 15%, transparent);
-  --progress-elemental-buffer-fill: color-mix(in srgb, var(--media-player-color) 30%, transparent);
+  --progress-elemental-track: transparent;
 }
 
 media-player .media-player-controls {
@@ -117,7 +111,7 @@ media-player .media-player-time {
 media-player[is-buffering] .media-player-scrubber::before {
   content: "";
   position: absolute;
-  inset-inline: 0;
+  inset-inline: calc(var(--slider-elemental-thumb-size, 1rem) / 2);
   top: 50%;
   translate: 0 -50%;
   height: 0.5rem;

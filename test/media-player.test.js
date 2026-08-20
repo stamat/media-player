@@ -7,7 +7,8 @@
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
  * track, the video controls' hide timer, the labels the buttons announce themselves by, the
  * keys a control claims and the presses that are somebody else's, the OS media panel against
- * a stubbed `navigator.mediaSession`, and that the surface the custom elements manifest
+ * a stubbed `navigator.mediaSession`, the slider fills caught up through slider-elemental's
+ * own `apply()` after scripted writes, and that the surface the custom elements manifest
  * publishes still exists on the element.
  *
  * Deliberately not covered: fullscreen and the `cuechange` event, neither of which jsdom
@@ -786,6 +787,58 @@ describe('the buffered bar', () => {
   });
 });
 
+describe('the slider fills follow scripted writes', () => {
+  // A value written into a range input from script fires no event, so slider-elemental
+  // cannot see it on its own — the player calls the slider's public apply() after every
+  // write. These mount a real slider-elemental, which jsdom runs fine: apply() reads the
+  // inputs and writes custom properties, no layout involved.
+  function scrubberSlider() {
+    const slider = document.createElement('slider-elemental');
+    slider.className = 'media-player-scrubber';
+    slider.innerHTML =
+      '<input type="range" min="0" step="1" value="0" aria-label="Seek" bind="duration:attr#max|floor;currentTime:prop#value|floor" />';
+    return slider;
+  }
+
+  test('a seek from script drags the fill with the thumb, though the input fires no event for it', () => {
+    const media = fakeMedia('audio', { duration: 120 });
+    const player = document.createElement('media-player');
+    player.appendChild(media);
+    const slider = scrubberSlider();
+    player.appendChild(slider);
+    document.body.appendChild(player);
+
+    player.seekTo(30);
+    expect(slider.style.getPropertyValue('--slider-elemental-end')).toBe('0.25');
+  });
+
+  test('a mute landing from script pulls the volume fill down with it', () => {
+    const media = fakeMedia();
+    const player = document.createElement('media-player');
+    player.appendChild(media);
+    const slider = document.createElement('slider-elemental');
+    slider.className = 'media-player-volume';
+    slider.innerHTML =
+      '<input type="range" min="0" max="100" step="1" value="100" aria-label="Volume" bind="volumePercent:prop#value" />';
+    player.appendChild(slider);
+    document.body.appendChild(player);
+    expect(slider.style.getPropertyValue('--slider-elemental-end')).toBe('1');
+
+    media.volume = 0;
+    media.muted = true;
+    player.onVolumeChange();
+    expect(slider.style.getPropertyValue('--slider-elemental-end')).toBe('0');
+  });
+
+  test('a player drawn without sliders paints the clock and the volume without reaching for them', () => {
+    const player = mount(fakeMedia());
+    expect(() => {
+      player.seekTo(10);
+      player.onVolumeChange();
+    }).not.toThrow();
+  });
+});
+
 describe('the labels a button announces itself by', () => {
   test('playing makes the button offer to pause, and pausing makes it offer to play', () => {
     const media = fakeMedia();
@@ -807,8 +860,7 @@ describe('the labels a button announces itself by', () => {
     player.onVolumeChange();
     expect(player.muteLabel).toBe('Unmute');
     expect(player.volumeState).toBe('mute');
-    // What the volume slider and the <progress> behind it are both bound to — the bar only
-    // redraws because this lands at zero.
+    // What the volume slider's input is bound to — zero here is what drags its fill down.
     expect(player.volumePercent).toBe(0);
   });
 });

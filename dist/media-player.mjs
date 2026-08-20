@@ -1557,6 +1557,8 @@ var MediaPlayer = class extends HgElement {
     this.isVideo = this.media.tagName === "VIDEO";
     this.frame = 0;
     this.linger = null;
+    this.scrubber = this.querySelector(".media-player-scrubber");
+    this.volumeSlider = this.querySelector(".media-player-volume");
     if (this.isVideo) {
       this.noFullscreen = !(document.fullscreenEnabled || this.media.webkitEnterFullscreen);
     }
@@ -1810,6 +1812,7 @@ var MediaPlayer = class extends HgElement {
   paint(seconds) {
     this.currentTime = seconds;
     this.remaining = Math.max((this.media?.duration || 0) - seconds, 0);
+    this.scrubber?.apply?.();
   }
   /**
    * The playing clock.
@@ -1871,10 +1874,9 @@ var MediaPlayer = class extends HgElement {
   /**
    * How far ahead the browser has loaded, in seconds.
    *
-   * Seconds rather than a percentage so it shares a scale with `duration`, which is what the
-   * `<progress>` behind the scrubber is set to — two values on one `max`, which is the whole
-   * reason the buffered bar can sit behind the played one without any arithmetic in the
-   * markup.
+   * Seconds rather than a percentage so it shares a scale with `duration`, which is what
+   * the `<progress>` behind the scrubber has for a `max` — one bind each and no arithmetic
+   * in the markup.
    *
    * The range the playhead sits in, not the first or the furthest: after a seek the browser
    * holds disjoint ranges, and either end would lie — the first stops behind the playhead,
@@ -2061,6 +2063,7 @@ var MediaPlayer = class extends HgElement {
     this.volumePercent = Math.round(volume * VOLUME_SCALE);
     this.volumeState = volumeState(volume);
     this.muteLabel = volume === 0 ? "Unmute" : "Mute";
+    this.volumeSlider?.apply?.();
   }
   onVolumeChange() {
     this.syncVolume();
@@ -2228,13 +2231,12 @@ __publicField(MediaPlayer, "wires", {
 __publicField(MediaPlayer, "formatters", {
   time: (value) => formatTime(value),
   /**
-   * Whole seconds, for the two nodes that draw the scrubber.
+   * Whole seconds for the scrubber's range input.
    *
-   * The thumb and the played bar have to be given the *same* number or they disagree on
-   * screen. A range input with `step="1"` snaps what it is assigned to the **nearest**
-   * step while a bar drawn from the raw value keeps every decimal, so 3.6 is a thumb at 4
-   * beside a fill at 3.6 — a whole step apart at the worst moment, twice a second. Floor
-   * both and there is one number and nothing to disagree about.
+   * A `step="1"` range snaps what it is assigned to the **nearest** step while the clock
+   * label truncates, so an unfloored 3.6 is a thumb at 4 beside a label reading 00:03 —
+   * the thumb a second ahead of the clock it sits next to, twice a second. Floored first,
+   * the input is handed the number the label shows.
    */
   floor: (value) => Number.isFinite(value) ? Math.floor(value) : value,
   /**

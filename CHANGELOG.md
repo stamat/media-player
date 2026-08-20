@@ -43,6 +43,21 @@ for the person who wrote the code.
 
 ### Fixed
 
+- **The played bar missed the knob at both ends of a long file.** The played fill was a
+  full-width `<progress>` behind the range input, but a thumb's centre travels from half a
+  thumb in to half a thumb short of the far end — so the bar sat `thumb × (position − ½)`
+  off the knob: a visible gap between fill and knob early in a twelve-minute file, a
+  squared-off knob near its end. The played fill is now the slider's own, which
+  slider-elemental places with that same thumb-centre arithmetic, and the element calls the
+  slider's public `apply()` after every scripted write — a range input fires no event for
+  one, which is why the `<progress>` was standing in to begin with. The markup changes with
+  it: the scrubber's `<progress>` now carries only the buffered bar
+  (`bind="buffered:prop#value;duration:prop#max"`, no more `buffer` attribute), inset half
+  a thumb to sit on the thumb's travel, and the volume slider drops its
+  `<progress-elemental>` entirely. The buffered bar gets its easing back too — it was
+  turned off because one duration eased both bars and the played one was written per
+  animation frame, and only the buffered bar is left.
+
 - **The long-form demo played in Safari and errored in Chrome.** The ten minutes of Big Buck
   Bunny came from W3C's 2010 encode, and Chrome's decoder rejects that file mid-stream with
   `PIPELINE_ERROR_DECODE` — H.264 Main@3.0, so the codec is not the problem; the encode is,

@@ -43,43 +43,28 @@ media-player video {
 }
 
 .media-player-scrubber {
+  // The containing block for the buffered bar and the buffering stripes. slider-elemental's
+  // own stylesheet says `relative` too, but that sheet is a separate load — without this,
+  // forgetting it paints the stripes across the whole player instead of along the track.
+  position: relative;
   flex: 1 1 100%;
   min-width: 0;
 }
 
-// The played and buffered bars — and the volume level — are a <progress> stacked behind
-// the range input, not the slider's own fill. An <input type="range">'s `value` is not a
-// reflecting IDL attribute and fires no event when written from script, so slider-elemental
-// cannot see the write and its fill stays frozen wherever the last real pointer left it:
-// the clock while playing, the volume when a mute lands. A <progress> reflects, so the same
-// write redraws the bar. The range input stays for what it is good at — seeking, setting a
-// level, and the whole APG keyboard pattern.
-.media-player-scrubber,
-.media-player-volume {
-  position: relative;
-
-  --slider-elemental-fill: transparent;
-  --slider-elemental-track: transparent;
-
-  // The thumb defaults to the fill, and the fill is now transparent, so it has to be said
-  // again or the handle disappears along with the track it stopped drawing.
-  --slider-elemental-thumb: currentcolor;
-}
-
-.media-player-scrubber progress-elemental,
-.media-player-volume progress-elemental {
+// The buffered bar, behind the range input. Only the buffered bar: the played fill and the
+// volume level are the slider's own fill, which slider-elemental places with thumb-centre
+// arithmetic so it ends under the knob at every position — a full-width bar is off by half
+// a thumb at both ends, a visible gap early in a long file and a squared-off knob near its
+// end. A range input fires no event for a value written from script, which is what froze
+// that fill once; the element calls the slider's public apply() after every write instead.
+// Inset by half a thumb so the bar spans exactly the thumb's travel — the same geometry the
+// slider draws its track and fill on.
+.media-player-scrubber progress-elemental {
   position: absolute;
-  inset-inline: 0;
+  inset-inline: calc(var(--slider-elemental-thumb-size, 1rem) / 2);
   top: 50%;
   translate: 0 -50%;
   pointer-events: none;
-
-  // No easing. These bars are written per animation frame or per input tick, and each write
-  // restarts a transition the previous one never finished, so an eased fill trails a
-  // quarter second behind the thumb it is supposed to sit under. One duration eases both of
-  // a progress-elemental's bars, so the buffered bar gives its easing up with the played
-  // one — a loss, since that one really does arrive in jumps.
-  --progress-elemental-duration: 0s;
 }
 
 // The volume takes a fixed slice rather than its share: two sliders in one flex row both

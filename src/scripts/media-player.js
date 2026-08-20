@@ -188,7 +188,7 @@ function focusedElement() {
  * What the element does not draw, it borrows. The scrubber and the volume control are
  * `<slider-elemental>` around a native `<input type="range">`, which is where the whole
  * [APG Slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) already lives; the
- * buffered-ahead bar is `<progress-elemental buffer>`; the control row is
+ * buffered-ahead bar is `<progress-elemental>`; the control row is
  * `<toolbar-elemental>`. None of their keyboard handling, ARIA or focus management is
  * rewritten here, which is why this element writes no `role` and no `aria-valuenow` of its
  * own.
@@ -318,13 +318,12 @@ export class MediaPlayer extends HgElement {
     time: (value) => formatTime(value),
 
     /**
-     * Whole seconds, for the two nodes that draw the scrubber.
+     * Whole seconds for the scrubber's range input.
      *
-     * The thumb and the played bar have to be given the *same* number or they disagree on
-     * screen. A range input with `step="1"` snaps what it is assigned to the **nearest**
-     * step while a bar drawn from the raw value keeps every decimal, so 3.6 is a thumb at 4
-     * beside a fill at 3.6 — a whole step apart at the worst moment, twice a second. Floor
-     * both and there is one number and nothing to disagree about.
+     * A `step="1"` range snaps what it is assigned to the **nearest** step while the clock
+     * label truncates, so an unfloored 3.6 is a thumb at 4 beside a label reading 00:03 —
+     * the thumb a second ahead of the clock it sits next to, twice a second. Floored first,
+     * the input is handed the number the label shows.
      */
     floor: (value) => (Number.isFinite(value) ? Math.floor(value) : value),
 
@@ -346,6 +345,12 @@ export class MediaPlayer extends HgElement {
     this.isVideo = this.media.tagName === 'VIDEO';
     this.frame = 0;
     this.linger = null;
+
+    // The sliders whose inputs this element writes into from script, found by the classes
+    // the stylesheet already targets — they are the markup contract. A player drawn without
+    // one reads null here and the fill catch-ups skip.
+    this.scrubber = this.querySelector('.media-player-scrubber');
+    this.volumeSlider = this.querySelector('.media-player-volume');
 
     // Present only when no fullscreen door will open — an iframe without
     // `allow="fullscreen"` is the common way to get here — so a stylesheet can hide the
@@ -669,6 +674,10 @@ export class MediaPlayer extends HgElement {
   paint(seconds) {
     this.currentTime = seconds;
     this.remaining = Math.max((this.media?.duration || 0) - seconds, 0);
+    // The write above lands in the scrubber's range input, and a value written from script
+    // fires no event — slider-elemental cannot see it, and its fill would stay wherever the
+    // last real drag left it. apply() is that element's public catch-up for exactly this.
+    this.scrubber?.apply?.();
   }
 
   /**
@@ -740,10 +749,9 @@ export class MediaPlayer extends HgElement {
   /**
    * How far ahead the browser has loaded, in seconds.
    *
-   * Seconds rather than a percentage so it shares a scale with `duration`, which is what the
-   * `<progress>` behind the scrubber is set to — two values on one `max`, which is the whole
-   * reason the buffered bar can sit behind the played one without any arithmetic in the
-   * markup.
+   * Seconds rather than a percentage so it shares a scale with `duration`, which is what
+   * the `<progress>` behind the scrubber has for a `max` — one bind each and no arithmetic
+   * in the markup.
    *
    * The range the playhead sits in, not the first or the furthest: after a seek the browser
    * holds disjoint ranges, and either end would lie — the first stops behind the playhead,
@@ -951,6 +959,10 @@ export class MediaPlayer extends HgElement {
     this.volumePercent = Math.round(volume * VOLUME_SCALE);
     this.volumeState = volumeState(volume);
     this.muteLabel = volume === 0 ? 'Unmute' : 'Mute';
+    // A value written into a range input from script fires no event, so the volume slider's
+    // fill is caught up by hand — a mute from the button or the OS would otherwise leave it
+    // sitting full over a silent player.
+    this.volumeSlider?.apply?.();
   }
 
   onVolumeChange() {
