@@ -31,6 +31,18 @@ for the person who wrote the code.
 
 ### Fixed
 
+- **The long-form demo played in Safari and errored in Chrome.** The ten minutes of Big Buck
+  Bunny came from W3C's 2010 encode, and Chrome's decoder rejects that file mid-stream with
+  `PIPELINE_ERROR_DECODE` — H.264 Main@3.0, so the codec is not the problem; the encode is,
+  and Safari's decoder happens to tolerate it. Every stable host of a good Big Buck Bunny
+  encode is gone — Google's sample bucket answers 403, Blender's own `peach/` directory 404s,
+  and archive.org's copy 500s from its storage node — so the demo is now twelve minutes of
+  _Tears of Steel_ from Blender's download server, verified playing in Chrome, WebKit and
+  Firefox. Same shape as before: H.264 in a container with the index at the tail, so
+  everything the page says about `preload="metadata"` and the late `moov` stays true, with
+  the numbers re-measured for the new file. The poster is a frame from the film, committed
+  as `sample/tears-of-steel.jpg` rather than hotlinked.
+
 - **Playing from the overlay dropped focus, and the next <kbd>Space</kbd> scrolled the page.**
   The click-to-play overlay is a real button, so pressing it left focus on it — and that press
   is exactly what sets `poster-hidden`, whose stylesheet rule takes the overlay out with

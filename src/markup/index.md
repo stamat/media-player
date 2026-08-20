@@ -754,11 +754,11 @@ Captions render into whatever binds `captionText`, with the track held `hidden` 
 browser's own caption box stays out of the way — which is what leaves your stylesheet in
 charge of what captions look like.
 
-## Ten minutes, from someone else's server
+## Twelve minutes, from someone else's server
 
 Twelve seconds proves the wiring and proves nothing about the seeking. A local file that
 short never buffers, and a clock reading `00:00 / 00:12` never needs the minutes it can show.
-So here is the same row over ten minutes of Big Buck Bunny, and this one is not in an editable
+So here is the same row over twelve minutes of Tears of Steel, and this one is not in an editable
 frame — it is the page's own DOM, upgraded by the one module tag sitting under it. Block that
 tag and what is left is a plain `<video controls>`, which makes the claim this page opens with
 testable right here rather than in a file you have to build yourself.
@@ -766,9 +766,9 @@ testable right here rather than in a file you have to build yourself.
 <!-- One line, and it has to be: the whole opening tag of an unknown element must sit on a
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
-<media-player tabindex="-1" media-title="Big Buck Bunny" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
-  <video controls playsinline preload="metadata" src="https://media.w3.org/2010/05/bunny/movie.mp4" poster="https://media.w3.org/2010/05/bunny/poster.png" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></video>
-  <img class="media-player-poster" src="https://media.w3.org/2010/05/bunny/poster.png" alt="" />
+<media-player tabindex="-1" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
+  <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></video>
+  <img class="media-player-poster" src="sample/tears-of-steel.jpg" alt="" />
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
     <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
@@ -810,21 +810,22 @@ button whose handler has nothing to toggle is a lie in the shape of a control. M
 _are_ here, and unlike the Artemis clip this one has sound for them to move.
 
 What it costs is worth naming. The file is not mine — it is on
-[W3C's media server](https://media.w3.org/), so this page makes a third-party request for it,
-and `preload="metadata"` means that request happens on load rather than on your first click.
+[Blender's download server](https://download.blender.org/), so this page makes a third-party
+request for it, and `preload="metadata"` means that request happens on load rather than on
+your first click.
 
-Which is a deliberate choice, and the reason is the flaw in the file. It is 238 MiB laid out
-`ftyp free mdat moov` — the index is the _last_ 441 KiB of it, at byte 248,773,025 — so it is
+Which is a deliberate choice, and the reason is the flaw in the file. It is 355 MiB laid out
+`ftyp wide mdat moov` — the index is the _last_ 585 KiB of it, at byte 371,579,659 — so it is
 not "fast start", and nothing can know the duration until a range request for the tail comes
 back. `preload="none"` would defer that to the first click, and the click would then look
 broken: the control row is bound `isReady:if`, readiness needs a duration, so there would be
 no row to press and nothing on screen would change for as long as the tail took to arrive.
-Fetching the index up front costs 441 KiB and buys a player that is a player before you touch
+Fetching the index up front costs 585 KiB and buys a player that is a player before you touch
 it. The stripe march and the buffered bar then have something real to show, which a
 twelve-second local file never gives them.
 
-Attribution: _Big Buck Bunny_ is © the Blender Foundation, released under
-[CC-BY 3.0](https://peach.blender.org/about/).
+Attribution: _Tears of Steel_ is © the Blender Foundation, released under
+[CC-BY 3.0](https://mango.blender.org/sharing/).
 
 ## A background loop, and the one button it owes you
 
