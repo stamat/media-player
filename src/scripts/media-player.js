@@ -108,7 +108,7 @@ export function volumeState(value) {
  *
  * A comment box under a player is the ordinary case, not the exotic one, and a `k` typed
  * into it must reach it. The excluded input types answer arrows and Space and nothing
- * alphabetic, so a range or a checkbox with focus is still a fair place to press a key.
+ * alphabetic, so a range or a checkbox with focus is still a fair place to press a letter.
  */
 const TYPING_FIELDS =
   'input:not([type=range],[type=checkbox],[type=radio],[type=button],[type=submit],[type=reset]),textarea,select';
@@ -116,6 +116,30 @@ const TYPING_FIELDS =
 /** Is this key being typed into something, rather than pressed at the player? */
 function isTyping(node) {
   return !!node && node.nodeType === 1 && (node.isContentEditable || node.matches(TYPING_FIELDS));
+}
+
+/**
+ * The two keys that press whatever holds focus, so a `key` can never claim them off it.
+ *
+ * Space and Enter are how the platform activates a focused control, and a checkbox answers
+ * no other key at all. YouTube documents the same split — Space pauses when the player holds
+ * focus and activates the button when a button does — which is what hands are used to.
+ * Letters have no such owner, which is why they are the keys worth claiming.
+ *
+ * A link is in the list for Enter, which follows it, and stays in it for Space, which does
+ * not: Space over a link scrolls the page, and the page's scroll key is no more this
+ * element's to take than the link is.
+ *
+ * A control claiming Space that also holds focus loses nothing: the press is left alone and
+ * the platform clicks it, which is the same click by a shorter route.
+ */
+const ACTIVATION_KEYS = new Set([' ', 'enter']);
+const ACTIVATED_CONTROLS =
+  'button,input[type=button],input[type=submit],input[type=reset],input[type=checkbox],input[type=radio],a[href],summary,[role=button],[role=checkbox],[role=switch],[role=link]';
+
+/** Does the platform already press this node with Space or Enter? */
+function isActivated(node) {
+  return !!node && node.nodeType === 1 && node.matches(ACTIVATED_CONTROLS);
 }
 
 /**
@@ -444,6 +468,32 @@ export class MediaPlayer extends HgElement {
   seekBy(seconds) {
     if (!this.media || this.isLive) return;
     this.seekTo(this.media.currentTime + seconds);
+    this.hidePoster();
+  }
+
+  /**
+   * Hide the poster and the overlay, and catch the focus they are about to take with them.
+   *
+   * The overlay is a real button, so pressing it to play leaves focus on it — and this is the
+   * moment `display: none` removes it, which drops focus to `<body>`. Every key bound to this
+   * player then has nowhere to land: the next Space scrolls the page instead of pausing, and
+   * nothing on screen says why. Moving focus here is not taking focus, it is declining to lose
+   * it, which is the one case where moving it is the correct thing rather than the rude one.
+   *
+   * Only when the author made the player focusable. `focus()` on an element that cannot hold
+   * focus is a silent no-op, and there is nothing this can write on the author's element to fix
+   * that which would not also change where every click on the player lands.
+   */
+  hidePoster() {
+    const focused = focusedElement();
+    if (
+      this.hasAttribute('tabindex') &&
+      focused &&
+      focused !== this &&
+      focused.closest?.('.media-player-overlay,.media-player-poster')
+    ) {
+      this.focus();
+    }
     this.posterHidden = true;
   }
 
@@ -623,7 +673,7 @@ export class MediaPlayer extends HgElement {
   onPlay() {
     this.isPlaying = true;
     this.isBuffering = false;
-    this.posterHidden = true;
+    this.hidePoster();
     this.playLabel = 'Pause';
     this.resume();
     this.claimSession();
@@ -753,7 +803,7 @@ export class MediaPlayer extends HgElement {
     }
     this.pendingSeek = null;
     this.seekTo(seconds);
-    this.posterHidden = true;
+    this.hidePoster();
     this.interaction('seek', this.currentTime);
     this.resume();
   }
@@ -773,15 +823,19 @@ export class MediaPlayer extends HgElement {
    *
    * Letters, in practice. `toolbar-elemental` walks the control row with the arrows and
    * Home/End and every `<input type="range">` here answers them too, so binding an arrow
-   * would be taking a key back off the control that already answers it. Modified presses are
-   * left alone because they belong to the browser, and an already-handled one because
-   * whatever handled it got there first.
+   * would be taking a key back off the control that already answers it. Space and Enter go
+   * the same way whenever a button, a checkbox, a link or a `summary` holds focus: the press
+   * is spent there already, activating the control or — Space over a link — scrolling the
+   * page. Modified presses are left alone because they belong to the browser, and an
+   * already-handled one because whatever handled it got there first.
    */
   onKeyDown(event) {
     if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
     if (isTyping(event.target) || isTyping(focusedElement())) return;
 
     const pressed = event.key.toLowerCase();
+    if (ACTIVATION_KEYS.has(pressed) && (isActivated(event.target) || isActivated(focusedElement()))) return;
+
     const control = Array.from(this.querySelectorAll('[key]')).find(
       (node) => node.getAttribute('key').toLowerCase() === pressed
     );

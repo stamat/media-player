@@ -857,6 +857,51 @@ describe('video controls that hide themselves', () => {
   });
 });
 
+describe('the focus the overlay takes with it', () => {
+  /**
+   * A video player whose overlay holds focus, the way pressing it to play leaves it.
+   *
+   * jsdom applies none of `index.scss`, so the `display: none` that drops focus in a browser
+   * never happens here. What is asserted is the half this element owns: focus is moved off the
+   * overlay before the attribute that hides it is written.
+   */
+  function overlaid({ focusable = true } = {}) {
+    const player = mount(fakeMedia('video'));
+    if (focusable) player.setAttribute('tabindex', '-1');
+    const overlay = document.createElement('button');
+    overlay.className = 'media-player-overlay';
+    player.appendChild(overlay);
+    overlay.focus();
+    return { player, overlay };
+  }
+
+  test('playing from the overlay leaves focus on the player, not on the body it would fall to', () => {
+    const { player, overlay } = overlaid();
+    expect(document.activeElement).toBe(overlay);
+    player.onPlay();
+    expect(player.hasAttribute('poster-hidden')).toBe(true);
+    expect(document.activeElement).toBe(player);
+  });
+
+  test('a player the author left unfocusable keeps its hands off, rather than pretending', () => {
+    // `focus()` on an element with no `tabindex` is a silent no-op, and a player that acted as
+    // though it had worked would be a player reporting a fix it did not make.
+    const { player, overlay } = overlaid({ focusable: false });
+    player.onPlay();
+    expect(player.hasAttribute('poster-hidden')).toBe(true);
+    expect(document.activeElement).toBe(overlay);
+  });
+
+  test('focus on a control the poster never covered is left where it is', () => {
+    const { player } = overlaid();
+    const button = document.createElement('button');
+    player.appendChild(button);
+    button.focus();
+    player.onPlay();
+    expect(document.activeElement).toBe(button);
+  });
+});
+
 describe('keys the markup claims', () => {
   /**
    * A player with one keyed button, wired the way an author would wire it.
@@ -933,6 +978,56 @@ describe('keys the markup claims', () => {
     player.appendChild(range);
     press(range, 'k');
     expect(presses).toEqual(['k']);
+  });
+
+  test('Space belongs to the focused button, the one control that already answers it', () => {
+    // The split YouTube documents and every pair of hands expects: Space pauses when the
+    // player has focus, and presses the button when a button has it. Claimed off the focused
+    // button, a control row would be a row where Space does the same thing everywhere.
+    const { player, presses } = keyed(fakeMedia(), ' ');
+    const focused = document.createElement('button');
+    player.appendChild(focused);
+    const event = press(focused, ' ');
+    expect(presses).toEqual([]);
+    expect(event.defaultPrevented).toBe(false); // left for the platform to spend on the button
+  });
+
+  test('Space belongs to a focused checkbox too, which answers no other key', () => {
+    const { player, presses } = keyed(fakeMedia(), ' ');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    player.appendChild(checkbox);
+    expect(press(checkbox, ' ').defaultPrevented).toBe(false);
+    expect(presses).toEqual([]);
+  });
+
+  test('Enter belongs to a focused link the same way Space belongs to a button', () => {
+    const { player, presses } = keyed(fakeMedia(), 'Enter');
+    const link = document.createElement('a');
+    link.href = '#transcript';
+    player.appendChild(link);
+    expect(press(link, 'Enter').defaultPrevented).toBe(false);
+    expect(presses).toEqual([]);
+  });
+
+  test('a letter pressed on a focused button is still the player\'s', () => {
+    // The two activation keys are what a focused control owns, not every key pressed over
+    // one — a row of buttons is where a reader's focus sits, so claiming nothing there would
+    // leave the keys working only on the way to the first press.
+    const { player, presses } = keyed();
+    const focused = document.createElement('button');
+    player.appendChild(focused);
+    press(focused, 'k');
+    expect(presses).toEqual(['k']);
+  });
+
+  test('Space reaches the player when what holds focus does not answer it', () => {
+    const { player, presses } = keyed(fakeMedia(), ' ');
+    const range = document.createElement('input');
+    range.type = 'range';
+    player.appendChild(range);
+    press(range, ' ');
+    expect(presses).toEqual([' ']);
   });
 
   test('a modified press belongs to the browser', () => {

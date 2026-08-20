@@ -231,6 +231,12 @@
             },
             {
               "kind": "method",
+              "name": "hidePoster",
+              "description": "Hide the poster and the overlay, and catch the focus they are about to take with them.\n\nThe overlay is a real button, so pressing it to play leaves focus on it — and this is the\nmoment `display: none` removes it, which drops focus to `<body>`. Every key bound to this\nplayer then has nowhere to land: the next Space scrolls the page instead of pausing, and\nnothing on screen says why. Moving focus here is not taking focus, it is declining to lose\nit, which is the one case where moving it is the correct thing rather than the rude one.\n\nOnly when the author made the player focusable. `focus()` on an element that cannot hold\nfocus is a silent no-op, and there is nothing this can write on the author's element to fix\nthat which would not also change where every click on the player lands.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
               "name": "seekableSecond",
               "parameters": [
                 {
@@ -359,7 +365,7 @@
                   "name": "event"
                 }
               ],
-              "description": "A key pressed inside the player presses the control that claims it.\n\nThe map is the markup: `key=\"k\"` goes on the button the author already wrote, and this\nfinds that button and clicks it. So a key can never name an action that no visible\ncontrol names, there is no second list to keep in step with the first, and a `disabled`\nbutton ignores its key with no code here — the platform declines to dispatch a click on\none. The whole thing is opt-in twice over: no `on=` naming this means no listener at all,\nand no `key` on anything means nothing to find. Nothing here knows which of the two\nscopes it was bound in: `keydown@document:onKeyDown` hands it presses from anywhere on\nthe page and the lookup is the same one, which is why a page-wide binding still cannot\nreach an action no control on this player names.\n\nLetters, in practice. `toolbar-elemental` walks the control row with the arrows and\nHome/End and every `<input type=\"range\">` here answers them too, so binding an arrow\nwould be taking a key back off the control that already answers it. Modified presses are\nleft alone because they belong to the browser, and an already-handled one because\nwhatever handled it got there first."
+              "description": "A key pressed inside the player presses the control that claims it.\n\nThe map is the markup: `key=\"k\"` goes on the button the author already wrote, and this\nfinds that button and clicks it. So a key can never name an action that no visible\ncontrol names, there is no second list to keep in step with the first, and a `disabled`\nbutton ignores its key with no code here — the platform declines to dispatch a click on\none. The whole thing is opt-in twice over: no `on=` naming this means no listener at all,\nand no `key` on anything means nothing to find. Nothing here knows which of the two\nscopes it was bound in: `keydown@document:onKeyDown` hands it presses from anywhere on\nthe page and the lookup is the same one, which is why a page-wide binding still cannot\nreach an action no control on this player names.\n\nLetters, in practice. `toolbar-elemental` walks the control row with the arrows and\nHome/End and every `<input type=\"range\">` here answers them too, so binding an arrow\nwould be taking a key back off the control that already answers it. Space and Enter go\nthe same way whenever a button, a checkbox, a link or a `summary` holds focus: the press\nis spent there already, activating the control or — Space over a link — scrolling the\npage. Modified presses are left alone because they belong to the browser, and an\nalready-handled one because whatever handled it got there first."
             },
             {
               "kind": "method",

@@ -41,7 +41,7 @@ knob spliced into the markup would not survive the next `play`.
 <code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
-<media-player>
+<media-player tabindex="-1" on="keydown:onKeyDown">
   <audio
     controls
     src="sample/tone.wav"
@@ -120,7 +120,7 @@ knob spliced into the markup would not survive the next `play`.
       <span>Skip backward</span>
     </tooltip-elemental>
     <tooltip-elemental>
-      <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled>
+      <button on="click:togglePlay" key=" " bind="playLabel:attr#aria-label" disabled>
         <span class="media-player-play-icon"
           ><svg
             aria-hidden="true"
@@ -398,7 +398,8 @@ controls that fade out while playing — only when it wrapped a `<video>`.
 
 ```html
 <media-player
-  on="mousemove:showControls;fullscreenchange@document:onFullscreenChange"
+  tabindex="-1"
+  on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown"
 >
   <video
     controls
@@ -495,7 +496,12 @@ controls that fade out while playing — only when it wrapped a `<video>`.
       <span>Skip backward</span>
     </tooltip-elemental>
     <tooltip-elemental>
-      <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled>
+      <button
+        on="click:togglePlay"
+        key=" "
+        bind="playLabel:attr#aria-label"
+        disabled
+      >
         <span class="media-player-play-icon"
           ><svg
             aria-hidden="true"
@@ -760,7 +766,7 @@ testable right here rather than in a file you have to build yourself.
 <!-- One line, and it has to be: the whole opening tag of an unknown element must sit on a
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
-<media-player media-title="Big Buck Bunny" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+<media-player tabindex="-1" media-title="Big Buck Bunny" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
   <video controls playsinline preload="metadata" src="https://media.w3.org/2010/05/bunny/movie.mp4" poster="https://media.w3.org/2010/05/bunny/poster.png" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></video>
   <img class="media-player-poster" src="https://media.w3.org/2010/05/bunny/poster.png" alt="" />
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
@@ -774,7 +780,7 @@ testable right here rather than in a file you have to build yourself.
       <span>Skip backward</span>
     </tooltip-elemental>
     <tooltip-elemental>
-      <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
+      <button on="click:togglePlay" key=" " bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
       <span bind="playLabel">Play</span>
     </tooltip-elemental>
     <tooltip-elemental>
@@ -1013,11 +1019,11 @@ Two things follow from the key living on the button rather than in a list somewh
 `on=` says where the listener goes, so the reach of the keys is one attribute and not an
 option:
 
-| Written as                        | Answers                          | Costs                                                                                                         |
-| --------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| nothing                           | nothing — there is no listener   | none, and this is the default                                                                                 |
-| `on="keydown:onKeyDown"`          | while focus is inside the player | the reader has to tab or click into the player first, which for a keyboard shortcut is most of the point gone |
-| `on="keydown@document:onKeyDown"` | anywhere on the page             | the page gives up those keys, and two players both bound this way both answer one press                       |
+| Written as                        | Answers                          | Costs                                                                                                                                         |
+| --------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| nothing                           | nothing — there is no listener   | none, and this is the default                                                                                                                 |
+| `on="keydown:onKeyDown"`          | while focus is inside the player | the reader has to tab or click into the player first, which for a keyboard shortcut is most of the point gone                                 |
+| `on="keydown@document:onKeyDown"` | anywhere on the page             | the page gives up those keys — <kbd>Space</kbd> included, which is its scroll key — and two players both bound this way both answer one press |
 
 The last one is what a shortcut usually means, and it is the one to write on a page built
 around a single player — an episode page, a video page. hydrargyri puts the listener on
@@ -1026,22 +1032,70 @@ it belongs to. What it cannot do is share: two players bound page-wide both hear
 <kbd>k</kbd> and both press their own play button. With more than one on a page, bind the
 focused form, or bind the page-wide form on exactly one of them.
 
-No sample on this page binds either, and the reason is the page: three players and several
-thousand words of prose is precisely where a page-wide <kbd>k</kbd> is somebody else's key.
-Copy a sample and the decision is yours to make once, in markup.
+Focus is yours to place, and the focused form depends on where it lands: a click leaves focus
+on the nearest focusable thing, and `<media-player>` is not one until you say so. Write
+`tabindex="-1"` on it and clicking the video — or anywhere in the row that is not itself a
+control — leaves focus inside the player, which is what makes <kbd>Space</kbd> answer
+afterwards. The element never moves focus itself: pulling it back after a button press would
+move a screen reader's cursor mid-sentence, and there is no quiet way to do that.
+
+It does move focus in one place, and it is the opposite case: the click-to-play overlay is a
+real button, so pressing it to play leaves focus on it — and starting playback is the moment
+the overlay is hidden, which drops that focus to `<body>` and takes every key on this player
+with it. The next <kbd>Space</kbd> would scroll the page rather than pause. So focus moves to
+the player instead, which is not taking focus but declining to lose it. It needs the
+`tabindex` to land on: without one there is nowhere to put it, and the element leaves it
+alone rather than pretend.
+
+`theme.css` draws a ring on a focused player, so a reader holding the keys can see that they
+do. On `:focus`, which is the opposite of the rule it uses for the buttons: those get
+`:focus-visible`, the heuristic that
+[hides a ring you placed with a finger](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible)
+on the grounds that you know where you clicked. A `tabindex="-1"` player has no Tab to arrive
+by, so pointer is nearly the only way focus gets there, and the same rule would hide the ring
+every time it mattered. It is also not saying the same thing: on a button the ring says where
+you are, here it says the keys are live, which a click gives no other sign of. The ring sits
+outside the box because inside it is invisible: on a video the overlay button covers the whole
+player and the poster sits under that, and both paint over it. Style
+`media-player:focus { outline: none }` if you would rather it stayed quiet.
+
+With it on, a `key=" "` answers from every place a reader is likely to leave focus: the
+player, the media element, the scrubber, and the big overlay button on a video — none of
+which scroll on <kbd>Space</kbd> any more, which is the trade it is buying. The overlay
+is the one the player keeps its hands off — a focused button is activated by the press it
+already owns — and it lands on the same action regardless, since the overlay in these samples
+is the play button. That is only worth knowing for the button it is not: focus parked on mute
+or fullscreen spends <kbd>Space</kbd> there, which is the point of the rule and the thing
+YouTube gets asked about.
+
+The audio and video samples above both bind the focused form, so this is one to press rather
+than read: `keydown:onKeyDown` on the player, `key=" "` on its play button and `tabindex="-1"`
+so a click on the bar leaves focus inside. Put focus anywhere in one — the scrubber, the
+picture, the row — and <kbd>Space</kbd> plays and pauses, except on a button, where it presses
+the button.
+
+No sample binds the page-wide form. Not because it would misbehave here: a preview runs in
+its own frame, so a <kbd>k</kbd> claimed inside one never reaches this page. It is that the
+markup a sample hands you is markup you paste, and page-wide is the decision worth making
+once, on your own page, with the scroll key in mind.
 
 ### What a press has to get past first
 
-| Press                                                                     | Who it belongs to                                                                                                                                                                                                 |
-| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The arrows, <kbd>Home</kbd>, <kbd>End</kbd>                               | the sliders and the control row, which answer them already                                                                                                                                                        |
-| Anything with <kbd>Ctrl</kbd>, <kbd>⌘</kbd> or <kbd>Alt</kbd> held        | the browser                                                                                                                                                                                                       |
-| A key typed into a text field, a `<select>` or anything `contenteditable` | whatever is being typed into — a comment box under a player is the ordinary case, not the odd one. Found through an open shadow root too, since a `keydown` reports the component rather than the field inside it |
-| A key already handled by something else                                   | whatever called `preventDefault` first                                                                                                                                                                            |
+| Press                                                                                           | Who it belongs to                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The arrows, <kbd>Home</kbd>, <kbd>End</kbd>                                                     | the sliders and the control row, which answer them already                                                                                                                                                                                                                                                                                                             |
+| <kbd>Space</kbd> or <kbd>Enter</kbd> with a button, a checkbox, a link or a `<summary>` focused | whatever the press does there already — it activates a button, a checkbox or a `<summary>`, it follows a link on <kbd>Enter</kbd>, and on <kbd>Space</kbd> over a link it scrolls the page. It is the split [YouTube documents](https://support.google.com/youtube/answer/7631406): Space pauses when the player holds focus and presses the button when a button does |
+| Anything with <kbd>Ctrl</kbd>, <kbd>⌘</kbd> or <kbd>Alt</kbd> held                              | the browser                                                                                                                                                                                                                                                                                                                                                            |
+| A key typed into a text field, a `<select>` or anything `contenteditable`                       | whatever is being typed into — a comment box under a player is the ordinary case, not the odd one. Found through an open shadow root too, since a `keydown` reports the component rather than the field inside it                                                                                                                                                      |
+| A key already handled by something else                                                         | whatever called `preventDefault` first                                                                                                                                                                                                                                                                                                                                 |
 
-A press that gets past all four and finds a `key` is taken off the page with
+A press that gets past all five and finds a `key` is taken off the page with
 `preventDefault`, which is the part to weigh before binding `@document`: a letter the player
-claims is a letter the page no longer sees. One field it cannot see is one inside a _closed_
+claims is a letter the page no longer sees. <kbd>Space</kbd> is the expensive one to claim
+that way, because unclaimed it scrolls — bound `@document` it stops scrolling the whole page,
+not only the player. That is the reason YouTube's always-works key is <kbd>k</kbd> and its
+<kbd>Space</kbd> reaches no further than the player: a page that has given up its scroll key
+has given up more than a shortcut is worth. One field it cannot see is one inside a _closed_
 shadow root — the platform reports the component and offers no way in, so its letters are
 taken. A page with one of those wants the focused binding.
 

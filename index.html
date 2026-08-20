@@ -78,7 +78,7 @@ knob spliced into the markup would not survive the next <code>play</code>.</p>
      honest rather than tidy: 1.5rem a side renders it 48px narrower than the page a reader
      would paste this markup onto, which is enough to wrap the video row to a third line on
      a phone and show a defect the markup does not have. -->
-<code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
+<code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;-1&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;keydown:onKeyDown&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">audio</span>
     <span class="hljs-attr">controls</span>
     <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/tone.wav&quot;</span>
@@ -157,7 +157,7 @@ knob spliced into the markup would not survive the next <code>play</code>.</p>
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Skip backward<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">key</span>=<span class="hljs-string">&quot; &quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>
           &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
             <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
@@ -414,7 +414,8 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
      would paste this markup onto, which is enough to wrap the video row to a third line on
      a phone and show a defect the markup does not have. -->
 <code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>
-  <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>
+  <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;-1&quot;</span>
+  <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown&quot;</span>
 &gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
     <span class="hljs-attr">controls</span>
@@ -511,7 +512,12 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Skip backward<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span>
+        <span class="hljs-attr">key</span>=<span class="hljs-string">&quot; &quot;</span>
+        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span>
+        <span class="hljs-attr">disabled</span>
+      &gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>
           &gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
             <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
@@ -766,7 +772,7 @@ testable right here rather than in a file you have to build yourself.</p>
 <!-- One line, and it has to be: the whole opening tag of an unknown element must sit on a
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
-<media-player media-title="Big Buck Bunny" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+<media-player tabindex="-1" media-title="Big Buck Bunny" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
   <video controls playsinline preload="metadata" src="https://media.w3.org/2010/05/bunny/movie.mp4" poster="https://media.w3.org/2010/05/bunny/poster.png" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></video>
   <img class="media-player-poster" src="https://media.w3.org/2010/05/bunny/poster.png" alt="" />
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
@@ -780,7 +786,7 @@ testable right here rather than in a file you have to build yourself.</p>
       <span>Skip backward</span>
     </tooltip-elemental>
     <tooltip-elemental>
-      <button on="click:togglePlay" bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
+      <button on="click:togglePlay" key=" " bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
       <span bind="playLabel">Play</span>
     </tooltip-elemental>
     <tooltip-elemental>
@@ -1023,7 +1029,7 @@ option:</p>
 <tr>
 <td><code>on=&quot;keydown@document:onKeyDown&quot;</code></td>
 <td>anywhere on the page</td>
-<td>the page gives up those keys, and two players both bound this way both answer one press</td>
+<td>the page gives up those keys — <kbd>Space</kbd> included, which is its scroll key — and two players both bound this way both answer one press</td>
 </tr>
 </tbody></table>
 <p>The last one is what a shortcut usually means, and it is the one to write on a page built
@@ -1032,9 +1038,47 @@ around a single player — an episode page, a video page. hydrargyri puts the li
 it belongs to. What it cannot do is share: two players bound page-wide both hear the same
 <kbd>k</kbd> and both press their own play button. With more than one on a page, bind the
 focused form, or bind the page-wide form on exactly one of them.</p>
-<p>No sample on this page binds either, and the reason is the page: three players and several
-thousand words of prose is precisely where a page-wide <kbd>k</kbd> is somebody else&#39;s key.
-Copy a sample and the decision is yours to make once, in markup.</p>
+<p>Focus is yours to place, and the focused form depends on where it lands: a click leaves focus
+on the nearest focusable thing, and <code>&lt;media-player&gt;</code> is not one until you say so. Write
+<code>tabindex=&quot;-1&quot;</code> on it and clicking the video — or anywhere in the row that is not itself a
+control — leaves focus inside the player, which is what makes <kbd>Space</kbd> answer
+afterwards. The element never moves focus itself: pulling it back after a button press would
+move a screen reader&#39;s cursor mid-sentence, and there is no quiet way to do that.</p>
+<p>It does move focus in one place, and it is the opposite case: the click-to-play overlay is a
+real button, so pressing it to play leaves focus on it — and starting playback is the moment
+the overlay is hidden, which drops that focus to <code>&lt;body&gt;</code> and takes every key on this player
+with it. The next <kbd>Space</kbd> would scroll the page rather than pause. So focus moves to
+the player instead, which is not taking focus but declining to lose it. It needs the
+<code>tabindex</code> to land on: without one there is nowhere to put it, and the element leaves it
+alone rather than pretend.</p>
+<p><code>theme.css</code> draws a ring on a focused player, so a reader holding the keys can see that they
+do. On <code>:focus</code>, which is the opposite of the rule it uses for the buttons: those get
+<code>:focus-visible</code>, the heuristic that
+<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible">hides a ring you placed with a finger</a>
+on the grounds that you know where you clicked. A <code>tabindex=&quot;-1&quot;</code> player has no Tab to arrive
+by, so pointer is nearly the only way focus gets there, and the same rule would hide the ring
+every time it mattered. It is also not saying the same thing: on a button the ring says where
+you are, here it says the keys are live, which a click gives no other sign of. The ring sits
+outside the box because inside it is invisible: on a video the overlay button covers the whole
+player and the poster sits under that, and both paint over it. Style
+<code>media-player:focus { outline: none }</code> if you would rather it stayed quiet.</p>
+<p>With it on, a <code>key=&quot; &quot;</code> answers from every place a reader is likely to leave focus: the
+player, the media element, the scrubber, and the big overlay button on a video — none of
+which scroll on <kbd>Space</kbd> any more, which is the trade it is buying. The overlay
+is the one the player keeps its hands off — a focused button is activated by the press it
+already owns — and it lands on the same action regardless, since the overlay in these samples
+is the play button. That is only worth knowing for the button it is not: focus parked on mute
+or fullscreen spends <kbd>Space</kbd> there, which is the point of the rule and the thing
+YouTube gets asked about.</p>
+<p>The audio and video samples above both bind the focused form, so this is one to press rather
+than read: <code>keydown:onKeyDown</code> on the player, <code>key=&quot; &quot;</code> on its play button and <code>tabindex=&quot;-1&quot;</code>
+so a click on the bar leaves focus inside. Put focus anywhere in one — the scrubber, the
+picture, the row — and <kbd>Space</kbd> plays and pauses, except on a button, where it presses
+the button.</p>
+<p>No sample binds the page-wide form. Not because it would misbehave here: a preview runs in
+its own frame, so a <kbd>k</kbd> claimed inside one never reaches this page. It is that the
+markup a sample hands you is markup you paste, and page-wide is the decision worth making
+once, on your own page, with the scroll key in mind.</p>
 <h3 id="what-a-press-has-to-get-past-first">What a press has to get past first<a class="heading-anchor" href="#what-a-press-has-to-get-past-first" tabindex="-1" aria-hidden="true"></a></h3>
 <table>
 <thead>
@@ -1046,6 +1090,10 @@ Copy a sample and the decision is yours to make once, in markup.</p>
 <tbody><tr>
 <td>The arrows, <kbd>Home</kbd>, <kbd>End</kbd></td>
 <td>the sliders and the control row, which answer them already</td>
+</tr>
+<tr>
+<td><kbd>Space</kbd> or <kbd>Enter</kbd> with a button, a checkbox, a link or a <code>&lt;summary&gt;</code> focused</td>
+<td>whatever the press does there already — it activates a button, a checkbox or a <code>&lt;summary&gt;</code>, it follows a link on <kbd>Enter</kbd>, and on <kbd>Space</kbd> over a link it scrolls the page. It is the split <a href="https://support.google.com/youtube/answer/7631406">YouTube documents</a>: Space pauses when the player holds focus and presses the button when a button does</td>
 </tr>
 <tr>
 <td>Anything with <kbd>Ctrl</kbd>, <kbd>⌘</kbd> or <kbd>Alt</kbd> held</td>
@@ -1060,9 +1108,13 @@ Copy a sample and the decision is yours to make once, in markup.</p>
 <td>whatever called <code>preventDefault</code> first</td>
 </tr>
 </tbody></table>
-<p>A press that gets past all four and finds a <code>key</code> is taken off the page with
+<p>A press that gets past all five and finds a <code>key</code> is taken off the page with
 <code>preventDefault</code>, which is the part to weigh before binding <code>@document</code>: a letter the player
-claims is a letter the page no longer sees. One field it cannot see is one inside a <em>closed</em>
+claims is a letter the page no longer sees. <kbd>Space</kbd> is the expensive one to claim
+that way, because unclaimed it scrolls — bound <code>@document</code> it stops scrolling the whole page,
+not only the player. That is the reason YouTube&#39;s always-works key is <kbd>k</kbd> and its
+<kbd>Space</kbd> reaches no further than the player: a page that has given up its scroll key
+has given up more than a shortcut is worth. One field it cannot see is one inside a <em>closed</em>
 shadow root — the platform reports the component and offers no way in, so its letters are
 taken. A page with one of those wants the focused binding.</p>
 <h2 id="tooltips-on-the-controls">Tooltips on the controls<a class="heading-anchor" href="#tooltips-on-the-controls" tabindex="-1" aria-hidden="true"></a></h2>

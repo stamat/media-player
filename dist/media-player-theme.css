@@ -76,6 +76,11 @@ media-player button:focus-visible {
   outline-offset: 2px;
 }
 
+media-player:focus {
+  outline: 2px solid var(--media-player-accent);
+  outline-offset: 2px;
+}
+
 media-player button:disabled {
   background: none;
   color: color-mix(in srgb, var(--media-player-color) 45%, transparent);

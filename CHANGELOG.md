@@ -31,6 +31,54 @@ for the person who wrote the code.
 
 ### Fixed
 
+- **Playing from the overlay dropped focus, and the next <kbd>Space</kbd> scrolled the page.**
+  The click-to-play overlay is a real button, so pressing it left focus on it — and that press
+  is exactly what sets `poster-hidden`, whose stylesheet rule takes the overlay out with
+  `display: none`. A browser drops focus from an element it has just stopped rendering, so
+  focus landed on `<body>`, the player's own `keydown` listener never saw the next press, and
+  <kbd>Space</kbd> did what Space does on a page with focus nowhere: it scrolled. It reads as
+  keys that stopped working for no reason, one press after they worked. Focus now moves to the
+  player as the overlay goes, which is the one thing this element does with focus, and the one
+  case where moving it is correct rather than rude: it is not taking focus, it is declining to
+  lose it. It needs a `tabindex` on the player to land on — without one the element leaves
+  focus alone rather than call a `focus()` that silently does nothing. The three places that
+  hid the poster now go through one method, so none of them can forget.
+
+- **The samples answer <kbd>Space</kbd>.** Everything the manual said about keys was
+  a thing to read rather than press: no sample bound a `keydown`, no control carried a `key`,
+  and no player was focusable, so a reader who tried it on this page got nothing and no way to
+  tell a documented feature from a broken one. The audio and video samples now carry
+  `keydown:onKeyDown`, `key=" "` on their play buttons and `tabindex="-1"` on the player — the
+  focused scope, which reaches no further than the sample it is in. The page-wide form still
+  appears only as markup to copy.
+
+- **A focused player shows a ring.** `tabindex="-1"` on `<media-player>` is what makes a
+  click leave focus inside it, and the keys answer from there — but nothing said so: `style.css`
+  paints nothing and `theme.css` had a ring for every button and none for the player around
+  them. `theme.css` draws one now, on `:focus` — deliberately not the `:focus-visible` the
+  buttons use, because a `tabindex="-1"` player cannot be reached by Tab, so the pointer is
+  nearly the only way focus arrives and `:focus-visible` is the heuristic that hides exactly
+  that. The two rings say different things anyway: on a button, where you are; on the player,
+  that the keys are live. It sits two pixels outside the box rather than inside it, because a
+  video's overlay button covers the whole player with the poster under it, and both paint over
+  a ring drawn inside. `media-player:focus { outline: none }` turns it off.
+
+- **A claimed <kbd>Space</kbd> pressed the wrong control.** `key` matched whatever an author
+  wrote in it, `key=" "` included, and a claimed press was taken off the page with
+  `preventDefault` wherever it landed — including on a focused button, which then never
+  activated, and on a focused checkbox, whose only key it is. Space and Enter now belong to a
+  focused button, checkbox, link or `<summary>`, the way the arrows already belong to the
+  sliders — activating it, or in the one case of Space over a link, scrolling the page, which
+  is the browser's just as much. Every other key is unchanged, and a control that claims Space
+  and holds focus is clicked by the platform instead, which is the same click by a shorter
+  route. It is the
+  split [YouTube documents](https://support.google.com/youtube/answer/7631406) — Space pauses
+  when the player holds focus and activates the button when a button does. No sample binds
+  either key, so nothing on the page behaves differently; this was waiting for the first
+  author who wrote one. The manual gains the other half of it: where focus lands is yours to
+  place, `tabindex="-1"` on the player is what makes a click leave focus inside it, and the
+  element still never moves focus itself.
+
 - **The published page's Options tabs were empty.** `custom-elements.json` was not among the
   files staged for GitHub Pages, so every sample's generated knobs had nothing to read —
   working locally, where the file sits beside `index.html`, and broken on the site. It is
