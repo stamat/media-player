@@ -11,6 +11,47 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+### Added
+
+- **A background loop, and the one button it owes you.** The manual gains a guide for the
+  muted autoplaying `<video>` used as decoration: four handler names rather than ten, no
+  scrubber and no clock, and a play/pause button that is not optional — an autoplaying
+  animation longer than five seconds needs a way to stop it under
+  [WCAG 2.2.2](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html), and the
+  element already has the button for it.
+
+### Fixed
+
+- **The published page's Options tabs were empty.** `custom-elements.json` was not among the
+  files staged for GitHub Pages, so every sample's generated knobs had nothing to read —
+  working locally, where the file sits beside `index.html`, and broken on the site. It is
+  copied and asserted now, like the other three.
+
+- **The volume slider sat a hair off the scrubber above it.** It carries the same
+  `margin-right` the scrubber does, so the two right edges line up in the audio sample rather
+  than missing each other by 7px.
+
+- **The size numbers said 9.4 kB.** The comparison table's first row, and the paragraph under
+  it, were quoting figures the build had outgrown: `dist/media-player.min.mjs` gzips to
+  11.4 kB, and did at 0.1.1 too, so the number was already wrong when it shipped. The
+  stylesheet line beneath it counted the elementals' three themes and not the four structure
+  sheets under them, and called a bundle that carries four elementals three. Every sheet is
+  named with its own figure now, each gzipped on its own the way a browser fetches it. The
+  four columns beside this one are as they were — they were not re-measured.
+
+- **The README never said the look was optional.** `media-player-theme.css` is named in the
+  install paragraph now, so the sheet you can leave out is visible from the pitch and not
+  only from the manual.
+
+## [0.1.1] - 2026-08-18
+
+### Changed
+
+- **The package is `media-player-element` on npm.** The element is still `<media-player>` and
+  nothing in a page changes; only the install line and the import specifier do. 0.1.0 was
+  tagged but never reached the registry, so `media-player-element` is the first and only name
+  anything was published under — there is nothing to migrate from.
+
 ## [0.1.0] - 2026-08-18
 
 ### Added

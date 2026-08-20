@@ -1307,7 +1307,7 @@ win.</p>
 </thead>
 <tbody><tr>
 <td><strong>Size, gzipped</strong></td>
-<td><strong>9.4 kB</strong></td>
+<td><strong>11.4 kB</strong></td>
 <td>32 kB</td>
 <td>42 kB</td>
 <td>40 kB</td>
@@ -1381,9 +1381,11 @@ win.</p>
 <p>Sizes are each package&#39;s browser bundle, gzipped: Plyr and Video.js as published
 (<code>dist/plyr.min.js</code>, <code>dist/video.min.js</code>), media-chrome bundled from its package entry with
 esbuild, Vidstack from <code>cdn.vidstack.io/player</code>. This one is <code>dist/media-player.min.mjs</code>,
-which carries hydrargyri and the three elementals inside it — everything the player needs
-except the stylesheets: its own are another 2 kB, and the elementals&#39; about 2.5 kB more
-with their themes. Every one of those numbers moves with a release; measure before quoting.</p>
+which carries hydrargyri and the four elementals inside it — everything the player needs
+except the stylesheets: its own structure sheet is 0.8 kB and the theme 1.4 kB more, the
+elementals&#39; four structure sheets 1.2 kB and their three themes 2.5 kB more, each gzipped on
+its own the way a browser fetches it. Every one of those numbers moves with a release;
+measure before quoting.</p>
 <p>Where this loses is the bottom of that table, and it loses there on purpose. <strong>Plyr and
 Vidstack are the right answer for YouTube and Vimeo</strong>, and Video.js for the long tail of
 formats and plugins. None of that is planned here.</p>
