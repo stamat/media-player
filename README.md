@@ -18,11 +18,7 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
 
 ```html
 <media-player>
-  <audio
-    controls
-    src="/episode.mp3"
-    on="loadedmetadata:onLoaded;play:onPlay;pause:onPause;progress:onProgress"
-  ></audio>
+  <audio controls src="/episode.mp3"></audio>
 
   <toolbar-elemental
     class="media-player-controls"

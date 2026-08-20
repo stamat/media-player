@@ -2,7 +2,8 @@
  * What the player guarantees, and what is left to a browser.
  *
  * Covered here: the progressive-enhancement contract (native controls off on upgrade, back
- * on the way out), readiness from any of the five metadata events, live streams, the volume
+ * on the way out), the wiring the element declares itself (`static wires`, so the media
+ * element needs no `on=`), readiness from any of the five metadata events, live streams, the volume
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
  * track, the video controls' hide timer, the labels the buttons announce themselves by, the
  * keys a control claims and the presses that are somebody else's, the OS media panel against
@@ -100,6 +101,30 @@ describe('the progressive-enhancement contract', () => {
     expect(player.duration).toBe(120);
     expect(player.isReady).toBe(true);
     expect(media.controls).toBe(false);
+  });
+});
+
+describe('the wiring the element carries itself', () => {
+  test('the media element needs no on attribute — play, pause and volume reach the player anyway', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    media.dispatchEvent(new Event('play'));
+    expect(player.hasAttribute('is-playing')).toBe(true);
+    media.dispatchEvent(new Event('pause'));
+    expect(player.hasAttribute('is-playing')).toBe(false);
+    media.volume = 0.4;
+    media.dispatchEvent(new Event('volumechange'));
+    expect(player.volumePercent).toBe(40);
+  });
+
+  test('a pair the markup still carries from before the wires fires once, not twice', () => {
+    const media = fakeMedia();
+    media.setAttribute('on', 'play:onPlay');
+    const player = mount(media);
+    const seen = [];
+    player.addEventListener('media-player-interaction', (e) => seen.push(e.detail.type));
+    media.dispatchEvent(new Event('play'));
+    expect(seen).toEqual(['play']);
   });
 });
 

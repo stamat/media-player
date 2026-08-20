@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "book-of-elementals": "^0.11.1",
-    "hydrargyri": "^2.1.1"
+    "hydrargyri": "^2.2.0"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",

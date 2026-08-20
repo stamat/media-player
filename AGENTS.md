@@ -57,8 +57,9 @@ script/lint      # eslint + stylelint (the authority; CI runs it)
   `hasAttribute()` in tests rather than `toBe(false)`.
 - **Five events mean "metadata arrived".** `durationchange`, `loadedmetadata`, `loadeddata`,
   `canplay` and `canplaythrough` are used differently across browsers, and a small file can
-  fire all of them before the element upgrades. They all route to `loaded()`, which is
-  idempotent, and `connected()` calls it once more for the file that was ready first.
+  fire all of them before the element upgrades. They all route to `loaded()` — via
+  `static wires`, like every media-element listener; the markup writes no `on=` there — and
+  `connected()` calls it once more for the file that was ready first.
 - **jsdom implements no playback.** Tests define `duration`, `currentTime`, `paused`,
   `volume` and `muted` on the element instance and stub `play`/`pause`. Fullscreen and
   `cuechange` are not testable here and are documented as uncovered at the top of the test

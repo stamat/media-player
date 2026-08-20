@@ -79,14 +79,7 @@ knob spliced into the markup would not survive the next <code>play</code>.</p>
      would paste this markup onto, which is enough to wrap the video row to a third line on
      a phone and show a defect the markup does not have. -->
 <code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;-1&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;keydown:onKeyDown&quot;</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">audio</span>
-    <span class="hljs-attr">controls</span>
-    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/tone.wav&quot;</span>
-    <span class="hljs-attr">preload</span>=<span class="hljs-string">&quot;metadata&quot;</span>
-    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
-             play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
-             ended:onEnded;progress:onProgress;volumechange:onVolumeChange&quot;</span>
-  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">audio</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/tone.wav&quot;</span> <span class="hljs-attr">preload</span>=<span class="hljs-string">&quot;metadata&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>
 
   <span class="hljs-tag">&lt;<span class="hljs-name">toolbar-elemental</span>
     <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span>
@@ -423,16 +416,12 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
     <span class="hljs-attr">preload</span>=<span class="hljs-string">&quot;metadata&quot;</span>
     <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.mp4&quot;</span>
     <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;sample/rollout.jpg&quot;</span>
-    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
-        play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
-        ended:onEnded;progress:onProgress;volumechange:onVolumeChange&quot;</span>
   &gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">track</span>
       <span class="hljs-attr">kind</span>=<span class="hljs-string">&quot;captions&quot;</span>
       <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.en.vtt&quot;</span>
       <span class="hljs-attr">srclang</span>=<span class="hljs-string">&quot;en&quot;</span>
       <span class="hljs-attr">label</span>=<span class="hljs-string">&quot;English&quot;</span>
-      <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;cuechange:onCue&quot;</span>
     /&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
 
@@ -773,7 +762,7 @@ testable right here rather than in a file you have to build yourself.</p>
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
 <media-player tabindex="-1" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
-  <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></video>
+  <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg"></video>
   <img class="media-player-poster" src="sample/tears-of-steel.jpg" alt="" />
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
@@ -840,14 +829,7 @@ seconds has to be stoppable</strong> —
 — and a twelve-second loop is past that line the second time it plays. That is one button,
 and wiring one button is the smallest thing <code>&lt;media-player&gt;</code> does.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;video-background&quot;</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
-    <span class="hljs-attr">autoplay</span>
-    <span class="hljs-attr">muted</span>
-    <span class="hljs-attr">loop</span>
-    <span class="hljs-attr">playsinline</span>
-    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.mp4&quot;</span>
-    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;loadedmetadata:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause&quot;</span>
-  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">autoplay</span> <span class="hljs-attr">muted</span> <span class="hljs-attr">loop</span> <span class="hljs-attr">playsinline</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.mp4&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
 
   <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
     <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;video-background-toggle&quot;</span>
@@ -859,13 +841,12 @@ and wiring one button is the smallest thing <code>&lt;media-player&gt;</code> do
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
-<p>Four handler names and no more. <code>loadedmetadata</code> and <code>canplay</code> route to <code>onLoaded</code>, which is
-what takes <code>disabled</code> off the button once there is something to press; <code>play</code> and <code>pause</code>
-keep <code>playLabel</code> and the <code>is-playing</code> attribute honest, and those two are the accessible name
-and the icon swap. The two icon spans carry the same class names as the play button further
-up the page, because the rule that swaps them is in <code>style.css</code> and asks nothing of
-where the button sits. Every other handler in the samples above drives a control this one
-does not have.</p>
+<p>Nothing on the <code>&lt;video&gt;</code> but what the platform reads — the element listens to it by itself,
+here as everywhere. Metadata arriving is what takes <code>disabled</code> off the button once there is
+something to press; <code>play</code> and <code>pause</code> keep <code>playLabel</code> and the <code>is-playing</code> attribute
+honest, and those two are the accessible name and the icon swap. The two icon spans carry
+the same class names as the play button further up the page, because the rule that swaps
+them is in <code>style.css</code> and asks nothing of where the button sits.</p>
 <pre><code class="hljs language-css"><span class="hljs-selector-class">.hero</span> {
   <span class="hljs-attribute">position</span>: relative;
   <span class="hljs-attribute">isolation</span>: isolate;
@@ -898,8 +879,8 @@ own button with it. The content is written after the player and positioned, whic
 to paint it on top — and it is also what decides the collision, so keep the toggle in a
 corner your text does not reach.</p>
 <p>Two things it costs, both worth knowing before pasting it.</p>
-<p><strong>The lock screen.</strong> <code>play:onPlay</code> claims the OS media panel; it is the same handler as
-everywhere else on this page and it does not know this video is wallpaper. Leave
+<p><strong>The lock screen.</strong> Playing claims the OS media panel — the element&#39;s own <code>play</code> listener,
+the same one behind every player on this page — and it does not know this video is wallpaper. Leave
 <code>media-title</code>, <code>artist</code>, <code>album</code> and <code>artwork</code> off and there is nothing to name it with, so
 the metadata is cleared rather than set. <code>poster</code> is the one to watch: a <code>&lt;video poster&gt;</code> is
 read as artwork, so a background video that carries one puts a picture on the panel with no
@@ -1283,10 +1264,19 @@ properties — the first five live in the theme, the last two in the structure s
 </tbody></table>
 <h2 id="handlers-you-can-name">Handlers you can name<a class="heading-anchor" href="#handlers-you-can-name" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The samples above are the working answer; this is the index — every name <code>on=</code> can call, for
-the moment you are building a control row no sample here draws. It is the same list
-<code>custom-elements.json</code> publishes, which is what an editor reads.</p>
+the moment you are building a control row no sample here draws. It is the list
+<code>custom-elements.json</code> publishes minus the handlers the element wires itself, which an
+editor still reads.</p>
 <p>Which element you write the <code>on=</code> on matters as much as which name you write in it. There are
-four places, and a name from one list does nothing on another.</p>
+two places to write one — your controls and the <code>&lt;media-player&gt;</code> itself — and a name from one
+list does nothing on the other.</p>
+<p>The <code>&lt;audio&gt;</code>, the <code>&lt;video&gt;</code> and a <code>&lt;track&gt;</code> inside them take no <code>on=</code> at all. The listeners
+that keep the element in step with playback — the five metadata events, <code>play</code> and <code>pause</code>,
+<code>waiting</code> and <code>playing</code>, <code>ended</code>, <code>progress</code>, <code>volumechange</code>, and a track&#39;s <code>cuechange</code> into
+<code>captionText</code> — are the element&#39;s own plumbing, declared in its <code>static wires</code> and attached
+by <a href="https://github.com/stamat/hydrargyri">hydrargyri</a> when the element upgrades. Markup from
+an earlier version that still carries those pairs keeps firing once: a pair the attribute
+already wired is skipped, never doubled.</p>
 <p><strong>On your controls</strong> — a <code>&lt;button&gt;</code>, a range input, anything a person presses:</p>
 <table>
 <thead>
@@ -1338,52 +1328,6 @@ four places, and a name from one list does nothing on another.</p>
 <tr>
 <td><code>click:toggleFullscreen</code></td>
 <td>the player element, or the video itself on an iPhone, which has never allowed anything else</td>
-</tr>
-</tbody></table>
-<p><strong>On the <code>&lt;audio&gt;</code> or <code>&lt;video&gt;</code></strong> — the listeners that keep the element in step with playback:</p>
-<table>
-<thead>
-<tr>
-<th>Write</th>
-<th>Fires when</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>loadedmetadata:onLoaded</code>, <code>durationchange:onLoaded</code>, <code>loadeddata:onLoaded</code>, <code>canplay:onLoaded</code>, <code>canplaythrough:onLoaded</code></td>
-<td>the duration is known and the controls come alive — bind whichever of the five you like, in any combination: browsers disagree about which arrives and <code>onLoaded</code> is idempotent</td>
-</tr>
-<tr>
-<td><code>play:onPlay</code>, <code>pause:onPause</code></td>
-<td>playback started or stopped, however it was started or stopped</td>
-</tr>
-<tr>
-<td><code>waiting:onWaiting</code>, <code>playing:onPlaying</code></td>
-<td>buffering began, buffering ended — the <code>is-buffering</code> attribute</td>
-</tr>
-<tr>
-<td><code>ended:onEnded</code></td>
-<td>playback reached the end, and the clock is painted there rather than a frame short of it</td>
-</tr>
-<tr>
-<td><code>progress:onProgress</code></td>
-<td>more of the file arrived; <code>buffered</code> follows, in seconds</td>
-</tr>
-<tr>
-<td><code>volumechange:onVolumeChange</code></td>
-<td>the volume or the mute changed anywhere — your slider, the native controls, the OS panel</td>
-</tr>
-</tbody></table>
-<p><strong>On a <code>&lt;track&gt;</code> inside it</strong>, for captions you draw yourself rather than let the browser draw:</p>
-<table>
-<thead>
-<tr>
-<th>Write</th>
-<th>Does</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>cuechange:onCue</code></td>
-<td>puts the active caption line in <code>captionText</code>, for a page that draws its own subtitles</td>
 </tr>
 </tbody></table>
 <p><strong>On <code>&lt;media-player&gt;</code> itself:</strong></p>

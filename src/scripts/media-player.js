@@ -177,6 +177,14 @@ function focusedElement() {
  * what fires, `bind` says where state lands. Nothing here is evaluated, so a strict Content
  * Security Policy has nothing to object to.
  *
+ * What the author does not write is the media element's wiring. The events that keep this
+ * element in step with playback — metadata, play state, buffering, `progress`,
+ * `volumechange`, a caption track's `cuechange` — are declared in `static wires` and
+ * attached by hydrargyri at upgrade: there is nothing in those pairs to choose, and one
+ * forgotten in an `on=` was a player that half-worked with nothing saying why. Markup that
+ * still carries them keeps firing once, because a pair the attribute already wired is
+ * skipped.
+ *
  * What the element does not draw, it borrows. The scrubber and the volume control are
  * `<slider-elemental>` around a native `<input type="range">`, which is where the whole
  * [APG Slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) already lives; the
@@ -292,6 +300,19 @@ export class MediaPlayer extends HgElement {
     'captionText',
     'timeFormatter'
   ];
+
+  /**
+   * The media element's wiring, attached by hydrargyri at upgrade rather than written in
+   * every sample — plumbing with nothing in it for an author to choose, and one pair
+   * forgotten in an `on=` was a player that half-worked with nothing saying why. A pair the
+   * media element's own `on` attribute still carries is skipped, so markup predating this
+   * keeps firing once.
+   */
+  static wires = {
+    'audio, video':
+      'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange',
+    track: 'cuechange:onCue'
+  };
 
   static formatters = {
     time: (value) => formatTime(value),

@@ -42,14 +42,7 @@ knob spliced into the markup would not survive the next `play`.
 
 ```html
 <media-player tabindex="-1" on="keydown:onKeyDown">
-  <audio
-    controls
-    src="sample/tone.wav"
-    preload="metadata"
-    on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
-             play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
-             ended:onEnded;progress:onProgress;volumechange:onVolumeChange"
-  ></audio>
+  <audio controls src="sample/tone.wav" preload="metadata"></audio>
 
   <toolbar-elemental
     class="media-player-controls"
@@ -407,16 +400,12 @@ controls that fade out while playing — only when it wrapped a `<video>`.
     preload="metadata"
     src="sample/rollout.mp4"
     poster="sample/rollout.jpg"
-    on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;
-        play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;
-        ended:onEnded;progress:onProgress;volumechange:onVolumeChange"
   >
     <track
       kind="captions"
       src="sample/rollout.en.vtt"
       srclang="en"
       label="English"
-      on="cuechange:onCue"
     />
   </video>
 
@@ -767,7 +756,7 @@ testable right here rather than in a file you have to build yourself.
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
 <media-player tabindex="-1" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
-  <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg" on="loadedmetadata:onLoaded;durationchange:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange"></video>
+  <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg"></video>
   <img class="media-player-poster" src="sample/tears-of-steel.jpg" alt="" />
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
@@ -850,14 +839,7 @@ and wiring one button is the smallest thing `<media-player>` does.
 
 ```html
 <media-player class="video-background">
-  <video
-    autoplay
-    muted
-    loop
-    playsinline
-    src="sample/rollout.mp4"
-    on="loadedmetadata:onLoaded;canplay:onLoaded;play:onPlay;pause:onPause"
-  ></video>
+  <video autoplay muted loop playsinline src="sample/rollout.mp4"></video>
 
   <button
     class="video-background-toggle"
@@ -871,13 +853,12 @@ and wiring one button is the smallest thing `<media-player>` does.
 </media-player>
 ```
 
-Four handler names and no more. `loadedmetadata` and `canplay` route to `onLoaded`, which is
-what takes `disabled` off the button once there is something to press; `play` and `pause`
-keep `playLabel` and the `is-playing` attribute honest, and those two are the accessible name
-and the icon swap. The two icon spans carry the same class names as the play button further
-up the page, because the rule that swaps them is in `style.css` and asks nothing of
-where the button sits. Every other handler in the samples above drives a control this one
-does not have.
+Nothing on the `<video>` but what the platform reads — the element listens to it by itself,
+here as everywhere. Metadata arriving is what takes `disabled` off the button once there is
+something to press; `play` and `pause` keep `playLabel` and the `is-playing` attribute
+honest, and those two are the accessible name and the icon swap. The two icon spans carry
+the same class names as the play button further up the page, because the rule that swaps
+them is in `style.css` and asks nothing of where the button sits.
 
 ```css
 .hero {
@@ -916,8 +897,8 @@ corner your text does not reach.
 
 Two things it costs, both worth knowing before pasting it.
 
-**The lock screen.** `play:onPlay` claims the OS media panel; it is the same handler as
-everywhere else on this page and it does not know this video is wallpaper. Leave
+**The lock screen.** Playing claims the OS media panel — the element's own `play` listener,
+the same one behind every player on this page — and it does not know this video is wallpaper. Leave
 `media-title`, `artist`, `album` and `artwork` off and there is nothing to name it with, so
 the metadata is cleared rather than set. `poster` is the one to watch: a `<video poster>` is
 read as artwork, so a background video that carries one puts a picture on the panel with no
@@ -1201,11 +1182,21 @@ properties — the first five live in the theme, the last two in the structure s
 ## Handlers you can name
 
 The samples above are the working answer; this is the index — every name `on=` can call, for
-the moment you are building a control row no sample here draws. It is the same list
-`custom-elements.json` publishes, which is what an editor reads.
+the moment you are building a control row no sample here draws. It is the list
+`custom-elements.json` publishes minus the handlers the element wires itself, which an
+editor still reads.
 
 Which element you write the `on=` on matters as much as which name you write in it. There are
-four places, and a name from one list does nothing on another.
+two places to write one — your controls and the `<media-player>` itself — and a name from one
+list does nothing on the other.
+
+The `<audio>`, the `<video>` and a `<track>` inside them take no `on=` at all. The listeners
+that keep the element in step with playback — the five metadata events, `play` and `pause`,
+`waiting` and `playing`, `ended`, `progress`, `volumechange`, and a track's `cuechange` into
+`captionText` — are the element's own plumbing, declared in its `static wires` and attached
+by [hydrargyri](https://github.com/stamat/hydrargyri) when the element upgrades. Markup from
+an earlier version that still carries those pairs keeps firing once: a pair the attribute
+already wired is skipped, never doubled.
 
 **On your controls** — a `<button>`, a range input, anything a person presses:
 
@@ -1222,23 +1213,6 @@ four places, and a name from one list does nothing on another.
 | `click:toggleMute`                              | mute, and back to the level it remembered                                                                                                        |
 | `click:toggleCaptions`                          | captions on and off; there has to be a `<track>` in the media element for the button to have anything to toggle                                  |
 | `click:toggleFullscreen`                        | the player element, or the video itself on an iPhone, which has never allowed anything else                                                      |
-
-**On the `<audio>` or `<video>`** — the listeners that keep the element in step with playback:
-
-| Write                                                                                                                      | Fires when                                                                                                                                                                      |
-| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `loadedmetadata:onLoaded`, `durationchange:onLoaded`, `loadeddata:onLoaded`, `canplay:onLoaded`, `canplaythrough:onLoaded` | the duration is known and the controls come alive — bind whichever of the five you like, in any combination: browsers disagree about which arrives and `onLoaded` is idempotent |
-| `play:onPlay`, `pause:onPause`                                                                                             | playback started or stopped, however it was started or stopped                                                                                                                  |
-| `waiting:onWaiting`, `playing:onPlaying`                                                                                   | buffering began, buffering ended — the `is-buffering` attribute                                                                                                                 |
-| `ended:onEnded`                                                                                                            | playback reached the end, and the clock is painted there rather than a frame short of it                                                                                        |
-| `progress:onProgress`                                                                                                      | more of the file arrived; `buffered` follows, in seconds                                                                                                                        |
-| `volumechange:onVolumeChange`                                                                                              | the volume or the mute changed anywhere — your slider, the native controls, the OS panel                                                                                        |
-
-**On a `<track>` inside it**, for captions you draw yourself rather than let the browser draw:
-
-| Write             | Does                                                                                   |
-| ----------------- | -------------------------------------------------------------------------------------- |
-| `cuechange:onCue` | puts the active caption line in `captionText`, for a page that draws its own subtitles |
 
 **On `<media-player>` itself:**
 

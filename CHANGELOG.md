@@ -13,8 +13,20 @@ for the person who wrote the code.
 
 ### Added
 
+- **The media element wires itself.** The ten `on=` pairs every sample carried on its
+  `<audio>` or `<video>` — metadata, play state, buffering, `progress`, `volumechange` —
+  and the track's `cuechange:onCue` were plumbing an author had to transcribe and could get
+  silently wrong: forget `pause:onPause` and the play icon wedges the first time the OS
+  panel pauses it, with nothing on screen saying why. The element now declares them in
+  `static wires` (hydrargyri 2.2.0, the dependency bump this rides on) and they attach when
+  the element upgrades, so the media element and its track take no `on=` at all. Markup from
+  an earlier version keeps working — a pair the attribute already carries is wired once, not
+  twice. The samples and the handler reference shrink to match; the `on=` you still write
+  are the ones that are choices: your controls, and the keyboard, pointer and fullscreen
+  listeners on `<media-player>` itself.
+
 - **A background loop, and the one button it owes you.** The manual gains a guide for the
-  muted autoplaying `<video>` used as decoration: four handler names rather than ten, no
+  muted autoplaying `<video>` used as decoration: no wiring on the video, no
   scrubber and no clock, and a play/pause button that is not optional — an autoplaying
   animation longer than five seconds needs a way to stop it under
   [WCAG 2.2.2](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html), and the
@@ -24,8 +36,8 @@ for the person who wrote the code.
   sample somewhere on the page and none of them appeared in a list — which is enough while
   you are copying a sample and nothing at all the moment you build a control row no sample
   draws; `stop`, `volumeUp` and `volumeDown` were reachable only by reading the manifest. `Handlers you can name`
-  is that list, split by which element the `on=` belongs on, because a name from one of the
-  four lists does nothing on another: a listener written on a button, or `click:togglePlay`
+  is that list, split by which element the `on=` belongs on, because a name from one list
+  does nothing on the other: a listener written on a button, or `click:togglePlay`
   written on the `<video>`, fails silently. It also says which two names never appear in an
   `on=` — `seekTo` and `seekBy` take a number, which an event listener has none of.
 
