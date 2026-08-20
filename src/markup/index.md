@@ -41,7 +41,7 @@ knob spliced into the markup would not survive the next `play`.
 <code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
-<media-player tabindex="-1" on="keydown:onKeyDown">
+<media-player tabindex="0" role="region" aria-label="Audio player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" on="keydown:onKeyDown">
   <audio controls src="sample/tone.wav" preload="metadata"></audio>
 
   <toolbar-elemental
@@ -90,6 +90,7 @@ knob spliced into the markup would not survive the next `play`.
     <tooltip-elemental>
       <button
         on="click:skipBackward"
+        key="ArrowLeft"
         aria-label="Skip backward 10 seconds"
         disabled
       >
@@ -167,6 +168,7 @@ knob spliced into the markup would not survive the next `play`.
     <tooltip-elemental>
       <button
         on="click:skipForward"
+        key="ArrowRight"
         aria-label="Skip forward 10 seconds"
         disabled
       >
@@ -264,7 +266,7 @@ knob spliced into the markup would not survive the next `play`.
         type="range"
         min="0"
         max="100"
-        step="1"
+        step="5"
         aria-label="Volume"
         disabled
         bind="volumePercent:prop#value"
@@ -383,7 +385,10 @@ controls that fade out while playing — only when it wrapped a `<video>`.
 
 ```html
 <media-player
-  tabindex="-1"
+  tabindex="0"
+  role="region"
+  aria-label="Video player"
+  keys="ArrowUp:volumeUp;ArrowDown:volumeDown"
   on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown"
 >
   <video
@@ -455,6 +460,7 @@ controls that fade out while playing — only when it wrapped a `<video>`.
     <tooltip-elemental>
       <button
         on="click:skipBackward"
+        key="ArrowLeft"
         aria-label="Skip backward 10 seconds"
         disabled
       >
@@ -537,6 +543,7 @@ controls that fade out while playing — only when it wrapped a `<video>`.
     <tooltip-elemental>
       <button
         on="click:skipForward"
+        key="ArrowRight"
         aria-label="Skip forward 10 seconds"
         disabled
       >
@@ -634,7 +641,7 @@ controls that fade out while playing — only when it wrapped a `<video>`.
         type="range"
         min="0"
         max="100"
-        step="1"
+        step="5"
         aria-label="Volume"
         disabled
         bind="volumePercent:prop#value"
@@ -740,7 +747,7 @@ testable right here rather than in a file you have to build yourself.
 <!-- One line, and it has to be: the whole opening tag of an unknown element must sit on a
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
-<media-player tabindex="-1" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
+<media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
   <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg"></video>
   <img class="media-player-poster" src="sample/tears-of-steel.jpg" alt="" />
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
@@ -750,7 +757,7 @@ testable right here rather than in a file you have to build yourself.
       <input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
     </slider-elemental>
     <tooltip-elemental>
-      <button on="click:skipBackward" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+      <button on="click:skipBackward" key="ArrowLeft" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
       <span>Skip backward</span>
     </tooltip-elemental>
     <tooltip-elemental>
@@ -758,7 +765,7 @@ testable right here rather than in a file you have to build yourself.
       <span bind="playLabel">Play</span>
     </tooltip-elemental>
     <tooltip-elemental>
-      <button on="click:skipForward" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
+      <button on="click:skipForward" key="ArrowRight" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
       <span>Skip forward</span>
     </tooltip-elemental>
     <span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
@@ -766,7 +773,7 @@ testable right here rather than in a file you have to build yourself.
       <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
       <span bind="muteLabel">Mute</span>
     </tooltip-elemental>
-    <slider-elemental class="media-player-volume" tooltip="thumb"><input type="range" min="0" max="100" step="1" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
+    <slider-elemental class="media-player-volume" tooltip="thumb"><input type="range" min="0" max="100" step="5" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
     <tooltip-elemental>
       <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       <span>Fullscreen</span>
@@ -981,6 +988,15 @@ Two things follow from the key living on the button rather than in a list somewh
 - **A disabled button ignores its key,** because a disabled button ignores a click. Nothing
   answers before `is-ready`.
 
+One binding has no button to live on: the samples' volume is a slider, so `volumeUp` and
+`volumeDown` have nothing to carry a `key`. The `keys` attribute on the player covers exactly
+that gap — `keys="ArrowUp:volumeUp;ArrowDown:volumeDown"` maps a key straight to a handler
+from the reference below, which is how a focused player answers all four arrows the way
+YouTube does. It is the fallback, never the override: a control's own `key` wins the same
+press, every guard in the table further down applies unchanged, and a pair naming no handler
+warns in the console rather than dying silent. Reach for it only when no control names the
+action — a `keys` entry duplicating a button is a binding nothing on screen can show.
+
 ### Which keydown you bind is the whole scope
 
 `on=` says where the listener goes, so the reach of the keys is one attribute and not an
@@ -1001,10 +1017,14 @@ focused form, or bind the page-wide form on exactly one of them.
 
 Focus is yours to place, and the focused form depends on where it lands: a click leaves focus
 on the nearest focusable thing, and `<media-player>` is not one until you say so. Write
-`tabindex="-1"` on it and clicking the video — or anywhere in the row that is not itself a
-control — leaves focus inside the player, which is what makes <kbd>Space</kbd> answer
-afterwards. The element never moves focus itself: pulling it back after a button press would
-move a screen reader's cursor mid-sentence, and there is no quiet way to do that.
+`tabindex="0"` on it and the player is a Tab stop of its own as well as the place a click on
+the video — or anywhere in the row that is not itself a control — leaves focus, which is what
+makes <kbd>Space</kbd> answer afterwards. A focusable element with no role reads out its
+entire contents to a screen reader, so the samples pair it with `role="region"` and an
+`aria-label` naming the player; `tabindex="-1"` is the same click behaviour without the Tab
+stop, for a page where one more stop before the controls is one too many. The element never
+moves focus itself: pulling it back after a button press would move a screen reader's cursor
+mid-sentence, and there is no quiet way to do that.
 
 It does move focus in one place, and it is the opposite case: the click-to-play overlay is a
 real button, so pressing it to play leaves focus on it — and starting playback is the moment
@@ -1014,17 +1034,18 @@ the player instead, which is not taking focus but declining to lose it. It needs
 `tabindex` to land on: without one there is nowhere to put it, and the element leaves it
 alone rather than pretend.
 
-`theme.css` draws a ring on a focused player, so a reader holding the keys can see that they
-do. On `:focus`, which is the opposite of the rule it uses for the buttons: those get
-`:focus-visible`, the heuristic that
+`theme.css` draws a ring on a player that keyboard focus reaches, so a reader who Tabbed in —
+and therefore holds the keys — can see that they do. On `:focus-visible`, the same heuristic
+as the buttons, the one that
 [hides a ring you placed with a finger](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible)
-on the grounds that you know where you clicked. A `tabindex="-1"` player has no Tab to arrive
-by, so pointer is nearly the only way focus gets there, and the same rule would hide the ring
-every time it mattered. It is also not saying the same thing: on a button the ring says where
-you are, here it says the keys are live, which a click gives no other sign of. The ring sits
+on the grounds that you know where you clicked: a click on the picture or the bar focuses the
+player too, and an accent ring around the whole box on every click reads as a glitch rather
+than a ring. One case pays for that quiet — the focus the element catches when the overlay
+goes at playback start draws no ring after a mouse press, so a mouse reader gets no sign the
+keys went live; Tab in once and it shows. The ring sits
 outside the box because inside it is invisible: on a video the overlay button covers the whole
 player and the poster sits under that, and both paint over it. Style
-`media-player:focus { outline: none }` if you would rather it stayed quiet.
+`media-player:focus-visible { outline: none }` if you would rather it stayed quiet.
 
 With it on, a `key=" "` answers from every place a reader is likely to leave focus: the
 player, the media element, the scrubber, and the big overlay button on a video — none of
@@ -1036,10 +1057,14 @@ or fullscreen spends <kbd>Space</kbd> there, which is the point of the rule and 
 YouTube gets asked about.
 
 The audio and video samples above both bind the focused form, so this is one to press rather
-than read: `keydown:onKeyDown` on the player, `key=" "` on its play button and `tabindex="-1"`
-so a click on the bar leaves focus inside. Put focus anywhere in one — the scrubber, the
-picture, the row — and <kbd>Space</kbd> plays and pauses, except on a button, where it presses
-the button.
+than read: `keydown:onKeyDown` on the player, `key=" "` on its play button,
+`key="ArrowLeft"` and `key="ArrowRight"` on its skip buttons,
+`keys="ArrowUp:volumeUp;ArrowDown:volumeDown"` on the player for the pair with no button,
+and `tabindex="0"` so the player is a stop on the Tab order and a click on the bar leaves
+focus inside. Tab to one, or put focus anywhere in it — the scrubber, the picture, the row —
+and <kbd>Space</kbd> plays and pauses, except on a button, where it presses the button; the
+sideways arrows skip and the vertical ones move the volume the same way, except on the
+scrubber and the volume slider, which keep their own arrows.
 
 No sample binds the page-wide form. Not because it would misbehave here: a preview runs in
 its own frame, so a <kbd>k</kbd> claimed inside one never reaches this page. It is that the
@@ -1050,7 +1075,7 @@ once, on your own page, with the scroll key in mind.
 
 | Press                                                                                           | Who it belongs to                                                                                                                                                                                                                                                                                                                                                      |
 | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The arrows, <kbd>Home</kbd>, <kbd>End</kbd>                                                     | the sliders and the control row, which answer them already                                                                                                                                                                                                                                                                                                             |
+| The arrows, <kbd>Home</kbd>, <kbd>End</kbd> or a Page key with a slider or a radio group focused | the focused control — a slider spends them on its own value, a radio group on its own walk. Everywhere else an arrow is free to claim: `key="ArrowRight"` on the skip button skips while the player holds focus, and still nudges the scrubber by one second when focus is on it. The control row's arrows land in the already-handled line below                       |
 | <kbd>Space</kbd> or <kbd>Enter</kbd> with a button, a checkbox, a link or a `<summary>` focused | whatever the press does there already — it activates a button, a checkbox or a `<summary>`, it follows a link on <kbd>Enter</kbd>, and on <kbd>Space</kbd> over a link it scrolls the page. It is the split [YouTube documents](https://support.google.com/youtube/answer/7631406): Space pauses when the player holds focus and presses the button when a button does |
 | Anything with <kbd>Ctrl</kbd>, <kbd>⌘</kbd> or <kbd>Alt</kbd> held                              | the browser                                                                                                                                                                                                                                                                                                                                                            |
 | A key typed into a text field, a `<select>` or anything `contenteditable`                       | whatever is being typed into — a comment box under a player is the ordinary case, not the odd one. Found through an open shadow root too, since a `keydown` reports the component rather than the field inside it                                                                                                                                                      |
@@ -1108,9 +1133,10 @@ against them.
 | `has-captions`, `captions-visible`                 | a `<track>` was found; captions are on                                                                                       |
 | `volume-state`                                     | `mute`, `mid` or `full`, for a three-icon volume button                                                                      |
 
-Two you do set: `skip` is how many seconds a skip button moves (default `10`), and
+Three you do set: `skip` is how many seconds a skip button moves (default `10`);
 `storage-key` is the prefix for the remembered volume, mute and captions state — set it per
-player, or two players on one page will share one volume. Four more, for what the lock
+player, or two players on one page will share one volume; and `keys` maps a key to an action
+no visible control names, covered under the keys section above. Four more, for what the lock
 screen shows, are in the next section.
 
 ## On the lock screen
@@ -1194,7 +1220,7 @@ already wired is skipped, never doubled.
 | `change:seek`                                   | the drag committed: seek to the value under the thumb                                                                                            |
 | `pointerup@document:endScrub`, `keyup:endScrub` | the drag ended, whatever it did to the value — on the document because a drag very often ends with the pointer somewhere else                    |
 | `input:setVolume`                               | the sound follows the thumb immediately; the write to storage waits for the drag to settle                                                       |
-| `click:volumeUp`, `click:volumeDown`            | one tenth of full per press, climbing from zero when muted rather than jumping back — for a volume UI with no slider, which no sample here draws |
+| `click:volumeUp`, `click:volumeDown`            | one tenth of full per press, climbing from zero when muted rather than jumping back — for a volume UI with no slider, or a `keys` entry; the samples bind them to the up and down arrows |
 | `click:toggleMute`                              | mute, and back to the level it remembered                                                                                                        |
 | `click:toggleCaptions`                          | captions on and off; there has to be a `<track>` in the media element for the button to have anything to toggle                                  |
 | `click:toggleFullscreen`                        | the player element, or the video itself on an iPhone, which has never allowed anything else                                                      |

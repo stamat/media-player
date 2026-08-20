@@ -1542,6 +1542,23 @@ var ACTIVATED_CONTROLS = "button,input[type=button],input[type=submit],input[typ
 function isActivated(node) {
   return !!node && node.nodeType === 1 && node.matches(ACTIVATED_CONTROLS);
 }
+var ARROW_KEYS = /* @__PURE__ */ new Set(["arrowleft", "arrowright", "arrowup", "arrowdown", "home", "end", "pageup", "pagedown"]);
+var ARROWED_CONTROLS = "input[type=range],input[type=radio]";
+function isArrowed(node) {
+  return !!node && node.nodeType === 1 && node.matches(ARROWED_CONTROLS);
+}
+function keyedMethod(value, pressed) {
+  if (!value) return null;
+  for (const entry of value.split(";")) {
+    const at = entry.lastIndexOf(":");
+    if (at < 1) continue;
+    const half = entry.slice(0, at);
+    const key = half.trim() || " ";
+    const method = entry.slice(at + 1).trim();
+    if (method && key.toLowerCase() === pressed) return method;
+  }
+  return null;
+}
 function focusedElement() {
   let node = document.activeElement;
   while (node && node.shadowRoot && node.shadowRoot.activeElement) node = node.shadowRoot.activeElement;
@@ -1969,9 +1986,11 @@ var MediaPlayer = class extends HgElement {
    * the page and the lookup is the same one, which is why a page-wide binding still cannot
    * reach an action no control on this player names.
    *
-   * Letters, in practice. `toolbar-elemental` walks the control row with the arrows and
-   * Home/End and every `<input type="range">` here answers them too, so binding an arrow
-   * would be taking a key back off the control that already answers it. Space and Enter go
+   * Letters mostly, and the arrows where nothing spends them. `toolbar-elemental` walks the
+   * control row with the arrows and Home/End and calls `preventDefault` as it goes, and
+   * every `<input type="range">` answers them too — so an arrow in a `key` yields to both
+   * and answers from the player itself, the overlay or a plain button: ArrowRight on a
+   * focused player skips, and on a focused scrubber still nudges by one step. Space and Enter go
    * the same way whenever a button, a checkbox, a link or a `summary` holds focus: the press
    * is spent there already, activating the control or — Space over a link — scrolling the
    * page. Modified presses are left alone because they belong to the browser, and an
@@ -1982,12 +2001,19 @@ var MediaPlayer = class extends HgElement {
     if (isTyping(event.target) || isTyping(focusedElement())) return;
     const pressed = event.key.toLowerCase();
     if (ACTIVATION_KEYS.has(pressed) && (isActivated(event.target) || isActivated(focusedElement()))) return;
+    if (ARROW_KEYS.has(pressed) && (isArrowed(event.target) || isArrowed(focusedElement()))) return;
     const control = Array.from(this.querySelectorAll("[key]")).find(
       (node) => node.getAttribute("key").toLowerCase() === pressed
     );
-    if (!control) return;
+    const method = control ? null : keyedMethod(this.getAttribute("keys"), pressed);
+    if (method && typeof this[method] !== "function") {
+      console.warn(`media-player: keys names no method "${method}"`);
+      return;
+    }
+    if (!control && !method) return;
     event.preventDefault();
-    control.click();
+    if (control) control.click();
+    else this[method]();
     if (this.isVideo) this.showControls();
   }
   // VOLUME
@@ -2260,6 +2286,7 @@ export {
   clampVolume,
   media_player_default as default,
   formatTime,
+  keyedMethod,
   volumeState
 };
 //# sourceMappingURL=media-player.mjs.map

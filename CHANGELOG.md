@@ -41,6 +41,39 @@ for the person who wrote the code.
   written on the `<video>`, fails silently. It also says which two names never appear in an
   `on=` — `seekTo` and `seekBy` take a number, which an event listener has none of.
 
+- **The arrows skip, where nothing else spends them.** The samples write `key="ArrowLeft"`
+  and `key="ArrowRight"` on the skip buttons, so a player holding focus skips by its `skip`
+  seconds — and a new guard is what makes an arrow honest to bind at all: a key a focused
+  control spends on itself (a slider's arrows, Home, End and the Page keys; a radio group's
+  walk) is never claimed off it, so a focused scrubber still nudges by one second and the
+  volume slider keeps its arrows. The volume's own arrows move by five now instead of one —
+  `step="5"` on the sample's input, which also quantises a drag to the same twenty notches,
+  invisible at the slider's size.
+
+- **`keys`, for the action with no button — and YouTube's volume arrows with it.** The
+  samples bind `keys="ArrowUp:volumeUp;ArrowDown:volumeDown"` on the player, so a focused
+  player answers all four arrows the way YouTube does: sideways skips, vertical volume. The
+  attribute exists because `key` deliberately cannot reach this — `volumeUp` has no button
+  to carry a key when the volume is a slider, which is the deferral the `NOTE:` above the
+  class carried. It is the fallback, never the override: a control's `key` wins the same
+  press, every guard protecting a focused control applies unchanged, and a pair naming no
+  method warns instead of dying silent. CONTRIBUTING's refusal moves with it — a `keys`
+  entry duplicating what a button could carry is still the undiscoverable version and still
+  gets refused.
+
+### Changed
+
+- **The sample players are Tab stops now.** They carried `tabindex="-1"`, which takes a
+  click but no Tab — so the focus ring, and the keys that ride on focus, were reachable
+  only by pointer, and the ring first showed when the element caught the focus the overlay
+  drops as playback starts. The samples now write `tabindex="0"`, paired with
+  `role="region"` and an `aria-label`, because a focusable element with no role reads out
+  its entire contents to a screen reader. The theme's ring moved with it, from `:focus` to
+  `:focus-visible` — Tab shows it, a click on the picture no longer flashes it, and the
+  focus caught at playback start draws it only when the press was a keyboard's. In the
+  element itself nothing changed — `tabindex` was always the author's to choose, and `-1`
+  stays documented as the click-only variant.
+
 ### Fixed
 
 - **The played bar missed the knob at both ends of a long file.** The played fill was a

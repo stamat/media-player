@@ -46,8 +46,10 @@ the media element until this one upgrades and takes over.
 
 Keyboard shortcuts are the same idea. `key="k"` on your button is the whole binding, and
 `on="keydown@document:onKeyDown"` on the player is what makes the page answer it — so a
-shortcut can never name an action no visible control names. Nothing is bound by default;
-bind `keydown:onKeyDown` instead and the keys only answer while focus is inside the player.
+shortcut can never name an action no visible control names. The deliberate exception is
+`keys="ArrowUp:volumeUp;ArrowDown:volumeDown"` on the player, for the pair a volume slider
+gives no button to. Nothing is bound by default; bind `keydown:onKeyDown` instead and the
+keys only answer while focus is inside the player.
 
 One element for both — it reads which element you wrapped and turns on the video half
 (poster, overlay, captions, fullscreen, fading controls) only for a `<video>`. The scrubber

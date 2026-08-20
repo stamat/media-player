@@ -20,7 +20,7 @@
  */
 
 import { jest } from '@jest/globals';
-import { MediaPlayer, formatTime, clampVolume, volumeState, LIVE_DURATION, CONTROLS_LINGER, VOLUME_SETTLE } from '../src/scripts/media-player.js';
+import { MediaPlayer, formatTime, clampVolume, volumeState, keyedMethod, LIVE_DURATION, CONTROLS_LINGER, VOLUME_SETTLE } from '../src/scripts/media-player.js';
 
 /**
  * A media element jsdom will tolerate.
@@ -1057,6 +1057,76 @@ describe('keys the markup claims', () => {
     expect(presses).toEqual(['k']);
   });
 
+  test('an arrow skips when the player itself holds the press', () => {
+    const { player, presses } = keyed(fakeMedia(), 'ArrowRight');
+    press(player, 'ArrowRight');
+    expect(presses).toEqual(['ArrowRight']);
+  });
+
+  test('an arrow on a focused slider stays the slider\'s own step, not the skip', () => {
+    const { player, presses } = keyed(fakeMedia(), 'ArrowRight');
+    const range = document.createElement('input');
+    range.type = 'range';
+    player.appendChild(range);
+    const event = press(range, 'ArrowRight');
+    expect(presses).toEqual([]);
+    expect(event.defaultPrevented).toBe(false); // left for the platform to spend on the thumb
+  });
+
+  test('an arrow inside a radio group walks the group, not the player', () => {
+    const { player, presses } = keyed(fakeMedia(), 'ArrowDown');
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    player.appendChild(radio);
+    expect(press(radio, 'ArrowDown').defaultPrevented).toBe(false);
+    expect(presses).toEqual([]);
+  });
+
+  test('the keys attribute reaches the action no control names — the volume arrows', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    player.setAttribute('keys', 'ArrowUp:volumeUp;ArrowDown:volumeDown');
+    player.addEventListener('keydown', (event) => player.onKeyDown(event));
+    media.volume = 0.5;
+    expect(press(player, 'ArrowUp').defaultPrevented).toBe(true);
+    expect(media.volume).toBeCloseTo(0.6);
+    press(player, 'ArrowDown');
+    expect(media.volume).toBeCloseTo(0.5);
+  });
+
+  test('a control\'s key outranks a keys entry for the same press', () => {
+    const { player, presses } = keyed(fakeMedia(), 'ArrowUp');
+    player.setAttribute('keys', 'ArrowUp:volumeUp');
+    const volumeUp = jest.spyOn(player, 'volumeUp');
+    press(player, 'ArrowUp');
+    expect(presses).toEqual(['ArrowUp']);
+    expect(volumeUp).not.toHaveBeenCalled();
+    volumeUp.mockRestore();
+  });
+
+  test('a keys arrow on a focused slider is still the slider\'s', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    player.setAttribute('keys', 'ArrowUp:volumeUp');
+    player.addEventListener('keydown', (event) => player.onKeyDown(event));
+    const range = document.createElement('input');
+    range.type = 'range';
+    player.appendChild(range);
+    media.volume = 0.5;
+    expect(press(range, 'ArrowUp').defaultPrevented).toBe(false);
+    expect(media.volume).toBe(0.5);
+  });
+
+  test('a keys entry naming no method warns and leaves the press with the page', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const player = mount(fakeMedia());
+    player.setAttribute('keys', 'x:togglePlai');
+    player.addEventListener('keydown', (event) => player.onKeyDown(event));
+    expect(press(player, 'x').defaultPrevented).toBe(false);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('togglePlai'));
+    warn.mockRestore();
+  });
+
   test('Space belongs to the focused button, the one control that already answers it', () => {
     // The split YouTube documents and every pair of hands expects: Space pauses when the
     // player has focus, and presses the button when a button has it. Claimed off the focused
@@ -1165,6 +1235,26 @@ describe('interaction events', () => {
     player.addEventListener('media-player-interaction', (e) => seen.push(e.detail));
     player.skipForward();
     expect(seen).toEqual([{ type: 'skip-forward', value: 10 }]);
+  });
+});
+
+describe('the keys attribute grammar', () => {
+  test('pairs split on the semicolon and survive the spaces an author writes', () => {
+    expect(keyedMethod('ArrowUp:volumeUp; ArrowDown:volumeDown', 'arrowdown')).toBe('volumeDown');
+  });
+
+  test('an all-whitespace key half is the space key, which an attribute can write no other way', () => {
+    expect(keyedMethod(' :togglePlay', ' ')).toBe('togglePlay');
+  });
+
+  test('a key that is itself a colon still parses, from the last colon in the pair', () => {
+    expect(keyedMethod('::toggleMute', ':')).toBe('toggleMute');
+  });
+
+  test('an empty attribute, a bare key and a pair with no method all name nothing', () => {
+    expect(keyedMethod('', 'k')).toBe(null);
+    expect(keyedMethod('k', 'k')).toBe(null);
+    expect(keyedMethod('k:', 'k')).toBe(null);
   });
 });
 

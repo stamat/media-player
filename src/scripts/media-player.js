@@ -143,6 +143,45 @@ function isActivated(node) {
 }
 
 /**
+ * The keys a focused control spends on its own value or its own group, so a `key` can
+ * never claim one off it. Every `<input type="range">` answers the arrows, Home, End and
+ * the Page keys — the APG Slider pattern the elementals lean on — and a radio group walks
+ * itself with the arrows. The toolbar needs no entry here: it calls `preventDefault` on
+ * the arrows it spends walking the row, and an already-handled press is declined anyway.
+ *
+ * This is what makes an arrow honest to write in a `key` at all. Bound to a skip button it
+ * answers on the player itself, the overlay and any plain button — and a slider under
+ * focus still moves by its own step, rather than stepping and skipping off one press.
+ */
+const ARROW_KEYS = new Set(['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'home', 'end', 'pageup', 'pagedown']);
+const ARROWED_CONTROLS = 'input[type=range],input[type=radio]';
+
+/** Does the focused control spend this key on itself already? */
+function isArrowed(node) {
+  return !!node && node.nodeType === 1 && node.matches(ARROWED_CONTROLS);
+}
+
+/**
+ * The `keys` attribute parsed for one press: `keys="ArrowUp:volumeUp;ArrowDown:volumeDown"`
+ * maps a key straight to a method, for the action no visible control names — a volume that
+ * is a slider has no button to carry `key="ArrowUp"`. Pairs split on `;`, each split at its
+ * last `:` so a key that is itself a colon still parses, and a key half that trims to
+ * nothing is the space key, which an attribute can write no other way.
+ */
+export function keyedMethod(value, pressed) {
+  if (!value) return null;
+  for (const entry of value.split(';')) {
+    const at = entry.lastIndexOf(':');
+    if (at < 1) continue;
+    const half = entry.slice(0, at);
+    const key = half.trim() || ' ';
+    const method = entry.slice(at + 1).trim();
+    if (method && key.toLowerCase() === pressed) return method;
+  }
+  return null;
+}
+
+/**
  * The element actually holding focus, walked through any open shadow root.
  *
  * A `keydown` is retargeted at a shadow boundary, so a `<textarea>` inside a web component
@@ -211,8 +250,12 @@ function focusedElement() {
  * visible control already names. Which `keydown` it is bound to is the whole of the scope —
  * `keydown:onKeyDown` answers while focus is inside the player, `keydown@document:onKeyDown`
  * answers anywhere on the page, and the page-wide form is what a shortcut usually means.
- * Nothing is bound by default, and the arrows, Home and End are left where they already
- * work — the toolbar walks the row with them and every slider answers them.
+ * The one binding with no control to live on goes in `keys` — `volumeUp` behind a volume
+ * that is a slider — mapping a key straight to a method; a control's own `key` outranks it.
+ * Nothing is bound by default, and a focused control keeps the keys it already answers —
+ * the toolbar its walk, a slider its arrows, Home and End — so a `key` naming an arrow
+ * answers only where nothing spends it: `key="ArrowRight"` on a skip button skips while
+ * the player holds focus, and a focused scrubber still nudges by its own step.
  *
  * One limit worth knowing before you reach for it. The buffered bar is one span from the
  * start rather than the `TimeRanges` list the media element holds, because `<progress>`
@@ -237,6 +280,7 @@ function focusedElement() {
  * @attr {string} album - What it came from, for the OS media panel.
  * @attr {string} artwork - Cover image for the OS media panel. Falls back to a `<video>`'s `poster`. Relative paths are resolved against the page.
  * @attr {string} storage-key - Prefix for the remembered volume, mute and captions state. Defaults to `media-player`; set it per player to keep two of them from sharing one volume.
+ * @attr {string} keys - Key-to-method pairs for actions no visible control names, `keys="ArrowUp:volumeUp;ArrowDown:volumeDown"`. A control's own `key` outranks it for the same press, and a focused control keeps the keys it already answers.
  *
  * @cssprop {<color>} [--media-player-accent=#22c55e] - The played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring.
  * @cssprop {<color>} [--media-player-accent-ink=#fff] - What sits on the accent: the flooded button's glyph, the chip's triangle. Change it with the accent.
@@ -256,13 +300,6 @@ function focusedElement() {
 // consumer-facing so it carries no trigger. The multi-span buffered bar comes back when a
 // scrubber has to draw the hole seeking leaves in a long stream, and it arrives as an
 // element in book-of-elementals rather than a change here.
-//
-// `key` on a control is deliberately the only keyboard surface: it cannot reach an action
-// with no button, which leaves `volumeUp`/`volumeDown` unreachable for a player whose volume
-// is a slider, and a player drawn with no control row at all unreachable entirely. The
-// attribute mapping a key straight to a method — `keys="k:togglePlay"` on the player — is
-// what covers those, and it comes back when a player without a control row actually exists
-// to need it, because that is the case where there is no visible name for the key to borrow.
 export class MediaPlayer extends HgElement {
   static attributes = [
     'is-ready',
@@ -850,9 +887,11 @@ export class MediaPlayer extends HgElement {
    * the page and the lookup is the same one, which is why a page-wide binding still cannot
    * reach an action no control on this player names.
    *
-   * Letters, in practice. `toolbar-elemental` walks the control row with the arrows and
-   * Home/End and every `<input type="range">` here answers them too, so binding an arrow
-   * would be taking a key back off the control that already answers it. Space and Enter go
+   * Letters mostly, and the arrows where nothing spends them. `toolbar-elemental` walks the
+   * control row with the arrows and Home/End and calls `preventDefault` as it goes, and
+   * every `<input type="range">` answers them too — so an arrow in a `key` yields to both
+   * and answers from the player itself, the overlay or a plain button: ArrowRight on a
+   * focused player skips, and on a focused scrubber still nudges by one step. Space and Enter go
    * the same way whenever a button, a checkbox, a link or a `summary` holds focus: the press
    * is spent there already, activating the control or — Space over a link — scrolling the
    * page. Modified presses are left alone because they belong to the browser, and an
@@ -864,14 +903,25 @@ export class MediaPlayer extends HgElement {
 
     const pressed = event.key.toLowerCase();
     if (ACTIVATION_KEYS.has(pressed) && (isActivated(event.target) || isActivated(focusedElement()))) return;
+    if (ARROW_KEYS.has(pressed) && (isArrowed(event.target) || isArrowed(focusedElement()))) return;
 
     const control = Array.from(this.querySelectorAll('[key]')).find(
       (node) => node.getAttribute('key').toLowerCase() === pressed
     );
-    if (!control) return;
+    // The `keys` attribute is the fallback, never the override: a visible control claiming
+    // the key wins, so `key` and `keys` naming one press stay one action.
+    const method = control ? null : keyedMethod(this.getAttribute('keys'), pressed);
+    if (method && typeof this[method] !== 'function') {
+      // A typo'd name would otherwise be a key that silently never worked — and the press
+      // stays the page's, since nothing here acted on it.
+      console.warn(`media-player: keys names no method "${method}"`);
+      return;
+    }
+    if (!control && !method) return;
 
     event.preventDefault();
-    control.click();
+    if (control) control.click();
+    else this[method]();
     // A key is use, and use is what keeps a video's row up. Without this the controls fade
     // out from under someone driving by keyboard, which reads as a player that stopped
     // listening — while every key still works.

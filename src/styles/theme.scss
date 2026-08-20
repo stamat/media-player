@@ -125,17 +125,18 @@ media-player button:focus-visible {
   outline-offset: 2px;
 }
 
-// For a player the author made focusable with `tabindex`, so a reader who has focus on it —
-// and therefore the keys — can see that they do. `:focus` and not `:focus-visible`, which is
-// the opposite of the rule for the buttons above: a `tabindex="-1"` element is unreachable by
-// Tab, so pointer and script are the only ways focus arrives, and the pointer half is exactly
-// what `:focus-visible` suppresses. Written that way this rule fires almost never, which
-// looks like coverage and is not. What the ring says here is not where the click landed —
-// the reader knows that — but that the keys are live, which a click gives no other sign of.
+// For a player the author made focusable with `tabindex`, so a reader who Tabs to it — and
+// therefore holds the keys — can see that they do. `:focus-visible`, the same heuristic as
+// the buttons above: a click on the picture or the bar focuses the player too, and an
+// accent ring around the whole box on every click reads as a glitch rather than a ring.
+// The cost is deliberate — the focus the element catches when the overlay goes at playback
+// start draws no ring after a mouse press, because the browser holds `:focus-visible` back
+// unless the last interaction was a keyboard's, so a mouse reader gets no sign the keys
+// went live.
 // The offset is outward because inward is invisible: `.media-player-overlay` is
 // `position: absolute; inset: 0` over the whole player with the poster under it, so a ring
 // drawn inside the box is painted over by both on a video.
-media-player:focus {
+media-player:focus-visible {
   outline: 2px solid var(--media-player-accent);
   outline-offset: 2px;
 }

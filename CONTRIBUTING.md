@@ -25,11 +25,12 @@ probably for a different library.
 - **No creating the media element.** A `src` on the wrapper would mean no media element at
   all until the script arrives. The author writes the `<audio>` or `<video>`, with
   `controls` on it, and that is the fallback.
-- **No keyboard binding that is not on a control.** A key is written as `key="k"` on the
-  author's own button and presses it, so every binding has a visible thing naming it. An
-  attribute mapping a key straight to a method is the undiscoverable version and stays
-  refused for now — see the `NOTE:` above `MediaPlayer` in `src/scripts/media-player.js`,
-  which carries the trigger that would bring it back.
+- **No keyboard binding off the markup.** A key is written as `key="k"` on the author's own
+  button and presses it, so a binding has a visible thing naming it wherever a visible thing
+  exists. The `keys` attribute maps a key straight to a method and is only for the action no
+  control names — `volumeUp` behind a volume that is a slider. A control's `key` outranks a
+  `keys` entry for the same press, and a `keys` entry duplicating what a button could carry
+  is the undiscoverable version and gets refused in review.
 
 ## Getting set up
 
