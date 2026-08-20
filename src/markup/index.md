@@ -1143,6 +1143,61 @@ properties — the first five live in the theme, the last two in the structure s
 | `--media-player-gap`        | `0.5rem`     | between controls                                                                                                                               |
 | `--media-player-fade`       | `0.2s`       | how long the video controls take to fade out                                                                                                   |
 
+## Handlers you can name
+
+The samples above are the working answer; this is the index — every name `on=` can call, for
+the moment you are building a control row no sample here draws. It is the same list
+`custom-elements.json` publishes, which is what an editor reads.
+
+Which element you write the `on=` on matters as much as which name you write in it. There are
+four places, and a name from one list does nothing on another.
+
+**On your controls** — a `<button>`, a range input, anything a person presses:
+
+| Write                                           | Does                                                                                                                                             |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `click:togglePlay`                              | plays a paused player, pauses a playing one                                                                                                      |
+| `click:stop`                                    | pauses and returns to the start — a live stream has no start to return to, so there it only pauses                                               |
+| `click:skipForward`, `click:skipBackward`       | move by the `skip` attribute's seconds, ten by default; both decline on a live stream                                                            |
+| `input:scrub`                                   | the thumb moved: paint the clock, and do not seek until the drag ends                                                                            |
+| `change:seek`                                   | the drag committed: seek to the value under the thumb                                                                                            |
+| `pointerup@document:endScrub`, `keyup:endScrub` | the drag ended, whatever it did to the value — on the document because a drag very often ends with the pointer somewhere else                    |
+| `input:setVolume`                               | the sound follows the thumb immediately; the write to storage waits for the drag to settle                                                       |
+| `click:volumeUp`, `click:volumeDown`            | one tenth of full per press, climbing from zero when muted rather than jumping back — for a volume UI with no slider, which no sample here draws |
+| `click:toggleMute`                              | mute, and back to the level it remembered                                                                                                        |
+| `click:toggleCaptions`                          | captions on and off; there has to be a `<track>` in the media element for the button to have anything to toggle                                  |
+| `click:toggleFullscreen`                        | the player element, or the video itself on an iPhone, which has never allowed anything else                                                      |
+
+**On the `<audio>` or `<video>`** — the listeners that keep the element in step with playback:
+
+| Write                                                                                                                      | Fires when                                                                                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `loadedmetadata:onLoaded`, `durationchange:onLoaded`, `loadeddata:onLoaded`, `canplay:onLoaded`, `canplaythrough:onLoaded` | the duration is known and the controls come alive — bind whichever of the five you like, in any combination: browsers disagree about which arrives and `onLoaded` is idempotent |
+| `play:onPlay`, `pause:onPause`                                                                                             | playback started or stopped, however it was started or stopped                                                                                                                  |
+| `waiting:onWaiting`, `playing:onPlaying`                                                                                   | buffering began, buffering ended — the `is-buffering` attribute                                                                                                                 |
+| `ended:onEnded`                                                                                                            | playback reached the end, and the clock is painted there rather than a frame short of it                                                                                        |
+| `progress:onProgress`                                                                                                      | more of the file arrived; `buffered` follows, in seconds                                                                                                                        |
+| `volumechange:onVolumeChange`                                                                                              | the volume or the mute changed anywhere — your slider, the native controls, the OS panel                                                                                        |
+
+**On a `<track>` inside it**, for captions you draw yourself rather than let the browser draw:
+
+| Write             | Does                                                                                   |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| `cuechange:onCue` | puts the active caption line in `captionText`, for a page that draws its own subtitles |
+
+**On `<media-player>` itself:**
+
+| Write                                             | Does                                                                                                                           |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `keydown:onKeyDown`, `keydown@document:onKeyDown` | a press clicks the control whose `key` claims it — the two scopes are [Keys the buttons carry](#keys-the-buttons-carry)        |
+| `mousemove:showControls`                          | video only: bring the faded control row back, and start the timer that takes it away again                                     |
+| `fullscreenchange@document:onFullscreenChange`    | keeps `is-fullscreen` honest when the browser leaves fullscreen without going through your button — <kbd>Escape</kbd>, usually |
+
+Two names never appear in an `on=`: `seekTo(seconds)` and `seekBy(seconds)` take a number,
+which is the one thing an event listener has none of, so they are for script. `play()` and
+`pause()` are public beside them for script too — on a button it is `togglePlay` you want,
+which is the pair of them behind one control.
+
 ## State you can bind
 
 | Key                                       | Holds                                                                                                                               |
@@ -1153,9 +1208,6 @@ properties — the first five live in the theme, the last two in the structure s
 | `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next                                                                                             |
 | `captionText`                             | the active cue                                                                                                                      |
 | `timeFormatter`                           | the `formatTime` function itself — hand it to the scrubber's `prop#format` and the value bubble reads `01:12` instead of `72`       |
-
-Beside `togglePlay`, `stop`, the skips and the sliders' handlers, two more answer `on=` for
-a volume UI without a slider: `volumeUp` and `volumeDown`, one tenth of full per press.
 
 Three formatters pipe a bind: `|time` writes seconds as a clock, `|floor` a whole number,
 and `|pressed` a boolean as the literal `"true"`/`"false"` that a toggle's `aria-pressed`

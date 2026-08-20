@@ -1228,6 +1228,136 @@ properties — the first five live in the theme, the last two in the structure s
 <td>how long the video controls take to fade out</td>
 </tr>
 </tbody></table>
+<h2 id="handlers-you-can-name">Handlers you can name<a class="heading-anchor" href="#handlers-you-can-name" tabindex="-1" aria-hidden="true"></a></h2>
+<p>The samples above are the working answer; this is the index — every name <code>on=</code> can call, for
+the moment you are building a control row no sample here draws. It is the same list
+<code>custom-elements.json</code> publishes, which is what an editor reads.</p>
+<p>Which element you write the <code>on=</code> on matters as much as which name you write in it. There are
+four places, and a name from one list does nothing on another.</p>
+<p><strong>On your controls</strong> — a <code>&lt;button&gt;</code>, a range input, anything a person presses:</p>
+<table>
+<thead>
+<tr>
+<th>Write</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>click:togglePlay</code></td>
+<td>plays a paused player, pauses a playing one</td>
+</tr>
+<tr>
+<td><code>click:stop</code></td>
+<td>pauses and returns to the start — a live stream has no start to return to, so there it only pauses</td>
+</tr>
+<tr>
+<td><code>click:skipForward</code>, <code>click:skipBackward</code></td>
+<td>move by the <code>skip</code> attribute&#39;s seconds, ten by default; both decline on a live stream</td>
+</tr>
+<tr>
+<td><code>input:scrub</code></td>
+<td>the thumb moved: paint the clock, and do not seek until the drag ends</td>
+</tr>
+<tr>
+<td><code>change:seek</code></td>
+<td>the drag committed: seek to the value under the thumb</td>
+</tr>
+<tr>
+<td><code>pointerup@document:endScrub</code>, <code>keyup:endScrub</code></td>
+<td>the drag ended, whatever it did to the value — on the document because a drag very often ends with the pointer somewhere else</td>
+</tr>
+<tr>
+<td><code>input:setVolume</code></td>
+<td>the sound follows the thumb immediately; the write to storage waits for the drag to settle</td>
+</tr>
+<tr>
+<td><code>click:volumeUp</code>, <code>click:volumeDown</code></td>
+<td>one tenth of full per press, climbing from zero when muted rather than jumping back — for a volume UI with no slider, which no sample here draws</td>
+</tr>
+<tr>
+<td><code>click:toggleMute</code></td>
+<td>mute, and back to the level it remembered</td>
+</tr>
+<tr>
+<td><code>click:toggleCaptions</code></td>
+<td>captions on and off; there has to be a <code>&lt;track&gt;</code> in the media element for the button to have anything to toggle</td>
+</tr>
+<tr>
+<td><code>click:toggleFullscreen</code></td>
+<td>the player element, or the video itself on an iPhone, which has never allowed anything else</td>
+</tr>
+</tbody></table>
+<p><strong>On the <code>&lt;audio&gt;</code> or <code>&lt;video&gt;</code></strong> — the listeners that keep the element in step with playback:</p>
+<table>
+<thead>
+<tr>
+<th>Write</th>
+<th>Fires when</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>loadedmetadata:onLoaded</code>, <code>durationchange:onLoaded</code>, <code>loadeddata:onLoaded</code>, <code>canplay:onLoaded</code>, <code>canplaythrough:onLoaded</code></td>
+<td>the duration is known and the controls come alive — bind whichever of the five you like, in any combination: browsers disagree about which arrives and <code>onLoaded</code> is idempotent</td>
+</tr>
+<tr>
+<td><code>play:onPlay</code>, <code>pause:onPause</code></td>
+<td>playback started or stopped, however it was started or stopped</td>
+</tr>
+<tr>
+<td><code>waiting:onWaiting</code>, <code>playing:onPlaying</code></td>
+<td>buffering began, buffering ended — the <code>is-buffering</code> attribute</td>
+</tr>
+<tr>
+<td><code>ended:onEnded</code></td>
+<td>playback reached the end, and the clock is painted there rather than a frame short of it</td>
+</tr>
+<tr>
+<td><code>progress:onProgress</code></td>
+<td>more of the file arrived; <code>buffered</code> follows, in seconds</td>
+</tr>
+<tr>
+<td><code>volumechange:onVolumeChange</code></td>
+<td>the volume or the mute changed anywhere — your slider, the native controls, the OS panel</td>
+</tr>
+</tbody></table>
+<p><strong>On a <code>&lt;track&gt;</code> inside it</strong>, for captions you draw yourself rather than let the browser draw:</p>
+<table>
+<thead>
+<tr>
+<th>Write</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cuechange:onCue</code></td>
+<td>puts the active caption line in <code>captionText</code>, for a page that draws its own subtitles</td>
+</tr>
+</tbody></table>
+<p><strong>On <code>&lt;media-player&gt;</code> itself:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Write</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>keydown:onKeyDown</code>, <code>keydown@document:onKeyDown</code></td>
+<td>a press clicks the control whose <code>key</code> claims it — the two scopes are <a href="#keys-the-buttons-carry">Keys the buttons carry</a></td>
+</tr>
+<tr>
+<td><code>mousemove:showControls</code></td>
+<td>video only: bring the faded control row back, and start the timer that takes it away again</td>
+</tr>
+<tr>
+<td><code>fullscreenchange@document:onFullscreenChange</code></td>
+<td>keeps <code>is-fullscreen</code> honest when the browser leaves fullscreen without going through your button — <kbd>Escape</kbd>, usually</td>
+</tr>
+</tbody></table>
+<p>Two names never appear in an <code>on=</code>: <code>seekTo(seconds)</code> and <code>seekBy(seconds)</code> take a number,
+which is the one thing an event listener has none of, so they are for script. <code>play()</code> and
+<code>pause()</code> are public beside them for script too — on a button it is <code>togglePlay</code> you want,
+which is the pair of them behind one control.</p>
 <h2 id="state-you-can-bind">State you can bind<a class="heading-anchor" href="#state-you-can-bind" tabindex="-1" aria-hidden="true"></a></h2>
 <table>
 <thead>
@@ -1261,8 +1391,6 @@ properties — the first five live in the theme, the last two in the structure s
 <td>the <code>formatTime</code> function itself — hand it to the scrubber&#39;s <code>prop#format</code> and the value bubble reads <code>01:12</code> instead of <code>72</code></td>
 </tr>
 </tbody></table>
-<p>Beside <code>togglePlay</code>, <code>stop</code>, the skips and the sliders&#39; handlers, two more answer <code>on=</code> for
-a volume UI without a slider: <code>volumeUp</code> and <code>volumeDown</code>, one tenth of full per press.</p>
 <p>Three formatters pipe a bind: <code>|time</code> writes seconds as a clock, <code>|floor</code> a whole number,
 and <code>|pressed</code> a boolean as the literal <code>&quot;true&quot;</code>/<code>&quot;false&quot;</code> that a toggle&#39;s <code>aria-pressed</code>
 wants — the captions and fullscreen buttons in the video sample are wired with it.</p>

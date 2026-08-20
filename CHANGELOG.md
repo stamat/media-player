@@ -20,6 +20,15 @@ for the person who wrote the code.
   [WCAG 2.2.2](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html), and the
   element already has the button for it.
 
+- **A reference for the `on=` names.** Twenty-two of the twenty-nine appeared in a working
+  sample somewhere on the page and none of them appeared in a list — which is enough while
+  you are copying a sample and nothing at all the moment you build a control row no sample
+  draws; `stop`, `volumeUp` and `volumeDown` were reachable only by reading the manifest. `Handlers you can name`
+  is that list, split by which element the `on=` belongs on, because a name from one of the
+  four lists does nothing on another: a listener written on a button, or `click:togglePlay`
+  written on the `<video>`, fails silently. It also says which two names never appear in an
+  `on=` — `seekTo` and `seekBy` take a number, which an event listener has none of.
+
 ### Fixed
 
 - **The published page's Options tabs were empty.** `custom-elements.json` was not among the
