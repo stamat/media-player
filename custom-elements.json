@@ -493,6 +493,12 @@
             },
             {
               "kind": "method",
+              "name": "findCaptions",
+              "description": "The caption track, from the markup or from the list, whichever has one.\n\n`default` is the author's pick and the platform's own rule; without one the first in\ndocument order is what a browser would have shown, so it is what is taken. The first\ntrack found wins and keeps winning — switching language needs a control to switch it\nwith, and there is no such control to name.\n\n`track` holds the `TextTrack`, not the `<track>`: an in-band track from a streaming\nlibrary has no element, and it is the only kind that arrives after the upgrade.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
               "name": "toggleCaptions"
             },
             {
@@ -582,7 +588,7 @@
             {
               "kind": "method",
               "name": "restore",
-              "description": "Volume, mute and captions from last time.\n\nNothing is written back while restoring: `applyVolume` would otherwise store the value\nit just read, and a player that never got a real volume set on it would keep rewriting\nthe same entry on every page load.",
+              "description": "Volume and mute from last time. Captions are restored by `findCaptions` instead, which\nis the only thing that knows when there is a track to restore them onto.\n\nNothing is written back while restoring: `applyVolume` would otherwise store the value\nit just read, and a player that never got a real volume set on it would keep rewriting\nthe same entry on every page load.",
               "privacy": "private"
             },
             {
@@ -712,7 +718,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "A `<track>` was found, so a captions button is worth showing. CSS hook; the element sets it.",
+              "description": "A caption track was found, so a captions button is worth showing. CSS hook; the element sets it.",
               "name": "has-captions",
               "x-code-preview": {
                 "hidden": true

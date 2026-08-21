@@ -1235,7 +1235,7 @@ against them.</p>
 </tr>
 <tr>
 <td><code>has-captions</code>, <code>captions-visible</code></td>
-<td>a <code>&lt;track&gt;</code> was found; captions are on</td>
+<td>a caption track was found, in the markup or in the media element&#39;s track list; captions are on</td>
 </tr>
 <tr>
 <td><code>volume-state</code></td>
@@ -1413,7 +1413,7 @@ already wired is skipped, never doubled.</p>
 </tr>
 <tr>
 <td><code>click:toggleCaptions</code></td>
-<td>captions on and off; there has to be a <code>&lt;track&gt;</code> in the media element for the button to have anything to toggle</td>
+<td>captions on and off; there has to be a caption track for the button to have anything to toggle — the one marked <code>default</code>, or the first written</td>
 </tr>
 <tr>
 <td><code>click:toggleFullscreen</code></td>
@@ -1677,9 +1677,16 @@ setting <code>src</code> in the browsers that need it:</p>
   <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/stream.m3u8&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/vnd.apple.mpegurl&quot;</span> /&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/episode.mp4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;video/mp4&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span></code></pre>
-<p>None of this is covered by a test. jsdom implements no Media Source Extensions, so the
-composition above is read off the code rather than proven — if it breaks for you, that is an
-issue worth filing.</p>
+<p>Captions come along. A streaming library adds its caption track to the media element rather
+than as a <code>&lt;track&gt;</code> you wrote, and it arrives after this element has upgraded — so the track
+list is what is read, and <code>addtrack</code> is what says to read it again. The captions button
+lights up when the track lands, on whatever the page remembered from last visit. What is not
+here is a language picker: the first caption track found is the one that stays, because
+switching between them would need a control to switch with, and naming that control is a
+decision for markup rather than for this element.</p>
+<p>The late track is covered by a test, against a stated <code>textTracks</code> list. The rest of this is
+not: jsdom implements no Media Source Extensions, so attaching hls.js is read off the code
+rather than proven — if it breaks for you, that is an issue worth filing.</p>
 <h2 id="what-it-does-not-do">What it does not do<a class="heading-anchor" href="#what-it-does-not-do" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Each of these is a decision, not a gap waiting for a pull request.</p>
 <ul>

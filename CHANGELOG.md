@@ -59,6 +59,23 @@ for the person who wrote the code.
   CSS output changes; the DOM change is the scrubber input's `step` attribute moving
   between `any` and `1` while a press holds it.
 
+### Fixed
+
+- **A caption track is found however it arrives, and `default` decides which one.** The
+  track was read once with `querySelector`, at upgrade — so the first `<track>` in the
+  markup won even when the author marked a different one `default`, and a track added
+  afterwards was never seen at all. That second half is what a streaming library does: hls.js
+  and dash.js put captions on the media element as an in-band track with no `<track>` element
+  behind it, long after this element has upgraded, and the captions button stayed dark
+  forever. Now `default` is preferred over document order, the media element's own track list
+  is read when the markup has nothing, and `addtrack` says when to look again — the button
+  lights up when the track lands, carrying whatever captions choice the page remembered. The
+  first track found still wins and keeps winning; switching language needs a control to
+  switch with, and there is none to name. **Upgrading:** the `track` property now holds the
+  `TextTrack` rather than the `<track>` element that used to carry it, because an in-band
+  track has no element — `player.track.mode` where it was `player.track.track.mode`. No DOM
+  or CSS output changes.
+
 ## [1.0.0] - 2026-08-20
 
 ### Added

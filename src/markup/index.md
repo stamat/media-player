@@ -1214,7 +1214,7 @@ against them.
 | `is-video`                                         | it wrapped a `<video>`                                                                                                       |
 | `is-fullscreen`, `controls-shown`, `poster-hidden` | the video half                                                                                                               |
 | `no-fullscreen`                                    | fullscreen has no door to open — an iframe without `allow="fullscreen"` is the common way; hide your fullscreen button on it |
-| `has-captions`, `captions-visible`                 | a `<track>` was found; captions are on                                                                                       |
+| `has-captions`, `captions-visible`                 | a caption track was found, in the markup or in the media element's track list; captions are on                               |
 | `volume-state`                                     | `mute`, `mid` or `full`, for a three-icon volume button                                                                      |
 
 Three you do set: `skip` is how many seconds a skip button moves (default `10`);
@@ -1309,7 +1309,7 @@ already wired is skipped, never doubled.
 | `input:setVolume`                               | the sound follows the thumb immediately; the write to storage waits for the drag to settle                                                       |
 | `click:volumeUp`, `click:volumeDown`            | one tenth of full per press, climbing from zero when muted rather than jumping back — for a volume UI with no slider, or a `keys` entry; the samples bind them to the up and down arrows |
 | `click:toggleMute`                              | mute, and back to the level it remembered                                                                                                        |
-| `click:toggleCaptions`                          | captions on and off; there has to be a `<track>` in the media element for the button to have anything to toggle                                  |
+| `click:toggleCaptions`                          | captions on and off; there has to be a caption track for the button to have anything to toggle — the one marked `default`, or the first written  |
 | `click:toggleFullscreen`                        | the player element, or the video itself on an iPhone, which has never allowed anything else                                                      |
 
 **On `<media-player>` itself:**
@@ -1471,9 +1471,17 @@ setting `src` in the browsers that need it:
 </video>
 ```
 
-None of this is covered by a test. jsdom implements no Media Source Extensions, so the
-composition above is read off the code rather than proven — if it breaks for you, that is an
-issue worth filing.
+Captions come along. A streaming library adds its caption track to the media element rather
+than as a `<track>` you wrote, and it arrives after this element has upgraded — so the track
+list is what is read, and `addtrack` is what says to read it again. The captions button
+lights up when the track lands, on whatever the page remembered from last visit. What is not
+here is a language picker: the first caption track found is the one that stays, because
+switching between them would need a control to switch with, and naming that control is a
+decision for markup rather than for this element.
+
+The late track is covered by a test, against a stated `textTracks` list. The rest of this is
+not: jsdom implements no Media Source Extensions, so attaching hls.js is read off the code
+rather than proven — if it breaks for you, that is an issue worth filing.
 
 ## What it does not do
 

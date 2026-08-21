@@ -5,7 +5,8 @@
  * on the way out), the wiring the element declares itself (`static wires`, so the media
  * element needs no `on=`), readiness from any of the five metadata events, live streams, the volume
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
- * track, the video controls' hide timer, the labels the buttons announce themselves by, the
+ * track — the one the author marked `default`, and the one a streaming library adds after
+ * the upgrade with no `<track>` behind it — the video controls' hide timer, the labels the buttons announce themselves by, the
  * keys a control claims and the presses that are somebody else's, the OS media panel against
  * a stubbed `navigator.mediaSession`, the slider fills caught up through slider-elemental's
  * own `apply()` after scripted writes, the scrubber frame previews against stubbed
@@ -934,6 +935,32 @@ function fakeTrack() {
   return track;
 }
 
+/**
+ * A caption track with no `<track>` behind it, the way a streaming library adds one, and a
+ * `textTracks` list that can announce it: jsdom's own list is an empty stub with no
+ * `addEventListener`, so the list a browser would have is stated here.
+ */
+function fakeInbandCaptions(media, kind = 'captions') {
+  const bus = new EventTarget();
+  const list = [];
+  list.addEventListener = bus.addEventListener.bind(bus);
+  list.removeEventListener = bus.removeEventListener.bind(bus);
+  Object.defineProperty(media, 'textTracks', { value: list, configurable: true });
+
+  return () => {
+    const track = {
+      kind,
+      mode: 'disabled',
+      listeners: 0,
+      addEventListener() { this.listeners += 1; },
+      removeEventListener() { this.listeners -= 1; }
+    };
+    list.push(track);
+    bus.dispatchEvent(new Event('addtrack'));
+    return track;
+  };
+}
+
 describe('captions', () => {
   test('a track inside the media element is what makes a captions button worth showing', () => {
     const media = fakeMedia('video');
@@ -956,6 +983,62 @@ describe('captions', () => {
     player.toggleCaptions();
     expect(player.captionsLabel).toBe('Enable captions');
     expect(track.track.mode).toBe('disabled');
+  });
+
+  test('the track the author marked default is the one the button toggles, not the first written', () => {
+    const media = fakeMedia('video');
+    const first = fakeTrack();
+    const preferred = fakeTrack();
+    preferred.setAttribute('default', '');
+    media.append(first, preferred);
+    const player = mount(media);
+
+    expect(player.track).toBe(preferred.track);
+    player.toggleCaptions();
+    expect(preferred.track.mode).toBe('hidden');
+    expect(first.track.mode).toBe('disabled');
+  });
+
+  test('a caption track that arrives after the upgrade still earns its button', () => {
+    const media = fakeMedia('video');
+    const add = fakeInbandCaptions(media);
+    const player = mount(media);
+    expect(player.hasAttribute('has-captions')).toBe(false);
+
+    const track = add();
+    expect(player.hasAttribute('has-captions')).toBe(true);
+    player.toggleCaptions();
+    expect(track.mode).toBe('hidden');
+  });
+
+  test('a track that arrives late is handed the captions choice from last visit', () => {
+    localStorage.setItem('media-player-captions', 'true');
+    const media = fakeMedia('video');
+    const add = fakeInbandCaptions(media);
+    mount(media);
+    const track = add();
+    expect(track.mode).toBe('hidden');
+  });
+
+  test('an in-band track keeps its cue listener across a move in the DOM', () => {
+    const media = fakeMedia('video');
+    const add = fakeInbandCaptions(media);
+    const player = mount(media);
+    const track = add();
+    expect(track.listeners).toBe(1);
+
+    const aside = document.createElement('aside');
+    document.body.appendChild(aside);
+    aside.appendChild(player); // one move: disconnected takes it off, connected puts it back
+    expect(track.listeners).toBe(1);
+  });
+
+  test('a data track arriving is not mistaken for captions', () => {
+    const media = fakeMedia('video');
+    const add = fakeInbandCaptions(media, 'metadata');
+    const player = mount(media);
+    add();
+    expect(player.hasAttribute('has-captions')).toBe(false);
   });
 
   test('captions left on last visit come back on, without writing the choice again', () => {
@@ -1095,7 +1178,7 @@ describe('frame previews on the scrubber', () => {
     media.append(thumbs, captions);
     const player = mount(media);
     expect(player.hasAttribute('has-captions')).toBe(true);
-    expect(player.track).toBe(captions);
+    expect(player.track).toBe(captions.track);
     expect(player.thumbs).toBe(thumbs);
   });
 

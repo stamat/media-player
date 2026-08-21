@@ -1616,6 +1616,10 @@ var MediaPlayer = class extends HgElement {
     }
     this.hadControls = this.media.controls;
     this.media.controls = false;
+    this.onTrackAdded = () => this.findCaptions();
+    this.onInbandCue = (event) => this.onCue(event);
+    this.media.textTracks?.addEventListener?.("addtrack", this.onTrackAdded);
+    if (this.inband) this.track?.addEventListener?.("cuechange", this.onInbandCue);
     if (this.isReady) {
       this.resume();
       if (this.isPlaying) this.claimSession();
@@ -1630,8 +1634,7 @@ var MediaPlayer = class extends HgElement {
     this.muteLabel = "Mute";
     this.captionsLabel = "Enable captions";
     this.timeFormatter = formatTime;
-    this.track = this.media.querySelector("track:not([kind=metadata])");
-    if (this.track) this.hasCaptions = true;
+    this.findCaptions();
     this.thumbs = this.media.querySelector("track[kind=metadata]");
     if (this.thumbs?.track) this.thumbs.track.mode = "hidden";
     this.restore();
@@ -1642,6 +1645,8 @@ var MediaPlayer = class extends HgElement {
     if (this.linger) clearTimeout(this.linger);
     if (this.settle) clearTimeout(this.settle);
     this.releaseSession();
+    this.media?.textTracks?.removeEventListener?.("addtrack", this.onTrackAdded);
+    if (this.inband) this.track?.removeEventListener?.("cuechange", this.onInbandCue);
     if (this.media && this.hadControls) this.media.controls = true;
   }
   /**
@@ -2161,7 +2166,7 @@ var MediaPlayer = class extends HgElement {
   // CAPTIONS
   onCue(event) {
     if (event.target.kind === "metadata") return;
-    const track = event.target.track;
+    const track = event.target.track || event.target;
     const cues = track?.activeCues;
     if (!cues || !cues.length) {
       this.captionText = null;
@@ -2169,6 +2174,29 @@ var MediaPlayer = class extends HgElement {
     }
     track.mode = "hidden";
     this.captionText = cues[0].text;
+  }
+  /**
+   * The caption track, from the markup or from the list, whichever has one.
+   *
+   * `default` is the author's pick and the platform's own rule; without one the first in
+   * document order is what a browser would have shown, so it is what is taken. The first
+   * track found wins and keeps winning — switching language needs a control to switch it
+   * with, and there is no such control to name.
+   *
+   * `track` holds the `TextTrack`, not the `<track>`: an in-band track from a streaming
+   * library has no element, and it is the only kind that arrives after the upgrade.
+   */
+  findCaptions() {
+    if (this.track || !this.media) return;
+    const element = this.media.querySelector("track[default]:not([kind=metadata])") || this.media.querySelector("track:not([kind=metadata])");
+    const listed = Array.from(this.media.textTracks || []).find((one) => one.kind === "captions" || one.kind === "subtitles");
+    const found = element?.track || listed;
+    if (!found) return;
+    this.track = found;
+    this.hasCaptions = true;
+    this.inband = !element;
+    if (this.inband) found.addEventListener?.("cuechange", this.onInbandCue);
+    this.setCaptions(this.read("captions") === true, false);
   }
   toggleCaptions() {
     this.setCaptions(!this.captionsVisible);
@@ -2178,7 +2206,7 @@ var MediaPlayer = class extends HgElement {
     if (!this.track) return;
     this.captionsVisible = visible;
     this.captionsLabel = visible ? "Disable captions" : "Enable captions";
-    this.track.track.mode = visible ? "hidden" : "disabled";
+    this.track.mode = visible ? "hidden" : "disabled";
     if (!visible) this.captionText = null;
     if (remember) this.store("captions", visible);
   }
@@ -2308,7 +2336,8 @@ var MediaPlayer = class extends HgElement {
     }
   }
   /**
-   * Volume, mute and captions from last time.
+   * Volume and mute from last time. Captions are restored by `findCaptions` instead, which
+   * is the only thing that knows when there is a track to restore them onto.
    *
    * Nothing is written back while restoring: `applyVolume` would otherwise store the value
    * it just read, and a player that never got a real volume set on it would keep rewriting
@@ -2320,8 +2349,6 @@ var MediaPlayer = class extends HgElement {
     if (typeof volume === "number") this.applyVolume(muted ? 0 : volume, false);
     if (typeof volume === "number" && volume > 0) this.lastVolume = volume;
     this.syncVolume();
-    const captions = this.read("captions");
-    if (this.track) this.setCaptions(captions === true, false);
   }
   /** Something was pressed, dragged or toggled. One event, so a page can log all of it. */
   interaction(type, value = null) {

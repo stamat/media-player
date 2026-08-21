@@ -301,7 +301,7 @@ function focusedElement() {
  * @attr {boolean} no-fullscreen - Fullscreen has no door to open here — an iframe without `allow="fullscreen"` is the common way. CSS hook for hiding the button that would do nothing; the element sets it.
  * @attr {boolean} controls-shown - The video controls are up. CSS hook; the element sets it.
  * @attr {boolean} poster-hidden - The poster has been played past. CSS hook; the element sets it.
- * @attr {boolean} has-captions - A `<track>` was found, so a captions button is worth showing. CSS hook; the element sets it.
+ * @attr {boolean} has-captions - A caption track was found, so a captions button is worth showing. CSS hook; the element sets it.
  * @attr {boolean} captions-visible - Captions are on. Persisted; the element sets it.
  * @attr {string} volume-state - `mute`, `mid` or `full`, for the three-icon volume button. CSS hook; the element sets it.
  * @attr {number} skip - Seconds a skip button moves. Defaults to 10.
@@ -433,6 +433,19 @@ export class MediaPlayer extends HgElement {
     this.hadControls = this.media.controls;
     this.media.controls = false;
 
+    // A caption track can arrive after this runs: a streaming library adds an in-band track
+    // with no `<track>` element behind it, and hydrargyri wires `static wires` once at
+    // upgrade, so neither the element read below nor the `cuechange` wire would ever see it.
+    // `addtrack` is the platform saying when to look again. Both handlers are set up before
+    // the reconnect return below, because `disconnected` takes them off on the way out.
+    this.onTrackAdded = () => this.findCaptions();
+    this.onInbandCue = (event) => this.onCue(event);
+    this.media.textTracks?.addEventListener?.('addtrack', this.onTrackAdded);
+    // A move in the DOM took both listeners off, and `findCaptions` will not run again for a
+    // player that already has its track — so the in-band one is put back here or the cues
+    // stop rendering after a move, silently.
+    if (this.inband) this.track?.addEventListener?.('cuechange', this.onInbandCue);
+
     // A move in the DOM is a disconnect and a connect, and hydrargyri runs this method on
     // both connects. A player that was already ready keeps its state: resetting it here
     // would wedge the duration at zero, because `loaded` cannot run twice — so a reconnect
@@ -460,10 +473,7 @@ export class MediaPlayer extends HgElement {
     // one reference.
     this.timeFormatter = formatTime;
 
-    // Not the metadata track: a bare `<track>` defaults to subtitles and stays a captions
-    // track, but thumbnails must never end up behind the captions button.
-    this.track = this.media.querySelector('track:not([kind=metadata])');
-    if (this.track) this.hasCaptions = true;
+    this.findCaptions();
 
     this.thumbs = this.media.querySelector('track[kind=metadata]');
     // A disabled text track never fetches its file; hidden loads the cues and renders
@@ -484,6 +494,8 @@ export class MediaPlayer extends HgElement {
     if (this.linger) clearTimeout(this.linger);
     if (this.settle) clearTimeout(this.settle);
     this.releaseSession();
+    this.media?.textTracks?.removeEventListener?.('addtrack', this.onTrackAdded);
+    if (this.inband) this.track?.removeEventListener?.('cuechange', this.onInbandCue);
     // Put the page back the way it was found: an element removed from the DOM should leave
     // a media element that still plays, not a controlless one.
     if (this.media && this.hadControls) this.media.controls = true;
@@ -1093,7 +1105,7 @@ export class MediaPlayer extends HgElement {
   onCue(event) {
     // The thumbnails track rides the same wire, and its cues are image URLs, not speech.
     if (event.target.kind === 'metadata') return;
-    const track = event.target.track;
+    const track = event.target.track || event.target;
     const cues = track?.activeCues;
     if (!cues || !cues.length) {
       this.captionText = null;
@@ -1105,6 +1117,38 @@ export class MediaPlayer extends HgElement {
     this.captionText = cues[0].text;
   }
 
+  /**
+   * The caption track, from the markup or from the list, whichever has one.
+   *
+   * `default` is the author's pick and the platform's own rule; without one the first in
+   * document order is what a browser would have shown, so it is what is taken. The first
+   * track found wins and keeps winning — switching language needs a control to switch it
+   * with, and there is no such control to name.
+   *
+   * `track` holds the `TextTrack`, not the `<track>`: an in-band track from a streaming
+   * library has no element, and it is the only kind that arrives after the upgrade.
+   */
+  findCaptions() {
+    if (this.track || !this.media) return;
+    // Not the metadata track: a bare `<track>` defaults to subtitles and stays a captions
+    // track, but thumbnails must never end up behind the captions button.
+    const element = this.media.querySelector('track[default]:not([kind=metadata])')
+      || this.media.querySelector('track:not([kind=metadata])');
+    const listed = Array.from(this.media.textTracks || [])
+      .find((one) => one.kind === 'captions' || one.kind === 'subtitles');
+
+    const found = element?.track || listed;
+    if (!found) return;
+
+    this.track = found;
+    this.hasCaptions = true;
+    // A `<track>` in the markup already carries the `cuechange` wire; one with no element
+    // behind it has nothing to have been wired, so it is listened to directly.
+    this.inband = !element;
+    if (this.inband) found.addEventListener?.('cuechange', this.onInbandCue);
+    this.setCaptions(this.read('captions') === true, false);
+  }
+
   toggleCaptions() {
     this.setCaptions(!this.captionsVisible);
     this.interaction(this.captionsVisible ? 'captions-on' : 'captions-off');
@@ -1114,7 +1158,7 @@ export class MediaPlayer extends HgElement {
     if (!this.track) return;
     this.captionsVisible = visible;
     this.captionsLabel = visible ? 'Disable captions' : 'Enable captions';
-    this.track.track.mode = visible ? 'hidden' : 'disabled';
+    this.track.mode = visible ? 'hidden' : 'disabled';
     if (!visible) this.captionText = null;
     if (remember) this.store('captions', visible);
   }
@@ -1269,7 +1313,8 @@ export class MediaPlayer extends HgElement {
   }
 
   /**
-   * Volume, mute and captions from last time.
+   * Volume and mute from last time. Captions are restored by `findCaptions` instead, which
+   * is the only thing that knows when there is a track to restore them onto.
    *
    * Nothing is written back while restoring: `applyVolume` would otherwise store the value
    * it just read, and a player that never got a real volume set on it would keep rewriting
@@ -1281,9 +1326,6 @@ export class MediaPlayer extends HgElement {
     if (typeof volume === 'number') this.applyVolume(muted ? 0 : volume, false);
     if (typeof volume === 'number' && volume > 0) this.lastVolume = volume;
     this.syncVolume();
-
-    const captions = this.read('captions');
-    if (this.track) this.setCaptions(captions === true, false);
   }
 
   /** Something was pressed, dragged or toggled. One event, so a page can log all of it. */
