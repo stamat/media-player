@@ -1295,7 +1295,7 @@ against them.</p>
 </tr>
 <tr>
 <td><code>is-buffering</code></td>
-<td>waiting on data</td>
+<td>waiting on data; <code>.media-player-buffering</code> in your markup is the box a spinner goes in — shown under this hook, drawn by your stylesheet</td>
 </tr>
 <tr>
 <td><code>is-error</code></td>
@@ -1899,7 +1899,9 @@ map would spend letters on every page that never asked for them.</li>
 the toolbar and the tooltip too. Their stylesheets do not: each elemental draws its own
 track, thumb, bar or bubble, so its sheet loads beside this one. The tooltip is the one
 whose theme is not really optional: its own sheet places the bubble and leaves the painting
-to the theme, so without it there is unpainted text over the control row.</p>
+to the theme, so without it there is unpainted text over the control row. The <code>href</code>s are
+bare specifiers for a bundler to resolve — a page with no build step takes the CDN block
+below, full URLs and all.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/style.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/slider/style.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/progress/style.css&quot;</span> /&gt;</span>

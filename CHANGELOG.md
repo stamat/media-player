@@ -77,7 +77,9 @@ for the person who wrote the code.
   its second. The dark-mode claim names its condition now: `Canvas` follows `color-scheme`,
   not a class. And the `click:toggleCaptions` reference row speaks the same kind rule as the
   code — it still described the pre-1.1.x pick, any track but metadata — with the FAQ as the
-  one place the rule is written out.
+  one place the rule is written out. `.media-player-buffering`, the box a spinner goes in,
+  is in the hooks table at last, and the npm block says its bare-specifier `href`s want a
+  bundler.
 
 - **A `<track>` appended after the upgrade renders its cues.** The cue listener rode
   `static wires`, which hydrargyri scans once at upgrade — a `<track>` a script appends

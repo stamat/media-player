@@ -1266,7 +1266,7 @@ against them.
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `is-ready`                                         | metadata arrived; the duration is known and the controls are live                                                            |
 | `is-playing`                                       | playing — the hook the play/pause icon swap hangs on                                                                         |
-| `is-buffering`                                     | waiting on data                                                                                                              |
+| `is-buffering`                                     | waiting on data; `.media-player-buffering` in your markup is the box a spinner goes in — shown under this hook, drawn by your stylesheet     |
 | `is-error`                                         | the media gave up — a 404, a refused codec, a failed decode; the native controls come back for the browser's own error state |
 | `is-live`                                          | the duration says endless stream; what can be reached inside it is `seekableStart`–`seekableEnd`                             |
 | `is-video`                                         | it wrapped a `<video>`                                                                                                       |
@@ -1679,7 +1679,9 @@ The elementals ride along — importing `media-player-element` defines the slide
 the toolbar and the tooltip too. Their stylesheets do not: each elemental draws its own
 track, thumb, bar or bubble, so its sheet loads beside this one. The tooltip is the one
 whose theme is not really optional: its own sheet places the bubble and leaves the painting
-to the theme, so without it there is unpainted text over the control row.
+to the theme, so without it there is unpainted text over the control row. The `href`s are
+bare specifiers for a bundler to resolve — a page with no build step takes the CDN block
+below, full URLs and all.
 
 ```html
 <link rel="stylesheet" href="media-player-element/style.css" />
