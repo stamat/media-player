@@ -17,8 +17,9 @@ for the person who wrote the code.
   `muted` and no level — `rememberVolume` never writes a zero — and `restore` waited for a
   stored level before acting on either flag, so the one mute a fresh player could make was
   forgotten by the next visit. The flag is restored on its own now; unmuting after it
-  returns to full, there being no remembered level to return to. No DOM or CSS output
-  changes.
+  returns to full, there being no remembered level to return to. No new DOM or CSS hooks,
+  but `volume-state` now reads `mute` at first paint for that returning visitor, where it
+  read the unmuted state before.
 
 - **`goLive` is public in the manifest again.** The 1.1.0 handler shipped marked private in
   `custom-elements.json`: the live recipe writes `on="click:goLive"` and the reference lists
@@ -43,8 +44,10 @@ for the person who wrote the code.
   metadata one, so a chapters or descriptions track ended up behind the captions button,
   its cues rendered as captions text — while the in-band path already filtered to captions
   and subtitles, and the two disagreed. Both speak one rule now: `captions`, `subtitles`,
-  or a bare `<track>`, which the platform itself reads as subtitles. No DOM or CSS output
-  changes beyond which track the button binds.
+  or a bare `<track>`, which the platform itself reads as subtitles. Two output changes: a
+  different track can now sit behind the button, and a player whose only track is chapters
+  or descriptions no longer writes `has-captions` at all — a stylesheet keyed on it loses
+  the button there, by design.
 
 ## [1.1.0] - 2026-08-21
 
