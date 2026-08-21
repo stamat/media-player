@@ -1981,3 +1981,26 @@ test('every handler the manual names — through on=, data-on= or keys= — is i
   const missing = [...named].filter((name) => !PUBLIC.has(name));
   expect(missing).toEqual([]);
 });
+
+test('every attribute the manual writes on a <media-player> tag is one the Options panel offers', async () => {
+  // The AUTHORED allow-list has the same failure mode PUBLIC had: an attribute forgotten
+  // there falls through to the hidden marking meant for the CSS hooks and silently
+  // vanishes from the Options panel — how `keys` vanished in 1.1.0. Globals and
+  // hydrargyri's wiring attributes are the page's business, not the panel's. A tag inside
+  // a prose code span is skipped — unlike the handler walk above — because the one the
+  // manual writes there is the refused `<media-player src>`, a counter-example rather
+  // than a promise.
+  const { readFile } = await import('node:fs/promises');
+  const page = await readFile(new URL('../src/markup/index.md', import.meta.url), 'utf8');
+  const globals = new Set(['tabindex', 'role', 'class', 'style', 'id', 'on', 'data-on', 'bind']);
+  const written = new Set();
+  for (const [, tag] of page.matchAll(/(?<!`)<media-player\b([^>]*)>/g)) {
+    for (const [, name] of tag.matchAll(/\s([a-z-]+)=/g)) {
+      if (!globals.has(name) && !name.startsWith('aria-')) written.add(name);
+    }
+  }
+  expect(written.size).toBeGreaterThan(0);
+  const { AUTHORED } = await import('../custom-elements-manifest.config.mjs');
+  const missing = [...written].filter((name) => !AUTHORED.has(name));
+  expect(missing).toEqual([]);
+});

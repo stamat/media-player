@@ -89,7 +89,9 @@ for the person who wrote the code.
 - **The Options panel offers `keys`.** The attribute fell through to the hidden marking
   meant for the CSS hooks, so the panel showed six knobs where seven attributes are the
   author's to write — and the manual said six in its intro while its own reference counted
-  seven. The panel and the intro both say seven now.
+  seven. The panel and the intro both say seven now, and the allow-list has the same markup
+  walk the handlers got: every attribute a sample writes on a `<media-player>` tag must be
+  in it, so the next authored attribute cannot vanish the way `keys` did.
 
 - **A disabled control's key leaves the press with the page.** The press was claimed with
   `preventDefault` before the click a disabled control ignores, so a `key=" "` on a
