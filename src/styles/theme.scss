@@ -5,7 +5,11 @@
 // page into dark mode and forced colours without a palette to configure.
 
 media-player {
-  --media-player-accent: #22c55e;
+  // One step darker than the green this shipped with: the flood puts `accent-ink` glyphs
+  // on the accent and the focus ring puts the accent on the page's Canvas, and #22c55e
+  // held 2.3:1 against white — under the 3:1 WCAG 1.4.11 asks of both. #16a34a holds
+  // 3.3:1 on white and 6.4:1 on black, so glyph and ring clear it on either scheme.
+  --media-player-accent: #16a34a;
 
   // What sits on the accent — the flooded button's glyph, the chip's triangle. Its own
   // knob because the accent is one: whoever changes the accent has to be able to change

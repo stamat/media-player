@@ -1323,7 +1323,7 @@ properties — the first five live in the theme, the last two in the structure s
 
 | Property                    | Default      | Paints                                                                                                                                         |
 | --------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--media-player-accent`     | `#22c55e`    | the played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring                                |
+| `--media-player-accent`     | `#16a34a`    | the played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring                                |
 | `--media-player-accent-ink` | `#fff`       | what sits on the accent — the flooded button's glyph, the chip's triangle; change it with the accent                                           |
 | `--media-player-surface`    | `Canvas`     | behind the control row                                                                                                                         |
 | `--media-player-color`      | `CanvasText` | labels, and every neutral mixed from it — tracks, the buffered bar, disabled buttons; the video half swaps it to white and everything re-mixes |

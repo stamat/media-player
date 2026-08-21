@@ -11,6 +11,15 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+### Changed
+
+- **The accent is one step darker: `#16a34a`.** The old `#22c55e` held 2.3:1 against the
+  white ink that floods onto a button under hover, focus and a held toggle, and against a
+  light `Canvas` behind the focus ring — under the 3:1 that WCAG 1.4.11 asks of non-text
+  states and focus indicators. The new green holds 3.3:1 on white and 6.4:1 on black, so
+  glyph and ring clear the line on either scheme. Every accent use shifts with the token;
+  set `--media-player-accent` yourself if you want the brighter green back.
+
 ### Added
 
 - **`is-error` says the media gave up.** A 404, a refused codec or a decode failure used to

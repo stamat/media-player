@@ -123,7 +123,7 @@
               },
               "description": "The played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring.",
               "name": "--media-player-accent",
-              "default": "#22c55e"
+              "default": "#16a34a"
             },
             {
               "type": {

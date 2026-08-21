@@ -326,7 +326,7 @@ function focusedElement() {
  * @attr {string} storage-key - Prefix for the remembered volume, mute and captions state. Defaults to `media-player`; set it per player to keep two of them from sharing one volume.
  * @attr {string} keys - Key-to-method pairs for actions no visible control names, `keys="ArrowUp:volumeUp;ArrowDown:volumeDown"`. A control's own `key` outranks it for the same press, and a focused control keeps the keys it already answers.
  *
- * @cssprop {<color>} [--media-player-accent=#22c55e] - The played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring.
+ * @cssprop {<color>} [--media-player-accent=#16a34a] - The played fill, the hover that floods a button, a toggle held on, the thumbs, the overlay chip, the focus ring.
  * @cssprop {<color>} [--media-player-accent-ink=#fff] - What sits on the accent: the flooded button's glyph, the chip's triangle. Change it with the accent.
  * @cssprop {<color>} [--media-player-surface=Canvas] - Behind the control row.
  * @cssprop {<color>} [--media-player-color=CanvasText] - Icons and labels on it.
