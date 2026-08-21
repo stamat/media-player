@@ -1396,6 +1396,10 @@ export class MediaPlayer extends HgElement {
    * Volume and mute from last time. Captions are restored by `findCaptions` instead, which
    * is the only thing that knows when there is a track to restore them onto.
    *
+   * The mute stands on its own: muting a volume nobody ever dragged stores `muted` and no
+   * level at all — `rememberVolume` never writes a zero — so a restore that waited for a
+   * stored level would lose exactly that mute.
+   *
    * Nothing is written back while restoring: `applyVolume` would otherwise store the value
    * it just read, and a player that never got a real volume set on it would keep rewriting
    * the same entry on every page load.
@@ -1403,7 +1407,8 @@ export class MediaPlayer extends HgElement {
   restore() {
     const volume = this.read('volume');
     const muted = this.read('muted');
-    if (typeof volume === 'number') this.applyVolume(muted ? 0 : volume, false);
+    if (muted === true) this.applyVolume(0, false);
+    else if (typeof volume === 'number') this.applyVolume(volume, false);
     if (typeof volume === 'number' && volume > 0) this.lastVolume = volume;
     this.syncVolume();
   }

@@ -613,7 +613,7 @@
             {
               "kind": "method",
               "name": "restore",
-              "description": "Volume and mute from last time. Captions are restored by `findCaptions` instead, which\nis the only thing that knows when there is a track to restore them onto.\n\nNothing is written back while restoring: `applyVolume` would otherwise store the value\nit just read, and a player that never got a real volume set on it would keep rewriting\nthe same entry on every page load.",
+              "description": "Volume and mute from last time. Captions are restored by `findCaptions` instead, which\nis the only thing that knows when there is a track to restore them onto.\n\nThe mute stands on its own: muting a volume nobody ever dragged stores `muted` and no\nlevel at all — `rememberVolume` never writes a zero — so a restore that waited for a\nstored level would lose exactly that mute.\n\nNothing is written back while restoring: `applyVolume` would otherwise store the value\nit just read, and a player that never got a real volume set on it would keep rewriting\nthe same entry on every page load.",
               "privacy": "private"
             },
             {

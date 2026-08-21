@@ -11,6 +11,15 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+### Fixed
+
+- **A mute survives a reload on its own.** Muting a volume nobody had dragged stores
+  `muted` and no level — `rememberVolume` never writes a zero — and `restore` waited for a
+  stored level before acting on either flag, so the one mute a fresh player could make was
+  forgotten by the next visit. The flag is restored on its own now; unmuting after it
+  returns to full, there being no remembered level to return to. No DOM or CSS output
+  changes.
+
 ## [1.1.0] - 2026-08-21
 
 ### Added

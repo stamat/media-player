@@ -691,6 +691,22 @@ describe('volume', () => {
     expect(media.volume).toBe(1); // the end snap closes the top
   });
 
+  test('a mute on a volume nobody ever dragged still survives the reload', () => {
+    // Muting stores `muted` and no level — `rememberVolume` never writes a zero — so the
+    // restore cannot wait for a stored volume before acting on the flag.
+    const player = mount(fakeMedia());
+    player.toggleMute();
+    player.remove();
+    document.body.innerHTML = '';
+
+    const media = fakeMedia();
+    const revisit = mount(media);
+    expect(media.muted).toBe(true);
+    expect(media.volume).toBe(0);
+    revisit.toggleMute();
+    expect(media.volume).toBe(1); // no remembered level to return to; full is the honest default
+  });
+
   test('a mute survives a reload, and unmuting after it returns to the old level rather than full blast', () => {
     const player = mount(fakeMedia());
     player.applyVolume(0.4);
