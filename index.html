@@ -395,8 +395,9 @@ a working native player rather than a row of dead buttons.</p>
 until JavaScript says so.</p>
 <h2 id="one-element-both-media">One element, both media<a class="heading-anchor" href="#one-element-both-media" tabindex="-1" aria-hidden="true"></a></h2>
 <p>There is no separate audio player and video player. <code>&lt;media-player&gt;</code> reads which element you
-wrapped and turns on the video half — poster, click-to-play overlay, captions, fullscreen,
-controls that fade out while playing — only when it wrapped a <code>&lt;video&gt;</code>.</p>
+wrapped and turns on the video half — poster, click-to-play overlay, click-to-pause on the
+picture, captions, fullscreen, controls that fade out while playing — only when it wrapped a
+<code>&lt;video&gt;</code>.</p>
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it.
      The frame's own padding drops to nothing on a narrow screen. That keeps the sample
@@ -429,9 +430,12 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
     <span class="hljs-tag">&lt;<span class="hljs-name">track</span> <span class="hljs-attr">kind</span>=<span class="hljs-string">&quot;metadata&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout-thumbs.vtt&quot;</span> /&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
 
-  <span class="hljs-comment">&lt;!-- Both go when playback starts: the element sets `poster-hidden` and the stylesheet
-       takes them off. The overlay leaves entirely rather than fading, so an invisible
-       button is never sitting over the controls swallowing their clicks. --&gt;</span>
+  <span class="hljs-comment">&lt;!-- Both go when playback starts and they come back differently. The poster is gone for
+       good — the element sets `poster-hidden` the first time playback starts — while the
+       overlay follows `is-playing`, so clicking the picture pauses the video and puts the
+       big play button back over the frame it stopped on. Both leave with `display` rather
+       than fading, so an invisible button is never sitting over the picture swallowing
+       clicks. --&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-poster&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.jpg&quot;</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">&quot;&quot;</span> /&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
     <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-overlay&quot;</span>
@@ -751,6 +755,10 @@ is paused or something inside has focus. <code>fullscreenchange@document:onFulls
 keeps <code>is-fullscreen</code> honest when <kbd>Escape</kbd> leaves fullscreen without the button
 being pressed. A third would bind the keyboard — <a href="#keys-the-buttons-carry">Keys the buttons carry</a>,
 below — which no sample on this page switches on.</p>
+<p>A click on the picture itself needs no handler in the markup: the element wires it, the same
+way it wires the media element&#39;s events. Clicking a playing video pauses it and the overlay
+returns over the frame it stopped on, so the big play button is up whenever there is
+something to start — including while a paused video is being scrubbed.</p>
 <p>Captions render into whatever binds <code>captionText</code>, with the track held <code>hidden</code> so the
 browser&#39;s own caption box stays out of the way — which is what leaves your stylesheet in
 charge of what captions look like.</p>
@@ -1273,7 +1281,7 @@ against them.</p>
 </tr>
 <tr>
 <td><code>is-fullscreen</code>, <code>controls-shown</code>, <code>poster-hidden</code></td>
-<td>the video half</td>
+<td>the video half — <code>poster-hidden</code> covers the poster only, the overlay follows <code>is-playing</code></td>
 </tr>
 <tr>
 <td><code>no-fullscreen</code></td>

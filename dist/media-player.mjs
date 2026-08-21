@@ -1715,13 +1715,15 @@ var MediaPlayer = class extends HgElement {
     this.hidePoster();
   }
   /**
-   * Hide the poster and the overlay, and catch the focus they are about to take with them.
+   * Hide the poster, and catch the focus the overlay over it is about to take with it.
    *
-   * The overlay is a real button, so pressing it to play leaves focus on it — and this is the
-   * moment `display: none` removes it, which drops focus to `<body>`. Every key bound to this
-   * player then has nowhere to land: the next Space scrolls the page instead of pausing, and
-   * nothing on screen says why. Moving focus here is not taking focus, it is declining to lose
-   * it, which is the one case where moving it is the correct thing rather than the rude one.
+   * The overlay is a real button, so pressing it to play leaves focus on it — and playing is
+   * the moment `display: none` removes it, which drops focus to `<body>`. Every key bound to
+   * this player then has nowhere to land: the next Space scrolls the page instead of pausing,
+   * and nothing on screen says why. Moving focus here is not taking focus, it is declining to
+   * lose it, which is the one case where moving it is the correct thing rather than the rude
+   * one. The poster is the only thing this hides for good — the overlay follows `is-playing`,
+   * so it is back over a video the moment one pauses.
    *
    * Only when the author made the player focusable. `focus()` on an element that cannot hold
    * focus is a silent no-op, and there is nothing this can write on the author's element to fix
@@ -1891,9 +1893,9 @@ var MediaPlayer = class extends HgElement {
     this.loaded();
   }
   onPlay() {
+    this.hidePoster();
     this.isPlaying = true;
     this.isBuffering = false;
-    this.hidePoster();
     this.playLabel = "Pause";
     this.resume();
     this.claimSession();
@@ -2402,6 +2404,11 @@ __publicField(MediaPlayer, "properties", [
  */
 __publicField(MediaPlayer, "wires", {
   "audio, video": "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange",
+  // The picture is the same button the overlay is, once the overlay has stepped out of the
+  // way: clicking a playing video pauses it, and the overlay comes back over the frame it
+  // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
+  // the pair would be a listener on nothing.
+  video: "click:togglePlay",
   track: "cuechange:onCue"
 });
 __publicField(MediaPlayer, "formatters", {

@@ -3,7 +3,8 @@
  *
  * Covered here: the progressive-enhancement contract (native controls off on upgrade, back
  * on the way out), the wiring the element declares itself (`static wires`, so the media
- * element needs no `on=`), readiness from any of the five metadata events, live streams, the volume
+ * element needs no `on=`, and a click on the picture toggles playback), readiness from any of
+ * the five metadata events, live streams, the volume
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
  * track — the one the author marked `default`, and the one a streaming library adds after
  * the upgrade with no `<track>` behind it — the video controls' hide timer, the labels the buttons announce themselves by, the
@@ -14,8 +15,10 @@
  * not provable here — and that the surface the custom elements manifest publishes still
  * exists on the element.
  *
- * Deliberately not covered: fullscreen and the `cuechange` event, neither of which jsdom
- * implements — `requestFullscreen` is absent and a `<track>` never fires a cue, so a test
+ * Deliberately not covered: which of the poster and the overlay is on screen, which is
+ * `display: none` off `poster-hidden` and `is-playing` in a stylesheet jsdom never applies —
+ * what is asserted here is the attributes those rules read. Nor fullscreen and the
+ * `cuechange` event, neither of which jsdom implements — `requestFullscreen` is absent and a `<track>` never fires a cue, so a test
  * here would only assert that the stub was called. The animation-frame clock is not covered
  * either: what it guarantees is smoothness, and a test of `requestAnimationFrame` under
  * fake timers proves the timer works rather than that the thumb moves. All three want a
@@ -129,6 +132,25 @@ describe('the wiring the element carries itself', () => {
     player.addEventListener('media-player-interaction', (e) => seen.push(e.detail.type));
     media.dispatchEvent(new Event('play'));
     expect(seen).toEqual(['play']);
+  });
+
+  test('a click on the picture toggles playback, both ways', () => {
+    const media = fakeMedia('video');
+    mount(media);
+    media.dispatchEvent(new Event('click'));
+    expect(media.paused).toBe(false);
+    media.dispatchEvent(new Event('click'));
+    expect(media.paused).toBe(true);
+  });
+
+  test('a click on an audio element is a click on the page, not on a control', () => {
+    // An `<audio>` with its controls off draws no box, so anything reaching it came from the
+    // page around it — starting playback from that is a player pressed by something the
+    // reader cannot see.
+    const media = fakeMedia();
+    mount(media);
+    media.dispatchEvent(new Event('click'));
+    expect(media.paused).toBe(true);
   });
 });
 
@@ -1261,6 +1283,31 @@ describe('the focus the overlay takes with it', () => {
     player.onPlay();
     expect(player.hasAttribute('poster-hidden')).toBe(true);
     expect(document.activeElement).toBe(overlay);
+  });
+
+  test('the focus is caught before the attribute that takes the overlay away, not after', () => {
+    // `is-playing` is what the stylesheet hides the overlay on, and a button already
+    // `display: none` has dropped its focus to `<body>` — there is nothing left to catch.
+    // jsdom applies no stylesheet, so the order is asserted rather than its effect.
+    const player = mount(fakeMedia('video'));
+    let playingWhenCaught = null;
+    const hidePoster = player.hidePoster.bind(player);
+    player.hidePoster = () => {
+      playingWhenCaught = player.hasAttribute('is-playing');
+      hidePoster();
+    };
+    player.onPlay();
+    expect(playingWhenCaught).toBe(false);
+  });
+
+  test('a video paused mid-drag is still a video with something to press', () => {
+    // The overlay follows `is-playing`, so what a scrub owes it is to leave that alone: the
+    // big play button stays over a paused video however far the thumb moves.
+    const media = fakeMedia('video');
+    const player = mount(media);
+    player.scrub({ target: { value: '30' } });
+    player.endDrag();
+    expect(player.hasAttribute('is-playing')).toBe(false);
   });
 
   test('focus on a control the poster never covered is left where it is', () => {

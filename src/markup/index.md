@@ -375,8 +375,9 @@ until JavaScript says so.
 ## One element, both media
 
 There is no separate audio player and video player. `<media-player>` reads which element you
-wrapped and turns on the video half — poster, click-to-play overlay, captions, fullscreen,
-controls that fade out while playing — only when it wrapped a `<video>`.
+wrapped and turns on the video half — poster, click-to-play overlay, click-to-pause on the
+picture, captions, fullscreen, controls that fade out while playing — only when it wrapped a
+`<video>`.
 
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it.
@@ -413,9 +414,12 @@ controls that fade out while playing — only when it wrapped a `<video>`.
     <track kind="metadata" src="sample/rollout-thumbs.vtt" />
   </video>
 
-  <!-- Both go when playback starts: the element sets `poster-hidden` and the stylesheet
-       takes them off. The overlay leaves entirely rather than fading, so an invisible
-       button is never sitting over the controls swallowing their clicks. -->
+  <!-- Both go when playback starts and they come back differently. The poster is gone for
+       good — the element sets `poster-hidden` the first time playback starts — while the
+       overlay follows `is-playing`, so clicking the picture pauses the video and puts the
+       big play button back over the frame it stopped on. Both leave with `display` rather
+       than fading, so an invisible button is never sitting over the picture swallowing
+       clicks. -->
   <img class="media-player-poster" src="sample/rollout.jpg" alt="" />
   <button
     class="media-player-overlay"
@@ -741,6 +745,11 @@ is paused or something inside has focus. `fullscreenchange@document:onFullscreen
 keeps `is-fullscreen` honest when <kbd>Escape</kbd> leaves fullscreen without the button
 being pressed. A third would bind the keyboard — [Keys the buttons carry](#keys-the-buttons-carry),
 below — which no sample on this page switches on.
+
+A click on the picture itself needs no handler in the markup: the element wires it, the same
+way it wires the media element's events. Clicking a playing video pauses it and the overlay
+returns over the frame it stopped on, so the big play button is up whenever there is
+something to start — including while a paused video is being scrubbed.
 
 Captions render into whatever binds `captionText`, with the track held `hidden` so the
 browser's own caption box stays out of the way — which is what leaves your stylesheet in
@@ -1233,7 +1242,7 @@ against them.
 | `is-buffering`                                     | waiting on data                                                                                                              |
 | `is-live`                                          | the duration says endless stream, so there is nothing to seek                                                                |
 | `is-video`                                         | it wrapped a `<video>`                                                                                                       |
-| `is-fullscreen`, `controls-shown`, `poster-hidden` | the video half                                                                                                               |
+| `is-fullscreen`, `controls-shown`, `poster-hidden` | the video half — `poster-hidden` covers the poster only, the overlay follows `is-playing`                                     |
 | `no-fullscreen`                                    | fullscreen has no door to open — an iframe without `allow="fullscreen"` is the common way; hide your fullscreen button on it |
 | `has-captions`, `captions-visible`                 | a caption track was found, in the markup or in the media element's track list; captions are on                               |
 | `volume-state`                                     | `mute`, `mid` or `full`, for a three-icon volume button                                                                      |

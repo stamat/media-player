@@ -52,8 +52,8 @@ gives no button to. Nothing is bound by default; bind `keydown:onKeyDown` instea
 keys only answer while focus is inside the player.
 
 One element for both — it reads which element you wrapped and turns on the video half
-(poster, overlay, captions, fullscreen, fading controls) only for a `<video>`. The scrubber
-and volume are [`<slider-elemental>`](https://github.com/stamat/book-of-elementals), the
+(poster, click-to-play overlay, click-to-pause on the picture, captions, fullscreen, fading
+controls) only for a `<video>`. The scrubber and volume are [`<slider-elemental>`](https://github.com/stamat/book-of-elementals), the
 buffered bar is `<progress-elemental>`, the control row is `<toolbar-elemental>`, and the
 binding is [hydrargyri](https://github.com/stamat/hydrargyri).
 

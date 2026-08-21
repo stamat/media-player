@@ -13,6 +13,13 @@ for the person who wrote the code.
 
 ### Added
 
+- **Clicking the picture pauses the video.** A click anywhere on a playing `<video>` now
+  pauses it, wired by the element itself the way the media element's events are — there is
+  no pair to add to the markup, and a `<video>` already carrying `on="click:…"` keeps
+  exactly what it wrote. Video only: an `<audio>` with its controls off draws no box, so a
+  click reaching one came from the page around it. DOM output changes: a `click` listener is
+  attached to the `<video>` at upgrade.
+
 - **Docs: what happens with a live stream, and how HLS composes.** The manual gained
   _Live, and the streams it does not carry_ — what `is-live` turns off and why, and a
   worked hls.js sample for the case the element refuses to ship. No code changed: the
@@ -60,6 +67,17 @@ for the person who wrote the code.
   between `any` and `1` while a press holds it.
 
 ### Fixed
+
+- **The big play button comes back when a video pauses, and stays up while it is scrubbed.**
+  The click-to-play overlay was taken off by `poster-hidden`, which is set once and never
+  cleared — so the button that starts a video vanished the first time it started and never
+  returned, and scrubbing a video that had never been played took it away too, leaving a
+  paused picture with nothing on it to press. It now follows `is-playing`: out while there is
+  something to pause, back over the frame the moment there is not. `poster-hidden` still
+  hides the poster and still means what it did. **Upgrading:** a stylesheet of your own that
+  hides `.media-player-overlay` on `media-player[poster-hidden]` now hides it over a paused
+  video too — key it on `[is-playing]` instead. CSS output changes: that one selector in
+  `media-player.css`.
 
 - **A caption track is found however it arrives, and `default` decides which one.** The
   track was read once with `querySelector`, at upgrade — so the first `<track>` in the

@@ -123,7 +123,7 @@ media-player[is-video] .media-player-controls:focus-within {
 }
 
 media-player[poster-hidden] .media-player-poster,
-media-player[poster-hidden] .media-player-overlay {
+media-player[is-playing] .media-player-overlay {
   display: none;
 }
 

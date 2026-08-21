@@ -182,12 +182,17 @@ media-player[is-video] .media-player-controls:focus-within {
   background: none;
 }
 
-// The element sets `poster-hidden` once playback has started; the poster and the
-// click-to-play overlay are the two things covering the picture until then, so both go
-// together — `display`, not opacity, because a button that is invisible but still over the
-// video would swallow every click meant for the controls.
+// Two things cover the picture before playback, and they leave on different terms. The
+// poster goes for good — the element sets `poster-hidden` the first time playback starts,
+// and a still frame back over a video already played is a player that looks unstarted. The
+// overlay is the play button, so it is out exactly while there is something to pause and
+// back over the frame the moment there is not: `is-playing`, not `poster-hidden`, which is
+// what makes a click on the video pause it and show the big button again, and what keeps
+// that button up while a paused video is scrubbed. Both leave with `display` rather than
+// opacity, because a button that is invisible but still over the video would swallow every
+// click meant for the picture.
 media-player[poster-hidden] .media-player-poster,
-media-player[poster-hidden] .media-player-overlay {
+media-player[is-playing] .media-player-overlay {
   display: none;
 }
 

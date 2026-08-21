@@ -226,7 +226,7 @@ function focusedElement() {
  * `<media-player>` custom element.
  *
  * One element over the `<audio>` or `<video>` the author already wrote. Which of the two it
- * is decides the video-only half — poster, overlay, captions, fullscreen, the controls that
+ * is decides the video-only half — poster, click-to-play overlay, captions, fullscreen, the controls that
  * hide themselves — and it is read off the child rather than off a `src`, because a `src`
  * attribute on the wrapper would mean no media element at all until the script arrives.
  * That is the whole bargain: the markup is the author's, `controls` on the media element is
@@ -300,7 +300,7 @@ function focusedElement() {
  * @attr {boolean} is-fullscreen - CSS hook; the element sets it.
  * @attr {boolean} no-fullscreen - Fullscreen has no door to open here — an iframe without `allow="fullscreen"` is the common way. CSS hook for hiding the button that would do nothing; the element sets it.
  * @attr {boolean} controls-shown - The video controls are up. CSS hook; the element sets it.
- * @attr {boolean} poster-hidden - The poster has been played past. CSS hook; the element sets it.
+ * @attr {boolean} poster-hidden - The poster has been played past. CSS hook; the element sets it. The click-to-play overlay is not hidden by it — that one follows `is-playing`, so it returns whenever a video pauses.
  * @attr {boolean} has-captions - A caption track was found, so a captions button is worth showing. CSS hook; the element sets it.
  * @attr {boolean} captions-visible - Captions are on. Persisted; the element sets it.
  * @attr {string} volume-state - `mute`, `mid` or `full`, for the three-icon volume button. CSS hook; the element sets it.
@@ -378,6 +378,11 @@ export class MediaPlayer extends HgElement {
   static wires = {
     'audio, video':
       'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange',
+    // The picture is the same button the overlay is, once the overlay has stepped out of the
+    // way: clicking a playing video pauses it, and the overlay comes back over the frame it
+    // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
+    // the pair would be a listener on nothing.
+    video: 'click:togglePlay',
     track: 'cuechange:onCue'
   };
 
@@ -586,13 +591,15 @@ export class MediaPlayer extends HgElement {
   }
 
   /**
-   * Hide the poster and the overlay, and catch the focus they are about to take with them.
+   * Hide the poster, and catch the focus the overlay over it is about to take with it.
    *
-   * The overlay is a real button, so pressing it to play leaves focus on it — and this is the
-   * moment `display: none` removes it, which drops focus to `<body>`. Every key bound to this
-   * player then has nowhere to land: the next Space scrolls the page instead of pausing, and
-   * nothing on screen says why. Moving focus here is not taking focus, it is declining to lose
-   * it, which is the one case where moving it is the correct thing rather than the rude one.
+   * The overlay is a real button, so pressing it to play leaves focus on it — and playing is
+   * the moment `display: none` removes it, which drops focus to `<body>`. Every key bound to
+   * this player then has nowhere to land: the next Space scrolls the page instead of pausing,
+   * and nothing on screen says why. Moving focus here is not taking focus, it is declining to
+   * lose it, which is the one case where moving it is the correct thing rather than the rude
+   * one. The poster is the only thing this hides for good — the overlay follows `is-playing`,
+   * so it is back over a video the moment one pauses.
    *
    * Only when the author made the player focusable. `focus()` on an element that cannot hold
    * focus is a silent no-op, and there is nothing this can write on the author's element to fix
@@ -789,9 +796,12 @@ export class MediaPlayer extends HgElement {
   }
 
   onPlay() {
+    // Before `isPlaying`, which is the attribute the stylesheet takes the overlay out on:
+    // the focus this catches is focus sitting on that overlay, and by the time the button is
+    // `display: none` it has already fallen to `<body>`.
+    this.hidePoster();
     this.isPlaying = true;
     this.isBuffering = false;
-    this.hidePoster();
     this.playLabel = 'Pause';
     this.resume();
     this.claimSession();
