@@ -79,7 +79,9 @@ for the person who wrote the code.
   code — it still described the pre-1.1.x pick, any track but metadata — with the FAQ as the
   one place the rule is written out. `.media-player-buffering`, the box a spinner goes in,
   is in the hooks table at last, and the npm block says its bare-specifier `href`s want a
-  bundler.
+  bundler. And letter keys are named for what they are: `event.key` matches the character
+  the layout produced, so a letter binding does not exist on a non-Latin layout — Space and
+  the arrows, which the samples bind, are layout-free.
 
 - **A `<track>` appended after the upgrade renders its cues.** The cue listener rode
   `static wires`, which hydrargyri scans once at upgrade — a `<track>` a script appends

@@ -1135,6 +1135,12 @@ YouTube does. It is the fallback, never the override: a control&#39;s own <code>
 press, every guard in the table further down applies unchanged, and a pair naming no handler
 warns in the console rather than dying silent. Reach for it only when no control names the
 action — a <code>keys</code> entry duplicating a button is a binding nothing on screen can show.</p>
+<p>Letters carry a cost the arrows do not: the match reads <code>event.key</code> — the character the
+layout produced, not the physical key — so <code>key=&quot;k&quot;</code> answers on a Latin layout and silently
+does not exist on a Cyrillic, Greek, Hebrew or Arabic one, where the same finger produces a
+different letter. <kbd>Space</kbd> and the arrows are layout-free, which is why they are
+what the samples bind; a letter shortcut is a Latin-layout feature, worth saying wherever
+the page announces it.</p>
 <h3 id="which-keydown-you-bind-is-the-whole-scope">Which keydown you bind is the whole scope<a class="heading-anchor" href="#which-keydown-you-bind-is-the-whole-scope" tabindex="-1" aria-hidden="true"></a></h3>
 <p><code>on=</code> says where the listener goes, so the reach of the keys is one attribute and not an
 option:</p>

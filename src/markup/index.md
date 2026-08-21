@@ -1138,6 +1138,13 @@ press, every guard in the table further down applies unchanged, and a pair namin
 warns in the console rather than dying silent. Reach for it only when no control names the
 action — a `keys` entry duplicating a button is a binding nothing on screen can show.
 
+Letters carry a cost the arrows do not: the match reads `event.key` — the character the
+layout produced, not the physical key — so `key="k"` answers on a Latin layout and silently
+does not exist on a Cyrillic, Greek, Hebrew or Arabic one, where the same finger produces a
+different letter. <kbd>Space</kbd> and the arrows are layout-free, which is why they are
+what the samples bind; a letter shortcut is a Latin-layout feature, worth saying wherever
+the page announces it.
+
 ### Which keydown you bind is the whole scope
 
 `on=` says where the listener goes, so the reach of the keys is one attribute and not an
