@@ -1621,9 +1621,9 @@ var MediaPlayer = class extends HgElement {
     this.hadControls = this.media.controls;
     this.media.controls = false;
     this.onTrackAdded = () => this.findCaptions();
-    this.onInbandCue = (event) => this.onCue(event);
+    this.onTrackCue = (event) => this.onCue(event);
     this.media.textTracks?.addEventListener?.("addtrack", this.onTrackAdded);
-    if (this.inband) this.track?.addEventListener?.("cuechange", this.onInbandCue);
+    this.track?.addEventListener?.("cuechange", this.onTrackCue);
     if (this.isReady) {
       this.resume();
       if (this.isPlaying) this.claimSession();
@@ -1650,7 +1650,7 @@ var MediaPlayer = class extends HgElement {
     if (this.settle) clearTimeout(this.settle);
     this.releaseSession();
     this.media?.textTracks?.removeEventListener?.("addtrack", this.onTrackAdded);
-    if (this.inband) this.track?.removeEventListener?.("cuechange", this.onInbandCue);
+    this.track?.removeEventListener?.("cuechange", this.onTrackCue);
     if (this.media && this.hadControls) this.media.controls = true;
   }
   /**
@@ -2253,7 +2253,7 @@ var MediaPlayer = class extends HgElement {
    * with, and there is no such control to name.
    *
    * `track` holds the `TextTrack`, not the `<track>`: an in-band track from a streaming
-   * library has no element, and it is the only kind that arrives after the upgrade.
+   * library has no element at all.
    */
   findCaptions() {
     if (this.track || !this.media) return;
@@ -2264,8 +2264,7 @@ var MediaPlayer = class extends HgElement {
     if (!found) return;
     this.track = found;
     this.hasCaptions = true;
-    this.inband = !element;
-    if (this.inband) found.addEventListener?.("cuechange", this.onInbandCue);
+    found.addEventListener?.("cuechange", this.onTrackCue);
     this.setCaptions(this.read("captions") === true, false);
   }
   toggleCaptions() {
@@ -2484,8 +2483,7 @@ __publicField(MediaPlayer, "wires", {
   // way: clicking a playing video pauses it, and the overlay comes back over the frame it
   // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
   // the pair would be a listener on nothing.
-  video: "click:togglePlay",
-  track: "cuechange:onCue"
+  video: "click:togglePlay"
 });
 __publicField(MediaPlayer, "formatters", {
   time: (value) => formatTime(value),

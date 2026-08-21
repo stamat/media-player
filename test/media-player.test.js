@@ -1050,7 +1050,13 @@ function fakeTrack(kind) {
   const track = document.createElement('track');
   if (kind) track.setAttribute('kind', kind);
   Object.defineProperty(track, 'track', {
-    value: { mode: 'disabled', kind: (kind || 'subtitles').toLowerCase() },
+    value: {
+      mode: 'disabled',
+      kind: (kind || 'subtitles').toLowerCase(),
+      listeners: 0,
+      addEventListener() { this.listeners += 1; },
+      removeEventListener() { this.listeners -= 1; }
+    },
     configurable: true
   });
   return track;
@@ -1176,6 +1182,40 @@ describe('captions', () => {
     const late = mount(inband);
     add();
     expect(late.hasAttribute('has-captions')).toBe(false);
+  });
+
+  test('a <track> appended after the upgrade is listened to, not just found', () => {
+    // hydrargyri scans `static wires` once at upgrade, so a cue wire on `<track>` elements
+    // could never hear one appended later: it earned its button and its cues never arrived,
+    // silently. The adopted TextTrack carries one direct listener instead, whatever stands
+    // behind it.
+    const media = fakeMedia('video');
+    const bus = new EventTarget();
+    const list = [];
+    list.addEventListener = bus.addEventListener.bind(bus);
+    list.removeEventListener = bus.removeEventListener.bind(bus);
+    Object.defineProperty(media, 'textTracks', { value: list, configurable: true });
+    const player = mount(media);
+    expect(player.hasAttribute('has-captions')).toBe(false);
+
+    const late = fakeTrack();
+    media.appendChild(late);
+    bus.dispatchEvent(new Event('addtrack'));
+    expect(player.hasAttribute('has-captions')).toBe(true);
+    expect(late.track.listeners).toBe(1);
+  });
+
+  test('a markup track\'s cue listener survives a move in the DOM', () => {
+    const media = fakeMedia('video');
+    const track = fakeTrack();
+    media.appendChild(track);
+    const player = mount(media);
+    expect(track.track.listeners).toBe(1);
+
+    const aside = document.createElement('aside');
+    document.body.appendChild(aside);
+    aside.appendChild(player); // one move: disconnected takes it off, connected puts it back
+    expect(track.track.listeners).toBe(1);
   });
 
   test('a chapters cue never paints into the caption box, though its track rides the same wire', () => {

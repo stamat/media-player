@@ -203,7 +203,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'audio, video': 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay', track: 'cuechange:onCue' }",
+              "default": "{ 'audio, video': 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay' }",
               "description": "The media element's wiring, attached by hydrargyri at upgrade rather than written in\nevery sample — plumbing with nothing in it for an author to choose, and one pair\nforgotten in an `on=` was a player that half-worked with nothing saying why. A pair the\nmedia element's own `on` attribute still carries is skipped, so markup predating this\nkeeps firing once.",
               "privacy": "private"
             },
@@ -527,7 +527,7 @@
             {
               "kind": "method",
               "name": "findCaptions",
-              "description": "The caption track, from the markup or from the list, whichever has one.\n\n`default` is the author's pick and the platform's own rule; without one the first in\ndocument order is what a browser would have shown, so it is what is taken. The first\ntrack found wins and keeps winning — switching language needs a control to switch it\nwith, and there is no such control to name.\n\n`track` holds the `TextTrack`, not the `<track>`: an in-band track from a streaming\nlibrary has no element, and it is the only kind that arrives after the upgrade.",
+              "description": "The caption track, from the markup or from the list, whichever has one.\n\n`default` is the author's pick and the platform's own rule; without one the first in\ndocument order is what a browser would have shown, so it is what is taken. The first\ntrack found wins and keeps winning — switching language needs a control to switch it\nwith, and there is no such control to name.\n\n`track` holds the `TextTrack`, not the `<track>`: an in-band track from a streaming\nlibrary has no element at all.",
               "privacy": "private"
             },
             {

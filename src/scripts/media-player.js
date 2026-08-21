@@ -398,8 +398,7 @@ export class MediaPlayer extends HgElement {
     // way: clicking a playing video pauses it, and the overlay comes back over the frame it
     // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
     // the pair would be a listener on nothing.
-    video: 'click:togglePlay',
-    track: 'cuechange:onCue'
+    video: 'click:togglePlay'
   };
 
   static formatters = {
@@ -455,17 +454,16 @@ export class MediaPlayer extends HgElement {
     this.media.controls = false;
 
     // A caption track can arrive after this runs: a streaming library adds an in-band track
-    // with no `<track>` element behind it, and hydrargyri wires `static wires` once at
-    // upgrade, so neither the element read below nor the `cuechange` wire would ever see it.
+    // with no `<track>` element behind it, and a script can append a `<track>` late —
     // `addtrack` is the platform saying when to look again. Both handlers are set up before
     // the reconnect return below, because `disconnected` takes them off on the way out.
     this.onTrackAdded = () => this.findCaptions();
-    this.onInbandCue = (event) => this.onCue(event);
+    this.onTrackCue = (event) => this.onCue(event);
     this.media.textTracks?.addEventListener?.('addtrack', this.onTrackAdded);
     // A move in the DOM took both listeners off, and `findCaptions` will not run again for a
-    // player that already has its track — so the in-band one is put back here or the cues
+    // player that already has its track — so the cue listener is put back here or the cues
     // stop rendering after a move, silently.
-    if (this.inband) this.track?.addEventListener?.('cuechange', this.onInbandCue);
+    this.track?.addEventListener?.('cuechange', this.onTrackCue);
 
     // A move in the DOM is a disconnect and a connect, and hydrargyri runs this method on
     // both connects. A player that was already ready keeps its state: resetting it here
@@ -516,7 +514,7 @@ export class MediaPlayer extends HgElement {
     if (this.settle) clearTimeout(this.settle);
     this.releaseSession();
     this.media?.textTracks?.removeEventListener?.('addtrack', this.onTrackAdded);
-    if (this.inband) this.track?.removeEventListener?.('cuechange', this.onInbandCue);
+    this.track?.removeEventListener?.('cuechange', this.onTrackCue);
     // Put the page back the way it was found: an element removed from the DOM should leave
     // a media element that still plays, not a controlless one.
     if (this.media && this.hadControls) this.media.controls = true;
@@ -1228,7 +1226,7 @@ export class MediaPlayer extends HgElement {
    * with, and there is no such control to name.
    *
    * `track` holds the `TextTrack`, not the `<track>`: an in-band track from a streaming
-   * library has no element, and it is the only kind that arrives after the upgrade.
+   * library has no element at all.
    */
   findCaptions() {
     if (this.track || !this.media) return;
@@ -1244,10 +1242,11 @@ export class MediaPlayer extends HgElement {
 
     this.track = found;
     this.hasCaptions = true;
-    // A `<track>` in the markup already carries the `cuechange` wire; one with no element
-    // behind it has nothing to have been wired, so it is listened to directly.
-    this.inband = !element;
-    if (this.inband) found.addEventListener?.('cuechange', this.onInbandCue);
+    // Listened to directly on the `TextTrack`, whatever stands behind it: hydrargyri scans
+    // `static wires` once at upgrade, so a wire on the `<track>` element would miss any
+    // track arriving after — and a wire on every element would hand `onCue` tracks the
+    // button never adopted.
+    found.addEventListener?.('cuechange', this.onTrackCue);
     this.setCaptions(this.read('captions') === true, false);
   }
 

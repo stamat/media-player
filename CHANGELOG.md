@@ -13,6 +13,13 @@ for the person who wrote the code.
 
 ### Fixed
 
+- **A `<track>` appended after the upgrade renders its cues.** The cue listener rode
+  `static wires`, which hydrargyri scans once at upgrade — a `<track>` a script appends
+  later was found by `addtrack` and earned its button, and its cues never arrived,
+  silently. The adopted `TextTrack` is listened to directly now, whatever stands behind
+  it, which is also what keeps a track the button declined from reaching the caption box.
+  No DOM or CSS output changes.
+
 - **A mute survives a reload on its own.** Muting a volume nobody had dragged stores
   `muted` and no level — `rememberVolume` never writes a zero — and `restore` waited for a
   stored level before acting on either flag, so the one mute a fresh player could make was
