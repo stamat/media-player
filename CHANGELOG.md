@@ -48,7 +48,9 @@ for the person who wrote the code.
   press, and the press stays the page's. The decline asks the platform's own question:
   `:disabled`, so a control inside a `<fieldset disabled>` is declined even though its
   `disabled` property reads false, and `[disabled]` beside it, so a keyed link or custom
-  element the author marked unpressable is declined rather than clicked anyway.
+  element the author marked unpressable is declined rather than clicked anyway. On a video
+  the declined press still brings a faded control row back — feedback the shorter path had
+  silently dropped.
 
 - **Only captions earn the captions button.** The markup path took any `<track>` but the
   metadata one, so a chapters or descriptions track ended up behind the captions button,

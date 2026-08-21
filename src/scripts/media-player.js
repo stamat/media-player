@@ -1089,7 +1089,12 @@ export class MediaPlayer extends HgElement {
     // declines the control. `[disabled]` beside it covers what the readiness gate strips
     // the attribute from — a keyed link or custom element has no `:disabled` state, and
     // the author marked it unpressable all the same.
-    if (control?.matches(':disabled, [disabled]')) return;
+    if (control?.matches(':disabled, [disabled]')) {
+      // Even a declined press is use: the row comes back so the viewer can see the greyed
+      // control that ignored them, while the press itself stays the page's.
+      if (this.isVideo) this.showControls();
+      return;
+    }
     // The `keys` attribute is the fallback, never the override: a visible control claiming
     // the key wins, so `key` and `keys` naming one press stay one action.
     const method = control ? null : keyedMethod(this.getAttribute('keys'), pressed);

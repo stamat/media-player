@@ -1808,6 +1808,20 @@ describe('keys the markup claims', () => {
     expect(presses).toEqual(['k']);
   });
 
+  test('a key aimed at a disabled control still wakes a faded video row', () => {
+    // The press is declined, not claimed — but a viewer who pressed something deserves to
+    // see the greyed control that ignored them, the way the old fall-through path did.
+    jest.useFakeTimers();
+    const { player, button } = keyed(fakeMedia('video', { paused: false }));
+    button.disabled = true;
+    jest.advanceTimersByTime(CONTROLS_LINGER);
+    expect(player.hasAttribute('controls-shown')).toBe(false);
+    const event = press(player, 'k');
+    expect(player.hasAttribute('controls-shown')).toBe(true);
+    expect(event.defaultPrevented).toBe(false);
+    jest.useRealTimers();
+  });
+
   test('a key brings a faded video row back, the way moving the pointer does', () => {
     jest.useFakeTimers();
     const { player } = keyed(fakeMedia('video', { paused: false }));
