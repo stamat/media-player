@@ -20,6 +20,14 @@ for the person who wrote the code.
   returns to full, there being no remembered level to return to. No DOM or CSS output
   changes.
 
+- **`goLive` is public in the manifest again.** The 1.1.0 handler shipped marked private in
+  `custom-elements.json`: the live recipe writes `on="click:goLive"` and the reference lists
+  it, but the manifest's allow-list was never told — the silent privatisation the manifest
+  test warns about and could not catch, because it walks the allow-list to the prototype and
+  not the markup to the allow-list. A new test walks the other way — every name an `on=` in
+  the manual's samples calls must be in the list — so the next forgotten handler fails the
+  build instead of quietly dropping out of editors.
+
 ## [1.1.0] - 2026-08-21
 
 ### Added

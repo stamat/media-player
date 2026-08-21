@@ -15,6 +15,7 @@ export const PUBLIC = new Set([
   'skipBackward',
   'seekBy',
   'seekTo',
+  'goLive',
   'volumeUp',
   'volumeDown',
   'toggleMute',

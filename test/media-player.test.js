@@ -1712,3 +1712,23 @@ test('every name the manifest publishes as public API is still a method on the e
   const missing = [...PUBLIC].filter((name) => typeof MediaPlayer.prototype[name] !== 'function');
   expect(missing).toEqual([]);
 });
+
+test('every handler an on= in the manual\'s samples names is in the manifest\'s public list', async () => {
+  // The other direction of the test above, and the one that catches the other silence: a
+  // handler newly written into a sample but forgotten in PUBLIC ships marked private —
+  // out of every editor that reads the manifest — while the allow-list walk stays green,
+  // which is how `goLive` shipped private in 1.1.0.
+  const { readFile } = await import('node:fs/promises');
+  const page = await readFile(new URL('../src/markup/index.md', import.meta.url), 'utf8');
+  const named = new Set();
+  for (const [, value] of page.matchAll(/\son="([^"]*)"/g)) {
+    for (const pair of value.split(';')) {
+      const method = pair.slice(pair.lastIndexOf(':') + 1).trim();
+      if (method) named.add(method);
+    }
+  }
+  expect(named.size).toBeGreaterThan(0);
+  const { PUBLIC } = await import('../custom-elements-manifest.config.mjs');
+  const missing = [...named].filter((name) => !PUBLIC.has(name));
+  expect(missing).toEqual([]);
+});

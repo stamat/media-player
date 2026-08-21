@@ -299,8 +299,7 @@
             {
               "kind": "method",
               "name": "goLive",
-              "description": "The live edge, for a button that says so. Nothing to go back to without a window.",
-              "privacy": "private"
+              "description": "The live edge, for a button that says so. Nothing to go back to without a window."
             },
             {
               "kind": "method",
