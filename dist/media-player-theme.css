@@ -130,15 +130,6 @@ media-player[is-buffering] .media-player-scrubber::before {
   pointer-events: none;
 }
 
-media-player .media-player-scrubber {
-  margin-left: 0.4375rem;
-  margin-right: 0.4375rem;
-}
-
-media-player .media-player-volume {
-  margin-right: 0.4375rem;
-}
-
 media-player tooltip-elemental:defined > [role=tooltip]::before,
 media-player tooltip-elemental:defined > [role=tooltip]::after {
   content: none;
