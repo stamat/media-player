@@ -327,11 +327,19 @@ worth trying with JavaScript off before taking the claim on trust. Not on this p
 the preview above is itself a custom element, so with scripting off there is nothing here but
 the code block it was built from. Paste the sample into a file of your own and the claim is
 one browser setting from proof.</p>
-<p>That is the whole wiring model. <code>on</code> says what fires, <code>bind</code> says where state lands, and
-both hold names — never code — so there is nothing to evaluate and nothing for a Content
-Security Policy to object to. It sits on
-<a href="https://github.com/stamat/hydrargyri">hydrargyri</a> for the binding and
-<a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a> for the sliders.</p>
+<p>That is the whole wiring model. <code>on</code> says what fires, <code>bind</code> says
+  where state lands, and both hold names — never code — so there is nothing to evaluate and
+  nothing for a Content Security Policy to object to. It sits on
+  <a href="https://github.com/stamat/hydrargyri">hydrargyri</a> for the binding and
+  <a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a> for the
+  sliders.</p>
+
+
+
+<details class="toc-disclosure" open>
+  <summary>On this page</summary>
+  <nav class="toc" aria-label="On this page"><ul><li class="toc-h2"><a href="#two-rows-and-what-a-phone-changes">Two rows, and what a phone changes</a></li><li class="toc-h2"><a href="#the-part-that-matters-most">The part that matters most</a></li><li class="toc-h2"><a href="#one-element-both-media">One element, both media</a></li><li class="toc-h2"><a href="#twelve-minutes-from-someone-elses-server">Twelve minutes, from someone else&#39;s server</a></li><li class="toc-h2"><a href="#frames-on-the-scrubber">Frames on the scrubber</a></li><li class="toc-h2"><a href="#a-background-loop-and-the-one-button-it-owes-you">A background loop, and the one button it owes you</a></li><li class="toc-h2"><a href="#what-it-borrows">What it borrows</a></li><li class="toc-h2"><a href="#keys-the-buttons-carry">Keys the buttons carry</a></li><li class="toc-h3"><a href="#which-keydown-you-bind-is-the-whole-scope">Which keydown you bind is the whole scope</a></li><li class="toc-h3"><a href="#what-a-press-has-to-get-past-first">What a press has to get past first</a></li><li class="toc-h2"><a href="#tooltips-on-the-controls">Tooltips on the controls</a></li><li class="toc-h2"><a href="#attributes-it-writes">Attributes it writes</a></li><li class="toc-h2"><a href="#on-the-lock-screen">On the lock screen</a></li><li class="toc-h2"><a href="#what-the-theme-takes">What the theme takes</a></li><li class="toc-h2"><a href="#handlers-you-can-name">Handlers you can name</a></li><li class="toc-h2"><a href="#state-you-can-bind">State you can bind</a></li><li class="toc-h2"><a href="#labels-in-another-language">Labels in another language</a></li><li class="toc-h2"><a href="#events">Events</a></li><li class="toc-h2"><a href="#against-the-alternatives">Against the alternatives</a></li><li class="toc-h2"><a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a></li><li class="toc-h2"><a href="#what-it-does-not-do">What it does not do</a></li><li class="toc-h2"><a href="#install">Install</a></li><li class="toc-h2"><a href="#what-editors-read">What editors read</a></li><li class="toc-h2"><a href="#questions">Questions</a></li><li class="toc-h2"><a href="#license">License</a></li></ul></nav>
+</details>
 <h2 id="two-rows-and-what-a-phone-changes">Two rows, and what a phone changes<a class="heading-anchor" href="#two-rows-and-what-a-phone-changes" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The scrubber is first in that markup on purpose. <code>style.css</code> gives it a whole flex line, so
 the buttons and the clock wrap under it and the bar is two rows with no breakpoint to tune —
@@ -1947,9 +1955,66 @@ ignores — the twelve CSS hooks stay documented for a stylesheet and are marked
 the panel, because they are the element&#39;s to write and not an author&#39;s.</p>
 <p>What any given editor does with it is its own business, and none of it is required to use
 the element: the manifest is a description, not a runtime.</p>
-<h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
-<p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> © <a href="https://github.com/stamat">Stamat</a>.
-The icons in the samples are <a href="https://lucide.dev">Lucide</a>, ISC.</p>
+<h2 id="questions">Questions<a class="heading-anchor" href="#questions" tabindex="-1" aria-hidden="true"></a></h2>
+<div class="faq">
+<details>
+<summary id="faq-no-js"><h3>Does the page still play with the script blocked?</h3></summary><p>Yes, and that is the one claim everything else is arranged around. You write
+<code>&lt;audio controls&gt;</code> or <code>&lt;video controls&gt;</code>; this element takes <code>controls</code> off when it upgrades
+and puts it back if it is ever removed from the DOM. It never creates, moves or replaces the
+media element, so with no script there is still a working native player where you put one.</p>
+<p>The exception is a streaming manifest, and it is the format&#39;s doing rather than this
+element&#39;s — see <a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a>.</p>
+</details>
+<details>
+<summary id="faq-streaming"><h3>Can I use it with HLS or DASH?</h3></summary><p>Nothing here ships either, and neither is coming. But both compose, and no seam was written
+to make them: attach hls.js or dash.js to the <code>&lt;video&gt;</code> you wrote, because this element only
+ever reads the media element and never touches its <code>src</code>.</p>
+<p>One half does not survive DASH. hls.js reports an endless duration for a live manifest and
+dash.js reports the rewind window&#39;s length, so <code>is-live</code> never comes on there. The worked
+recipe and that limit are in
+<a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a>.</p>
+</details>
+<details>
+<summary id="faq-controls"><h3>Where is the default control bar?</h3></summary><p>There is not one, and there will not be. A control bar this element could draw would need an
+option to reorder it, an option to drop a button, an option to pass an icon — which is
+templating in JavaScript wearing a smaller hat, and the thing this exists to avoid. The
+samples on this page are the starter: copy one, delete what you do not want, and it is
+already your markup in your stylesheet.</p>
+</details>
+<details>
+<summary id="faq-live-scrubber"><h3>My scrubber disappeared on a live stream</h3></summary><p>The optional theme hides it — <code>media-player[is-live] .media-player-scrubber</code> — because it was
+written when a live stream had nothing to seek. A stream with a rewind window does, so one
+line in your own sheet brings it back. It is in the live recipe, with the reason.</p>
+</details>
+<details>
+<summary id="faq-captions"><h3>The captions button never appears</h3></summary><p>There has to be a caption track for the button to have anything to toggle, and a
+<code>&lt;track kind=&quot;metadata&quot;&gt;</code> for thumbnails is not one. If several are written, the one marked
+<code>default</code> wins, and otherwise the first. A track a streaming library adds after the upgrade
+counts too — the element watches <code>addtrack</code> for exactly that — but the button only lights
+once the track lands, which on a stream can be a moment after playback starts.</p>
+</details>
+<details>
+<summary id="faq-two-players"><h3>Two players on one page share a volume</h3></summary><p>They share a <code>storage-key</code>, which defaults to <code>media-player</code>. Set it per player and each
+remembers its own volume, mute and captions choice. Storage failing outright — a Safari
+private window, a blocking cookie policy — is swallowed on purpose: remembering a volume is a
+nicety, and taking the page down over one is not.</p>
+</details>
+<details>
+<summary id="faq-shadow"><h3>Why light DOM rather than a shadow root?</h3></summary><p>Because the page&#39;s CSS, the page&#39;s semantics and the page working before the script arrives
+are the whole point. A shadow root would take your stylesheet&#39;s reach away from controls you
+wrote yourself, which is a strange thing to do to markup that is already yours.</p>
+</details>
+<details>
+<summary id="faq-frameworks"><h3>Does it work inside React, Vue or Svelte?</h3></summary><p>It is a standard custom element in the light DOM, so any framework that renders plain HTML
+renders it. What this project does not ship is a wrapper component for any of them — the
+markup contract is <code>on</code> and <code>bind</code> attributes, and those are attributes wherever they are
+written.</p>
+</details>
+</div><h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
+<p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> ©
+  <a href="https://github.com/stamat">Stamat</a>. The icons in the samples are
+  <a href="https://lucide.dev">Lucide</a>, ISC.</p>
+
 
 
     </article>

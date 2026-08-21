@@ -43,3 +43,155 @@
 .prose media-player {
   margin-block: 1.75rem;
 }
+
+// The on-this-page map, wrapped around the `toc` filter's bare `<nav><ul>`. The filter's
+// markup is styled by the theme's *docs* bundle, where the nav sits in a sidebar under the
+// page's own nav link and that link is its title. This page links only the prose half and
+// has no sidebar, so the title is the `<summary>` — the same `aria-label="On this page"` the
+// filter already writes, made visible and made a control rather than a second label.
+// Bordered and unfilled: `--bg-alt` and `--bg-code` are the same colour here, so a filled
+// box above the article is pixel-wise a code block on a page made of code blocks, and a
+// filled decorated panel over the content is the shape readers skip as an ad.
+.toc-disclosure {
+  margin: 0 0 3rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.toc-disclosure > summary,
+.faq > details > summary {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+
+  // `--fg-muted` on something clickable reads as disabled, and the caret inherits it.
+  color: var(--fg);
+  font-weight: 600;
+
+  // Under the body size so it never enters the article's heading scale, and sentence case:
+  // uppercase strips the word shapes a reader scans by, which a control should not do.
+  font-size: 0.875rem;
+  list-style: none;
+}
+
+// Safari wants the native marker dropped this way rather than through `list-style`.
+.toc-disclosure > summary::-webkit-details-marker,
+.faq > details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.toc-disclosure > summary:hover,
+.faq > details > summary:hover {
+  background: color-mix(in srgb, currentcolor 5%, transparent);
+}
+
+// Rounded only where the summary is actually the box's edge: closed it is the whole box,
+// open the list sits underneath and the bottom corners square off against it.
+.toc-disclosure[open] > summary {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
+// A half turn rather than a quarter, so it reads the same either way round in RTL. Drawn as
+// a mask so the caret takes the summary's colour instead of baking one in.
+.toc-disclosure > summary::before,
+.faq > details > summary::after {
+  content: "";
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  background: currentcolor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L8 8.94l3.72-3.72a.749.749 0 0 1 1.06 0Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: rotate 250ms ease;
+}
+
+.toc-disclosure[open] > summary::before,
+.faq > details[open] > summary::after {
+  rotate: 180deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc-disclosure > summary::before,
+  .faq > details > summary::after {
+    transition: none;
+  }
+}
+
+// No left rule on the list: the container's border already fences it off. The indent is the
+// caret's width plus its gap, so links start where the title they belong to starts.
+.toc {
+  padding: 0 1rem 1rem;
+}
+
+.toc ul {
+  margin: 0 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+// Twenty-two sections open at once is a screenful before the article. Columns rather than a
+// scroller or a closed default: the whole map stays visible and the height halves.
+@media (width >= 48rem) {
+  .toc ul {
+    columns: 2;
+    gap: 2rem;
+  }
+
+  .toc li {
+    break-inside: avoid;
+  }
+}
+
+// No colour and no `text-decoration` here on purpose: `.prose a` already underlines. A
+// table-of-contents link that reads differently from every other link in the article is the
+// thing usability guidance warns about — these are links, so they look like the page's links.
+.toc a {
+  display: block;
+  padding: 0.2rem 0;
+}
+
+.toc .toc-h3 a {
+  padding-left: 1rem;
+}
+
+// The questions at the end: the same disclosure worn as a run of rows rather than one box —
+// rows sharing a border, the radius only on the outer corners. Plain `<details>` rather than
+// an accordion element, because the browser already announces the expanded state, handles
+// Enter and Space, and opens a closed one for find-in-page or a `#faq-…` link. What is lost
+// is the slide, which is the one part of an accordion nothing native does yet.
+.faq {
+  margin-block: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+// `:not(:first-of-type)` rather than `details + details`: markdown decides what lands between
+// two html runs, and adjacency is not worth betting a border on.
+.faq > details:not(:first-of-type) {
+  border-top: 1px solid var(--border);
+}
+
+// The question is a heading so the outline and a crawler both see it; the summary around it
+// is what makes it a control. No margin or heading scale on it — it is a row label.
+.faq > details > summary > h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+// Trailing rather than leading, unlike the map above: a run of full-width questions lines its
+// carets up at the far edge, and there is a run here to line up with.
+.faq > details > summary::after {
+  margin-inline-start: auto;
+}
+
+.faq > details > div,
+.faq > details > p:last-child {
+  margin-bottom: 1rem;
+}
+
+.faq > details > :not(summary) {
+  padding-inline: 1rem;
+}

@@ -302,11 +302,19 @@ the preview above is itself a custom element, so with scripting off there is not
 the code block it was built from. Paste the sample into a file of your own and the claim is
 one browser setting from proof.
 
-That is the whole wiring model. `on` says what fires, `bind` says where state lands, and
-both hold names — never code — so there is nothing to evaluate and nothing for a Content
-Security Policy to object to. It sits on
-[hydrargyri](https://github.com/stamat/hydrargyri) for the binding and
-[book-of-elementals](https://github.com/stamat/book-of-elementals) for the sliders.
+<p>That is the whole wiring model. <code>on</code> says what fires, <code>bind</code> says
+  where state lands, and both hold names — never code — so there is nothing to evaluate and
+  nothing for a Content Security Policy to object to. It sits on
+  <a href="https://github.com/stamat/hydrargyri">hydrargyri</a> for the binding and
+  <a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a> for the
+  sliders.</p>
+{# The rest of the page is captured, then rendered twice: once through `toc` for its
+   headings, once as itself. The docs layout does this around its own `{% block content %}`;
+   this page is a prose layout, so it does it here. The filter reads ids off rendered html,
+   which the markdown heading renderer emits — which is why the sections below stay markdown
+   rather than becoming html like the paragraph above. No blank line above this: the capture
+   opens against that paragraph's run, and a blank line would end it. #}
+{% set body %}
 
 ## Two rows, and what a phone changes
 
@@ -1741,7 +1749,101 @@ the panel, because they are the element's to write and not an author's.
 What any given editor does with it is its own business, and none of it is required to use
 the element: the manifest is a description, not a runtime.
 
+## Questions
+
+<div class="faq">
+<details>
+<summary id="faq-no-js"><h3>Does the page still play with the script blocked?</h3></summary>
+
+Yes, and that is the one claim everything else is arranged around. You write
+`<audio controls>` or `<video controls>`; this element takes `controls` off when it upgrades
+and puts it back if it is ever removed from the DOM. It never creates, moves or replaces the
+media element, so with no script there is still a working native player where you put one.
+
+The exception is a streaming manifest, and it is the format's doing rather than this
+element's — see [Live, and the streams it does not carry](#live-and-the-streams-it-does-not-carry).
+
+</details>
+<details>
+<summary id="faq-streaming"><h3>Can I use it with HLS or DASH?</h3></summary>
+
+Nothing here ships either, and neither is coming. But both compose, and no seam was written
+to make them: attach hls.js or dash.js to the `<video>` you wrote, because this element only
+ever reads the media element and never touches its `src`.
+
+One half does not survive DASH. hls.js reports an endless duration for a live manifest and
+dash.js reports the rewind window's length, so `is-live` never comes on there. The worked
+recipe and that limit are in
+[Live, and the streams it does not carry](#live-and-the-streams-it-does-not-carry).
+
+</details>
+<details>
+<summary id="faq-controls"><h3>Where is the default control bar?</h3></summary>
+
+There is not one, and there will not be. A control bar this element could draw would need an
+option to reorder it, an option to drop a button, an option to pass an icon — which is
+templating in JavaScript wearing a smaller hat, and the thing this exists to avoid. The
+samples on this page are the starter: copy one, delete what you do not want, and it is
+already your markup in your stylesheet.
+
+</details>
+<details>
+<summary id="faq-live-scrubber"><h3>My scrubber disappeared on a live stream</h3></summary>
+
+The optional theme hides it — `media-player[is-live] .media-player-scrubber` — because it was
+written when a live stream had nothing to seek. A stream with a rewind window does, so one
+line in your own sheet brings it back. It is in the live recipe, with the reason.
+
+</details>
+<details>
+<summary id="faq-captions"><h3>The captions button never appears</h3></summary>
+
+There has to be a caption track for the button to have anything to toggle, and a
+`<track kind="metadata">` for thumbnails is not one. If several are written, the one marked
+`default` wins, and otherwise the first. A track a streaming library adds after the upgrade
+counts too — the element watches `addtrack` for exactly that — but the button only lights
+once the track lands, which on a stream can be a moment after playback starts.
+
+</details>
+<details>
+<summary id="faq-two-players"><h3>Two players on one page share a volume</h3></summary>
+
+They share a `storage-key`, which defaults to `media-player`. Set it per player and each
+remembers its own volume, mute and captions choice. Storage failing outright — a Safari
+private window, a blocking cookie policy — is swallowed on purpose: remembering a volume is a
+nicety, and taking the page down over one is not.
+
+</details>
+<details>
+<summary id="faq-shadow"><h3>Why light DOM rather than a shadow root?</h3></summary>
+
+Because the page's CSS, the page's semantics and the page working before the script arrives
+are the whole point. A shadow root would take your stylesheet's reach away from controls you
+wrote yourself, which is a strange thing to do to markup that is already yours.
+
+</details>
+<details>
+<summary id="faq-frameworks"><h3>Does it work inside React, Vue or Svelte?</h3></summary>
+
+It is a standard custom element in the light DOM, so any framework that renders plain HTML
+renders it. What this project does not ship is a wrapper component for any of them — the
+markup contract is `on` and `bind` attributes, and those are attributes wherever they are
+written.
+
+</details>
+</div>
+
 ## License
 
-[MIT](https://github.com/stamat/media-player/blob/main/LICENSE) © [Stamat](https://github.com/stamat).
-The icons in the samples are [Lucide](https://lucide.dev), ISC.
+<p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> ©
+  <a href="https://github.com/stamat">Stamat</a>. The icons in the samples are
+  <a href="https://lucide.dev">Lucide</a>, ISC.</p>
+{% endset %}
+{# The filter emits a bare `<nav><ul>`, so the disclosure is wrapped around it here rather
+   than asked of it. Open, because twenty-two sections are the reason this exists — but two
+   columns on a wide viewport, or the map is a screenful before the article starts. #}
+<details class="toc-disclosure" open>
+  <summary>On this page</summary>
+  {{ body | toc }}
+</details>
+{{ body }}
