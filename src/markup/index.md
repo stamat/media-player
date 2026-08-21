@@ -1317,7 +1317,9 @@ last. A live stream gets no seek buttons, because there is nowhere on it to seek
 flood with the accent under the pointer, a slim rounded track carrying an accent thumb,
 video controls on a bottom gradient with a centred play chip. Where Plyr hardcodes white
 and slate, this sheet uses `Canvas` and `CanvasText`, so the same look follows the page
-into dark mode and forced colours. It reaches one thing it does not own: the caret comes off
+into dark mode and forced colours — dark mode as the page declares it, `color-scheme:
+dark`, which is what flips the system pair; a class-toggled theme that never sets it keeps
+a light bar on a dark page. It reaches one thing it does not own: the caret comes off
 a `<tooltip-elemental>` bubble inside a player, because a row of buttons a few pixels apart
 is not ambiguous about which one a bubble points at. What it takes from you are custom
 properties — the first five live in the theme, the last two in the structure sheet:
