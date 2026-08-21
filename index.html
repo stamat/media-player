@@ -769,7 +769,10 @@ returns over the frame it stopped on, so the big play button is up whenever ther
 something to start — including while a paused video is being scrubbed.</p>
 <p>Captions render into whatever binds <code>captionText</code>, with the track held <code>hidden</code> so the
 browser&#39;s own caption box stays out of the way — which is what leaves your stylesheet in
-charge of what captions look like.</p>
+charge of what captions look like. Position included: the structure sheet clears a two-row
+control bar with <code>padding-bottom: 5.5rem</code> on <code>.media-player-captions</code>, and a taller bar —
+or one wrapped to a third row on a narrow phone — wants that number overridden in your own
+sheet.</p>
 <h2 id="twelve-minutes-from-someone-elses-server">Twelve minutes, from someone else&#39;s server<a class="heading-anchor" href="#twelve-minutes-from-someone-elses-server" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Twelve seconds proves the wiring and proves nothing about the seeking. A local file that
 short never buffers, and a clock reading <code>00:00 / 00:12</code> never needs the minutes it can show.

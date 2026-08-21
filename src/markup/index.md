@@ -761,7 +761,10 @@ something to start — including while a paused video is being scrubbed.
 
 Captions render into whatever binds `captionText`, with the track held `hidden` so the
 browser's own caption box stays out of the way — which is what leaves your stylesheet in
-charge of what captions look like.
+charge of what captions look like. Position included: the structure sheet clears a two-row
+control bar with `padding-bottom: 5.5rem` on `.media-player-captions`, and a taller bar —
+or one wrapped to a third row on a narrow phone — wants that number overridden in your own
+sheet.
 
 ## Twelve minutes, from someone else's server
 
