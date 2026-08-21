@@ -4,7 +4,8 @@
  * Covered here: the progressive-enhancement contract (native controls off on upgrade, back
  * on the way out), the wiring the element declares itself (`static wires`, so the media
  * element needs no `on=`, and a click on the picture toggles playback), readiness from any of
- * the five metadata events, live streams, the volume
+ * the five metadata events, live streams and the rewind window that decides how much of one
+ * can be reached, the volume
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
  * track — the one the author marked `default`, and the one a streaming library adds after
  * the upgrade with no `<track>` behind it — the video controls' hide timer, the labels the buttons announce themselves by, the
@@ -277,6 +278,81 @@ describe('live streams', () => {
     player.skipForward();
     expect(media.currentTime).toBe(0);
     expect(seen).toEqual([]);
+  });
+
+  /**
+   * A stream with a rewind window: one `seekable` range, the way a DVR manifest reports one.
+   */
+  function windowedMedia(range, at = 0) {
+    const media = fakeMedia('video', { duration: LIVE_DURATION });
+    Object.defineProperty(media, 'seekable', {
+      get: () => ({ length: 1, start: () => range[0], end: () => range[1] }),
+      configurable: true
+    });
+    media.currentTime = at;
+    return media;
+  }
+
+  test('a rewind window is what makes a live stream seekable, and its edges are what bound the seek', () => {
+    const media = windowedMedia([100, 400]);
+    const player = mount(media);
+    player.seekTo(250);
+    expect(media.currentTime).toBe(250);
+    player.seekTo(9999);
+    expect(media.currentTime).toBe(400);
+    player.seekTo(0);
+    expect(media.currentTime).toBe(100);
+  });
+
+  test('skipping inside the window moves, and says so, where skipping without one did neither', () => {
+    const media = windowedMedia([100, 400], 200);
+    const player = mount(media);
+    const seen = [];
+    player.addEventListener('media-player-interaction', (e) => seen.push(e.detail.type));
+    player.skipBackward();
+    expect(media.currentTime).toBe(190);
+    expect(seen).toEqual(['skip-backward']);
+  });
+
+  test('the live edge is one press away, and the press is an interaction like any other', () => {
+    const media = windowedMedia([100, 400], 150);
+    const player = mount(media);
+    const seen = [];
+    player.addEventListener('media-player-interaction', (e) => seen.push(e.detail.type));
+    player.goLive();
+    expect(media.currentTime).toBe(400);
+    expect(seen).toEqual(['go-live']);
+  });
+
+  test('a live stream with no window has no live edge to go back to, and goLive says nothing', () => {
+    const media = fakeMedia('audio', { duration: LIVE_DURATION });
+    const player = mount(media);
+    const seen = [];
+    player.addEventListener('media-player-interaction', (e) => seen.push(e.detail.type));
+    player.goLive();
+    expect(media.currentTime).toBe(0);
+    expect(seen).toEqual([]);
+  });
+
+  test('the window and how far behind it playback sits are absolute seconds, ready to bind', () => {
+    const media = windowedMedia([100, 400], 340);
+    const player = mount(media);
+    media.dispatchEvent(new Event('timeupdate'));
+    expect(player.seekableStart).toBe(100);
+    expect(player.seekableEnd).toBe(400);
+    expect(player.behindLive).toBe(60);
+    expect(player.currentTime).toBe(340);
+    // `remaining` counts a file down to its end; a stream has no end to count down to.
+    expect(player.remaining).toBe(0);
+  });
+
+  test('a window does not give a live stream a start, so stop still only pauses', () => {
+    const media = windowedMedia([100, 400], 250);
+    media.play();
+    const player = mount(media);
+    player.stop();
+    expect(media.paused).toBe(true);
+    expect(media.currentTime).toBe(250);
   });
 
   test('a live stream schedules no animation frames, because there is no clock to paint', () => {

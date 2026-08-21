@@ -1661,6 +1661,7 @@ var MediaPlayer = class extends HgElement {
     this.remaining = this.duration;
     this.isReady = true;
     this.isBuffering = false;
+    if (this.isLive) this.paintWindow();
     this.syncVolume();
     this.onProgress();
     for (const control of this.querySelectorAll("[disabled]")) control.removeAttribute("disabled");
@@ -1687,20 +1688,27 @@ var MediaPlayer = class extends HgElement {
     if (this.media.paused) this.play();
     else this.pause();
   }
-  /** Pause and go home. `seekTo` refuses both halves for a live stream, so there it only pauses. */
+  /**
+   * Pause and go home, where a file has one.
+   *
+   * A live stream does not, and a rewind window does not give it one: the oldest second
+   * still reachable is whatever has not expired yet, which moves, and landing a listener
+   * there is not returning to a beginning. So on a stream this only pauses, window or no
+   * window — `goLive` is the other end, and it is the one worth a button.
+   */
   stop() {
     if (!this.media) return;
     this.pause();
-    this.seekTo(0);
+    if (!this.isLive) this.seekTo(0);
     this.interaction("stop");
   }
   skipForward() {
-    if (!this.media || this.isLive) return;
+    if (!this.media || this.isLive && !this.liveWindow) return;
     this.seekBy(this.skipStep);
     this.interaction("skip-forward", this.skipStep);
   }
   skipBackward() {
-    if (!this.media || this.isLive) return;
+    if (!this.media || this.isLive && !this.liveWindow) return;
     this.seekBy(-this.skipStep);
     this.interaction("skip-backward", this.skipStep);
   }
@@ -1710,7 +1718,7 @@ var MediaPlayer = class extends HgElement {
     return Number.isFinite(step) && step > 0 ? step : 10;
   }
   seekBy(seconds) {
-    if (!this.media || this.isLive) return;
+    if (!this.media || this.isLive && !this.liveWindow) return;
     this.seekTo(this.media.currentTime + seconds);
     this.hidePoster();
   }
@@ -1769,8 +1777,45 @@ var MediaPlayer = class extends HgElement {
     }
     return nearest;
   }
+  /**
+   * How much of an endless stream is still reachable, in seconds.
+   *
+   * A stream with a rewind window has one `seekable` range that slides forward as segments
+   * expire; one without has a range too narrow to be worth calling a window, or none at all
+   * before the first segment lands. Zero is what says seeking is off, so it is read live
+   * rather than stored — the window is a different length every time it is asked for.
+   */
+  get liveWindow() {
+    const ranges = this.media?.seekable;
+    if (!ranges || !ranges.length) return 0;
+    return Math.max(ranges.end(ranges.length - 1) - ranges.start(0), 0);
+  }
+  /**
+   * The reachable window, for a scrubber the author scaled to it.
+   *
+   * Three numbers rather than a window-relative position, because a window-relative scale
+   * would put both ends of the scrubber in motion and make `duration` mean one thing on a
+   * file and another on a stream. The markup binds `seekableStart` and `seekableEnd` to its
+   * own `min` and `max` and keeps `currentTime` on the same absolute scale everything else
+   * here already speaks.
+   */
+  paintWindow() {
+    const ranges = this.media?.seekable;
+    if (!ranges || !ranges.length) return;
+    this.seekableStart = ranges.start(0);
+    this.seekableEnd = ranges.end(ranges.length - 1);
+    this.behindLive = Math.max(this.seekableEnd - this.media.currentTime, 0);
+  }
+  /** The live edge, for a button that says so. Nothing to go back to without a window. */
+  goLive() {
+    if (!this.media || !this.isLive || !this.liveWindow) return;
+    this.paintWindow();
+    this.seekTo(this.seekableEnd);
+    this.interaction("go-live");
+  }
   seekTo(seconds) {
-    if (!this.media || this.isLive) return;
+    if (!this.media) return;
+    if (this.isLive && !this.liveWindow) return;
     const bounded = this.seekableSecond(Math.min(Math.max(seconds, 0), this.media.duration || 0));
     this.media.currentTime = bounded;
     this.paint(bounded);
@@ -1872,7 +1917,7 @@ var MediaPlayer = class extends HgElement {
    */
   paint(seconds) {
     this.currentTime = seconds;
-    this.remaining = Math.max((this.media?.duration || 0) - seconds, 0);
+    this.remaining = this.isLive ? 0 : Math.max((this.media?.duration || 0) - seconds, 0);
     this.scrubber?.apply?.();
   }
   /**
@@ -1926,6 +1971,20 @@ var MediaPlayer = class extends HgElement {
     if (!this.isLive && this.media) this.paint(this.media.duration);
     this.pause();
   }
+  /**
+   * The live clock and the window under it.
+   *
+   * `timeupdate` is what a file deliberately does not use — about four a second is visibly
+   * steppy under a thumb moving across a two-minute scale. Across a rewind window it is not:
+   * the window slides in whole segments, several seconds at a time, so sixty frames a second
+   * would repaint the same two numbers fifty-six times for nothing. A file still gets the
+   * animation frame; this only runs for a stream.
+   */
+  onTimeUpdate() {
+    if (!this.media || !this.isLive) return;
+    this.paintWindow();
+    this.paint(this.media.currentTime);
+  }
   onWaiting() {
     this.isBuffering = true;
   }
@@ -1945,6 +2004,7 @@ var MediaPlayer = class extends HgElement {
    * ranges the bar keeps its last value rather than guessing.
    */
   onProgress() {
+    if (this.isLive) this.paintWindow();
     if (!this.media || !this.media.duration) return;
     const ranges = this.media.buffered;
     const at = this.media.currentTime;
@@ -1999,7 +2059,7 @@ var MediaPlayer = class extends HgElement {
    * already was.
    */
   scrub(event) {
-    if (!this.media || this.isLive) return;
+    if (!this.media || this.isLive && !this.liveWindow) return;
     cancelAnimationFrame(this.frame);
     this.pendingSeek = Number(event.target.value);
     this.paint(this.pendingSeek);
@@ -2387,6 +2447,9 @@ __publicField(MediaPlayer, "properties", [
   "currentTime",
   "remaining",
   "duration",
+  "seekableStart",
+  "seekableEnd",
+  "behindLive",
   "buffered",
   "volumePercent",
   "playLabel",
@@ -2403,7 +2466,7 @@ __publicField(MediaPlayer, "properties", [
  * keeps firing once.
  */
 __publicField(MediaPlayer, "wires", {
-  "audio, video": "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange",
+  "audio, video": "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange",
   // The picture is the same button the overlay is, once the overlay has stepped out of the
   // way: clicking a playing video pauses it, and the overlay comes back over the frame it
   // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so

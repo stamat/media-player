@@ -183,7 +183,7 @@
                 "text": "array"
               },
               "static": true,
-              "default": "[ 'currentTime', 'remaining', 'duration', 'buffered', 'volumePercent', 'playLabel', 'muteLabel', 'captionsLabel', 'captionText', 'timeFormatter' ]",
+              "default": "[ 'currentTime', 'remaining', 'duration', 'seekableStart', 'seekableEnd', 'behindLive', 'buffered', 'volumePercent', 'playLabel', 'muteLabel', 'captionsLabel', 'captionText', 'timeFormatter' ]",
               "description": "State that never reaches the DOM.\n\n`currentTime` moves sixty times a second while playing. Reflected to an attribute that\nwould be sixty `setAttribute` calls a second, every one of them waking anything watching\nthe subtree — so the values that move fast live here, and only the flags CSS needs are\nattributes.",
               "privacy": "private"
             },
@@ -194,7 +194,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ 'audio, video': 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;volumechange:onVolumeChange', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay', track: 'cuechange:onCue' }",
+              "default": "{ 'audio, video': 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay', track: 'cuechange:onCue' }",
               "description": "The media element's wiring, attached by hydrargyri at upgrade rather than written in\nevery sample — plumbing with nothing in it for an author to choose, and one pair\nforgotten in an `on=` was a player that half-worked with nothing saying why. A pair the\nmedia element's own `on` attribute still carries is skipped, so markup predating this\nkeeps firing once.",
               "privacy": "private"
             },
@@ -240,7 +240,7 @@
             {
               "kind": "method",
               "name": "stop",
-              "description": "Pause and go home. `seekTo` refuses both halves for a live stream, so there it only pauses."
+              "description": "Pause and go home, where a file has one.\n\nA live stream does not, and a rewind window does not give it one: the oldest second\nstill reachable is whatever has not expired yet, which moves, and landing a listener\nthere is not returning to a beginning. So on a stream this only pauses, window or no\nwindow — `goLive` is the other end, and it is the one worth a button."
             },
             {
               "kind": "method",
@@ -281,6 +281,25 @@
                 }
               ],
               "description": "The nearest second the browser will actually accept.\n\n`duration` says how long the file is; `seekable` says how much of it this browser can\nreach, and the two part company whenever a server answers a `Range` request with the\nwhole file — a plain `python -m http.server` is the one every author meets. Writing\n`currentTime` past `seekable` is refused, so painting the requested second would leave a\nscrubber sitting where playback is not.\n\nAn empty `seekable` is \"not known yet\" rather than \"nowhere\", so the request passes\nthrough: metadata can arrive before the first range does, and clamping to zero there\nwould turn every early seek into a jump to the start. The ranges are walked rather than\nbracketed by the first and last, because a seek leaves the browser holding disjoint ones\nand the gap between two of them is not seekable however far inside the outer edges it is.",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "liveWindow",
+              "description": "How much of an endless stream is still reachable, in seconds.\n\nA stream with a rewind window has one `seekable` range that slides forward as segments\nexpire; one without has a range too narrow to be worth calling a window, or none at all\nbefore the first segment lands. Zero is what says seeking is off, so it is read live\nrather than stored — the window is a different length every time it is asked for.",
+              "readonly": true,
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "paintWindow",
+              "description": "The reachable window, for a scrubber the author scaled to it.\n\nThree numbers rather than a window-relative position, because a window-relative scale\nwould put both ends of the scrubber in motion and make `duration` mean one thing on a\nfile and another on a stream. The markup binds `seekableStart` and `seekableEnd` to its\nown `min` and `max` and keeps `currentTime` on the same absolute scale everything else\nhere already speaks.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "goLive",
+              "description": "The live edge, for a button that says so. Nothing to go back to without a window.",
               "privacy": "private"
             },
             {
@@ -349,6 +368,12 @@
               "kind": "method",
               "name": "onEnded",
               "description": "Playback reached the end.\n\nThe clock is painted here rather than left where the last animation frame put it. That\nframe ran some fraction of a second before the end and the scrubber floors to whole\nseconds, so a track that finished would leave the thumb a step short of the end it just\nreached — the one position a listener is certain about, and the one it got wrong."
+            },
+            {
+              "kind": "method",
+              "name": "onTimeUpdate",
+              "description": "The live clock and the window under it.\n\n`timeupdate` is what a file deliberately does not use — about four a second is visibly\nsteppy under a thumb moving across a two-minute scale. Across a rewind window it is not:\nthe window slides in whole segments, several seconds at a time, so sixty frames a second\nwould repaint the same two numbers fifty-six times for nothing. A file still gets the\nanimation frame; this only runs for a stream.",
+              "privacy": "private"
             },
             {
               "kind": "method",

@@ -1256,7 +1256,7 @@ against them.
 | `is-ready`                                         | metadata arrived; the duration is known and the controls are live                                                            |
 | `is-playing`                                       | playing — the hook the play/pause icon swap hangs on                                                                         |
 | `is-buffering`                                     | waiting on data                                                                                                              |
-| `is-live`                                          | the duration says endless stream, so there is nothing to seek                                                                |
+| `is-live`                                          | the duration says endless stream; what can be reached inside it is `seekableStart`–`seekableEnd`                             |
 | `is-video`                                         | it wrapped a `<video>`                                                                                                       |
 | `is-fullscreen`, `controls-shown`, `poster-hidden` | the video half — `poster-hidden` covers the poster only, the overlay follows `is-playing`                                     |
 | `no-fullscreen`                                    | fullscreen has no door to open — an iframe without `allow="fullscreen"` is the common way; hide your fullscreen button on it |
@@ -1333,7 +1333,8 @@ list does nothing on the other.
 
 The `<audio>`, the `<video>` and a `<track>` inside them take no `on=` at all. The listeners
 that keep the element in step with playback — the five metadata events, `play` and `pause`,
-`waiting` and `playing`, `ended`, `progress`, `volumechange`, and a track's `cuechange` into
+`waiting` and `playing`, `ended`, `progress`, `timeupdate` for a live stream's window,
+`volumechange`, and a track's `cuechange` into
 `captionText` — are the element's own plumbing, declared in its `static wires` and attached
 by [hydrargyri](https://github.com/stamat/hydrargyri) when the element upgrades. Markup from
 an earlier version that still carries those pairs keeps firing once: a pair the attribute
@@ -1345,7 +1346,7 @@ already wired is skipped, never doubled.
 | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `click:togglePlay`                              | plays a paused player, pauses a playing one                                                                                                      |
 | `click:stop`                                    | pauses and returns to the start — a live stream has no start to return to, so there it only pauses                                               |
-| `click:skipForward`, `click:skipBackward`       | move by the `skip` attribute's seconds, ten by default; both decline on a live stream                                                            |
+| `click:skipForward`, `click:skipBackward`       | move by the `skip` attribute's seconds, ten by default; on a live stream they move inside the rewind window, and decline when there is none      |
 | `pointerdown:beginScrub`, `keydown:beginScrub`  | a hand landed: flip the scrubber's `step="any"` to whole seconds before the press moves the value, so a drag and the arrows move per second while playback between them glides free — a keydown that is not a seek key is ignored |
 | `input:scrub`                                   | the thumb moved: paint the clock, and do not seek until the drag ends                                                                            |
 | `change:seek`                                   | the drag committed: seek to the value under the thumb                                                                                            |
@@ -1356,6 +1357,7 @@ already wired is skipped, never doubled.
 | `click:volumeUp`, `click:volumeDown`            | one tenth of full per press, climbing from zero when muted rather than jumping back — for a volume UI with no slider, or a `keys` entry; the samples bind them to the up and down arrows |
 | `click:toggleMute`                              | mute, and back to the level it remembered                                                                                                        |
 | `click:toggleCaptions`                          | captions on and off; there has to be a caption track for the button to have anything to toggle — the one marked `default`, or the first written  |
+| `click:goLive`                                  | back to the live edge of a stream with a rewind window; does nothing on a file, or on a stream with no window to have left                       |
 | `click:toggleFullscreen`                        | the player element, or the video itself on an iPhone, which has never allowed anything else                                                      |
 
 **On `<media-player>` itself:**
@@ -1377,6 +1379,8 @@ which is the pair of them behind one control.
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `currentTime`, `duration`, `remaining`    | seconds; pipe them through `\|time` for `mm:ss`                                                                                     |
 | `buffered`                                | how far ahead the browser has loaded, **in seconds** — same scale as `duration`, so it goes straight on the `<progress>`'s `value`  |
+| `seekableStart`, `seekableEnd`            | the reachable window of a live stream, in absolute seconds — a scrubber's `min` and `max` on a stream with a rewind window          |
+| `behindLive`                              | seconds between playback and the live edge; `0` at the edge                                                                         |
 | `volumePercent`                           | `0`–`100`, for a volume slider's `value`                                                                                            |
 | `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next                                                                                             |
 | `captionText`                             | the active cue                                                                                                                      |
@@ -1416,7 +1420,8 @@ two spans and one `display` rule of your own.
 `media-player-ready` when the duration is known, and `media-player-interaction` for
 everything a person did — `{ type, value }` in `detail`, where `type` is one of `play`,
 `pause`, `stop`, `seek`, `skip-forward`, `skip-backward`, `volume`, `volume-up`,
-`volume-down`, `mute`, `unmute`, `fullscreen`, `captions-on`, `captions-off`. Both bubble
+`volume-down`, `mute`, `unmute`, `fullscreen`, `go-live`, `captions-on`, `captions-off`. Both
+bubble
 from the element, not from `document`. A `fullscreen` event says which way in `value` —
 `true` entering, `false` leaving — and a volume drag settles into one `volume` event, not
 one per pixel.
@@ -1457,11 +1462,59 @@ formats and plugins. None of that is planned here.
 
 A live stream has no end, and browsers disagree about how to say that: some report
 `Infinity` for the duration, some a number in the billions. Anything at or above 2³² is read
-as endless here. `is-live` goes on the element, `duration` reads `0` rather than a bogus
-number, and `seek`, `seekTo`, `skipForward`, `skipBackward` and the lock screen's position
-all decline, because there is nowhere on an endless stream to seek to. `stop` survives as a
-pause with nothing to rewind. Bind `isLive:if` on a **Live** badge and the row says which
-kind of thing it is holding.
+as endless here. `is-live` goes on the element and `duration` reads `0` rather than a bogus
+number, so a clock bound to it stays honest. Bind `isLive:if` on a **Live** badge and the row
+says which kind of thing it is holding.
+
+What can be reached inside that stream is a separate question, and the browser answers it.
+`seekable` is the platform saying which seconds still exist — a stream with a rewind window
+reports one range that slides forward as segments expire, and a stream without one reports
+something too narrow to call a window, or nothing at all before the first segment lands. So
+the window is what decides, not the endlessness: `seekTo`, `skipForward`, `skipBackward` and
+a drag on the scrubber all work inside it and all decline without it. `goLive` is the way
+back to the edge. `stop` refuses either way — a window does not give a stream a beginning,
+only an oldest second that has not expired yet, and landing a listener there is not going
+home.
+
+The scale is the markup's, which is what keeps `duration` meaning one thing everywhere. The
+element publishes three absolute numbers — `seekableStart`, `seekableEnd` and `behindLive` —
+and a scrubber over a rewind window binds the first two where a file's scrubber binds
+`duration`:
+
+```html
+<slider-elemental class="media-player-scrubber" bind="timeFormatter:prop#format">
+  <input
+    type="range"
+    step="any"
+    aria-label="Seek"
+    bind="seekableStart:attr#min;seekableEnd:attr#max;currentTime:prop#value"
+    on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
+  />
+</slider-elemental>
+
+<button on="click:goLive">Go live</button>
+```
+
+The optional theme hides the scrubber on any live stream — it was written when a live stream
+had nothing to seek, and `visibility` rather than `display` so the row does not reshuffle. A
+player over a rewind window wants it back, which is one line in your own sheet:
+
+```css
+media-player[is-live] .media-player-scrubber {
+  visibility: visible;
+}
+```
+
+Those three refresh on `timeupdate` and on `progress` — about four times a second while
+playing, which is the rate a window that slides in whole segments actually changes at, rather
+than the sixty a second a file's clock is painted at. What is deliberately absent is a live
+edge tolerance: nothing here decides how many seconds behind still counts as *at* the edge,
+because that number is a design decision about a badge, and the badge is yours. Bind
+`behindLive` and pick it in your own stylesheet.
+
+Two more things stay off on a stream, window or not: the OS lock screen gets no position, and
+the scrubber's frame previews do nothing — the spec wants a finite duration for the first,
+and a thumbnail sheet is cut from a file that has ended for the second.
 
 That is the whole of what ships. HLS and DASH are not here and are not coming: a manifest
 needs a third-party script driving Media Source Extensions, and a script driving the media

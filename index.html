@@ -1288,7 +1288,7 @@ against them.</p>
 </tr>
 <tr>
 <td><code>is-live</code></td>
-<td>the duration says endless stream, so there is nothing to seek</td>
+<td>the duration says endless stream; what can be reached inside it is <code>seekableStart</code>–<code>seekableEnd</code></td>
 </tr>
 <tr>
 <td><code>is-video</code></td>
@@ -1419,7 +1419,8 @@ two places to write one — your controls and the <code>&lt;media-player&gt;</co
 list does nothing on the other.</p>
 <p>The <code>&lt;audio&gt;</code>, the <code>&lt;video&gt;</code> and a <code>&lt;track&gt;</code> inside them take no <code>on=</code> at all. The listeners
 that keep the element in step with playback — the five metadata events, <code>play</code> and <code>pause</code>,
-<code>waiting</code> and <code>playing</code>, <code>ended</code>, <code>progress</code>, <code>volumechange</code>, and a track&#39;s <code>cuechange</code> into
+<code>waiting</code> and <code>playing</code>, <code>ended</code>, <code>progress</code>, <code>timeupdate</code> for a live stream&#39;s window,
+<code>volumechange</code>, and a track&#39;s <code>cuechange</code> into
 <code>captionText</code> — are the element&#39;s own plumbing, declared in its <code>static wires</code> and attached
 by <a href="https://github.com/stamat/hydrargyri">hydrargyri</a> when the element upgrades. Markup from
 an earlier version that still carries those pairs keeps firing once: a pair the attribute
@@ -1442,7 +1443,7 @@ already wired is skipped, never doubled.</p>
 </tr>
 <tr>
 <td><code>click:skipForward</code>, <code>click:skipBackward</code></td>
-<td>move by the <code>skip</code> attribute&#39;s seconds, ten by default; both decline on a live stream</td>
+<td>move by the <code>skip</code> attribute&#39;s seconds, ten by default; on a live stream they move inside the rewind window, and decline when there is none</td>
 </tr>
 <tr>
 <td><code>pointerdown:beginScrub</code>, <code>keydown:beginScrub</code></td>
@@ -1483,6 +1484,10 @@ already wired is skipped, never doubled.</p>
 <tr>
 <td><code>click:toggleCaptions</code></td>
 <td>captions on and off; there has to be a caption track for the button to have anything to toggle — the one marked <code>default</code>, or the first written</td>
+</tr>
+<tr>
+<td><code>click:goLive</code></td>
+<td>back to the live edge of a stream with a rewind window; does nothing on a file, or on a stream with no window to have left</td>
 </tr>
 <tr>
 <td><code>click:toggleFullscreen</code></td>
@@ -1531,6 +1536,14 @@ which is the pair of them behind one control.</p>
 <td>how far ahead the browser has loaded, <strong>in seconds</strong> — same scale as <code>duration</code>, so it goes straight on the <code>&lt;progress&gt;</code>&#39;s <code>value</code></td>
 </tr>
 <tr>
+<td><code>seekableStart</code>, <code>seekableEnd</code></td>
+<td>the reachable window of a live stream, in absolute seconds — a scrubber&#39;s <code>min</code> and <code>max</code> on a stream with a rewind window</td>
+</tr>
+<tr>
+<td><code>behindLive</code></td>
+<td>seconds between playback and the live edge; <code>0</code> at the edge</td>
+</tr>
+<tr>
 <td><code>volumePercent</code></td>
 <td><code>0</code>–<code>100</code>, for a volume slider&#39;s <code>value</code></td>
 </tr>
@@ -1573,7 +1586,8 @@ two spans and one <code>display</code> rule of your own.</p>
 <p><code>media-player-ready</code> when the duration is known, and <code>media-player-interaction</code> for
 everything a person did — <code>{ type, value }</code> in <code>detail</code>, where <code>type</code> is one of <code>play</code>,
 <code>pause</code>, <code>stop</code>, <code>seek</code>, <code>skip-forward</code>, <code>skip-backward</code>, <code>volume</code>, <code>volume-up</code>,
-<code>volume-down</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>, <code>captions-on</code>, <code>captions-off</code>. Both bubble
+<code>volume-down</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>, <code>go-live</code>, <code>captions-on</code>, <code>captions-off</code>. Both
+bubble
 from the element, not from <code>document</code>. A <code>fullscreen</code> event says which way in <code>value</code> —
 <code>true</code> entering, <code>false</code> leaving — and a volume drag settles into one <code>volume</code> event, not
 one per pixel.</p>
@@ -1687,11 +1701,48 @@ formats and plugins. None of that is planned here.</p>
 <h2 id="live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry<a class="heading-anchor" href="#live-and-the-streams-it-does-not-carry" tabindex="-1" aria-hidden="true"></a></h2>
 <p>A live stream has no end, and browsers disagree about how to say that: some report
 <code>Infinity</code> for the duration, some a number in the billions. Anything at or above 2³² is read
-as endless here. <code>is-live</code> goes on the element, <code>duration</code> reads <code>0</code> rather than a bogus
-number, and <code>seek</code>, <code>seekTo</code>, <code>skipForward</code>, <code>skipBackward</code> and the lock screen&#39;s position
-all decline, because there is nowhere on an endless stream to seek to. <code>stop</code> survives as a
-pause with nothing to rewind. Bind <code>isLive:if</code> on a <strong>Live</strong> badge and the row says which
-kind of thing it is holding.</p>
+as endless here. <code>is-live</code> goes on the element and <code>duration</code> reads <code>0</code> rather than a bogus
+number, so a clock bound to it stays honest. Bind <code>isLive:if</code> on a <strong>Live</strong> badge and the row
+says which kind of thing it is holding.</p>
+<p>What can be reached inside that stream is a separate question, and the browser answers it.
+<code>seekable</code> is the platform saying which seconds still exist — a stream with a rewind window
+reports one range that slides forward as segments expire, and a stream without one reports
+something too narrow to call a window, or nothing at all before the first segment lands. So
+the window is what decides, not the endlessness: <code>seekTo</code>, <code>skipForward</code>, <code>skipBackward</code> and
+a drag on the scrubber all work inside it and all decline without it. <code>goLive</code> is the way
+back to the edge. <code>stop</code> refuses either way — a window does not give a stream a beginning,
+only an oldest second that has not expired yet, and landing a listener there is not going
+home.</p>
+<p>The scale is the markup&#39;s, which is what keeps <code>duration</code> meaning one thing everywhere. The
+element publishes three absolute numbers — <code>seekableStart</code>, <code>seekableEnd</code> and <code>behindLive</code> —
+and a scrubber over a rewind window binds the first two where a file&#39;s scrubber binds
+<code>duration</code>:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;timeFormatter:prop#format&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+    <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span>
+    <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;any&quot;</span>
+    <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Seek&quot;</span>
+    <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;seekableStart:attr#min;seekableEnd:attr#max;currentTime:prop#value&quot;</span>
+    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub&quot;</span>
+  /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:goLive&quot;</span>&gt;</span>Go live<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></code></pre>
+<p>The optional theme hides the scrubber on any live stream — it was written when a live stream
+had nothing to seek, and <code>visibility</code> rather than <code>display</code> so the row does not reshuffle. A
+player over a rewind window wants it back, which is one line in your own sheet:</p>
+<pre><code class="hljs language-css">media-player<span class="hljs-selector-attr">[is-live]</span> <span class="hljs-selector-class">.media-player-scrubber</span> {
+  <span class="hljs-attribute">visibility</span>: visible;
+}</code></pre>
+<p>Those three refresh on <code>timeupdate</code> and on <code>progress</code> — about four times a second while
+playing, which is the rate a window that slides in whole segments actually changes at, rather
+than the sixty a second a file&#39;s clock is painted at. What is deliberately absent is a live
+edge tolerance: nothing here decides how many seconds behind still counts as <em>at</em> the edge,
+because that number is a design decision about a badge, and the badge is yours. Bind
+<code>behindLive</code> and pick it in your own stylesheet.</p>
+<p>Two more things stay off on a stream, window or not: the OS lock screen gets no position, and
+the scrubber&#39;s frame previews do nothing — the spec wants a finite duration for the first,
+and a thumbnail sheet is cut from a file that has ended for the second.</p>
 <p>That is the whole of what ships. HLS and DASH are not here and are not coming: a manifest
 needs a third-party script driving Media Source Extensions, and a script driving the media
 element is the opposite of the bargain this page opens with.</p>

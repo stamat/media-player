@@ -13,6 +13,25 @@ for the person who wrote the code.
 
 ### Added
 
+- **A live stream is seekable as far as the browser says it is.** `is-live` used to turn
+  seeking off wholesale — `seekTo`, `seekBy`, `skipForward`, `skipBackward` and a drag on the
+  scrubber all refused the moment a duration came back endless. That is right for a stream
+  with nothing behind the live edge and wrong for one with a rewind window, which is what a
+  DVR manifest serves: the browser reports the reachable seconds in `seekable`, and the
+  element was ignoring an answer it already had. Now the window decides. Where there is one,
+  all five work inside it, clamped by the same range walk that has always kept a seek where a
+  server can serve it; where there is none, all five still decline, and so does the new
+  `goLive`. `stop` refuses either way — a window gives a stream an oldest second, not a
+  beginning. Three properties carry the window for markup to bind: `seekableStart` and
+  `seekableEnd`, in absolute seconds, so a scrubber over a stream binds them where a file's
+  scrubber binds `duration`, and `behindLive` for how far back playback sits. They refresh on
+  `timeupdate` — newly in `static wires` — and on `progress`, about four times a second,
+  which is the rate a window sliding in whole segments moves at; a file's clock still comes
+  off the animation frame. New interaction type: `go-live`. **Watch for:** the optional theme
+  still hides the scrubber on any live stream, which a DVR player does not want — one line of
+  your own CSS puts it back, and the manual says which. No other DOM or CSS output changes.
+
+
 - **Clicking the picture pauses the video.** A click anywhere on a playing `<video>` now
   pauses it, wired by the element itself the way the media element's events are — there is
   no pair to add to the markup, and a `<video>` already carrying `on="click:…"` keeps
