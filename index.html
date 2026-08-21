@@ -70,7 +70,7 @@ press <strong>Edit</strong> and what you type is what plays. The <strong>Options
 writes and the seven custom properties the theme takes, each with what the manifest says its
 type is. An attribute knob rewrites the markup above it, so the code tab stays the truth; a
 custom property is not part of the sample, so it writes a rule into the frame and prints that
-rule for you to copy. The twelve attributes the element writes for itself are left out — a
+rule for you to copy. The thirteen attributes the element writes for itself are left out — a
 knob spliced into the markup would not survive the next <code>play</code>.</p>
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it.
@@ -1297,6 +1297,10 @@ against them.</p>
 <td>waiting on data</td>
 </tr>
 <tr>
+<td><code>is-error</code></td>
+<td>the media gave up — a 404, a refused codec, a failed decode; the native controls come back for the browser&#39;s own error state</td>
+</tr>
+<tr>
 <td><code>is-live</code></td>
 <td>the duration says endless stream; what can be reached inside it is <code>seekableStart</code>–<code>seekableEnd</code></td>
 </tr>
@@ -1953,7 +1957,7 @@ do not name as private, so an editor offering completions offers <code>togglePla
 this file and nothing else, which is the reason to ship one rather than invent a format: the
 knobs cannot describe an element this page no longer has. What the panel leaves out is in
 the file as well, under an <code>x-code-preview</code> key the schema permits and every other tool
-ignores — the twelve CSS hooks stay documented for a stylesheet and are marked hidden for
+ignores — the thirteen CSS hooks stay documented for a stylesheet and are marked hidden for
 the panel, because they are the element&#39;s to write and not an author&#39;s.</p>
 <p>What any given editor does with it is its own business, and none of it is required to use
 the element: the manifest is a description, not a runtime.</p>

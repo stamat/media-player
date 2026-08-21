@@ -1869,6 +1869,39 @@ describe('keys the markup claims', () => {
   });
 });
 
+describe('load failure', () => {
+  test('a media error fails loud: is-error set, native controls handed back, a warning named', () => {
+    // Readiness never arrives to show the custom row and the upgrade already took
+    // `controls` off — without this a 404 is a black box: no controls of either kind, no
+    // attribute, no message.
+    const media = fakeMedia('audio', { duration: NaN });
+    Object.defineProperty(media, 'error', { value: { code: 4, message: 'no supported source' }, configurable: true });
+    const player = mount(media);
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    media.dispatchEvent(new Event('error'));
+    expect(player.hasAttribute('is-error')).toBe(true);
+    expect(media.controls).toBe(true);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  test('a source fixed after an error clears the hook and reclaims the controls', () => {
+    const media = fakeMedia('audio', { duration: NaN });
+    Object.defineProperty(media, 'error', { value: { code: 4, message: 'gone' }, configurable: true });
+    const player = mount(media);
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    media.dispatchEvent(new Event('error'));
+    warn.mockRestore();
+    expect(player.hasAttribute('is-error')).toBe(true);
+
+    Object.defineProperty(media, 'duration', { get: () => 120, configurable: true });
+    Object.defineProperty(media, 'error', { value: null, configurable: true });
+    media.dispatchEvent(new Event('canplay'));
+    expect(player.hasAttribute('is-error')).toBe(false);
+    expect(media.controls).toBe(false);
+  });
+});
+
 describe('interaction events', () => {
   test('a press says what it was and what it did, on the element rather than on the document', () => {
     const media = fakeMedia();

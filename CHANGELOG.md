@@ -11,6 +11,15 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+### Added
+
+- **`is-error` says the media gave up.** A 404, a refused codec or a decode failure used to
+  be a black box: the upgrade takes the native controls off at connect, readiness never
+  arrives to show the custom row, and nothing anywhere said why. The element now sets
+  `is-error` — a CSS hook like its siblings — hands the native controls back so the
+  browser's own error state has something to draw it, and warns in the console with the
+  platform's message. All of it is undone the moment a later load succeeds.
+
 ### Fixed
 
 - **A sub-threshold level in the store cannot wedge the mute button.** `applyVolume` snaps

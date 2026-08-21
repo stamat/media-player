@@ -308,6 +308,7 @@ function focusedElement() {
  * @attr {boolean} is-ready - Metadata has arrived and the duration is known. CSS hook; the element sets it.
  * @attr {boolean} is-playing - The media is playing. CSS hook for the play/pause icon swap; the element sets it.
  * @attr {boolean} is-buffering - Waiting on data. CSS hook for a spinner; the element sets it.
+ * @attr {boolean} is-error - The media gave up — a 404, a refused codec, a failed decode. CSS hook; the element sets it, hands the native controls back for the browser's own error state, and warns in the console.
  * @attr {boolean} is-live - The duration says this is an endless stream, so there is nothing to seek. CSS hook; the element sets it.
  * @attr {boolean} is-video - The wrapped element is a `<video>`. CSS hook; the element sets it.
  * @attr {boolean} is-fullscreen - CSS hook; the element sets it.
@@ -348,6 +349,7 @@ export class MediaPlayer extends HgElement {
     'is-ready',
     'is-playing',
     'is-buffering',
+    'is-error',
     'is-live',
     'is-video',
     'is-fullscreen',
@@ -393,7 +395,7 @@ export class MediaPlayer extends HgElement {
    */
   static wires = {
     'audio, video':
-      'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange',
+      'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;error:onError',
     // The picture is the same button the overlay is, once the overlay has stepped out of the
     // way: clicking a playing video pauses it, and the overlay comes back over the frame it
     // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
@@ -533,6 +535,12 @@ export class MediaPlayer extends HgElement {
     this.remaining = this.duration;
     this.isReady = true;
     this.isBuffering = false;
+    // A source fixed after a failure: the error hook comes off and the controls come back
+    // to this element, undoing what `onError` handed to the browser.
+    if (this.isError) {
+      this.isError = false;
+      this.media.controls = false;
+    }
     if (this.isLive) this.paintWindow();
     this.syncVolume();
     // `progress` is the only event that reports buffering, and a small file can be fully
@@ -546,6 +554,20 @@ export class MediaPlayer extends HgElement {
     for (const control of this.querySelectorAll('[disabled]')) control.removeAttribute('disabled');
 
     this.dispatchEvent(new CustomEvent('media-player-ready', { bubbles: true }));
+  }
+
+  /**
+   * The media element gave up — a 404, a codec it refuses, a decode that died. The custom
+   * row waits on `isReady`, which now never comes, and the upgrade already took the native
+   * controls off — so without this, failure is a black box: no controls of either kind, no
+   * attribute, no message. Fail loud, and hand back the one thing that still works: the
+   * native controls draw the browser's own error state.
+   */
+  onError() {
+    if (!this.media?.error) return;
+    this.isError = true;
+    if (this.hadControls) this.media.controls = true;
+    console.warn('media-player: the media failed to load —', this.media.error.message || `code ${this.media.error.code}`);
   }
 
   // PLAYBACK

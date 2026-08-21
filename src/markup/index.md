@@ -29,7 +29,7 @@ press **Edit** and what you type is what plays. The **Options** tab beside it is
 writes and the seven custom properties the theme takes, each with what the manifest says its
 type is. An attribute knob rewrites the markup above it, so the code tab stays the truth; a
 custom property is not part of the sample, so it writes a rule into the frame and prints that
-rule for you to copy. The twelve attributes the element writes for itself are left out — a
+rule for you to copy. The thirteen attributes the element writes for itself are left out — a
 knob spliced into the markup would not survive the next `play`.
 
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
@@ -1266,6 +1266,7 @@ against them.
 | `is-ready`                                         | metadata arrived; the duration is known and the controls are live                                                            |
 | `is-playing`                                       | playing — the hook the play/pause icon swap hangs on                                                                         |
 | `is-buffering`                                     | waiting on data                                                                                                              |
+| `is-error`                                         | the media gave up — a 404, a refused codec, a failed decode; the native controls come back for the browser's own error state |
 | `is-live`                                          | the duration says endless stream; what can be reached inside it is `seekableStart`–`seekableEnd`                             |
 | `is-video`                                         | it wrapped a `<video>`                                                                                                       |
 | `is-fullscreen`, `controls-shown`, `poster-hidden` | the video half — `poster-hidden` covers the poster only, the overlay follows `is-playing`                                     |
@@ -1745,7 +1746,7 @@ The samples at the top of this page read it too. Their **Options** tab is genera
 this file and nothing else, which is the reason to ship one rather than invent a format: the
 knobs cannot describe an element this page no longer has. What the panel leaves out is in
 the file as well, under an `x-code-preview` key the schema permits and every other tool
-ignores — the twelve CSS hooks stay documented for a stylesheet and are marked hidden for
+ignores — the thirteen CSS hooks stay documented for a stylesheet and are marked hidden for
 the panel, because they are the element's to write and not an author's.
 
 What any given editor does with it is its own business, and none of it is required to use

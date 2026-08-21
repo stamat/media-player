@@ -1665,11 +1665,28 @@ var MediaPlayer = class extends HgElement {
     this.remaining = this.duration;
     this.isReady = true;
     this.isBuffering = false;
+    if (this.isError) {
+      this.isError = false;
+      this.media.controls = false;
+    }
     if (this.isLive) this.paintWindow();
     this.syncVolume();
     this.onProgress();
     for (const control of this.querySelectorAll("[disabled]")) control.removeAttribute("disabled");
     this.dispatchEvent(new CustomEvent("media-player-ready", { bubbles: true }));
+  }
+  /**
+   * The media element gave up — a 404, a codec it refuses, a decode that died. The custom
+   * row waits on `isReady`, which now never comes, and the upgrade already took the native
+   * controls off — so without this, failure is a black box: no controls of either kind, no
+   * attribute, no message. Fail loud, and hand back the one thing that still works: the
+   * native controls draw the browser's own error state.
+   */
+  onError() {
+    if (!this.media?.error) return;
+    this.isError = true;
+    if (this.hadControls) this.media.controls = true;
+    console.warn("media-player: the media failed to load \u2014", this.media.error.message || `code ${this.media.error.code}`);
   }
   // PLAYBACK
   /**
@@ -2444,6 +2461,7 @@ __publicField(MediaPlayer, "attributes", [
   "is-ready",
   "is-playing",
   "is-buffering",
+  "is-error",
   "is-live",
   "is-video",
   "is-fullscreen",
@@ -2486,7 +2504,7 @@ __publicField(MediaPlayer, "properties", [
  * keeps firing once.
  */
 __publicField(MediaPlayer, "wires", {
-  "audio, video": "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange",
+  "audio, video": "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;error:onError",
   // The picture is the same button the overlay is, once the overlay has stepped out of the
   // way: clicking a playing video pauses it, and the overlay comes back over the frame it
   // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so

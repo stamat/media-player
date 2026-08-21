@@ -45,7 +45,7 @@ export const PUBLIC = new Set([
 /**
  * What an author is allowed to type into the opening tag.
  *
- * The other twelve attributes are CSS hooks the element writes for itself, and a knob is a
+ * The other thirteen attributes are CSS hooks the element writes for itself, and a knob is a
  * splice into the sample's source: turning `is-playing` on would put a word in the markup
  * that the next `play` event overwrites, so the panel would be offering a control that
  * cannot hold. They stay in the manifest — a stylesheet needs them documented — and are
