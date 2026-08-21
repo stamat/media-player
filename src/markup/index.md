@@ -769,10 +769,12 @@ testable right here rather than in a file you have to build yourself.
      above, and the reason this player's attributes are not broken up for readability. -->
 <media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
   <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg">
+    <track kind="captions" src="sample/tears-of-steel.en.vtt" srclang="en" label="English" />
     <track kind="metadata" src="sample/tears-of-steel-thumbs.vtt" />
   </video>
   <img class="media-player-poster" src="sample/tears-of-steel.jpg" alt="" />
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
+  <div class="media-player-captions" bind="captionText:if"><span bind="captionText"></span></div>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
     <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format" on="pointermove:preview;pointerleave:endPreview">
       <div class="media-player-preview" hidden></div>
@@ -798,6 +800,10 @@ testable right here rather than in a file you have to build yourself.
     </tooltip-elemental>
     <slider-elemental class="media-player-volume" tooltip="thumb"><input type="range" min="0" max="100" step="5" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
     <tooltip-elemental>
+      <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg></button>
+      <span bind="captionsLabel">Enable captions</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
       <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       <span>Fullscreen</span>
     </tooltip-elemental>
@@ -809,9 +815,19 @@ testable right here rather than in a file you have to build yourself.
      it imports, and the stylesheets are already in `prose.css`. -->
 <script type="module" src="dist/media-player.min.mjs"></script>
 
-There is no captions button on this row, because this file ships no caption track and a
-button whose handler has nothing to toggle is a lie in the shape of a control. Mute and volume
-_are_ here, and unlike the Artemis clip this one has sound for them to move.
+The captions are the Blender Foundation's own English subtitles, and they are served from
+this repository rather than from Blender's. A `<track>` cannot read the file that is up
+there: it is SRT, it comes back as `application/octet-stream` under `nosniff`, and it carries
+no `access-control-allow-origin` while a track fetch is CORS-mode whatever the media element
+says. So the cues were converted to WebVTT once and committed beside the poster, which is the
+trip a third-party caption track takes onto any page. The last one ends at `09:27` and the
+closing minutes carry none — that is what the file has, not something the element dropped.
+
+There is no language picker, though that server holds twenty-four translations. The element
+takes the first caption track and keeps it, because switching language needs a control to
+switch it with and there is no such control here to name. What it does remember is whether
+you had captions on, along with the volume, so this row comes back the way you left it. Mute
+and volume are here too, and unlike the Artemis clip this one has sound for them to move.
 
 What it costs is worth naming. The file is not mine — it is on
 [Blender's download server](https://download.blender.org/), so this page makes a third-party
@@ -828,7 +844,7 @@ Fetching the index up front costs 585 KiB and buys a player that is a player bef
 it. The stripe march and the buffered bar then have something real to show, which a
 twelve-second local file never gives them.
 
-Attribution: _Tears of Steel_ is © the Blender Foundation, released under
+Attribution: _Tears of Steel_ and its subtitles are © the Blender Foundation, released under
 [CC-BY 3.0](https://mango.blender.org/sharing/).
 
 ## Frames on the scrubber
