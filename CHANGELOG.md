@@ -11,6 +11,8 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-21
+
 ### Added
 
 - **A live stream is seekable as far as the browser says it is.** `is-live` used to turn
