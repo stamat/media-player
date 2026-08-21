@@ -31,6 +31,14 @@ for the person who wrote the code.
 
 ### Fixed
 
+- **The dead button-cluster rule is gone.** The theme's
+  `.media-player-controls button + button` negative margin never matched the documented
+  markup: every control-row button sits inside a `<tooltip-elemental>`, so no two buttons
+  are ever siblings — `display: contents` changes layout, not selector matching. Every page
+  always rendered the untightened spacing, so nothing shifts by removing it. If the
+  skip-play-skip trio should read as one control after all, the selector that does it is
+  `tooltip-elemental + tooltip-elemental > button`.
+
 - **The page plays with the script blocked, theme or no theme.** The `:not(:defined)` rule
   hiding the custom controls until the element upgrades lived in `media-player-theme.css` —
   the sheet the install labels optional — so structure-without-theme served a blocked-script

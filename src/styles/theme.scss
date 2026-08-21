@@ -95,13 +95,6 @@ media-player .media-player-controls button {
   aspect-ratio: 1;
 }
 
-// Consecutive buttons cluster: the row's gap is right between a button and a slider or a
-// label, and too much between two buttons whose padding already holds their glyphs apart —
-// the skip-play-skip trio wants to read as one transport control, not three strays.
-media-player .media-player-controls button + button {
-  margin-inline-start: calc(var(--media-player-gap) * -0.75);
-}
-
 // The hover is the accent filling the control, not the icon changing shade — Plyr's most
 // recognisable move. A toggle that is on keeps the flood: `aria-pressed` is the state the
 // button already announces, so it is the hook the paint hangs on too. Scoped to the row:
