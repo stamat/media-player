@@ -67,6 +67,14 @@ for the person who wrote the code.
   now lists the theme links the npm instructions always had, the tooltip theme the row
   cannot really go without included, optional comments and all.
 
+- **A reconnect resumes only the element it went ready with.** A morph or a framework
+  re-render can put the player back in the DOM with a fresh media element inside; the
+  reconnect path resumed regardless, keeping the clock, the caption track and the volume of
+  the element that was gone while the new one played at platform defaults — a slider
+  reading muted over an element playing at full. A different element now re-initialises the
+  way a first connect does; the same element resumes exactly as before. No new DOM or CSS
+  hooks.
+
 - **The manual says only true things about the element again.** The refusals list described
   `keys` — an attribute that shipped in 1.1.0 and is documented at length two sections up —
   as the feature this project declined to build; the bullet now names what is actually

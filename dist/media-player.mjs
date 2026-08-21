@@ -1603,11 +1603,24 @@ function focusedElement() {
 }
 var MediaPlayer = class extends HgElement {
   connected() {
-    this.media = this.querySelector("audio, video");
-    if (!this.media) {
+    const media = this.querySelector("audio, video");
+    if (!media) {
       console.warn("media-player: no <audio> or <video> inside \u2014 nothing to play");
       return;
     }
+    if (this.isReady && this.media !== media) {
+      this.isReady = false;
+      this.isLive = false;
+      this.isPlaying = false;
+      this.isError = false;
+      this.posterHidden = false;
+      this.track = null;
+      this.hasCaptions = false;
+      this.captionsVisible = false;
+      this.captionText = null;
+      this.thumbs = null;
+    }
+    this.media = media;
     this.isVideo = this.media.tagName === "VIDEO";
     this.frame = 0;
     this.linger = null;

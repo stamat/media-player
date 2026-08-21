@@ -425,11 +425,29 @@ export class MediaPlayer extends HgElement {
   };
 
   connected() {
-    this.media = this.querySelector('audio, video');
-    if (!this.media) {
+    const media = this.querySelector('audio, video');
+    if (!media) {
       console.warn('media-player: no <audio> or <video> inside — nothing to play');
       return;
     }
+    // A reconnect resumes only for the element it went ready with: a morph or a framework
+    // re-render can hand the player back with a fresh media element inside, and resuming
+    // would keep the clock, the caption track and the volume of the one that is gone while
+    // the new element sits at platform defaults. A different element starts over, the way
+    // a first connect does.
+    if (this.isReady && this.media !== media) {
+      this.isReady = false;
+      this.isLive = false;
+      this.isPlaying = false;
+      this.isError = false;
+      this.posterHidden = false;
+      this.track = null;
+      this.hasCaptions = false;
+      this.captionsVisible = false;
+      this.captionText = null;
+      this.thumbs = null;
+    }
+    this.media = media;
 
     this.isVideo = this.media.tagName === 'VIDEO';
     this.frame = 0;

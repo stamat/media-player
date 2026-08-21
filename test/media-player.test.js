@@ -1241,6 +1241,28 @@ describe('captions', () => {
     expect(late.track.listeners).toBe(1);
   });
 
+  test('a reconnect with a different media element starts over instead of resuming the old one', () => {
+    // A morph or a framework re-render can put the player back with a fresh <audio>
+    // inside. Resuming would keep the clock, track and volume of the element that is gone
+    // while the new one sits at platform defaults — same element resumes, different
+    // element re-initialises.
+    const player = mount(fakeMedia());
+    player.applyVolume(0.3);
+    player.toggleMute();
+    expect(localStorage.getItem('media-player-muted')).toBe('true');
+    player.remove();
+
+    const swapped = fakeMedia('audio', { duration: 60 });
+    player.querySelector('audio').remove();
+    player.appendChild(swapped);
+    document.body.appendChild(player);
+
+    expect(player.media).toBe(swapped);
+    expect(swapped.controls).toBe(false);
+    expect(swapped.muted).toBe(true); // the stored mute reached the new element
+    expect(player.duration).toBe(60); // the new element's metadata, not the old clock
+  });
+
   test('a markup track\'s cue listener survives a move in the DOM', () => {
     const media = fakeMedia('video');
     const track = fakeTrack();
