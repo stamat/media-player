@@ -1955,17 +1955,24 @@ test('every name the manifest publishes as public API is still a method on the e
   expect(missing).toEqual([]);
 });
 
-test('every handler an on= in the manual\'s samples names is in the manifest\'s public list', async () => {
+test('every handler the manual names — through on=, data-on= or keys= — is in the manifest\'s public list', async () => {
   // The other direction of the test above, and the one that catches the other silence: a
   // handler newly written into a sample but forgotten in PUBLIC ships marked private —
   // out of every editor that reads the manifest — while the allow-list walk stays green,
-  // which is how `goLive` shipped private in 1.1.0.
+  // which is how `goLive` shipped private in 1.1.0. The walk speaks each attribute's own
+  // grammar: hydrargyri reads `data-on` as a full alias of `on` and splits a pair at its
+  // FIRST colon, while `keys` splits at its LAST so a key that is itself a colon parses —
+  // a scraper with one grammar of its own would go green over markup that does not work.
+  // Single quotes count too, and so does an attribute quoted inside a prose code span.
   const { readFile } = await import('node:fs/promises');
   const page = await readFile(new URL('../src/markup/index.md', import.meta.url), 'utf8');
   const named = new Set();
-  for (const [, value] of page.matchAll(/\son="([^"]*)"/g)) {
-    for (const pair of value.split(';')) {
-      const method = pair.slice(pair.lastIndexOf(':') + 1).trim();
+  for (const [, attr, doubled, singled] of page.matchAll(/[\s`](on|data-on|keys)=(?:"([^"]*)"|'([^']*)')/g)) {
+    for (const pair of (doubled ?? singled).split(';')) {
+      const entry = pair.trim();
+      const at = attr === 'keys' ? entry.lastIndexOf(':') : entry.indexOf(':');
+      if (at === -1) continue;
+      const method = entry.slice(at + 1).trim();
       if (method) named.add(method);
     }
   }
