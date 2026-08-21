@@ -1434,7 +1434,7 @@ win.
 
 |                                    | media-player                                            | [Plyr](https://github.com/sampotts/plyr)             | [media-chrome](https://github.com/muxinc/media-chrome) | [Vidstack](https://vidstack.io)      | [Video.js](https://videojs.com)        |
 | ---------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ | ------------------------------------ | -------------------------------------- |
-| **Size, gzipped**                  | **12.9 kB**                                             | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
+| **Size, gzipped**                  | **13.5 kB**                                             | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
 | **You write the controls**         | yes, as the only way                                    | no — a `controls` array, or an HTML string in config | yes, from its components                               | no — layouts                         | no                                     |
 | **Shadow DOM**                     | never                                                   | never                                                | yes                                                    | yes                                  | no                                     |
 | **Page plays with no script**      | yes                                                     | yes, if you keep `controls`                          | no — its starter `<video>` has none                    | no                                   | yes                                    |
@@ -1450,7 +1450,7 @@ Sizes are each package's browser bundle, gzipped: Plyr and Video.js as published
 esbuild, Vidstack from `cdn.vidstack.io/player`. This one is `dist/media-player.min.mjs`,
 which carries hydrargyri and the four elementals inside it — everything the player needs
 except the stylesheets: its own structure sheet is 0.8 kB and the theme 1.4 kB more, the
-elementals' four structure sheets 1.2 kB and their three themes 2.5 kB more, each gzipped on
+elementals' four structure sheets 1.3 kB and their three themes 2.5 kB more, each gzipped on
 its own the way a browser fetches it. Every one of those numbers moves with a release;
 measure before quoting.
 
