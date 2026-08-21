@@ -905,7 +905,7 @@ frames at the size the box should be.
 Cutting them is one command —
 [`script/thumbs`](https://github.com/stamat/media-player/blob/main/script/thumbs) in this
 repository, a bash script over `ffmpeg` and `ffprobe`, which is what wrote both sprites
-the players above hover — the twelve-minute film cuts to 147 frames in a 637 KB sheet.
+the players above hover — the twelve-minute film cuts to 147 frames in a 637 KiB sheet.
 Each frame is cut from the middle of its cue rather than the start, so a hover is never
 more than half an interval away from the second it names:
 
@@ -923,10 +923,10 @@ at every interval with 160px tiles:
 
 | Interval                | Frames | Sheet   | A hover is off by at most |
 | ----------------------- | ------ | ------- | ------------------------- |
-| 10 s                    | 74     | 332 KB  | 5 s                       |
-| **5 s** — the default   | 147    | 637 KB  | 2.5 s                     |
-| 2 s                     | 368    | 1.6 MB  | 1 s                       |
-| 1 s                     | 735    | 3.2 MB  | 0.5 s                     |
+| 10 s                    | 74     | 332 KiB | 5 s                       |
+| **5 s** — the default   | 147    | 637 KiB | 2.5 s                     |
+| 2 s                     | 368    | 1.6 MiB | 1 s                       |
+| 1 s                     | 735    | 3.2 MiB | 0.5 s                     |
 
 `script/thumbs movie.mp4 1` is the whole of getting the last row — nothing in the element
 cares which you pick. It is the sheet your visitors pay for on their first hover, which is
