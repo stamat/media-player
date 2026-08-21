@@ -1323,6 +1323,74 @@ Where this loses is the bottom of that table, and it loses there on purpose. **P
 Vidstack are the right answer for YouTube and Vimeo**, and Video.js for the long tail of
 formats and plugins. None of that is planned here.
 
+## Live, and the streams it does not carry
+
+A live stream has no end, and browsers disagree about how to say that: some report
+`Infinity` for the duration, some a number in the billions. Anything at or above 2³² is read
+as endless here. `is-live` goes on the element, `duration` reads `0` rather than a bogus
+number, and `seek`, `seekTo`, `skipForward`, `skipBackward` and the lock screen's position
+all decline, because there is nowhere on an endless stream to seek to. `stop` survives as a
+pause with nothing to rewind. Bind `isLive:if` on a **Live** badge and the row says which
+kind of thing it is holding.
+
+That is the whole of what ships. HLS and DASH are not here and are not coming: a manifest
+needs a third-party script driving Media Source Extensions, and a script driving the media
+element is the opposite of the bargain this page opens with.
+
+It composes anyway, and nothing here was written to make it. The element never creates,
+moves or replaces the media element and never touches its `src` — it reads the one you wrote
+and wires your controls to it. So attach hls.js to that `<video>` and the row works
+unchanged:
+
+```html
+<media-player>
+  <video controls playsinline></video>
+  <!-- your control row, exactly as in the samples above -->
+</media-player>
+
+<script type="module">
+  import Hls from "hls.js";
+
+  const video = document.querySelector("media-player video");
+  const manifest = "/stream.m3u8";
+
+  if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    video.src = manifest; // Safari and iOS play HLS without help
+  } else if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(manifest);
+    hls.attachMedia(video);
+  }
+</script>
+```
+
+Order does not matter, which is the part that usually costs a library an option. Metadata
+arriving is five different events and all of them route to the same idempotent handler, so
+the controls come up whenever the manifest resolves — before this element upgrades or long
+after. A live manifest reports `Infinity`, which lands on `is-live` with no extra wiring.
+
+What you give up is the promise at the top of this page, and it is HLS that takes it rather
+than this element:
+
+| With the `<script>` blocked | A bare `<video src="stream.m3u8" controls>` |
+| --------------------------- | ------------------------------------------- |
+| Safari, iOS                 | plays — HLS is native there                 |
+| Chrome, Edge, Firefox       | nothing; an empty box                       |
+
+A progressive file listed after the manifest is the fallback, and hls.js overrides it by
+setting `src` in the browsers that need it:
+
+```html
+<video controls playsinline>
+  <source src="/stream.m3u8" type="application/vnd.apple.mpegurl" />
+  <source src="/episode.mp4" type="video/mp4" />
+</video>
+```
+
+None of this is covered by a test. jsdom implements no Media Source Extensions, so the
+composition above is read off the code rather than proven — if it breaks for you, that is an
+issue worth filing.
+
 ## What it does not do
 
 Each of these is a decision, not a gap waiting for a pull request.
@@ -1332,7 +1400,10 @@ Each of these is a decision, not a gap waiting for a pull request.
   what you do not want.
 - **Streaming formats.** HLS, DASH and the YouTube and Vimeo iframe APIs are all a
   third-party script driving an element you did not write, which is the opposite of the
-  bargain here.
+  bargain here. Live streams themselves are handled, and hls.js composes with this element
+  without it shipping a line about it —
+  [Live, and the streams it does not carry](#live-and-the-streams-it-does-not-carry) says how,
+  and what it costs.
 - **Keep a keyboard map of its own.** `key` on a button is the whole of it, and that is the
   refusal rather than a shortcut around one: the key presses a control the page already
   shows, already names and already disables. An attribute mapping a key straight to a method

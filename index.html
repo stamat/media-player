@@ -1534,6 +1534,71 @@ measure before quoting.</p>
 <p>Where this loses is the bottom of that table, and it loses there on purpose. <strong>Plyr and
 Vidstack are the right answer for YouTube and Vimeo</strong>, and Video.js for the long tail of
 formats and plugins. None of that is planned here.</p>
+<h2 id="live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry<a class="heading-anchor" href="#live-and-the-streams-it-does-not-carry" tabindex="-1" aria-hidden="true"></a></h2>
+<p>A live stream has no end, and browsers disagree about how to say that: some report
+<code>Infinity</code> for the duration, some a number in the billions. Anything at or above 2³² is read
+as endless here. <code>is-live</code> goes on the element, <code>duration</code> reads <code>0</code> rather than a bogus
+number, and <code>seek</code>, <code>seekTo</code>, <code>skipForward</code>, <code>skipBackward</code> and the lock screen&#39;s position
+all decline, because there is nowhere on an endless stream to seek to. <code>stop</code> survives as a
+pause with nothing to rewind. Bind <code>isLive:if</code> on a <strong>Live</strong> badge and the row says which
+kind of thing it is holding.</p>
+<p>That is the whole of what ships. HLS and DASH are not here and are not coming: a manifest
+needs a third-party script driving Media Source Extensions, and a script driving the media
+element is the opposite of the bargain this page opens with.</p>
+<p>It composes anyway, and nothing here was written to make it. The element never creates,
+moves or replaces the media element and never touches its <code>src</code> — it reads the one you wrote
+and wires your controls to it. So attach hls.js to that <code>&lt;video&gt;</code> and the row works
+unchanged:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">playsinline</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
+  <span class="hljs-comment">&lt;!-- your control row, exactly as in the samples above --&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
+  <span class="hljs-keyword">import</span> <span class="hljs-title class_">Hls</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;hls.js&quot;</span>;
+
+  <span class="hljs-keyword">const</span> video = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&quot;media-player video&quot;</span>);
+  <span class="hljs-keyword">const</span> manifest = <span class="hljs-string">&quot;/stream.m3u8&quot;</span>;
+
+  <span class="hljs-keyword">if</span> (video.<span class="hljs-title function_">canPlayType</span>(<span class="hljs-string">&quot;application/vnd.apple.mpegurl&quot;</span>)) {
+    video.<span class="hljs-property">src</span> = manifest; <span class="hljs-comment">// Safari and iOS play HLS without help</span>
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Hls</span>.<span class="hljs-title function_">isSupported</span>()) {
+    <span class="hljs-keyword">const</span> hls = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Hls</span>();
+    hls.<span class="hljs-title function_">loadSource</span>(manifest);
+    hls.<span class="hljs-title function_">attachMedia</span>(video);
+  }
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+<p>Order does not matter, which is the part that usually costs a library an option. Metadata
+arriving is five different events and all of them route to the same idempotent handler, so
+the controls come up whenever the manifest resolves — before this element upgrades or long
+after. A live manifest reports <code>Infinity</code>, which lands on <code>is-live</code> with no extra wiring.</p>
+<p>What you give up is the promise at the top of this page, and it is HLS that takes it rather
+than this element:</p>
+<table>
+<thead>
+<tr>
+<th>With the <code>&lt;script&gt;</code> blocked</th>
+<th>A bare <code>&lt;video src=&quot;stream.m3u8&quot; controls&gt;</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Safari, iOS</td>
+<td>plays — HLS is native there</td>
+</tr>
+<tr>
+<td>Chrome, Edge, Firefox</td>
+<td>nothing; an empty box</td>
+</tr>
+</tbody></table>
+<p>A progressive file listed after the manifest is the fallback, and hls.js overrides it by
+setting <code>src</code> in the browsers that need it:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">playsinline</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/stream.m3u8&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;application/vnd.apple.mpegurl&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/episode.mp4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;video/mp4&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span></code></pre>
+<p>None of this is covered by a test. jsdom implements no Media Source Extensions, so the
+composition above is read off the code rather than proven — if it breaks for you, that is an
+issue worth filing.</p>
 <h2 id="what-it-does-not-do">What it does not do<a class="heading-anchor" href="#what-it-does-not-do" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Each of these is a decision, not a gap waiting for a pull request.</p>
 <ul>
@@ -1542,7 +1607,10 @@ the problem this exists to avoid. The sample above is the starter — copy it an
 what you do not want.</li>
 <li><strong>Streaming formats.</strong> HLS, DASH and the YouTube and Vimeo iframe APIs are all a
 third-party script driving an element you did not write, which is the opposite of the
-bargain here.</li>
+bargain here. Live streams themselves are handled, and hls.js composes with this element
+without it shipping a line about it —
+<a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a> says how,
+and what it costs.</li>
 <li><strong>Keep a keyboard map of its own.</strong> <code>key</code> on a button is the whole of it, and that is the
 refusal rather than a shortcut around one: the key presses a control the page already
 shows, already names and already disables. An attribute mapping a key straight to a method

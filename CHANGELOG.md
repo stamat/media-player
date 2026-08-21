@@ -11,6 +11,16 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+### Added
+
+- **Docs: what happens with a live stream, and how HLS composes.** The manual gained
+  _Live, and the streams it does not carry_ — what `is-live` turns off and why, and a
+  worked hls.js sample for the case the element refuses to ship. No code changed: the
+  element never creates or replaces the media element, so a third-party script attaching to
+  the `<video>` you wrote already worked, in either order, and the page now says so along
+  with the cost — with the script blocked, a bare `.m3u8` plays on Safari and nowhere else.
+  Not covered by a test: jsdom implements no Media Source Extensions.
+
 ### Changed
 
 - **The thumb glides.** The clock has always painted every animation frame, but the
