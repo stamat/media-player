@@ -13,6 +13,13 @@ for the person who wrote the code.
 
 ### Fixed
 
+- **An author's `muted` outranks the shared store.** The default storage key is shared by
+  every player on a site, so the level a visitor dragged on one page unmuted the background
+  video another page deliberately ships `muted` — and an autoplaying loop is stopped by its
+  browser the moment it makes sound. `restore` now leaves a `muted` attribute muted; give
+  the player its own `storage-key` where a visitor's unmute should win instead. No new DOM
+  or CSS hooks, but `volume-state` reads `mute` on load for such a player.
+
 - **A `<track>` appended after the upgrade renders its cues.** The cue listener rode
   `static wires`, which hydrargyri scans once at upgrade — a `<track>` a script appends
   later was found by `addtrack` and earned its button, and its cues never arrived,

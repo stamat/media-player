@@ -722,6 +722,19 @@ describe('volume', () => {
     expect(media.volume).toBe(0.4);
   });
 
+  test('an author-written muted survives a level stored by another player on the shared key', () => {
+    // The default storage key is site-wide: the level a visitor dragged on one page must
+    // not unmute the background video another page deliberately ships `muted` — an
+    // autoplaying loop is stopped by its browser the moment it makes sound.
+    localStorage.setItem('media-player-volume', '0.6');
+    localStorage.setItem('media-player-muted', 'false');
+    const media = fakeMedia('video');
+    media.setAttribute('muted', '');
+    const player = mount(media);
+    expect(media.muted).toBe(true);
+    expect(player.getAttribute('volume-state')).toBe('mute');
+  });
+
   test('a volume drag persists and announces once it settles, not once per pixel', () => {
     jest.useFakeTimers();
     const media = fakeMedia();

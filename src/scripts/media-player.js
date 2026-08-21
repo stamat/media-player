@@ -1437,7 +1437,12 @@ export class MediaPlayer extends HgElement {
   restore() {
     const volume = this.read('volume');
     const muted = this.read('muted');
-    if (muted === true) this.applyVolume(0, false);
+    // The author's own `muted` attribute outranks the store: the storage key is shared
+    // across players by default, so a level dragged on one page must not unmute the
+    // background video another page deliberately ships silent — autoplay itself depends on
+    // that attribute holding. A `storage-key` of the player's own is how a remembered
+    // unmute gets to win instead.
+    if (muted === true || this.media.defaultMuted) this.applyVolume(0, false);
     else if (typeof volume === 'number') this.applyVolume(volume, false);
     if (typeof volume === 'number' && volume > 0) this.lastVolume = volume;
     this.syncVolume();

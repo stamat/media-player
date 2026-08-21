@@ -2422,7 +2422,7 @@ var MediaPlayer = class extends HgElement {
   restore() {
     const volume = this.read("volume");
     const muted = this.read("muted");
-    if (muted === true) this.applyVolume(0, false);
+    if (muted === true || this.media.defaultMuted) this.applyVolume(0, false);
     else if (typeof volume === "number") this.applyVolume(volume, false);
     if (typeof volume === "number" && volume > 0) this.lastVolume = volume;
     this.syncVolume();
