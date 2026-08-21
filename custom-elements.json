@@ -815,10 +815,7 @@
                 "text": "string"
               },
               "description": "Key-to-method pairs for actions no visible control names, `keys=\"ArrowUp:volumeUp;ArrowDown:volumeDown\"`. A control's own `key` outranks it for the same press, and a focused control keeps the keys it already answers.",
-              "name": "keys",
-              "x-code-preview": {
-                "hidden": true
-              }
+              "name": "keys"
             }
           ],
           "superclass": {

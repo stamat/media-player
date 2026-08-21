@@ -57,7 +57,8 @@ export const AUTHORED = new Set([
   'artist',
   'album',
   'artwork',
-  'storage-key'
+  'storage-key',
+  'keys'
 ]);
 
 export default {

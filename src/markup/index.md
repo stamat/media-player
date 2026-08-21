@@ -25,7 +25,7 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
 The sample below is not a picture of one. It is the page's only copy of that markup, rendered
 in an isolated frame by [`<code-preview>`](https://github.com/stamat/code-preview-element) —
 press **Edit** and what you type is what plays. The **Options** tab beside it is the same
-`custom-elements.json` this package ships, turned into controls: the six attributes an author
+`custom-elements.json` this package ships, turned into controls: the seven attributes an author
 writes and the seven custom properties the theme takes, each with what the manifest says its
 type is. An attribute knob rewrites the markup above it, so the code tab stays the truth; a
 custom property is not part of the sample, so it writes a rule into the frame and prints that

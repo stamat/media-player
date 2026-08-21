@@ -28,6 +28,11 @@ for the person who wrote the code.
   the manual's samples calls must be in the list — so the next forgotten handler fails the
   build instead of quietly dropping out of editors.
 
+- **The Options panel offers `keys`.** The attribute fell through to the hidden marking
+  meant for the CSS hooks, so the panel showed six knobs where seven attributes are the
+  author's to write — and the manual said six in its intro while its own reference counted
+  seven. The panel and the intro both say seven now.
+
 ## [1.1.0] - 2026-08-21
 
 ### Added
