@@ -1730,6 +1730,23 @@ way, from each package's `dist/`:
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/tooltip.min.css"
 />
+
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/media-player-element/dist/media-player-theme.min.css"
+/><!-- the look; optional -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/slider-theme.min.css"
+/><!-- optional -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/progress-theme.min.css"
+/><!-- optional -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/tooltip-theme.min.css"
+/><!-- optional, but a bubble nothing paints is text over the row -->
 ```
 
 ## What editors read

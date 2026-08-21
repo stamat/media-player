@@ -61,6 +61,12 @@ for the person who wrote the code.
   the player its own `storage-key` where a visitor's unmute should win instead. No new DOM
   or CSS hooks, but `volume-state` reads `mute` on load for such a player.
 
+- **The CDN install carries the theme.** The copy-paste block loaded the structure sheets
+  alone — and with the no-script guard living in the theme until this release, the copied
+  install was precisely the arrangement that broke the blocked-script fallback. The block
+  now lists the theme links the npm instructions always had, the tooltip theme the row
+  cannot really go without included, optional comments and all.
+
 - **The manual says only true things about the element again.** The refusals list described
   `keys` — an attribute that shipped in 1.1.0 and is documented at length two sections up —
   as the feature this project declined to build; the bullet now names what is actually
