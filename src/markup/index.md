@@ -1719,48 +1719,50 @@ below, full URLs and all.
 ```
 
 Or from a CDN as a module, no install and no build step — the stylesheets come the same
-way, from each package's `dist/`:
+way, from each package's `dist/`. The pins take fixes and refuse breakage: `@1` follows
+every 1.x release, and the elementals' `@0.11` follows patches only, because a 0.x minor is
+allowed to break:
 
 ```html
 <script type="module">
-  import "https://cdn.jsdelivr.net/npm/media-player-element/dist/media-player.min.mjs";
+  import "https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs";
 </script>
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/media-player-element/dist/media-player.min.css"
+  href="https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.css"
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/slider.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/slider.min.css"
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/progress.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/progress.min.css"
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/toolbar.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/toolbar.min.css"
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/tooltip.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/tooltip.min.css"
 />
 
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/media-player-element/dist/media-player-theme.min.css"
+  href="https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player-theme.min.css"
 /><!-- the look; optional -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/slider-theme.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/slider-theme.min.css"
 /><!-- optional -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/progress-theme.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/progress-theme.min.css"
 /><!-- optional -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals/dist/elementals/tooltip-theme.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/tooltip-theme.min.css"
 /><!-- optional, but a bubble nothing paints is text over the row -->
 ```
 

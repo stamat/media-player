@@ -65,7 +65,10 @@ for the person who wrote the code.
   alone — and with the no-script guard living in the theme until this release, the copied
   install was precisely the arrangement that broke the blocked-script fallback. The block
   now lists the theme links the npm instructions always had, the tooltip theme the row
-  cannot really go without included, optional comments and all.
+  cannot really go without included, optional comments and all. The URLs are pinned, too —
+  `@1`, with the elementals at `@0.11` since a 0.x minor may break — where they used to
+  resolve to latest, which would have walked the next major straight onto every page that
+  copied the block.
 
 - **A reconnect resumes only the element it went ready with.** A morph or a framework
   re-render can put the player back in the DOM with a fresh media element inside; the
