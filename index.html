@@ -947,8 +947,8 @@ for you.</p>
 <p>The degradation is the usual bargain. No <code>&lt;track kind=&quot;metadata&quot;&gt;</code>, no
 <code>.media-player-preview</code> box, cues not loaded yet, a live stream — each means no preview and
 no error, and the scrubber&#39;s own value bubble still reads the time. A captions <code>&lt;track&gt;</code> is
-untouched by any of this: the captions button looks only for <code>captions</code>, <code>subtitles</code> and the
-bare <code>&lt;track&gt;</code> the platform reads as subtitles, so the two tracks sit in one <code>&lt;video&gt;</code>
+untouched by any of this: a <code>kind=&quot;metadata&quot;</code> track is not one the captions button takes —
+<a href="#faq-captions">the FAQ names which are</a> — so the two tracks sit in one <code>&lt;video&gt;</code>
 without stepping on each other. Blocked script never enters
 into it — the preview box is <code>hidden</code> in the markup and the native player the fallback
 leaves behind never had hover previews to lose.</p>
@@ -1499,7 +1499,7 @@ already wired is skipped, never doubled.</p>
 </tr>
 <tr>
 <td><code>click:toggleCaptions</code></td>
-<td>captions on and off; there has to be a caption track for the button to have anything to toggle — the one marked <code>default</code>, or the first written</td>
+<td>captions on and off; needs a track the button governs — <code>captions</code>, <code>subtitles</code> or a bare <code>&lt;track&gt;</code>, the <code>default</code> one or the first written: <a href="#faq-captions">the FAQ names the rule</a></td>
 </tr>
 <tr>
 <td><code>click:goLive</code></td>

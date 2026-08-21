@@ -941,8 +941,8 @@ for you.
 The degradation is the usual bargain. No `<track kind="metadata">`, no
 `.media-player-preview` box, cues not loaded yet, a live stream — each means no preview and
 no error, and the scrubber's own value bubble still reads the time. A captions `<track>` is
-untouched by any of this: the captions button looks only for `captions`, `subtitles` and the
-bare `<track>` the platform reads as subtitles, so the two tracks sit in one `<video>`
+untouched by any of this: a `kind="metadata"` track is not one the captions button takes —
+[the FAQ names which are](#faq-captions) — so the two tracks sit in one `<video>`
 without stepping on each other. Blocked script never enters
 into it — the preview box is `hidden` in the markup and the native player the fallback
 leaves behind never had hover previews to lose.
@@ -1370,7 +1370,7 @@ already wired is skipped, never doubled.
 | `input:setVolume`                               | the sound follows the thumb immediately; the write to storage waits for the drag to settle                                                       |
 | `click:volumeUp`, `click:volumeDown`            | one tenth of full per press, climbing from zero when muted rather than jumping back — for a volume UI with no slider, or a `keys` entry; the samples bind them to the up and down arrows |
 | `click:toggleMute`                              | mute, and back to the level it remembered                                                                                                        |
-| `click:toggleCaptions`                          | captions on and off; there has to be a caption track for the button to have anything to toggle — the one marked `default`, or the first written  |
+| `click:toggleCaptions`                          | captions on and off; needs a track the button governs — `captions`, `subtitles` or a bare `<track>`, the `default` one or the first written: [the FAQ names the rule](#faq-captions) |
 | `click:goLive`                                  | back to the live edge of a stream with a rewind window; does nothing on a file, or on a stream with no window to have left                       |
 | `click:toggleFullscreen`                        | the player element, or the video itself on an iPhone, which has never allowed anything else                                                      |
 
