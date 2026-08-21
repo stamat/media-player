@@ -11,6 +11,8 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-21
+
 ### Changed
 
 - **The accent is one step darker: `#16a34a`.** The old `#22c55e` held 2.3:1 against the
