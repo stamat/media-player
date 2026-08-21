@@ -1216,10 +1216,11 @@ export class MediaPlayer extends HgElement {
    */
   findCaptions() {
     if (this.track || !this.media) return;
-    // Not the metadata track: a bare `<track>` defaults to subtitles and stays a captions
-    // track, but thumbnails must never end up behind the captions button.
-    const element = this.media.querySelector('track[default]:not([kind=metadata])')
-      || this.media.querySelector('track:not([kind=metadata])');
+    // Captions and subtitles only, plus the bare `<track>` the platform itself defaults to
+    // subtitles. Chapters and descriptions are declined the way the in-band list below
+    // already declines them, and the metadata track never lands behind the captions button.
+    const element = this.media.querySelector('track[default][kind=captions],track[default][kind=subtitles],track[default]:not([kind])')
+      || this.media.querySelector('track[kind=captions],track[kind=subtitles],track:not([kind])');
     const listed = Array.from(this.media.textTracks || [])
       .find((one) => one.kind === 'captions' || one.kind === 'subtitles');
 

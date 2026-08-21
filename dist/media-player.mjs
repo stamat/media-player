@@ -2253,7 +2253,7 @@ var MediaPlayer = class extends HgElement {
    */
   findCaptions() {
     if (this.track || !this.media) return;
-    const element = this.media.querySelector("track[default]:not([kind=metadata])") || this.media.querySelector("track:not([kind=metadata])");
+    const element = this.media.querySelector("track[default][kind=captions],track[default][kind=subtitles],track[default]:not([kind])") || this.media.querySelector("track[kind=captions],track[kind=subtitles],track:not([kind])");
     const listed = Array.from(this.media.textTracks || []).find((one) => one.kind === "captions" || one.kind === "subtitles");
     const found = element?.track || listed;
     if (!found) return;

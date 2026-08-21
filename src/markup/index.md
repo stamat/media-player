@@ -941,8 +941,9 @@ for you.
 The degradation is the usual bargain. No `<track kind="metadata">`, no
 `.media-player-preview` box, cues not loaded yet, a live stream — each means no preview and
 no error, and the scrubber's own value bubble still reads the time. A captions `<track>` is
-untouched by any of this: the captions button looks for every kind _but_ `metadata`, so the
-two tracks sit in one `<video>` without stepping on each other. Blocked script never enters
+untouched by any of this: the captions button looks only for `captions`, `subtitles` and the
+bare `<track>` the platform reads as subtitles, so the two tracks sit in one `<video>`
+without stepping on each other. Blocked script never enters
 into it — the preview box is `hidden` in the markup and the native player the fallback
 leaves behind never had hover previews to lose.
 
@@ -1799,9 +1800,11 @@ line in your own sheet brings it back. It is in the live recipe, with the reason
 <details>
 <summary id="faq-captions"><h3>The captions button never appears</h3></summary>
 
-There has to be a caption track for the button to have anything to toggle, and a
-`<track kind="metadata">` for thumbnails is not one. If several are written, the one marked
-`default` wins, and otherwise the first. A track a streaming library adds after the upgrade
+There has to be a caption track for the button to have anything to toggle — `captions`,
+`subtitles`, or a bare `<track>`, which the platform reads as subtitles. A
+`<track kind="metadata">` for thumbnails is not one, and neither are chapters or
+descriptions. If several are written, the one marked `default` wins, and otherwise the
+first. A track a streaming library adds after the upgrade
 counts too — the element watches `addtrack` for exactly that — but the button only lights
 once the track lands, which on a stream can be a moment after playback starts.
 

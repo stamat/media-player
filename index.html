@@ -947,8 +947,9 @@ for you.</p>
 <p>The degradation is the usual bargain. No <code>&lt;track kind=&quot;metadata&quot;&gt;</code>, no
 <code>.media-player-preview</code> box, cues not loaded yet, a live stream — each means no preview and
 no error, and the scrubber&#39;s own value bubble still reads the time. A captions <code>&lt;track&gt;</code> is
-untouched by any of this: the captions button looks for every kind <em>but</em> <code>metadata</code>, so the
-two tracks sit in one <code>&lt;video&gt;</code> without stepping on each other. Blocked script never enters
+untouched by any of this: the captions button looks only for <code>captions</code>, <code>subtitles</code> and the
+bare <code>&lt;track&gt;</code> the platform reads as subtitles, so the two tracks sit in one <code>&lt;video&gt;</code>
+without stepping on each other. Blocked script never enters
 into it — the preview box is <code>hidden</code> in the markup and the native player the fallback
 leaves behind never had hover previews to lose.</p>
 <h2 id="a-background-loop-and-the-one-button-it-owes-you">A background loop, and the one button it owes you<a class="heading-anchor" href="#a-background-loop-and-the-one-button-it-owes-you" tabindex="-1" aria-hidden="true"></a></h2>
@@ -1988,9 +1989,11 @@ written when a live stream had nothing to seek. A stream with a rewind window do
 line in your own sheet brings it back. It is in the live recipe, with the reason.</p>
 </details>
 <details>
-<summary id="faq-captions"><h3>The captions button never appears</h3></summary><p>There has to be a caption track for the button to have anything to toggle, and a
-<code>&lt;track kind=&quot;metadata&quot;&gt;</code> for thumbnails is not one. If several are written, the one marked
-<code>default</code> wins, and otherwise the first. A track a streaming library adds after the upgrade
+<summary id="faq-captions"><h3>The captions button never appears</h3></summary><p>There has to be a caption track for the button to have anything to toggle — <code>captions</code>,
+<code>subtitles</code>, or a bare <code>&lt;track&gt;</code>, which the platform reads as subtitles. A
+<code>&lt;track kind=&quot;metadata&quot;&gt;</code> for thumbnails is not one, and neither are chapters or
+descriptions. If several are written, the one marked <code>default</code> wins, and otherwise the
+first. A track a streaming library adds after the upgrade
 counts too — the element watches <code>addtrack</code> for exactly that — but the button only lights
 once the track lands, which on a stream can be a moment after playback starts.</p>
 </details>

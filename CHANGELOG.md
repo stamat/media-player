@@ -39,6 +39,13 @@ for the person who wrote the code.
   before the claim now — a disabled control still outranks a `keys` entry for the same
   press, and the press stays the page's.
 
+- **Only captions earn the captions button.** The markup path took any `<track>` but the
+  metadata one, so a chapters or descriptions track ended up behind the captions button,
+  its cues rendered as captions text — while the in-band path already filtered to captions
+  and subtitles, and the two disagreed. Both speak one rule now: `captions`, `subtitles`,
+  or a bare `<track>`, which the platform itself reads as subtitles. No DOM or CSS output
+  changes beyond which track the button binds.
+
 ## [1.1.0] - 2026-08-21
 
 ### Added

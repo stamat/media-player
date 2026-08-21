@@ -1155,6 +1155,23 @@ describe('captions', () => {
     expect(player.hasAttribute('has-captions')).toBe(false);
   });
 
+  test('a chapters track earns no captions button, written in the markup or arriving in the list', () => {
+    // Only captions, subtitles and the bare `<track>` the platform defaults to subtitles
+    // count — a chapters walk rendered as captions text would read as broken captions.
+    const media = fakeMedia('video');
+    const chapters = fakeTrack();
+    chapters.setAttribute('kind', 'chapters');
+    media.appendChild(chapters);
+    const player = mount(media);
+    expect(player.hasAttribute('has-captions')).toBe(false);
+
+    const inband = fakeMedia('video');
+    const add = fakeInbandCaptions(inband, 'chapters');
+    const late = mount(inband);
+    add();
+    expect(late.hasAttribute('has-captions')).toBe(false);
+  });
+
   test('captions left on last visit come back on, without writing the choice again', () => {
     localStorage.setItem('media-player-captions', 'true');
     const media = fakeMedia('video');
