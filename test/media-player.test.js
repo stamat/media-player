@@ -1741,6 +1741,38 @@ describe('keys the markup claims', () => {
     expect(event.defaultPrevented).toBe(false);
   });
 
+  test('a control inside a disabled fieldset ignores its key the same way', () => {
+    // `button.disabled` reads false there — only `:disabled` knows the ancestor — and
+    // `click()` on an actually-disabled control is a spec no-op, so claiming the press
+    // would spend it on nothing.
+    const { player, button, presses } = keyed();
+    const fence = document.createElement('fieldset');
+    fence.disabled = true;
+    player.appendChild(fence);
+    fence.appendChild(button);
+    const event = press(player, 'k');
+    expect(presses).toEqual([]);
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  test('a disabled attribute on a keyed non-form control is honoured too', () => {
+    // The readiness gate strips `[disabled]` from any element, form control or not — the
+    // attribute is the author's "not yet" marker even where the platform gives the element
+    // no disabled state of its own, so a press must not click through it.
+    const { player, presses } = keyed();
+    const chip = document.createElement('span');
+    chip.setAttribute('role', 'button');
+    chip.setAttribute('key', 'j');
+    chip.setAttribute('disabled', '');
+    let clicked = 0;
+    chip.addEventListener('click', () => { clicked += 1; });
+    player.appendChild(chip);
+    const event = press(player, 'j');
+    expect(clicked).toBe(0);
+    expect(event.defaultPrevented).toBe(false);
+    expect(presses).toEqual([]);
+  });
+
   test('a disabled control still outranks a keys entry, so one press stays one action', () => {
     const { player, button, presses } = keyed(fakeMedia(), 'ArrowUp');
     button.disabled = true;

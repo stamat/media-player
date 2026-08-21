@@ -2142,7 +2142,7 @@ var MediaPlayer = class extends HgElement {
     const control = Array.from(this.querySelectorAll("[key]")).find(
       (node) => node.getAttribute("key").toLowerCase() === pressed
     );
-    if (control?.disabled) return;
+    if (control?.matches(":disabled, [disabled]")) return;
     const method = control ? null : keyedMethod(this.getAttribute("keys"), pressed);
     if (method && typeof this[method] !== "function") {
       console.warn(`media-player: keys names no method "${method}"`);

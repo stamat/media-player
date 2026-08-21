@@ -1084,8 +1084,12 @@ export class MediaPlayer extends HgElement {
     );
     // A disabled control still claims its key — it outranks a `keys` entry for the same
     // press even while it cannot act — but the press is left with the page rather than
-    // spent on nothing.
-    if (control?.disabled) return;
+    // spent on nothing. `:disabled` is the platform's own answer where a `.disabled` read
+    // is not: inside a `<fieldset disabled>` the property stays false while `click()`
+    // declines the control. `[disabled]` beside it covers what the readiness gate strips
+    // the attribute from — a keyed link or custom element has no `:disabled` state, and
+    // the author marked it unpressable all the same.
+    if (control?.matches(':disabled, [disabled]')) return;
     // The `keys` attribute is the fallback, never the override: a visible control claiming
     // the key wins, so `key` and `keys` naming one press stay one action.
     const method = control ? null : keyedMethod(this.getAttribute('keys'), pressed);

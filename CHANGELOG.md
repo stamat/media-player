@@ -45,7 +45,10 @@ for the person who wrote the code.
   `preventDefault` before the click a disabled control ignores, so a `key=" "` on a
   not-yet-ready play button stopped the page scrolling in exchange for nothing. Declined
   before the claim now — a disabled control still outranks a `keys` entry for the same
-  press, and the press stays the page's.
+  press, and the press stays the page's. The decline asks the platform's own question:
+  `:disabled`, so a control inside a `<fieldset disabled>` is declined even though its
+  `disabled` property reads false, and `[disabled]` beside it, so a keyed link or custom
+  element the author marked unpressable is declined rather than clicked anyway.
 
 - **Only captions earn the captions button.** The markup path took any `<track>` but the
   metadata one, so a chapters or descriptions track ended up behind the captions button,
