@@ -1654,12 +1654,12 @@ Each of these is a decision, not a gap waiting for a pull request.
   without it shipping a line about it —
   [Live, and the streams it does not carry](#live-and-the-streams-it-does-not-carry) says how,
   and what it costs.
-- **Keep a keyboard map of its own.** `key` on a button is the whole of it, and that is the
-  refusal rather than a shortcut around one: the key presses a control the page already
-  shows, already names and already disables. An attribute mapping a key straight to a method
-  would reach further — `volumeUp` and `volumeDown` have no button in these samples, so no
-  key either — at the price of a second set of bindings with nothing on the page announcing
-  them, which is the half worth refusing.
+- **Ship a keyboard map of its own.** Nothing is bound until the author writes it: `key` on
+  a control the page already shows, already names and already disables, and `keys` for the
+  action no visible control carries — `volumeUp` behind a volume that is a slider. A `keys`
+  entry is the expensive half: a binding nothing on the page announces, so what it maps is
+  the author's to say. What stays refused is the ready-made set — a default `k`, `m`, `f`
+  map would spend letters on every page that never asked for them.
 - **Sanitize anything.** It writes text and attributes, never HTML.
 
 ## Install

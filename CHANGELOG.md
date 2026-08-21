@@ -61,6 +61,11 @@ for the person who wrote the code.
   the player its own `storage-key` where a visitor's unmute should win instead. No new DOM
   or CSS hooks, but `volume-state` reads `mute` on load for such a player.
 
+- **The manual says only true things about the element again.** The refusals list described
+  `keys` — an attribute that shipped in 1.1.0 and is documented at length two sections up —
+  as the feature this project declined to build; the bullet now names what is actually
+  refused, the ready-made key map.
+
 - **A `<track>` appended after the upgrade renders its cues.** The cue listener rode
   `static wires`, which hydrargyri scans once at upgrade — a `<track>` a script appends
   later was found by `addtrack` and earned its button, and its cues never arrived,
