@@ -74,6 +74,29 @@ than compiled, because the live samples need it and no CDN should be in the way.
 
 Commit messages are freeform; write something that says what changed.
 
+## Checking HLS by hand
+
+jsdom implements no Media Source Extensions, so nothing about a streaming source can be
+covered by `script/test`. A change to the live-stream or rewind-window code wants ten minutes
+against a real manifest instead:
+
+1. `script/server`, and a scratch page under `_sitecheck/` — the directory is gitignored, so
+   nothing there ships and hls.js can come off a CDN without becoming a dependency.
+2. A `<media-player>` whose scrubber binds `seekableStart` and `seekableEnd` rather than
+   `duration`, plus one line of `media-player[is-live] .media-player-scrubber { visibility:
+   visible; }`, which the optional theme otherwise hides.
+3. Load a live manifest in Safari, which plays HLS natively, and in Chrome, which reaches it
+   through hls.js. Only one of those two paths is hls.js, so a check in one browser proves
+   half of it.
+
+A pass looks like this: the first duration the element sees is `Infinity`, so `is-live` comes
+on; `seekableStart`–`seekableEnd` spans the manifest's window; `behindLive` falls to zero at
+the edge; a skip backwards lands inside the window and stays there; and `goLive` returns.
+
+No manifest URL is pinned here on purpose. Public test streams rot — one 404'd mid-session
+while this page was being written — and a URL kept in a repository that refuses HLS is a
+maintenance promise nobody made.
+
 ## How a release works
 
 `script/publish [version]` bumps `package.json`, runs `script/changelog` to cut

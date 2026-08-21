@@ -1578,9 +1578,15 @@ here is a language picker: the first caption track found is the one that stays, 
 switching between them would need a control to switch with, and naming that control is a
 decision for markup rather than for this element.
 
-The late track is covered by a test, against a stated `textTracks` list. The rest of this is
-not: jsdom implements no Media Source Extensions, so attaching hls.js is read off the code
-rather than proven — if it breaks for you, that is an issue worth filing.
+The late track is covered by a test, against a stated `textTracks` list. Nothing else here
+can be, because jsdom implements no Media Source Extensions — so what stands in for the test
+is a check by hand, and this one was run: a live manifest with a ten-minute rewind window, in
+Safari, which plays HLS natively, and in Chrome, which reaches it through hls.js. In both the
+first duration the element saw was `Infinity`, so `is-live` came on rather than latching a
+bogus number; the window drove the scrubber; skipping backwards landed inside it and stayed.
+[CONTRIBUTING.md](https://github.com/stamat/media-player/blob/main/CONTRIBUTING.md) says how
+to run that check yourself. It is not run on every release, so if it breaks for you, that is
+an issue worth filing.
 
 ## What it does not do
 
