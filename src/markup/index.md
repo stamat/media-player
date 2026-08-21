@@ -1476,34 +1476,80 @@ back to the edge. `stop` refuses either way — a window does not give a stream 
 only an oldest second that has not expired yet, and landing a listener there is not going
 home.
 
+That is the whole of what ships. HLS and DASH are not here and are not coming: a manifest
+needs a third-party script driving Media Source Extensions, and a script driving the media
+element is the opposite of the bargain this page opens with.
+
+It composes anyway, and nothing here was written to make it. The element never creates, moves
+or replaces the media element and never touches its `src`: it reads the one you wrote and
+wires your controls to it, and a third-party script writing that same `src` is invisible to
+it — which is why the recipe below needs no seam to hold hls.js, and why hls.js is the only
+part of it this project does not ship.
+
 The scale is the markup's, which is what keeps `duration` meaning one thing everywhere. The
 element publishes three absolute numbers — `seekableStart`, `seekableEnd` and `behindLive` —
 and a scrubber over a rewind window binds the first two where a file's scrubber binds
-`duration`:
+`duration`. Here is a whole live player, that binding and hls.js included:
 
 ```html
-<slider-elemental class="media-player-scrubber" bind="timeFormatter:prop#format">
-  <input
-    type="range"
-    step="any"
-    aria-label="Seek"
-    bind="seekableStart:attr#min;seekableEnd:attr#max;currentTime:prop#value"
-    on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
-  />
-</slider-elemental>
+<media-player
+  tabindex="0"
+  role="region"
+  aria-label="Live stream"
+  on="keydown:onKeyDown"
+>
+  <video controls playsinline></video>
 
-<button on="click:goLive">Go live</button>
+  <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
+    <slider-elemental class="media-player-scrubber" bind="timeFormatter:prop#format">
+      <input
+        type="range"
+        step="any"
+        aria-label="Seek"
+        disabled
+        bind="seekableStart:attr#min;seekableEnd:attr#max;currentTime:prop#value"
+        on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
+      />
+    </slider-elemental>
+
+    <button on="click:togglePlay" bind="playLabel:attr#aria-label" key="k" disabled>▶</button>
+    <button on="click:skipBackward" aria-label="Back ten seconds" disabled>−10s</button>
+    <button on="click:goLive" disabled>Go live</button>
+    <span bind="isLive:if">LIVE</span>
+    <span bind="behindLive|time">00:00</span>
+  </toolbar-elemental>
+</media-player>
+
+<style>
+  /* The optional theme hides the scrubber on any live stream — it was written when a live
+     stream had nothing to seek. A rewind window wants it back. */
+  media-player[is-live] .media-player-scrubber {
+    visibility: visible;
+  }
+</style>
+
+<script type="module">
+  import "media-player-element";
+  import Hls from "hls.js";
+
+  const video = document.querySelector("media-player video");
+  const manifest = "/live.m3u8";
+
+  if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    video.src = manifest; // Safari and iOS play HLS without help
+  } else if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(manifest);
+    hls.attachMedia(video);
+    addEventListener("pagehide", () => hls.destroy(), { once: true });
+  }
+</script>
 ```
 
-The optional theme hides the scrubber on any live stream — it was written when a live stream
-had nothing to seek, and `visibility` rather than `display` so the row does not reshuffle. A
-player over a rewind window wants it back, which is one line in your own sheet:
-
-```css
-media-player[is-live] .media-player-scrubber {
-  visibility: visible;
-}
-```
+The `disabled` attributes are the author being honest: nothing on that row can do anything
+until a manifest resolves, and the element takes them off when it does. `hls.destroy()` on
+the way out is the one piece of housekeeping a stream needs that a file does not — a live
+loader keeps refetching the manifest otherwise.
 
 Those three refresh on `timeupdate` and on `progress` — about four times a second while
 playing, which is the rate a window that slides in whole segments actually changes at, rather
@@ -1515,37 +1561,6 @@ because that number is a design decision about a badge, and the badge is yours. 
 Two more things stay off on a stream, window or not: the OS lock screen gets no position, and
 the scrubber's frame previews do nothing — the spec wants a finite duration for the first,
 and a thumbnail sheet is cut from a file that has ended for the second.
-
-That is the whole of what ships. HLS and DASH are not here and are not coming: a manifest
-needs a third-party script driving Media Source Extensions, and a script driving the media
-element is the opposite of the bargain this page opens with.
-
-It composes anyway, and nothing here was written to make it. The element never creates,
-moves or replaces the media element and never touches its `src` — it reads the one you wrote
-and wires your controls to it. So attach hls.js to that `<video>` and the row works
-unchanged:
-
-```html
-<media-player>
-  <video controls playsinline></video>
-  <!-- your control row, exactly as in the samples above -->
-</media-player>
-
-<script type="module">
-  import Hls from "hls.js";
-
-  const video = document.querySelector("media-player video");
-  const manifest = "/stream.m3u8";
-
-  if (video.canPlayType("application/vnd.apple.mpegurl")) {
-    video.src = manifest; // Safari and iOS play HLS without help
-  } else if (Hls.isSupported()) {
-    const hls = new Hls();
-    hls.loadSource(manifest);
-    hls.attachMedia(video);
-  }
-</script>
-```
 
 Order does not matter, which is the part that usually costs a library an option. Metadata
 arriving is five different events and all of them route to the same idempotent handler, so

@@ -1713,27 +1713,74 @@ a drag on the scrubber all work inside it and all decline without it. <code>goLi
 back to the edge. <code>stop</code> refuses either way — a window does not give a stream a beginning,
 only an oldest second that has not expired yet, and landing a listener there is not going
 home.</p>
+<p>That is the whole of what ships. HLS and DASH are not here and are not coming: a manifest
+needs a third-party script driving Media Source Extensions, and a script driving the media
+element is the opposite of the bargain this page opens with.</p>
+<p>It composes anyway, and nothing here was written to make it. The element never creates, moves
+or replaces the media element and never touches its <code>src</code>: it reads the one you wrote and
+wires your controls to it, and a third-party script writing that same <code>src</code> is invisible to
+it — which is why the recipe below needs no seam to hold hls.js, and why hls.js is the only
+part of it this project does not ship.</p>
 <p>The scale is the markup&#39;s, which is what keeps <code>duration</code> meaning one thing everywhere. The
 element publishes three absolute numbers — <code>seekableStart</code>, <code>seekableEnd</code> and <code>behindLive</code> —
 and a scrubber over a rewind window binds the first two where a file&#39;s scrubber binds
-<code>duration</code>:</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;timeFormatter:prop#format&quot;</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
-    <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span>
-    <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;any&quot;</span>
-    <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Seek&quot;</span>
-    <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;seekableStart:attr#min;seekableEnd:attr#max;currentTime:prop#value&quot;</span>
-    <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub&quot;</span>
-  /&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
+<code>duration</code>. Here is a whole live player, that binding and hls.js included:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>
+  <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span>
+  <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;region&quot;</span>
+  <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Live stream&quot;</span>
+  <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;keydown:onKeyDown&quot;</span>
+&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">playsinline</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
 
-<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:goLive&quot;</span>&gt;</span>Go live<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></code></pre>
-<p>The optional theme hides the scrubber on any live stream — it was written when a live stream
-had nothing to seek, and <code>visibility</code> rather than <code>display</code> so the row does not reshuffle. A
-player over a rewind window wants it back, which is one line in your own sheet:</p>
-<pre><code class="hljs language-css">media-player<span class="hljs-selector-attr">[is-live]</span> <span class="hljs-selector-class">.media-player-scrubber</span> {
-  <span class="hljs-attribute">visibility</span>: visible;
-}</code></pre>
+  <span class="hljs-tag">&lt;<span class="hljs-name">toolbar-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Playback&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isReady:if&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;timeFormatter:prop#format&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+        <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span>
+        <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;any&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Seek&quot;</span>
+        <span class="hljs-attr">disabled</span>
+        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;seekableStart:attr#min;seekableEnd:attr#max;currentTime:prop#value&quot;</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub&quot;</span>
+      /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">key</span>=<span class="hljs-string">&quot;k&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>▶<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:skipBackward&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Back ten seconds&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>−10s<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:goLive&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>Go live<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isLive:if&quot;</span>&gt;</span>LIVE<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;behindLive|time&quot;</span>&gt;</span>00:00<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">toolbar-elemental</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css">
+  <span class="hljs-comment">/* The optional theme hides the scrubber on any live stream — it was written when a live
+     stream had nothing to seek. A rewind window wants it back. */</span>
+  media-player<span class="hljs-selector-attr">[is-live]</span> <span class="hljs-selector-class">.media-player-scrubber</span> {
+    <span class="hljs-attribute">visibility</span>: visible;
+  }
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
+  <span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player-element&quot;</span>;
+  <span class="hljs-keyword">import</span> <span class="hljs-title class_">Hls</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;hls.js&quot;</span>;
+
+  <span class="hljs-keyword">const</span> video = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&quot;media-player video&quot;</span>);
+  <span class="hljs-keyword">const</span> manifest = <span class="hljs-string">&quot;/live.m3u8&quot;</span>;
+
+  <span class="hljs-keyword">if</span> (video.<span class="hljs-title function_">canPlayType</span>(<span class="hljs-string">&quot;application/vnd.apple.mpegurl&quot;</span>)) {
+    video.<span class="hljs-property">src</span> = manifest; <span class="hljs-comment">// Safari and iOS play HLS without help</span>
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Hls</span>.<span class="hljs-title function_">isSupported</span>()) {
+    <span class="hljs-keyword">const</span> hls = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Hls</span>();
+    hls.<span class="hljs-title function_">loadSource</span>(manifest);
+    hls.<span class="hljs-title function_">attachMedia</span>(video);
+    <span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;pagehide&quot;</span>, <span class="hljs-function">() =&gt;</span> hls.<span class="hljs-title function_">destroy</span>(), { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });
+  }
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+<p>The <code>disabled</code> attributes are the author being honest: nothing on that row can do anything
+until a manifest resolves, and the element takes them off when it does. <code>hls.destroy()</code> on
+the way out is the one piece of housekeeping a stream needs that a file does not — a live
+loader keeps refetching the manifest otherwise.</p>
 <p>Those three refresh on <code>timeupdate</code> and on <code>progress</code> — about four times a second while
 playing, which is the rate a window that slides in whole segments actually changes at, rather
 than the sixty a second a file&#39;s clock is painted at. What is deliberately absent is a live
@@ -1743,32 +1790,6 @@ because that number is a design decision about a badge, and the badge is yours. 
 <p>Two more things stay off on a stream, window or not: the OS lock screen gets no position, and
 the scrubber&#39;s frame previews do nothing — the spec wants a finite duration for the first,
 and a thumbnail sheet is cut from a file that has ended for the second.</p>
-<p>That is the whole of what ships. HLS and DASH are not here and are not coming: a manifest
-needs a third-party script driving Media Source Extensions, and a script driving the media
-element is the opposite of the bargain this page opens with.</p>
-<p>It composes anyway, and nothing here was written to make it. The element never creates,
-moves or replaces the media element and never touches its <code>src</code> — it reads the one you wrote
-and wires your controls to it. So attach hls.js to that <code>&lt;video&gt;</code> and the row works
-unchanged:</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">playsinline</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
-  <span class="hljs-comment">&lt;!-- your control row, exactly as in the samples above --&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span>
-
-<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-  <span class="hljs-keyword">import</span> <span class="hljs-title class_">Hls</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;hls.js&quot;</span>;
-
-  <span class="hljs-keyword">const</span> video = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&quot;media-player video&quot;</span>);
-  <span class="hljs-keyword">const</span> manifest = <span class="hljs-string">&quot;/stream.m3u8&quot;</span>;
-
-  <span class="hljs-keyword">if</span> (video.<span class="hljs-title function_">canPlayType</span>(<span class="hljs-string">&quot;application/vnd.apple.mpegurl&quot;</span>)) {
-    video.<span class="hljs-property">src</span> = manifest; <span class="hljs-comment">// Safari and iOS play HLS without help</span>
-  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Hls</span>.<span class="hljs-title function_">isSupported</span>()) {
-    <span class="hljs-keyword">const</span> hls = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Hls</span>();
-    hls.<span class="hljs-title function_">loadSource</span>(manifest);
-    hls.<span class="hljs-title function_">attachMedia</span>(video);
-  }
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 <p>Order does not matter, which is the part that usually costs a library an option. Metadata
 arriving is five different events and all of them route to the same idempotent handler, so
 the controls come up whenever the manifest resolves — before this element upgrades or long
