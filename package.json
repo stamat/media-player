@@ -61,7 +61,7 @@
     "transform": {}
   },
   "dependencies": {
-    "book-of-elementals": "^0.11.1",
+    "book-of-elementals": "^1.0.0",
     "hydrargyri": "^2.2.0"
   },
   "devDependencies": {
@@ -73,7 +73,7 @@
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.0.0",
     "poops": "^2.5.0",
-    "poops-docs-theme": "^4.3.0",
+    "poops-docs-theme": "^4.4.0",
     "stylelint": "^17.14.1",
     "stylelint-config-standard-scss": "^17.0.0"
   }
