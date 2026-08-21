@@ -67,6 +67,19 @@ media-player video {
   pointer-events: none;
 }
 
+// The preview frame over the scrubber. The element writes its size — the sprite tile's own
+// — its background and its `left` per pointer move, so structure owes it only the
+// coordinate system and `pointer-events: none`, without which the box sits under the
+// pointer and its own arrival fires the pointerleave that hides it.
+.media-player-preview {
+  position: absolute;
+  bottom: 100%;
+  translate: -50% 0;
+  margin-bottom: var(--media-player-gap);
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
 // The volume takes a fixed slice rather than its share: two sliders in one flex row both
 // growing means a volume control as wide as the seek bar, which reads as two scrubbers.
 .media-player-volume {

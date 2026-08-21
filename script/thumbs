@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# Cut a video into scrubber preview frames: one sprite sheet and the WebVTT file mapping
+# playback time onto it with `#xywh=` fragments — the format Plyr, Vidstack and JW read,
+# and the one `<media-player>`'s preview handler reads off a `<track kind="metadata">`.
+#
+# Usage: script/thumbs <video> [interval] [width] [columns]
+#
+#   interval   seconds between frames (default 5)
+#   width      one frame's width in pixels — the frame is shown at exactly this size, so
+#              pick the size the preview box should be (default 160)
+#   columns    frames per sprite row (default 5)
+#
+# Writes <video>-thumbs.jpg and <video>-thumbs.vtt beside the video. The VTT names the
+# sprite by bare filename, so the pair travels together: keep them in one directory.
+#
+# Needs ffmpeg and ffprobe.
+
+set -euo pipefail
+
+if ! command -v ffmpeg > /dev/null || ! command -v ffprobe > /dev/null; then
+  echo "script/thumbs: ffmpeg and ffprobe are both needed — brew install ffmpeg" >&2
+  exit 1
+fi
+
+video="${1:-}"
+if [ -z "$video" ]; then
+  echo "usage: script/thumbs <video> [interval] [width] [columns]" >&2
+  exit 1
+fi
+if [ ! -f "$video" ]; then
+  echo "script/thumbs: no such file: $video" >&2
+  exit 1
+fi
+
+interval="${2:-5}"
+width="${3:-160}"
+columns="${4:-5}"
+
+base="${video%.*}"
+sprite="$base-thumbs.jpg"
+vtt="$base-thumbs.vtt"
+
+duration=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 -- "$video")
+
+# The tile height follows the video's own ratio, floored to an even number: the sprite is
+# assembled from these exact rectangles, and the VTT below has to state the same height.
+IFS=, read -r vw vh < <(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 -- "$video")
+height=$(awk -v w="$width" -v vw="$vw" -v vh="$vh" 'BEGIN { h = int(w * vh / vw); print h - h % 2 }')
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+# Two passes rather than one fps+tile filter: the tile filter needs the frame count up
+# front and pads the last row with black when guessed wrong. Extracting first makes the
+# count a fact, and PNG in between keeps the sprite one JPEG encode, not two.
+ffmpeg -v error -i "$video" -vf "fps=1/$interval,scale=$width:$height" "$tmp/thumb-%04d.png"
+
+count=$(find "$tmp" -name 'thumb-*.png' | wc -l | tr -d ' ')
+rows=$(( (count + columns - 1) / columns ))
+
+ffmpeg -v error -i "$tmp/thumb-%04d.png" -vf "tile=${columns}x${rows}" -frames:v 1 -update 1 -q:v 3 -y "$sprite"
+
+awk -v n="$count" -v interval="$interval" -v duration="$duration" \
+    -v w="$width" -v h="$height" -v cols="$columns" -v sprite="$(basename "$sprite")" '
+  function clock(t) { return sprintf("%02d:%02d:%06.3f", t / 3600, (t % 3600) / 60, t % 60) }
+  BEGIN {
+    print "WEBVTT"
+    for (i = 0; i < n; i++) {
+      start = i * interval
+      end = (i + 1) * interval
+      # The last cue runs to the end of the file: the frame count rounds down, and a tail
+      # shorter than one interval is still seconds a hover should answer for.
+      if (i == n - 1 || end > duration) end = duration
+      printf "\n%s --> %s\n", clock(start), clock(end)
+      printf "%s#xywh=%d,%d,%d,%d\n", sprite, (i % cols) * w, int(i / cols) * h, w, h
+    }
+  }
+' > "$vtt"
+
+echo "$sprite — $count frames, ${width}x${height} each, $columns a row"
+echo "$vtt"

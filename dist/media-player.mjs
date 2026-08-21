@@ -1286,6 +1286,10 @@ function nextTooltipState(state, event) {
     case "escape":
       next.dismissed = true;
       break;
+    case "activate":
+      next.hovering = false;
+      next.focused = false;
+      break;
     default:
       return state;
   }
@@ -1303,9 +1307,14 @@ function arrowOffset(trigger, bubble, horizontal, rtl) {
   const middle = (trigger.left + trigger.right) / 2;
   return rtl ? bubble.left + bubble.width - middle : middle - bubble.left;
 }
-function alignOnAxis(start, end, size, limit, toStart, centred) {
-  const at = centred ? (start + end) / 2 - size / 2 : toStart ? start : end - size;
-  return Math.min(Math.max(at, 0), Math.max(limit - size, 0));
+function alignOnAxis(start, end, size, limit, margin = 0) {
+  const at = (start + end) / 2 - size / 2;
+  return Math.min(Math.max(at, margin), Math.max(limit - size - margin, margin));
+}
+function landedAlign(at, size, start, end, rtl) {
+  const off = Math.round(at + size / 2) - Math.round((start + end) / 2);
+  if (!off) return "center";
+  return off > 0 !== rtl ? "start" : "end";
 }
 function withoutToken(list, token) {
   const kept = (list || "").split(/\s+/).filter((one) => one && one !== token);
@@ -1314,6 +1323,11 @@ function withoutToken(list, token) {
 var FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 var CLOSE_DELAY = 120;
 var FALLBACK_GAP = 6;
+var FALLBACK_VIEWPORT_MARGIN = 6;
+function styleLength(styles, name, fallback) {
+  const value = parseFloat(styles.getPropertyValue(name));
+  return Number.isNaN(value) ? fallback : value;
+}
 var sequence = 0;
 var TooltipElemental = class extends ElementBase {
   /** The control being described: what the element wraps, or what `for` names. */
@@ -1373,6 +1387,7 @@ var TooltipElemental = class extends ElementBase {
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
     this.onKeydown = this.onKeydown.bind(this);
+    this.onClick = this.onClick.bind(this);
     this.reposition = this.reposition.bind(this);
     for (const el of [trigger, bubble]) {
       el.addEventListener("pointerenter", this.onPointer);
@@ -1380,6 +1395,7 @@ var TooltipElemental = class extends ElementBase {
     }
     trigger.addEventListener("focus", this.onFocus);
     trigger.addEventListener("blur", this.onBlur);
+    trigger.addEventListener("click", this.onClick);
   }
   disconnectedCallback() {
     if (!this.initialized) return;
@@ -1391,6 +1407,7 @@ var TooltipElemental = class extends ElementBase {
     }
     trigger.removeEventListener("focus", this.onFocus);
     trigger.removeEventListener("blur", this.onBlur);
+    trigger.removeEventListener("click", this.onClick);
     this.stopWatching();
     clearTimeout(this.closeTimer);
     if (this.wroteName) trigger.removeAttribute("aria-label");
@@ -1419,6 +1436,10 @@ var TooltipElemental = class extends ElementBase {
   onKeydown(e) {
     if (e.key !== "Escape") return;
     this.apply("escape");
+  }
+  onClick(e) {
+    if (e.pointerType === "touch") return;
+    this.apply("activate");
   }
   /** Runs one event through the state machine and draws whatever came out of it. */
   apply(event) {
@@ -1473,20 +1494,20 @@ var TooltipElemental = class extends ElementBase {
     const bubble = this.bubbleElement.getBoundingClientRect();
     const viewport = { width: window.innerWidth, height: window.innerHeight };
     const rtl = window.getComputedStyle(this.triggerElement).direction === "rtl";
-    const gap = parseFloat(window.getComputedStyle(this.bubbleElement).getPropertyValue("--tooltip-elemental-gap")) || FALLBACK_GAP;
+    const styles = window.getComputedStyle(this.bubbleElement);
+    const gap = styleLength(styles, "--tooltip-elemental-gap", FALLBACK_GAP);
+    const margin = styleLength(styles, "--tooltip-elemental-viewport-margin", FALLBACK_VIEWPORT_MARGIN);
     const horizontal = this.hasAttribute("horizontal");
     const panel = {
-      width: bubble.width + (horizontal ? gap : 0),
-      height: bubble.height + (horizontal ? 0 : gap)
+      width: bubble.width + (horizontal ? gap + margin : 0),
+      height: bubble.height + (horizontal ? 0 : gap + margin)
     };
-    const { side, align } = horizontal ? placeSubmenu(trigger, panel, viewport, rtl) : placeFlyout(trigger, panel, viewport, rtl, true);
+    const { side } = horizontal ? placeSubmenu(trigger, panel, viewport, rtl) : placeFlyout(trigger, panel, viewport, rtl);
     const after = side === "inline-end" !== rtl;
-    const toStart = align === "start" !== rtl;
-    const centred = align === "center";
-    const top = horizontal ? alignOnAxis(trigger.top, trigger.bottom, bubble.height, viewport.height, align === "start", centred) : side === "block-end" ? trigger.bottom + gap : trigger.top - bubble.height - gap;
-    const left = horizontal ? after ? trigger.right + gap : trigger.left - bubble.width - gap : alignOnAxis(trigger.left, trigger.right, bubble.width, viewport.width, toStart, centred);
+    const top = horizontal ? alignOnAxis(trigger.top, trigger.bottom, bubble.height, viewport.height, margin) : side === "block-end" ? trigger.bottom + gap : trigger.top - bubble.height - gap;
+    const left = horizontal ? after ? trigger.right + gap : trigger.left - bubble.width - gap : alignOnAxis(trigger.left, trigger.right, bubble.width, viewport.width, margin);
     this.bubbleElement.dataset.side = side;
-    this.bubbleElement.dataset.align = align;
+    this.bubbleElement.dataset.align = horizontal ? landedAlign(top, bubble.height, trigger.top, trigger.bottom, false) : landedAlign(left, bubble.width, trigger.left, trigger.right, rtl);
     this.bubbleElement.style.top = `${Math.round(top)}px`;
     this.bubbleElement.style.left = `${Math.round(left)}px`;
     this.bubbleElement.style.setProperty(
@@ -1527,6 +1548,18 @@ function clampVolume(value) {
   if (value > 0.9) return 1;
   if (value < 0.1) return 0;
   return value;
+}
+function parseThumb(text, base) {
+  let url;
+  try {
+    url = new URL((text || "").trim(), base);
+  } catch {
+    return null;
+  }
+  const region = url.hash.match(/^#xywh=(\d+),(\d+),(\d+),(\d+)$/);
+  if (!region) return { src: url.href };
+  url.hash = "";
+  return { src: url.href, x: +region[1], y: +region[2], w: +region[3], h: +region[4] };
 }
 function volumeState(value) {
   if (value < 0.1) return "mute";
@@ -1577,6 +1610,7 @@ var MediaPlayer = class extends HgElement {
     this.scrubStep = null;
     this.scrubber = this.querySelector(".media-player-scrubber");
     this.volumeSlider = this.querySelector(".media-player-volume");
+    this.previewBox = this.querySelector(".media-player-preview");
     if (this.isVideo) {
       this.noFullscreen = !(document.fullscreenEnabled || this.media.webkitEnterFullscreen);
     }
@@ -1596,8 +1630,10 @@ var MediaPlayer = class extends HgElement {
     this.muteLabel = "Mute";
     this.captionsLabel = "Enable captions";
     this.timeFormatter = formatTime;
-    this.track = this.media.querySelector("track");
+    this.track = this.media.querySelector("track:not([kind=metadata])");
     if (this.track) this.hasCaptions = true;
+    this.thumbs = this.media.querySelector("track[kind=metadata]");
+    if (this.thumbs?.track) this.thumbs.track.mode = "hidden";
     this.restore();
     if (this.media.readyState > 0) this.loaded();
   }
@@ -2124,6 +2160,7 @@ var MediaPlayer = class extends HgElement {
   }
   // CAPTIONS
   onCue(event) {
+    if (event.target.kind === "metadata") return;
     const track = event.target.track;
     const cues = track?.activeCues;
     if (!cues || !cues.length) {
@@ -2144,6 +2181,64 @@ var MediaPlayer = class extends HgElement {
     this.track.track.mode = visible ? "hidden" : "disabled";
     if (!visible) this.captionText = null;
     if (remember) this.store("captions", visible);
+  }
+  // FRAME PREVIEWS
+  /**
+   * The frame for the second under the pointer, out of markup the author already wrote: a
+   * `<track kind="metadata">` naming a WebVTT of `sprite.jpg#xywh=…` cues — the format
+   * Plyr and Vidstack read, which `script/thumbs` in this repository generates — and a
+   * `.media-player-preview` box inside the scrubber for the frame to land in. The browser
+   * parses the VTT itself; no track, no box, or a live stream all mean no preview.
+   *
+   * The tile is shown at the size it was cut, never scaled: scaling needs the sprite
+   * sheet's natural size, which is unknown until the image loads, and a box that resizes
+   * itself on load is a bubble jumping under a still pointer. Cut the frames at display
+   * size.
+   */
+  preview(event) {
+    const box = this.previewBox;
+    if (!box || !this.scrubber || !this.media || this.isLive) return;
+    const duration = this.media.duration;
+    if (!duration || !Number.isFinite(duration)) return;
+    const rect = this.scrubber.getBoundingClientRect();
+    if (!rect.width) return;
+    const along = Math.min(Math.max(event.clientX - rect.left, 0), rect.width);
+    const cue = this.thumbCue(along / rect.width * duration);
+    const frame = cue ? parseThumb(cue.text, this.thumbs.src) : null;
+    if (!frame) {
+      this.endPreview();
+      return;
+    }
+    box.style.backgroundImage = `url("${frame.src}")`;
+    if (frame.w) {
+      box.style.width = `${frame.w}px`;
+      box.style.height = `${frame.h}px`;
+      box.style.backgroundSize = "";
+      box.style.backgroundPosition = `-${frame.x}px -${frame.y}px`;
+    } else {
+      box.style.backgroundSize = "cover";
+      box.style.backgroundPosition = "center";
+    }
+    box.hidden = false;
+    const half = box.offsetWidth / 2;
+    box.style.left = `${Math.min(Math.max(along, half), rect.width - half)}px`;
+  }
+  endPreview() {
+    if (this.previewBox) this.previewBox.hidden = true;
+  }
+  /**
+   * The cue covering a second, walked rather than asked for: `activeCues` answers only at
+   * the playhead, and the pointer is nowhere near it. Cues arrive time-ordered, so the
+   * walk stops at the first one starting past the mark.
+   */
+  thumbCue(seconds) {
+    const cues = this.thumbs?.track?.cues;
+    if (!cues) return null;
+    for (let i = 0; i < cues.length; i++) {
+      if (cues[i].startTime > seconds) break;
+      if (seconds <= cues[i].endTime) return cues[i];
+    }
+    return null;
   }
   // FULLSCREEN
   /**
@@ -2315,6 +2410,7 @@ export {
   media_player_default as default,
   formatTime,
   keyedMethod,
+  parseThumb,
   volumeState
 };
 //# sourceMappingURL=media-player.mjs.map

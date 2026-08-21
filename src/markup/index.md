@@ -407,6 +407,10 @@ controls that fade out while playing — only when it wrapped a `<video>`.
       srclang="en"
       label="English"
     />
+    <!-- Scrubber frame previews, from a sprite sheet and the WebVTT mapping time onto it —
+         script/thumbs in this repository generates both. The browser parses the file; the
+         element only reads the cues. -->
+    <track kind="metadata" src="sample/rollout-thumbs.vtt" />
   </video>
 
   <!-- Both go when playback starts: the element sets `poster-hidden` and the stylesheet
@@ -437,7 +441,11 @@ controls that fade out while playing — only when it wrapped a `<video>`.
       class="media-player-scrubber"
       tooltip="thumb track"
       bind="timeFormatter:prop#format"
+      on="pointermove:preview;pointerleave:endPreview"
     >
+      <!-- The frame under the pointer, painted and placed by the element from the
+           kind="metadata" track's cues. `hidden` until there is a frame to show. -->
+      <div class="media-player-preview" hidden></div>
       <progress-elemental>
         <progress
           value="0"
@@ -751,11 +759,14 @@ testable right here rather than in a file you have to build yourself.
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
 <media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
-  <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg"></video>
+  <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg">
+    <track kind="metadata" src="sample/tears-of-steel-thumbs.vtt" />
+  </video>
   <img class="media-player-poster" src="sample/tears-of-steel.jpg" alt="" />
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
-    <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
+    <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format" on="pointermove:preview;pointerleave:endPreview">
+      <div class="media-player-preview" hidden></div>
       <progress-elemental><progress value="0" max="1" bind="buffered:prop#value;duration:prop#max"></progress></progress-elemental>
       <input type="range" min="0" step="any" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
     </slider-elemental>
@@ -810,6 +821,76 @@ twelve-second local file never gives them.
 
 Attribution: _Tears of Steel_ is © the Blender Foundation, released under
 [CC-BY 3.0](https://mango.blender.org/sharing/).
+
+## Frames on the scrubber
+
+A scrubber names a second; a frame says what is there. Every big player draws one on hover,
+and every one of them makes you pay for it the same way, because there is no way not to: **the
+frames have to be cut from the video beforehand.** No browser API hands out the picture at an
+arbitrary second without seeking there, so the preview is a build step and a markup choice,
+never a flag.
+
+The format is the one the field already settled on — a WebVTT file whose cues map a time
+range to a slice of a sprite sheet, `sprite.jpg#xywh=x,y,width,height` — which means
+thumbnails cut for [Plyr](https://github.com/sampotts/plyr),
+[Vidstack](https://www.vidstack.io) or
+[media-chrome](https://www.media-chrome.org/docs/en/components/media-preview-thumbnail) work
+here unchanged, and the other way round. Where those parse the file themselves, this element
+hands it to the browser: the author writes it as a `<track kind="metadata">` — the same
+element media-chrome asks for — the element flips the track `hidden` so the browser fetches
+and parses it, and the only syntax read here is the `#xywh` fragment. Both video players
+above carry the whole wiring — the twelve-minute one is the one worth hovering, since
+twelve seconds of frames barely change; the three lines that are it:
+
+```html
+<video controls preload="metadata" src="movie.mp4">
+  <track kind="metadata" src="movie-thumbs.vtt" />
+</video>
+```
+
+```html
+<slider-elemental
+  class="media-player-scrubber"
+  tooltip="thumb track"
+  bind="timeFormatter:prop#format"
+  on="pointermove:preview;pointerleave:endPreview"
+>
+  <div class="media-player-preview" hidden></div>
+  …
+</slider-elemental>
+```
+
+The box is yours, like every control on this page — position and paint come from
+`style.css` and `theme.css`, and the element writes only what a stylesheet cannot know: the
+slice, the tile's size, and where along the track the pointer is. A relative image path in
+the VTT resolves against the VTT file, not against the page, so the pair travels as one
+directory. What the element never does is scale: **a tile is shown at the size it was cut**,
+because scaling needs the sprite's natural size, which is unknown until the image loads, and
+a box that resizes itself mid-hover is a bubble jumping under a still pointer. Cut the
+frames at the size the box should be.
+
+Cutting them is one command —
+[`script/thumbs`](https://github.com/stamat/media-player/blob/main/script/thumbs) in this
+repository, a bash script over `ffmpeg` and `ffprobe`, which is what wrote both sprites
+the players above hover — the twelve-minute film cuts to 73 frames in a 308 KB sheet:
+
+```bash
+script/thumbs movie.mp4          # movie-thumbs.jpg + movie-thumbs.vtt, a frame every 5 s
+script/thumbs movie.mp4 2 160 5  # every 2 s, 160px wide, 5 to a sprite row
+```
+
+Copy it out of the repository — it is not in the npm package, because a bash script in a
+browser library's tarball is a file nobody runs from there. Anything else that emits the
+`#xywh` format works the same; hosted pipelines like Mux and Cloudflare Stream generate it
+for you.
+
+The degradation is the usual bargain. No `<track kind="metadata">`, no
+`.media-player-preview` box, cues not loaded yet, a live stream — each means no preview and
+no error, and the scrubber's own value bubble still reads the time. A captions `<track>` is
+untouched by any of this: the captions button looks for every kind _but_ `metadata`, so the
+two tracks sit in one `<video>` without stepping on each other. Blocked script never enters
+into it — the preview box is `hidden` in the markup and the native player the fallback
+leaves behind never had hover previews to lose.
 
 ## A background loop, and the one button it owes you
 
@@ -1223,6 +1304,8 @@ already wired is skipped, never doubled.
 | `input:scrub`                                   | the thumb moved: paint the clock, and do not seek until the drag ends                                                                            |
 | `change:seek`                                   | the drag committed: seek to the value under the thumb                                                                                            |
 | `pointerup@document:endScrub`, `keyup:endScrub` | the drag ended, whatever it did to the value — on the document because a drag very often ends with the pointer somewhere else; puts the resting step back |
+| `pointermove:preview`                           | on the scrubber: paint the frame whose cue covers the second under the pointer into `.media-player-preview` — [Frames on the scrubber](#frames-on-the-scrubber); no metadata track, no box or a live stream each mean nothing shown |
+| `pointerleave:endPreview`                       | the pointer left the scrubber; the frame goes with it                                                                                            |
 | `input:setVolume`                               | the sound follows the thumb immediately; the write to storage waits for the drag to settle                                                       |
 | `click:volumeUp`, `click:volumeDown`            | one tenth of full per press, climbing from zero when muted rather than jumping back — for a volume UI with no slider, or a `keys` entry; the samples bind them to the up and down arrows |
 | `click:toggleMute`                              | mute, and back to the level it remembered                                                                                                        |
@@ -1300,11 +1383,12 @@ win.
 
 |                                    | media-player                                            | [Plyr](https://github.com/sampotts/plyr)             | [media-chrome](https://github.com/muxinc/media-chrome) | [Vidstack](https://vidstack.io)      | [Video.js](https://videojs.com)        |
 | ---------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ | ------------------------------------ | -------------------------------------- |
-| **Size, gzipped**                  | **12.2 kB**                                             | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
+| **Size, gzipped**                  | **12.9 kB**                                             | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
 | **You write the controls**         | yes, as the only way                                    | no — a `controls` array, or an HTML string in config | yes, from its components                               | no — layouts                         | no                                     |
 | **Shadow DOM**                     | never                                                   | never                                                | yes                                                    | yes                                  | no                                     |
 | **Page plays with no script**      | yes                                                     | yes, if you keep `controls`                          | no — its starter `<video>` has none                    | no                                   | yes                                    |
 | **Your CSS reaches every part**    | yes                                                     | yes                                                  | through `::part()` and the variables it chose          | partly                               | yes                                    |
+| **Scrubber frame previews**        | yes — your box, the browser's VTT parser                | yes — its own VTT parser                             | yes, inside its time range                             | yes — VTT, sprites, storyboards      | a community plugin                     |
 | **Built from reusable primitives** | yes — the sliders ship separately                       | no                                                   | no                                                     | no                                   | no                                     |
 | **YouTube, Vimeo, HLS, DASH**      | **no**                                                  | YouTube, Vimeo                                       | via a provider                                         | all of them                          | via plugins                            |
 | **Ecosystem**                      | none                                                    | large                                                | Mux's                                                  | large                                | the largest                            |

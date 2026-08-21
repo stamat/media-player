@@ -423,6 +423,10 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
       <span class="hljs-attr">srclang</span>=<span class="hljs-string">&quot;en&quot;</span>
       <span class="hljs-attr">label</span>=<span class="hljs-string">&quot;English&quot;</span>
     /&gt;</span>
+    <span class="hljs-comment">&lt;!-- Scrubber frame previews, from a sprite sheet and the WebVTT mapping time onto it —
+         script/thumbs in this repository generates both. The browser parses the file; the
+         element only reads the cues. --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">track</span> <span class="hljs-attr">kind</span>=<span class="hljs-string">&quot;metadata&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout-thumbs.vtt&quot;</span> /&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
 
   <span class="hljs-comment">&lt;!-- Both go when playback starts: the element sets `poster-hidden` and the stylesheet
@@ -453,7 +457,11 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
       <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span>
       <span class="hljs-attr">tooltip</span>=<span class="hljs-string">&quot;thumb track&quot;</span>
       <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;timeFormatter:prop#format&quot;</span>
+      <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;pointermove:preview;pointerleave:endPreview&quot;</span>
     &gt;</span>
+      <span class="hljs-comment">&lt;!-- The frame under the pointer, painted and placed by the element from the
+           kind=&quot;metadata&quot; track&#x27;s cues. `hidden` until there is a frame to show. --&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-preview&quot;</span> <span class="hljs-attr">hidden</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">progress-elemental</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">progress</span>
           <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0&quot;</span>
@@ -757,11 +765,14 @@ testable right here rather than in a file you have to build yourself.</p>
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
 <media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
-  <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg"></video>
+  <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg">
+    <track kind="metadata" src="sample/tears-of-steel-thumbs.vtt" />
+  </video>
   <img class="media-player-poster" src="sample/tears-of-steel.jpg" alt="" />
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
-    <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
+    <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format" on="pointermove:preview;pointerleave:endPreview">
+      <div class="media-player-preview" hidden></div>
       <progress-elemental><progress value="0" max="1" bind="buffered:prop#value;duration:prop#max"></progress></progress-elemental>
       <input type="range" min="0" step="any" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
     </slider-elemental>
@@ -809,6 +820,60 @@ it. The stripe march and the buffered bar then have something real to show, whic
 twelve-second local file never gives them.</p>
 <p>Attribution: <em>Tears of Steel</em> is © the Blender Foundation, released under
 <a href="https://mango.blender.org/sharing/">CC-BY 3.0</a>.</p>
+<h2 id="frames-on-the-scrubber">Frames on the scrubber<a class="heading-anchor" href="#frames-on-the-scrubber" tabindex="-1" aria-hidden="true"></a></h2>
+<p>A scrubber names a second; a frame says what is there. Every big player draws one on hover,
+and every one of them makes you pay for it the same way, because there is no way not to: <strong>the
+frames have to be cut from the video beforehand.</strong> No browser API hands out the picture at an
+arbitrary second without seeking there, so the preview is a build step and a markup choice,
+never a flag.</p>
+<p>The format is the one the field already settled on — a WebVTT file whose cues map a time
+range to a slice of a sprite sheet, <code>sprite.jpg#xywh=x,y,width,height</code> — which means
+thumbnails cut for <a href="https://github.com/sampotts/plyr">Plyr</a>,
+<a href="https://www.vidstack.io">Vidstack</a> or
+<a href="https://www.media-chrome.org/docs/en/components/media-preview-thumbnail">media-chrome</a> work
+here unchanged, and the other way round. Where those parse the file themselves, this element
+hands it to the browser: the author writes it as a <code>&lt;track kind=&quot;metadata&quot;&gt;</code> — the same
+element media-chrome asks for — the element flips the track <code>hidden</code> so the browser fetches
+and parses it, and the only syntax read here is the <code>#xywh</code> fragment. Both video players
+above carry the whole wiring — the twelve-minute one is the one worth hovering, since
+twelve seconds of frames barely change; the three lines that are it:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">preload</span>=<span class="hljs-string">&quot;metadata&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;movie.mp4&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">track</span> <span class="hljs-attr">kind</span>=<span class="hljs-string">&quot;metadata&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;movie-thumbs.vtt&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span></code></pre>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">slider-elemental</span>
+  <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-scrubber&quot;</span>
+  <span class="hljs-attr">tooltip</span>=<span class="hljs-string">&quot;thumb track&quot;</span>
+  <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;timeFormatter:prop#format&quot;</span>
+  <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;pointermove:preview;pointerleave:endPreview&quot;</span>
+&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-preview&quot;</span> <span class="hljs-attr">hidden</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  …
+<span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span></code></pre>
+<p>The box is yours, like every control on this page — position and paint come from
+<code>style.css</code> and <code>theme.css</code>, and the element writes only what a stylesheet cannot know: the
+slice, the tile&#39;s size, and where along the track the pointer is. A relative image path in
+the VTT resolves against the VTT file, not against the page, so the pair travels as one
+directory. What the element never does is scale: <strong>a tile is shown at the size it was cut</strong>,
+because scaling needs the sprite&#39;s natural size, which is unknown until the image loads, and
+a box that resizes itself mid-hover is a bubble jumping under a still pointer. Cut the
+frames at the size the box should be.</p>
+<p>Cutting them is one command —
+<a href="https://github.com/stamat/media-player/blob/main/script/thumbs"><code>script/thumbs</code></a> in this
+repository, a bash script over <code>ffmpeg</code> and <code>ffprobe</code>, which is what wrote both sprites
+the players above hover — the twelve-minute film cuts to 73 frames in a 308 KB sheet:</p>
+<pre><code class="hljs language-bash">script/thumbs movie.mp4          <span class="hljs-comment"># movie-thumbs.jpg + movie-thumbs.vtt, a frame every 5 s</span>
+script/thumbs movie.mp4 2 160 5  <span class="hljs-comment"># every 2 s, 160px wide, 5 to a sprite row</span></code></pre>
+<p>Copy it out of the repository — it is not in the npm package, because a bash script in a
+browser library&#39;s tarball is a file nobody runs from there. Anything else that emits the
+<code>#xywh</code> format works the same; hosted pipelines like Mux and Cloudflare Stream generate it
+for you.</p>
+<p>The degradation is the usual bargain. No <code>&lt;track kind=&quot;metadata&quot;&gt;</code>, no
+<code>.media-player-preview</code> box, cues not loaded yet, a live stream — each means no preview and
+no error, and the scrubber&#39;s own value bubble still reads the time. A captions <code>&lt;track&gt;</code> is
+untouched by any of this: the captions button looks for every kind <em>but</em> <code>metadata</code>, so the
+two tracks sit in one <code>&lt;video&gt;</code> without stepping on each other. Blocked script never enters
+into it — the preview box is <code>hidden</code> in the markup and the native player the fallback
+leaves behind never had hover previews to lose.</p>
 <h2 id="a-background-loop-and-the-one-button-it-owes-you">A background loop, and the one button it owes you<a class="heading-anchor" href="#a-background-loop-and-the-one-button-it-owes-you" tabindex="-1" aria-hidden="true"></a></h2>
 <p>A video behind a headline is not a player. Nothing on it is meant to be pressed — no
 scrubber, no clock, no volume on a track that is silent — and the markup for it is four
@@ -1327,6 +1392,14 @@ already wired is skipped, never doubled.</p>
 <td>the drag ended, whatever it did to the value — on the document because a drag very often ends with the pointer somewhere else; puts the resting step back</td>
 </tr>
 <tr>
+<td><code>pointermove:preview</code></td>
+<td>on the scrubber: paint the frame whose cue covers the second under the pointer into <code>.media-player-preview</code> — <a href="#frames-on-the-scrubber">Frames on the scrubber</a>; no metadata track, no box or a live stream each mean nothing shown</td>
+</tr>
+<tr>
+<td><code>pointerleave:endPreview</code></td>
+<td>the pointer left the scrubber; the frame goes with it</td>
+</tr>
+<tr>
 <td><code>input:setVolume</code></td>
 <td>the sound follows the thumb immediately; the write to storage waits for the drag to settle</td>
 </tr>
@@ -1452,7 +1525,7 @@ win.</p>
 </thead>
 <tbody><tr>
 <td><strong>Size, gzipped</strong></td>
-<td><strong>12.2 kB</strong></td>
+<td><strong>12.9 kB</strong></td>
 <td>32 kB</td>
 <td>42 kB</td>
 <td>40 kB</td>
@@ -1489,6 +1562,14 @@ win.</p>
 <td>through <code>::part()</code> and the variables it chose</td>
 <td>partly</td>
 <td>yes</td>
+</tr>
+<tr>
+<td><strong>Scrubber frame previews</strong></td>
+<td>yes — your box, the browser&#39;s VTT parser</td>
+<td>yes — its own VTT parser</td>
+<td>yes, inside its time range</td>
+<td>yes — VTT, sprites, storyboards</td>
+<td>a community plugin</td>
 </tr>
 <tr>
 <td><strong>Built from reusable primitives</strong></td>

@@ -172,6 +172,22 @@ media-player .media-player-time {
   font-size: 0.8125rem;
 }
 
+// The preview frame, dressed like the bubbles around it: same radius as the buttons, a rim
+// so the frame reads against whatever it floats over, and a surface behind the image for
+// the moment before the sprite arrives. The rim is `CanvasText` — dark on a light scheme,
+// white on a dark one — rather than either variable: `--media-player-surface` matches the
+// dark it has to stand out from, and the video half pins `--media-player-color` to white,
+// which on a light page is a white rim on a light ground. The margin clears the slider's
+// own value bubble, which this theme puts in the structure sheet's default gap — without
+// it the time paints over the frame's bottom edge.
+media-player .media-player-preview {
+  margin-bottom: 2.25rem;
+  border: 2px solid CanvasText;
+  border-radius: 4px;
+  background-color: var(--media-player-surface);
+  box-shadow: 0 1px 1px rgb(35 40 47 / 15%);
+}
+
 // BUFFERING
 
 // A stripe march over the track while data is short. Drawn on the scrubber's ::before with

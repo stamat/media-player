@@ -37,6 +37,15 @@ media-player video {
   pointer-events: none;
 }
 
+.media-player-preview {
+  position: absolute;
+  bottom: 100%;
+  translate: -50% 0;
+  margin-bottom: var(--media-player-gap);
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
 .media-player-volume {
   flex: 0 0 4.5rem;
 }

@@ -69,6 +69,19 @@
         },
         {
           "kind": "function",
+          "name": "parseThumb",
+          "parameters": [
+            {
+              "name": "text"
+            },
+            {
+              "name": "base"
+            }
+          ],
+          "description": "One thumbnails cue as a paintable frame, or null for a payload that is not a URL.\n\nResolved against the VTT file's own URL, because that is where the relative paths in\nthese files point — the sprite sits beside the VTT, not beside the page. Resolution is\nalso the escaping boundary: URL serialisation percent-encodes `\"` and `\\`, so the string\nlater dropped into `url(\"…\")` cannot close it. The `#xywh=` media fragment is the only\nsyntax read here; the VTT itself was the browser's to parse."
+        },
+        {
+          "kind": "function",
           "name": "volumeState",
           "parameters": [
             {
@@ -92,7 +105,7 @@
         },
         {
           "kind": "class",
-          "description": "`<media-player>` custom element.\n\nOne element over the `<audio>` or `<video>` the author already wrote. Which of the two it\nis decides the video-only half — poster, overlay, captions, fullscreen, the controls that\nhide themselves — and it is read off the child rather than off a `src`, because a `src`\nattribute on the wrapper would mean no media element at all until the script arrives.\nThat is the whole bargain: the markup is the author's, `controls` on the media element is\nthe fallback, and a script that never loads leaves a working native player behind.\n\nThe controls are the author's too. There is no generated control bar and no `controls`\noption taking an HTML string — the buttons, the sliders and the labels are written in the\npage, and [hydrargyri](https://github.com/stamat/hydrargyri) wires them by name: `on` says\nwhat fires, `bind` says where state lands. Nothing here is evaluated, so a strict Content\nSecurity Policy has nothing to object to.\n\nWhat the author does not write is the media element's wiring. The events that keep this\nelement in step with playback — metadata, play state, buffering, `progress`,\n`volumechange`, a caption track's `cuechange` — are declared in `static wires` and\nattached by hydrargyri at upgrade: there is nothing in those pairs to choose, and one\nforgotten in an `on=` was a player that half-worked with nothing saying why. Markup that\nstill carries them keeps firing once, because a pair the attribute already wired is\nskipped.\n\nWhat the element does not draw, it borrows. The scrubber and the volume control are\n`<slider-elemental>` around a native `<input type=\"range\">`, which is where the whole\n[APG Slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) already lives; the\nbuffered-ahead bar is `<progress-elemental>`; the control row is\n`<toolbar-elemental>`. None of their keyboard handling, ARIA or focus management is\nrewritten here, which is why this element writes no `role` and no `aria-valuenow` of its\nown.\n\nDegrades honestly. No script means the `controls` attribute the author wrote is still on\nthe media element and the browser's own player is what shows. The optional theme draws\nnothing under `:not(:defined)`, so the fallback is never a themed control bar with dead\nbuttons on it.\n\nIt also claims the OS media panel — lock screen, hardware media keys, headphone buttons —\nwhen playback starts. Play and pause are the browser's own and work with or without this\nelement; what the claim adds is skip buttons moving by the same `skip` the page's buttons\nuse, a working scrubber, and a title on the lock screen. The panel is one per document, so\nthe last player to start is the one it points at.\n\nThe keys are the markup as well. A `key=\"k\"` on a control the author already wrote is the\nwhole binding — the player finds that control and clicks it — and an `on=` naming\n`onKeyDown` is what makes it listen at all. So there is no second list of bindings to keep\nin step with the buttons and none to announce separately: the key names an action a\nvisible control already names. Which `keydown` it is bound to is the whole of the scope —\n`keydown:onKeyDown` answers while focus is inside the player, `keydown@document:onKeyDown`\nanswers anywhere on the page, and the page-wide form is what a shortcut usually means.\nThe one binding with no control to live on goes in `keys` — `volumeUp` behind a volume\nthat is a slider — mapping a key straight to a method; a control's own `key` outranks it.\nNothing is bound by default, and a focused control keeps the keys it already answers —\nthe toolbar its walk, a slider its arrows, Home and End — so a `key` naming an arrow\nanswers only where nothing spends it: `key=\"ArrowRight\"` on a skip button skips while\nthe player holds focus, and a focused scrubber still nudges by its own step.\n\nOne limit worth knowing before you reach for it. The buffered bar is one span from the\nstart rather than the `TimeRanges` list the media element holds, because `<progress>`\ncarries one value — after a seek it shows how far the range under the playhead reaches,\nnot the gap behind it.",
+          "description": "`<media-player>` custom element.\n\nOne element over the `<audio>` or `<video>` the author already wrote. Which of the two it\nis decides the video-only half — poster, overlay, captions, fullscreen, the controls that\nhide themselves — and it is read off the child rather than off a `src`, because a `src`\nattribute on the wrapper would mean no media element at all until the script arrives.\nThat is the whole bargain: the markup is the author's, `controls` on the media element is\nthe fallback, and a script that never loads leaves a working native player behind.\n\nThe controls are the author's too. There is no generated control bar and no `controls`\noption taking an HTML string — the buttons, the sliders and the labels are written in the\npage, and [hydrargyri](https://github.com/stamat/hydrargyri) wires them by name: `on` says\nwhat fires, `bind` says where state lands. Nothing here is evaluated, so a strict Content\nSecurity Policy has nothing to object to.\n\nWhat the author does not write is the media element's wiring. The events that keep this\nelement in step with playback — metadata, play state, buffering, `progress`,\n`volumechange`, a caption track's `cuechange` — are declared in `static wires` and\nattached by hydrargyri at upgrade: there is nothing in those pairs to choose, and one\nforgotten in an `on=` was a player that half-worked with nothing saying why. Markup that\nstill carries them keeps firing once, because a pair the attribute already wired is\nskipped.\n\nWhat the element does not draw, it borrows. The scrubber and the volume control are\n`<slider-elemental>` around a native `<input type=\"range\">`, which is where the whole\n[APG Slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) already lives; the\nbuffered-ahead bar is `<progress-elemental>`; the control row is\n`<toolbar-elemental>`. None of their keyboard handling, ARIA or focus management is\nrewritten here, which is why this element writes no `role` and no `aria-valuenow` of its\nown.\n\nFrame previews on the scrubber are the same bargain. The author adds a\n`<track kind=\"metadata\">` naming a WebVTT of `sprite.jpg#xywh=…` cues — the format Plyr\nand Vidstack read, generated by `script/thumbs` in this repository — and a\n`.media-player-preview` box inside the scrubber; hovering paints the cue's frame into\nthe box. The browser parses the VTT, so the only syntax read here is the `#xywh`\nfragment, and a player without the track, the box or a seekable duration previews\nnothing rather than erring.\n\nDegrades honestly. No script means the `controls` attribute the author wrote is still on\nthe media element and the browser's own player is what shows. The optional theme draws\nnothing under `:not(:defined)`, so the fallback is never a themed control bar with dead\nbuttons on it.\n\nIt also claims the OS media panel — lock screen, hardware media keys, headphone buttons —\nwhen playback starts. Play and pause are the browser's own and work with or without this\nelement; what the claim adds is skip buttons moving by the same `skip` the page's buttons\nuse, a working scrubber, and a title on the lock screen. The panel is one per document, so\nthe last player to start is the one it points at.\n\nThe keys are the markup as well. A `key=\"k\"` on a control the author already wrote is the\nwhole binding — the player finds that control and clicks it — and an `on=` naming\n`onKeyDown` is what makes it listen at all. So there is no second list of bindings to keep\nin step with the buttons and none to announce separately: the key names an action a\nvisible control already names. Which `keydown` it is bound to is the whole of the scope —\n`keydown:onKeyDown` answers while focus is inside the player, `keydown@document:onKeyDown`\nanswers anywhere on the page, and the page-wide form is what a shortcut usually means.\nThe one binding with no control to live on goes in `keys` — `volumeUp` behind a volume\nthat is a slider — mapping a key straight to a method; a control's own `key` outranks it.\nNothing is bound by default, and a focused control keeps the keys it already answers —\nthe toolbar its walk, a slider its arrows, Home and End — so a `key` naming an arrow\nanswers only where nothing spends it: `key=\"ArrowRight\"` on a skip button skips while\nthe player holds focus, and a focused scrubber still nudges by its own step.\n\nOne limit worth knowing before you reach for it. The buffered bar is one span from the\nstart rather than the `TimeRanges` list the media element holds, because `<progress>`\ncarries one value — after a seek it shows how far the range under the playhead reaches,\nnot the gap behind it.",
           "name": "MediaPlayer",
           "cssProperties": [
             {
@@ -364,8 +377,7 @@
                   "name": "event"
                 }
               ],
-              "description": "A hand landed on the scrubber: snap its step to whole seconds before the press moves it.\n\nAt rest the input carries `step=\"any\"`, so the clock's fractional writes land unsnapped\nand the thumb glides between seconds. Granularity for a person is a different choice —\na drag that lands on 3.6 and an arrow that nudges by whatever the browser fancies for\n`any` are both worse than the whole second — so the step flips to `1` here and\n`endDrag` puts the resting value back. `pointerdown` and `keydown` both run before the\nbrowser moves the value, which is what lets the flip land in time.\n\nKeydown is filtered to the keys a range spends on itself: a Tab passing through would\nflip the step and carry its `keyup` to the next control, and with no `endScrub` ever\nfiring the clock would be back to snapping until the next real drag.\n\nThe resting step is read off the input rather than assumed, so markup still carrying\n`step=\"1\"` from before the glide keeps exactly the behaviour it wrote.",
-              "privacy": "private"
+              "description": "A hand landed on the scrubber: snap its step to whole seconds before the press moves it.\n\nAt rest the input carries `step=\"any\"`, so the clock's fractional writes land unsnapped\nand the thumb glides between seconds. Granularity for a person is a different choice —\na drag that lands on 3.6 and an arrow that nudges by whatever the browser fancies for\n`any` are both worse than the whole second — so the step flips to `1` here and\n`endDrag` puts the resting value back. `pointerdown` and `keydown` both run before the\nbrowser moves the value, which is what lets the flip land in time.\n\nKeydown is filtered to the keys a range spends on itself: a Tab passing through would\nflip the step and carry its `keyup` to the next control, and with no `endScrub` ever\nfiring the clock would be back to snapping until the next real drag.\n\nThe resting step is read off the input rather than assumed, so markup still carrying\n`step=\"1\"` from before the glide keeps exactly the behaviour it wrote."
             },
             {
               "kind": "method",
@@ -495,6 +507,31 @@
                   "default": "true"
                 }
               ],
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "preview",
+              "parameters": [
+                {
+                  "name": "event"
+                }
+              ],
+              "description": "The frame for the second under the pointer, out of markup the author already wrote: a\n`<track kind=\"metadata\">` naming a WebVTT of `sprite.jpg#xywh=…` cues — the format\nPlyr and Vidstack read, which `script/thumbs` in this repository generates — and a\n`.media-player-preview` box inside the scrubber for the frame to land in. The browser\nparses the VTT itself; no track, no box, or a live stream all mean no preview.\n\nThe tile is shown at the size it was cut, never scaled: scaling needs the sprite\nsheet's natural size, which is unknown until the image loads, and a box that resizes\nitself on load is a bubble jumping under a still pointer. Cut the frames at display\nsize."
+            },
+            {
+              "kind": "method",
+              "name": "endPreview"
+            },
+            {
+              "kind": "method",
+              "name": "thumbCue",
+              "parameters": [
+                {
+                  "name": "seconds"
+                }
+              ],
+              "description": "The cue covering a second, walked rather than asked for: `activeCues` answers only at\nthe playhead, and the pointer is nowhere near it. Cues arrive time-ordered, so the\nwalk stops at the first one starting past the mark.",
               "privacy": "private"
             },
             {
@@ -816,6 +853,14 @@
           "name": "clampVolume",
           "declaration": {
             "name": "clampVolume",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseThumb",
+          "declaration": {
+            "name": "parseThumb",
             "module": "src/scripts/media-player.js"
           }
         },

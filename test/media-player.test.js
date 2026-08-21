@@ -8,8 +8,10 @@
  * track, the video controls' hide timer, the labels the buttons announce themselves by, the
  * keys a control claims and the presses that are somebody else's, the OS media panel against
  * a stubbed `navigator.mediaSession`, the slider fills caught up through slider-elemental's
- * own `apply()` after scripted writes, and that the surface the custom elements manifest
- * publishes still exists on the element.
+ * own `apply()` after scripted writes, the scrubber frame previews against stubbed
+ * thumbnail cues — jsdom fetches and parses no VTT, so the browser's cue loading itself is
+ * not provable here — and that the surface the custom elements manifest publishes still
+ * exists on the element.
  *
  * Deliberately not covered: fullscreen and the `cuechange` event, neither of which jsdom
  * implements — `requestFullscreen` is absent and a `<track>` never fires a cue, so a test
@@ -20,7 +22,7 @@
  */
 
 import { jest } from '@jest/globals';
-import { MediaPlayer, formatTime, clampVolume, volumeState, keyedMethod, LIVE_DURATION, CONTROLS_LINGER, VOLUME_SETTLE } from '../src/scripts/media-player.js';
+import { MediaPlayer, formatTime, clampVolume, volumeState, keyedMethod, parseThumb, LIVE_DURATION, CONTROLS_LINGER, VOLUME_SETTLE } from '../src/scripts/media-player.js';
 
 /**
  * A media element jsdom will tolerate.
@@ -967,6 +969,158 @@ describe('captions', () => {
     expect(track.track.mode).toBe('hidden');
     expect(setItem).not.toHaveBeenCalled();
     setItem.mockRestore();
+  });
+});
+
+/**
+ * A thumbnails track with its cues already in hand, since jsdom fetches and parses no VTT.
+ * The absolute `src` is what relative image paths in the cues resolve against.
+ */
+function fakeThumbs(cues) {
+  const track = document.createElement('track');
+  track.setAttribute('kind', 'metadata');
+  track.setAttribute('src', 'https://example.com/media/thumbs.vtt');
+  Object.defineProperty(track, 'track', { value: { kind: 'metadata', mode: 'disabled', cues }, configurable: true });
+  return track;
+}
+
+const SPRITE_CUES = [
+  { startTime: 0, endTime: 60, text: 'sprite.jpg#xywh=0,0,160,90' },
+  { startTime: 60, endTime: 120, text: 'sprite.jpg#xywh=160,0,160,90' }
+];
+
+function mountPreview(cues) {
+  const media = fakeMedia('video');
+  media.appendChild(fakeThumbs(cues));
+  const player = document.createElement('media-player');
+  const scrubber = document.createElement('div');
+  scrubber.className = 'media-player-scrubber';
+  const box = document.createElement('div');
+  box.className = 'media-player-preview';
+  box.hidden = true;
+  scrubber.appendChild(box);
+  player.append(media, scrubber);
+  document.body.appendChild(player);
+  // jsdom lays nothing out, so the track the pointer moves along is stated: 200px wide,
+  // over the fixture's 120s — clientX 100 is the 60-second mark.
+  scrubber.getBoundingClientRect = () => ({ left: 0, width: 200 });
+  return { player, box };
+}
+
+describe('frame previews on the scrubber', () => {
+  test('hovering shows the slice of the sprite whose cue covers that second, cut to the tile\'s own size', () => {
+    const { player, box } = mountPreview(SPRITE_CUES);
+    player.preview({ clientX: 150 });
+    expect(box.hidden).toBe(false);
+    expect(box.style.backgroundImage).toBe('url("https://example.com/media/sprite.jpg")');
+    expect(box.style.backgroundPosition).toContain('-160px');
+    expect(box.style.width).toBe('160px');
+    expect(box.style.height).toBe('90px');
+  });
+
+  test('the box follows the pointer and is stopped at the edges rather than leaving the player', () => {
+    const { player, box } = mountPreview(SPRITE_CUES);
+    Object.defineProperty(box, 'offsetWidth', { value: 40, configurable: true });
+    player.preview({ clientX: 100 });
+    expect(box.style.left).toBe('100px');
+    player.preview({ clientX: 5 }); // half the box, not the pointer, is the floor at the edge
+    expect(box.style.left).toBe('20px');
+    player.preview({ clientX: 199 });
+    expect(box.style.left).toBe('180px');
+  });
+
+  test('leaving the scrubber takes the frame with it', () => {
+    const { player, box } = mountPreview(SPRITE_CUES);
+    player.preview({ clientX: 100 });
+    expect(box.hidden).toBe(false);
+    player.endPreview();
+    expect(box.hidden).toBe(true);
+  });
+
+  test('a second no cue covers hides the frame rather than holding up a stale one', () => {
+    const { player, box } = mountPreview([SPRITE_CUES[0]]);
+    player.preview({ clientX: 50 });
+    expect(box.hidden).toBe(false);
+    player.preview({ clientX: 150 }); // 90s: past the only cue
+    expect(box.hidden).toBe(true);
+  });
+
+  test('a cue naming a whole image fills the box the stylesheet sized, instead of windowing a sprite', () => {
+    const { player, box } = mountPreview([{ startTime: 0, endTime: 120, text: 'poster.jpg' }]);
+    player.preview({ clientX: 100 });
+    expect(box.hidden).toBe(false);
+    expect(box.style.backgroundSize).toBe('cover');
+    expect(box.style.width).toBe('');
+  });
+
+  test('a live stream previews nothing, because a position on it names no frame', () => {
+    const { player, box } = mountPreview(SPRITE_CUES);
+    player.isLive = true;
+    player.preview({ clientX: 100 });
+    expect(box.hidden).toBe(true);
+  });
+
+  test('a player with no thumbnails track answers a hover with nothing rather than a throw', () => {
+    const media = fakeMedia('video');
+    const player = document.createElement('media-player');
+    const scrubber = document.createElement('div');
+    scrubber.className = 'media-player-scrubber';
+    const box = document.createElement('div');
+    box.className = 'media-player-preview';
+    box.hidden = true;
+    scrubber.appendChild(box);
+    player.append(media, scrubber);
+    document.body.appendChild(player);
+    scrubber.getBoundingClientRect = () => ({ left: 0, width: 200 });
+    expect(() => player.preview({ clientX: 100 })).not.toThrow();
+    expect(box.hidden).toBe(true);
+  });
+
+  test('the metadata track is flipped hidden, because a disabled track never fetches its file', () => {
+    const { player } = mountPreview(SPRITE_CUES);
+    expect(player.thumbs.track.mode).toBe('hidden');
+  });
+
+  test('a thumbnails track alone earns no captions button', () => {
+    const media = fakeMedia('video');
+    media.appendChild(fakeThumbs(SPRITE_CUES));
+    const player = mount(media);
+    expect(player.hasAttribute('has-captions')).toBe(false);
+  });
+
+  test('captions and thumbnails share one video without stepping on each other', () => {
+    const media = fakeMedia('video');
+    const thumbs = fakeThumbs(SPRITE_CUES);
+    const captions = fakeTrack();
+    media.append(thumbs, captions);
+    const player = mount(media);
+    expect(player.hasAttribute('has-captions')).toBe(true);
+    expect(player.track).toBe(captions);
+    expect(player.thumbs).toBe(thumbs);
+  });
+
+  test('a thumbnails cue never lands in the captions text', () => {
+    const { player } = mountPreview(SPRITE_CUES);
+    player.captionText = 'what was said';
+    player.thumbs.track.activeCues = [{ text: 'sprite.jpg#xywh=0,0,160,90' }];
+    player.onCue({ target: player.thumbs });
+    expect(player.captionText).toBe('what was said');
+  });
+
+  test('a relative image path points where the vtt sits, not where the page does', () => {
+    const frame = parseThumb('sprite.jpg#xywh=0,0,160,90', 'https://example.com/media/thumbs.vtt');
+    expect(frame.src).toBe('https://example.com/media/sprite.jpg');
+    expect(frame.w).toBe(160);
+  });
+
+  test('a url with a quote in it cannot close the background it is painted into', () => {
+    const frame = parseThumb('spri"te.jpg', 'https://example.com/media/thumbs.vtt');
+    expect(frame.src).not.toContain('"');
+    expect(frame.src).toContain('%22');
+  });
+
+  test('a cue that is no url at all paints nothing rather than throwing', () => {
+    expect(parseThumb('http://[', 'https://example.com/media/thumbs.vtt')).toBe(null);
   });
 });
 

@@ -21,6 +21,29 @@ for the person who wrote the code.
   with the cost — with the script blocked, a bare `.m3u8` plays on Safari and nowhere else.
   Not covered by a test: jsdom implements no Media Source Extensions.
 
+- **Frames on the scrubber.** Hovering the scrubber can now show the frame for the second
+  under the pointer, out of markup the author writes: a `<track kind="metadata">` on the
+  media element naming a WebVTT of `sprite.jpg#xywh=…` cues — the format Plyr, Vidstack
+  and media-chrome read, so thumbnails cut for any of them work here — and a
+  `.media-player-preview` box inside the scrubber, wired
+  `on="pointermove:preview;pointerleave:endPreview"`. The browser fetches and parses the
+  VTT itself (the element flips the track `hidden`, which is what makes a browser load
+  one); the element reads only the `#xywh` fragment, sizes the box to the tile — a tile is
+  shown at the size it was cut, never scaled — and slides it along the track, clamped to
+  the player's edges. A relative image path in the VTT resolves against the VTT file, and
+  URL serialisation is the escaping boundary that keeps a quote in a filename from closing
+  the `url("…")` it is painted into. No track, no box, unloaded cues or a live stream each
+  mean no preview and no error. Generating the sprite and the VTT is `script/thumbs` in
+  the repository — bash over ffmpeg/ffprobe, not shipped in the npm package. DOM output
+  changes: the element writes `background-image`, `background-position`,
+  `background-size`, `width`, `height`, `left` and the `hidden` attribute on the preview
+  box, and a captions `<track>` is now found by `track:not([kind=metadata])` rather than
+  `track`, so a thumbnails track never lands behind the captions button. CSS output
+  changes: `style.css` positions `.media-player-preview` above the scrubber and takes it
+  out of hit-testing; `theme.css` gives it the surface, the buttons' radius and a
+  `CanvasText` rim — dark on a light scheme, white on a dark one, following the page's
+  `color-scheme` the way the rest of the theme already does.
+
 ### Changed
 
 - **The thumb glides.** The clock has always painted every animation frame, but the
