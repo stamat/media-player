@@ -382,7 +382,7 @@ overriding the rule:</p>
 <p>The buttons do not grow for the finger, and that is a choice with a cost. <code>theme.css</code> draws
 a 32px button on every pointer: past <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html">WCAG 2.5.8</a>,
 the AA minimum of 24px, and short of <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html">2.5.5</a>,
-the AAA 44px that Apple and Google both ask for as well. 44px was tried and the row could
+the AAA 44px — Apple asks the same 44pt, Google a step more at 48dp. 44px was tried and the row could
 not afford it — six targets and the clock come to 343px where a 393px phone gives the bar
 338px, so the fullscreen button wrapped to a third line and clawing it back cost the gap
 between every button. If your row is short enough to pay for it, the AAA size is two
@@ -964,7 +964,7 @@ screen the moment it does.</p>
 needs is the one thing those four attributes cannot say: <strong>motion that runs longer than five
 seconds has to be stoppable</strong> —
 <a href="https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html">WCAG 2.2.2 Pause, Stop, Hide</a>
-— and a twelve-second loop is past that line the second time it plays. That is one button,
+— and a twelve-second loop crosses that line five seconds into its first play. That is one button,
 and wiring one button is the smallest thing <code>&lt;media-player&gt;</code> does.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;video-background&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">autoplay</span> <span class="hljs-attr">muted</span> <span class="hljs-attr">loop</span> <span class="hljs-attr">playsinline</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.mp4&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>

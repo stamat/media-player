@@ -72,7 +72,9 @@ for the person who wrote the code.
   as the feature this project declined to build; the bullet now names what is actually
   refused, the ready-made key map. The claim that nothing reads `prefers-reduced-motion` is
   scoped to the playback it was about — the theme has honoured the preference for its own
-  transitions all along.
+  transitions all along. Google's touch target is 48dp, not the 44px the sizing note lent
+  it, and a twelve-second loop crosses WCAG 2.2.2's five seconds during its first play, not
+  its second.
 
 - **A `<track>` appended after the upgrade renders its cues.** The cue listener rode
   `static wires`, which hydrargyri scans once at upgrade — a `<track>` a script appends

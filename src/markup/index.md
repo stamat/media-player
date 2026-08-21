@@ -354,7 +354,7 @@ overriding the rule:
 The buttons do not grow for the finger, and that is a choice with a cost. `theme.css` draws
 a 32px button on every pointer: past [WCAG 2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html),
 the AA minimum of 24px, and short of [2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html),
-the AAA 44px that Apple and Google both ask for as well. 44px was tried and the row could
+the AAA 44px — Apple asks the same 44pt, Google a step more at 48dp. 44px was tried and the row could
 not afford it — six targets and the clock come to 343px where a 393px phone gives the bar
 338px, so the fullscreen button wrapped to a third line and clawing it back cost the gap
 between every button. If your row is short enough to pay for it, the AAA size is two
@@ -965,7 +965,7 @@ So the honest first answer is that a background video does not need this element
 needs is the one thing those four attributes cannot say: **motion that runs longer than five
 seconds has to be stoppable** —
 [WCAG 2.2.2 Pause, Stop, Hide](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html)
-— and a twelve-second loop is past that line the second time it plays. That is one button,
+— and a twelve-second loop crosses that line five seconds into its first play. That is one button,
 and wiring one button is the smallest thing `<media-player>` does.
 
 ```html
