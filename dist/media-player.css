@@ -10,6 +10,12 @@ media-player [hidden] {
   display: none !important;
 }
 
+media-player:not(:defined) .media-player-controls,
+media-player:not(:defined) .media-player-poster,
+media-player:not(:defined) .media-player-overlay {
+  display: none;
+}
+
 media-player video {
   display: block;
   width: 100%;

@@ -1,10 +1,4 @@
 /* media-player-element v1.1.0 | https://stamat.github.io/media-player/ | MIT License */
-media-player:not(:defined) .media-player-controls,
-media-player:not(:defined) .media-player-poster,
-media-player:not(:defined) .media-player-overlay {
-  display: none;
-}
-
 media-player {
   --media-player-accent: #22c55e;
   --media-player-accent-ink: #fff;

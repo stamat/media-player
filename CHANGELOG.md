@@ -22,6 +22,14 @@ for the person who wrote the code.
 
 ### Fixed
 
+- **The page plays with the script blocked, theme or no theme.** The `:not(:defined)` rule
+  hiding the custom controls until the element upgrades lived in `media-player-theme.css` —
+  the sheet the install labels optional — so structure-without-theme served a blocked-script
+  visitor a live flex row of dead buttons, a poster over the frame, and a full-bleed overlay
+  button sitting on top of the native controls. The rule ships in `media-player.css` now,
+  the sheet the player cannot run without. CSS output moves between files; the selectors are
+  unchanged.
+
 - **A sub-threshold level in the store cannot wedge the mute button.** `applyVolume` snaps
   a level under 0.1 to zero, but `restore` remembered the raw stored value — an entry
   another script wrote as `0.05` on the shared key muted the player and handed every unmute

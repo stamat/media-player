@@ -22,6 +22,17 @@ media-player [hidden] {
   display: none !important;
 }
 
+// The no-script guarantee, in the mandatory sheet on purpose: with the script blocked the
+// element never defines, and what must show is the native player the author wrote — not a
+// row of dead buttons, a poster over the frame, and a full-bleed overlay button sitting on
+// the native controls. This rule lived in the optional theme once, and loading structure
+// without theme inverted the one promise the whole design stands on.
+media-player:not(:defined) .media-player-controls,
+media-player:not(:defined) .media-player-poster,
+media-player:not(:defined) .media-player-overlay {
+  display: none;
+}
+
 media-player video {
   display: block;
   width: 100%;

@@ -4,16 +4,6 @@
 // white and slate, this sheet uses `Canvas` and `CanvasText`, so the same look follows the
 // page into dark mode and forced colours without a palette to configure.
 
-// Nothing is drawn under :not(:defined). A themed control bar whose buttons do nothing is
-// worse than an unstyled one — the browser's own player is the honest fallback, and it is
-// what shows until this element upgrades.
-
-media-player:not(:defined) .media-player-controls,
-media-player:not(:defined) .media-player-poster,
-media-player:not(:defined) .media-player-overlay {
-  display: none;
-}
-
 media-player {
   --media-player-accent: #22c55e;
 
