@@ -18,9 +18,10 @@
  *
  * Deliberately not covered: which of the poster and the overlay is on screen, which is
  * `display: none` off `poster-hidden` and `is-playing` in a stylesheet jsdom never applies —
- * what is asserted here is the attributes those rules read. Nor fullscreen and the
- * `cuechange` event, neither of which jsdom implements — `requestFullscreen` is absent and a `<track>` never fires a cue, so a test
- * here would only assert that the stub was called. The animation-frame clock is not covered
+ * what is asserted here is the attributes those rules read. Nor fullscreen, which jsdom
+ * does not implement, nor the firing of `cuechange` itself — the handler is exercised by
+ * calling it with a stubbed event, but a `<track>` in jsdom never fires one, so the
+ * platform's dispatch stays a browser's to prove. The animation-frame clock is not covered
  * either: what it guarantees is smoothness, and a test of `requestAnimationFrame` under
  * fake timers proves the timer works rather than that the thumb moves. All three want a
  * browser.
@@ -1041,11 +1042,17 @@ describe('the labels a button announces itself by', () => {
 
 /**
  * A `<track>` jsdom will tolerate: the element exists but its `track` property does not,
- * so the TextTrack half is a plain object holding the one field the player writes.
+ * so the TextTrack half is a plain object holding the fields the player reads and writes.
+ * The stub's `kind` mirrors the platform's canonical form — lowercase, and `subtitles`
+ * where the attribute is missing.
  */
-function fakeTrack() {
+function fakeTrack(kind) {
   const track = document.createElement('track');
-  Object.defineProperty(track, 'track', { value: { mode: 'disabled' }, configurable: true });
+  if (kind) track.setAttribute('kind', kind);
+  Object.defineProperty(track, 'track', {
+    value: { mode: 'disabled', kind: (kind || 'subtitles').toLowerCase() },
+    configurable: true
+  });
   return track;
 }
 
@@ -1159,8 +1166,7 @@ describe('captions', () => {
     // Only captions, subtitles and the bare `<track>` the platform defaults to subtitles
     // count — a chapters walk rendered as captions text would read as broken captions.
     const media = fakeMedia('video');
-    const chapters = fakeTrack();
-    chapters.setAttribute('kind', 'chapters');
+    const chapters = fakeTrack('chapters');
     media.appendChild(chapters);
     const player = mount(media);
     expect(player.hasAttribute('has-captions')).toBe(false);
@@ -1170,6 +1176,56 @@ describe('captions', () => {
     const late = mount(inband);
     add();
     expect(late.hasAttribute('has-captions')).toBe(false);
+  });
+
+  test('a chapters cue never paints into the caption box, though its track rides the same wire', () => {
+    // The cue wire reaches every `<track>` in the player. Before the kind rule reached
+    // `onCue` too, a declined track's cues rendered as captions nothing could turn off —
+    // the button refuses the track, so there is no control to empty the box with.
+    const media = fakeMedia('video');
+    const chapters = fakeTrack('chapters');
+    media.appendChild(chapters);
+    const player = mount(media);
+
+    chapters.track.activeCues = [{ text: 'Chapter one' }];
+    player.onCue({ target: chapters });
+    expect(player.captionText ?? null).toBe(null);
+    expect(chapters.track.mode).toBe('disabled'); // not flipped hidden by a cue it declined
+  });
+
+  test('an adopted track\'s cue is what the caption box shows, and an empty set clears it', () => {
+    const media = fakeMedia('video');
+    const track = fakeTrack();
+    media.appendChild(track);
+    const player = mount(media);
+
+    track.track.activeCues = [{ text: 'hello' }];
+    player.onCue({ target: track });
+    expect(player.captionText).toBe('hello');
+
+    track.track.activeCues = [];
+    player.onCue({ target: track });
+    expect(player.captionText).toBe(null);
+  });
+
+  test('a track the author wrote as kind="Captions" is captions all the same', () => {
+    // `kind` is an enumerated attribute the platform matches case-insensitively; without
+    // the selector's `i` flag a valid track loses its button.
+    const media = fakeMedia('video');
+    const track = fakeTrack('Captions');
+    media.appendChild(track);
+    const player = mount(media);
+    expect(player.hasAttribute('has-captions')).toBe(true);
+    expect(player.track).toBe(track.track);
+  });
+
+  test('the default keeps winning when its kind is written in another case', () => {
+    const media = fakeMedia('video');
+    const first = fakeTrack();
+    const preferred = fakeTrack('SUBTITLES');
+    preferred.setAttribute('default', '');
+    media.append(first, preferred);
+    expect(mount(media).track).toBe(preferred.track);
   });
 
   test('captions left on last visit come back on, without writing the choice again', () => {

@@ -92,6 +92,15 @@
         },
         {
           "kind": "function",
+          "name": "isCaptionKind",
+          "parameters": [
+            {
+              "name": "kind"
+            }
+          ]
+        },
+        {
+          "kind": "function",
           "name": "keyedMethod",
           "parameters": [
             {
@@ -896,6 +905,14 @@
           "name": "volumeState",
           "declaration": {
             "name": "volumeState",
+            "module": "src/scripts/media-player.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isCaptionKind",
+          "declaration": {
+            "name": "isCaptionKind",
             "module": "src/scripts/media-player.js"
           }
         },

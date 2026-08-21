@@ -1566,6 +1566,10 @@ function volumeState(value) {
   if (value < 0.6) return "mid";
   return "full";
 }
+var CAPTION_KINDS = /* @__PURE__ */ new Set(["captions", "subtitles", ""]);
+function isCaptionKind(kind) {
+  return CAPTION_KINDS.has((kind || "").toLowerCase());
+}
 var TYPING_FIELDS = "input:not([type=range],[type=checkbox],[type=radio],[type=button],[type=submit],[type=reset]),textarea,select";
 function isTyping(node) {
   return !!node && node.nodeType === 1 && (node.isContentEditable || node.matches(TYPING_FIELDS));
@@ -2230,8 +2234,8 @@ var MediaPlayer = class extends HgElement {
   }
   // CAPTIONS
   onCue(event) {
-    if (event.target.kind === "metadata") return;
     const track = event.target.track || event.target;
+    if (!isCaptionKind(track.kind)) return;
     const cues = track?.activeCues;
     if (!cues || !cues.length) {
       this.captionText = null;
@@ -2253,8 +2257,9 @@ var MediaPlayer = class extends HgElement {
    */
   findCaptions() {
     if (this.track || !this.media) return;
-    const element = this.media.querySelector("track[default][kind=captions],track[default][kind=subtitles],track[default]:not([kind])") || this.media.querySelector("track[kind=captions],track[kind=subtitles],track:not([kind])");
-    const listed = Array.from(this.media.textTracks || []).find((one) => one.kind === "captions" || one.kind === "subtitles");
+    const tracks = Array.from(this.media.querySelectorAll("track[kind=captions i], track[kind=subtitles i], track:not([kind])"));
+    const element = tracks.find((one) => one.hasAttribute("default")) || tracks[0];
+    const listed = Array.from(this.media.textTracks || []).find((one) => isCaptionKind(one.kind));
     const found = element?.track || listed;
     if (!found) return;
     this.track = found;
@@ -2514,6 +2519,7 @@ export {
   clampVolume,
   media_player_default as default,
   formatTime,
+  isCaptionKind,
   keyedMethod,
   parseThumb,
   volumeState

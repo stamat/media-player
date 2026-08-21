@@ -126,6 +126,19 @@ export function volumeState(value) {
 }
 
 /**
+ * The kinds the captions button governs: captions, subtitles, and the bare `<track>` the
+ * platform itself defaults to subtitles. `findCaptions` and `onCue` both ask this one
+ * question — a button that declined a chapters track whose cues still painted was the two
+ * of them keeping separate rules. Case-insensitive because the platform reads `kind` as an
+ * enumerated attribute, `kind="Captions"` included, while a raw attribute read does not.
+ */
+const CAPTION_KINDS = new Set(['captions', 'subtitles', '']);
+
+export function isCaptionKind(kind) {
+  return CAPTION_KINDS.has((kind || '').toLowerCase());
+}
+
+/**
  * Fields whose own letters a key press belongs to.
  *
  * A comment box under a player is the ordinary case, not the exotic one, and a `k` typed
@@ -1189,9 +1202,12 @@ export class MediaPlayer extends HgElement {
   // CAPTIONS
 
   onCue(event) {
-    // The thumbnails track rides the same wire, and its cues are image URLs, not speech.
-    if (event.target.kind === 'metadata') return;
+    // Every `<track>` rides this wire — the thumbnails track with image URLs for cues, a
+    // chapters walk, an audio description — and only what the captions button governs may
+    // paint into the caption box: a declined track's cues rendering here would be captions
+    // with no control to turn them off.
     const track = event.target.track || event.target;
+    if (!isCaptionKind(track.kind)) return;
     const cues = track?.activeCues;
     if (!cues || !cues.length) {
       this.captionText = null;
@@ -1216,13 +1232,12 @@ export class MediaPlayer extends HgElement {
    */
   findCaptions() {
     if (this.track || !this.media) return;
-    // Captions and subtitles only, plus the bare `<track>` the platform itself defaults to
-    // subtitles. Chapters and descriptions are declined the way the in-band list below
-    // already declines them, and the metadata track never lands behind the captions button.
-    const element = this.media.querySelector('track[default][kind=captions],track[default][kind=subtitles],track[default]:not([kind])')
-      || this.media.querySelector('track[kind=captions],track[kind=subtitles],track:not([kind])');
-    const listed = Array.from(this.media.textTracks || [])
-      .find((one) => one.kind === 'captions' || one.kind === 'subtitles');
+    // The `i` flag is the platform's own case rule: `kind` is an enumerated attribute a
+    // browser matches case-insensitively, and without the flag a valid `kind="Captions"`
+    // track would lose its button and its `default` standing here.
+    const tracks = Array.from(this.media.querySelectorAll('track[kind=captions i], track[kind=subtitles i], track:not([kind])'));
+    const element = tracks.find((one) => one.hasAttribute('default')) || tracks[0];
+    const listed = Array.from(this.media.textTracks || []).find((one) => isCaptionKind(one.kind));
 
     const found = element?.track || listed;
     if (!found) return;

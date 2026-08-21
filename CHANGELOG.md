@@ -44,7 +44,11 @@ for the person who wrote the code.
   metadata one, so a chapters or descriptions track ended up behind the captions button,
   its cues rendered as captions text — while the in-band path already filtered to captions
   and subtitles, and the two disagreed. Both speak one rule now: `captions`, `subtitles`,
-  or a bare `<track>`, which the platform itself reads as subtitles. Two output changes: a
+  or a bare `<track>`, which the platform itself reads as subtitles. The cue wire asks the
+  same rule — a declined track's cues no longer paint into the caption box, where they used
+  to be unremovable precisely because the button had refused the track — and the rule reads
+  `kind` the way the platform does, case-insensitively, so `kind="Captions"` keeps its
+  button and its `default` standing. Two output changes: a
   different track can now sit behind the button, and a player whose only track is chapters
   or descriptions no longer writes `has-captions` at all — a stylesheet keyed on it loses
   the button there, by design.
