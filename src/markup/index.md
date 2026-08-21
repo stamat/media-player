@@ -872,7 +872,9 @@ frames at the size the box should be.
 Cutting them is one command —
 [`script/thumbs`](https://github.com/stamat/media-player/blob/main/script/thumbs) in this
 repository, a bash script over `ffmpeg` and `ffprobe`, which is what wrote both sprites
-the players above hover — the twelve-minute film cuts to 74 frames in a 332 KB sheet:
+the players above hover — the twelve-minute film cuts to 147 frames in a 637 KB sheet.
+Each frame is cut from the middle of its cue rather than the start, so a hover is never
+more than half an interval away from the second it names:
 
 ```bash
 script/thumbs movie.mp4          # movie-thumbs.jpg + movie-thumbs.vtt, a frame every 5 s

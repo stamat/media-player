@@ -860,7 +860,9 @@ frames at the size the box should be.</p>
 <p>Cutting them is one command —
 <a href="https://github.com/stamat/media-player/blob/main/script/thumbs"><code>script/thumbs</code></a> in this
 repository, a bash script over <code>ffmpeg</code> and <code>ffprobe</code>, which is what wrote both sprites
-the players above hover — the twelve-minute film cuts to 74 frames in a 332 KB sheet:</p>
+the players above hover — the twelve-minute film cuts to 147 frames in a 637 KB sheet.
+Each frame is cut from the middle of its cue rather than the start, so a hover is never
+more than half an interval away from the second it names:</p>
 <pre><code class="hljs language-bash">script/thumbs movie.mp4          <span class="hljs-comment"># movie-thumbs.jpg + movie-thumbs.vtt, a frame every 5 s</span>
 script/thumbs movie.mp4 2 160 5  <span class="hljs-comment"># every 2 s, 160px wide, 5 to a sprite row</span></code></pre>
 <p>Copy it out of the repository — it is not in the npm package, because a bash script in a

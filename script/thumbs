@@ -57,10 +57,18 @@ trap 'rm -rf "$tmp"' EXIT
 # failing. A seek is answered from the container's index and lands exactly, so "tile i is
 # the frame at i*interval" holds by construction; the cost is decoding from a keyframe
 # per frame, which on a feature-length file is minutes, not hours.
+# The frame is cut at the middle of its cue, not the start: a cue spans a whole interval,
+# and the start frame is up to one interval behind the second the pointer names — mid-cue
+# halves that worst case, which on a fast-cut film is the difference between "close
+# enough" and "wrong scene".
 frames=$(awk -v d="$duration" -v i="$interval" 'BEGIN { print int(d / i) + 1 }')
 n=0
 while [ "$n" -lt "$frames" ]; do
-  t=$(awk -v n="$n" -v i="$interval" 'BEGIN { printf "%.3f", n * i }')
+  t=$(awk -v n="$n" -v i="$interval" -v d="$duration" 'BEGIN {
+    mid = n * i + i / 2
+    if (mid > d) mid = (n * i + d) / 2
+    printf "%.3f", mid
+  }')
   ffmpeg -v error -ss "$t" -i "$video" -frames:v 1 -vf "scale=$width:$height" \
     "$tmp/thumb-$(printf '%04d' $((n + 1))).png"
   n=$((n + 1))
