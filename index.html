@@ -865,6 +865,50 @@ Each frame is cut from the middle of its cue rather than the start, so a hover i
 more than half an interval away from the second it names:</p>
 <pre><code class="hljs language-bash">script/thumbs movie.mp4          <span class="hljs-comment"># movie-thumbs.jpg + movie-thumbs.vtt, a frame every 5 s</span>
 script/thumbs movie.mp4 2 160 5  <span class="hljs-comment"># every 2 s, 160px wide, 5 to a sprite row</span></code></pre>
+<p>The interval is the cost knob, and the trade is lopsided: the sheet grows linearly with
+the frame count while what a finer grid buys shrinks. Every frame is cut from the middle
+of its cue, so a hover is off by at most half the interval — and the click seeks
+frame-exact regardless, so the bubble only has to orient. One pixel of a page-wide
+scrubber already spans about a second of a feature-length film. Tears of Steel above, cut
+at every interval with 160px tiles:</p>
+<table>
+<thead>
+<tr>
+<th>Interval</th>
+<th>Frames</th>
+<th>Sheet</th>
+<th>A hover is off by at most</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10 s</td>
+<td>74</td>
+<td>332 KB</td>
+<td>5 s</td>
+</tr>
+<tr>
+<td><strong>5 s</strong> — the default</td>
+<td>147</td>
+<td>637 KB</td>
+<td>2.5 s</td>
+</tr>
+<tr>
+<td>2 s</td>
+<td>368</td>
+<td>1.6 MB</td>
+<td>1 s</td>
+</tr>
+<tr>
+<td>1 s</td>
+<td>735</td>
+<td>3.2 MB</td>
+<td>0.5 s</td>
+</tr>
+</tbody></table>
+<p><code>script/thumbs movie.mp4 1</code> is the whole of getting the last row — nothing in the element
+cares which you pick. It is the sheet your visitors pay for on their first hover, which is
+why this page ships the middle of the table: below two seconds it outweighs the player&#39;s
+entire bundle several times over, spent on a bubble whose job is orientation.</p>
 <p>Copy it out of the repository — it is not in the npm package, because a bash script in a
 browser library&#39;s tarball is a file nobody runs from there. Anything else that emits the
 <code>#xywh</code> format works the same; hosted pipelines like Mux and Cloudflare Stream generate it

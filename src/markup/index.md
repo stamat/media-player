@@ -881,6 +881,25 @@ script/thumbs movie.mp4          # movie-thumbs.jpg + movie-thumbs.vtt, a frame 
 script/thumbs movie.mp4 2 160 5  # every 2 s, 160px wide, 5 to a sprite row
 ```
 
+The interval is the cost knob, and the trade is lopsided: the sheet grows linearly with
+the frame count while what a finer grid buys shrinks. Every frame is cut from the middle
+of its cue, so a hover is off by at most half the interval — and the click seeks
+frame-exact regardless, so the bubble only has to orient. One pixel of a page-wide
+scrubber already spans about a second of a feature-length film. Tears of Steel above, cut
+at every interval with 160px tiles:
+
+| Interval                | Frames | Sheet   | A hover is off by at most |
+| ----------------------- | ------ | ------- | ------------------------- |
+| 10 s                    | 74     | 332 KB  | 5 s                       |
+| **5 s** — the default   | 147    | 637 KB  | 2.5 s                     |
+| 2 s                     | 368    | 1.6 MB  | 1 s                       |
+| 1 s                     | 735    | 3.2 MB  | 0.5 s                     |
+
+`script/thumbs movie.mp4 1` is the whole of getting the last row — nothing in the element
+cares which you pick. It is the sheet your visitors pay for on their first hover, which is
+why this page ships the middle of the table: below two seconds it outweighs the player's
+entire bundle several times over, spent on a bubble whose job is orientation.
+
 Copy it out of the repository — it is not in the npm package, because a bash script in a
 browser library's tarball is a file nobody runs from there. Anything else that emits the
 `#xywh` format works the same; hosted pipelines like Mux and Cloudflare Stream generate it
