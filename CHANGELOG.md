@@ -33,6 +33,12 @@ for the person who wrote the code.
   author's to write — and the manual said six in its intro while its own reference counted
   seven. The panel and the intro both say seven now.
 
+- **A disabled control's key leaves the press with the page.** The press was claimed with
+  `preventDefault` before the click a disabled control ignores, so a `key=" "` on a
+  not-yet-ready play button stopped the page scrolling in exchange for nothing. Declined
+  before the claim now — a disabled control still outranks a `keys` entry for the same
+  press, and the press stays the page's.
+
 ## [1.1.0] - 2026-08-21
 
 ### Added

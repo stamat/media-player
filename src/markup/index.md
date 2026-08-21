@@ -1123,8 +1123,9 @@ Two things follow from the key living on the button rather than in a list somewh
   apart from the buttons and nothing to drift from them. Showing a binding is then a matter
   of showing it on the button it belongs to — a `<kbd>k</kbd>` in the button's tooltip, or
   `[key]::after { content: attr(key) }` in your own stylesheet, which needs no markup at all.
-- **A disabled button ignores its key,** because a disabled button ignores a click. Nothing
-  answers before `is-ready`.
+- **A disabled button ignores its key,** because a disabled button ignores a click, and the
+  press stays the page's — a claimed <kbd>Space</kbd> that did nothing would still have
+  stopped the page scrolling. Nothing answers before `is-ready`.
 
 One binding has no button to live on: the samples' volume is a slider, so `volumeUp` and
 `volumeDown` have nothing to carry a `key`. The `keys` attribute on the player covers exactly

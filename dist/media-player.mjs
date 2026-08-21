@@ -2110,8 +2110,10 @@ var MediaPlayer = class extends HgElement {
    * The map is the markup: `key="k"` goes on the button the author already wrote, and this
    * finds that button and clicks it. So a key can never name an action that no visible
    * control names, there is no second list to keep in step with the first, and a `disabled`
-   * button ignores its key with no code here — the platform declines to dispatch a click on
-   * one. The whole thing is opt-in twice over: no `on=` naming this means no listener at all,
+   * button ignores its key and leaves the press with the page — the platform would decline
+   * the click anyway, but declining before `preventDefault` is what keeps a claimed Space
+   * scrolling while nothing is ready to answer it.
+   * The whole thing is opt-in twice over: no `on=` naming this means no listener at all,
    * and no `key` on anything means nothing to find. Nothing here knows which of the two
    * scopes it was bound in: `keydown@document:onKeyDown` hands it presses from anywhere on
    * the page and the lookup is the same one, which is why a page-wide binding still cannot
@@ -2136,6 +2138,7 @@ var MediaPlayer = class extends HgElement {
     const control = Array.from(this.querySelectorAll("[key]")).find(
       (node) => node.getAttribute("key").toLowerCase() === pressed
     );
+    if (control?.disabled) return;
     const method = control ? null : keyedMethod(this.getAttribute("keys"), pressed);
     if (method && typeof this[method] !== "function") {
       console.warn(`media-player: keys names no method "${method}"`);

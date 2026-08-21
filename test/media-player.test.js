@@ -1618,11 +1618,25 @@ describe('keys the markup claims', () => {
     expect(presses).toEqual([]);
   });
 
-  test('a disabled control ignores its key, the same way it ignores a click', () => {
+  test('a disabled control ignores its key, and the press stays the page\'s', () => {
     const { player, button, presses } = keyed();
     button.disabled = true;
-    press(player, 'k');
+    const event = press(player, 'k');
     expect(presses).toEqual([]);
+    // Claimed and spent on nothing would still have stopped the page scrolling on a
+    // `key=" "` before `is-ready`.
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  test('a disabled control still outranks a keys entry, so one press stays one action', () => {
+    const { player, button, presses } = keyed(fakeMedia(), 'ArrowUp');
+    button.disabled = true;
+    player.setAttribute('keys', 'ArrowUp:volumeUp');
+    const volumeUp = jest.spyOn(player, 'volumeUp');
+    press(player, 'ArrowUp');
+    expect(presses).toEqual([]);
+    expect(volumeUp).not.toHaveBeenCalled();
+    volumeUp.mockRestore();
   });
 
   test('a key outside the player never reaches it', () => {
