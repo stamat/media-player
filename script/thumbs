@@ -51,11 +51,23 @@ height=$(awk -v w="$width" -v vw="$vw" -v vh="$vh" 'BEGIN { h = int(w * vh / vw)
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
-# Two passes rather than one fps+tile filter: the tile filter needs the frame count up
-# front and pads the last row with black when guessed wrong. Extracting first makes the
-# count a fact, and PNG in between keeps the sprite one JPEG encode, not two.
-ffmpeg -v error -i "$video" -vf "fps=1/$interval,scale=$width:$height" "$tmp/thumb-%04d.png"
+# One seek per frame rather than one pass through the fps filter. fps samples by the
+# stream's own display timestamps, and a stream with gaps in them — Blender's Tears of
+# Steel h264 mov is one — lands frames tens of seconds off their slot with nothing
+# failing. A seek is answered from the container's index and lands exactly, so "tile i is
+# the frame at i*interval" holds by construction; the cost is decoding from a keyframe
+# per frame, which on a feature-length file is minutes, not hours.
+frames=$(awk -v d="$duration" -v i="$interval" 'BEGIN { print int(d / i) + 1 }')
+n=0
+while [ "$n" -lt "$frames" ]; do
+  t=$(awk -v n="$n" -v i="$interval" 'BEGIN { printf "%.3f", n * i }')
+  ffmpeg -v error -ss "$t" -i "$video" -frames:v 1 -vf "scale=$width:$height" \
+    "$tmp/thumb-$(printf '%04d' $((n + 1))).png"
+  n=$((n + 1))
+done
 
+# Recounted from disk: a seek at the very end of the file can come back with no frame,
+# and the sprite and the VTT must agree on what actually exists.
 count=$(find "$tmp" -name 'thumb-*.png' | wc -l | tr -d ' ')
 rows=$(( (count + columns - 1) / columns ))
 
