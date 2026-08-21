@@ -1562,6 +1562,32 @@ Two more things stay off on a stream, window or not: the OS lock screen gets no 
 the scrubber's frame previews do nothing — the spec wants a finite duration for the first,
 and a thumbnail sheet is cut from a file that has ended for the second.
 
+**DASH swaps the script and nothing else.** The markup above, the `<style>` and every binding
+stay exactly as they are — only the loader changes, and the native branch goes, because no
+browser plays DASH without a library:
+
+```js
+import "media-player-element";
+import { MediaPlayer } from "dashjs";
+
+const video = document.querySelector("media-player video");
+const player = MediaPlayer().create();
+
+player.initialize(video, "/live.mpd", false);
+addEventListener("pagehide", () => player.destroy(), { once: true });
+```
+
+What that swap does not carry is the live half. Where hls.js reports `Infinity` for a live
+manifest, dash.js reports the length of the rewind window instead: a manifest declaring
+`timeShiftBufferDepth="PT10M"` arrived here as `634.566`, a number rather than an
+endlessness. `is-live` therefore never comes on, and a live DASH stream plays as a ten-minute
+file — the scrubber above works, but there is no **Live** badge, no `goLive`, no
+`behindLive`, and the duration slides as segments expire. Telling the two apart would mean
+asking a library what kind of stream it is, and this element knows about no libraries. So:
+either loader for playback, hls.js if the live half matters. And with the script blocked a
+DASH page shows an empty box in every browser, Safari included — there is no native path to
+degrade onto at all.
+
 Order does not matter, which is the part that usually costs a library an option. Metadata
 arriving is five different events and all of them route to the same idempotent handler, so
 the controls come up whenever the manifest resolves — before this element upgrades or long
@@ -1599,6 +1625,7 @@ is a check by hand, and this one was run: a live manifest with a ten-minute rewi
 Safari, which plays HLS natively, and in Chrome, which reaches it through hls.js. In both the
 first duration the element saw was `Infinity`, so `is-live` came on rather than latching a
 bogus number; the window drove the scrubber; skipping backwards landed inside it and stayed.
+The DASH figure above came out of the same check, in Chrome, against two dynamic manifests.
 [CONTRIBUTING.md](https://github.com/stamat/media-player/blob/main/CONTRIBUTING.md) says how
 to run that check yourself. It is not run on every release, so if it breaks for you, that is
 an issue worth filing.

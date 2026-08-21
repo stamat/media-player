@@ -1790,6 +1790,27 @@ because that number is a design decision about a badge, and the badge is yours. 
 <p>Two more things stay off on a stream, window or not: the OS lock screen gets no position, and
 the scrubber&#39;s frame previews do nothing — the spec wants a finite duration for the first,
 and a thumbnail sheet is cut from a file that has ended for the second.</p>
+<p><strong>DASH swaps the script and nothing else.</strong> The markup above, the <code>&lt;style&gt;</code> and every binding
+stay exactly as they are — only the loader changes, and the native branch goes, because no
+browser plays DASH without a library:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player-element&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MediaPlayer</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dashjs&quot;</span>;
+
+<span class="hljs-keyword">const</span> video = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&quot;media-player video&quot;</span>);
+<span class="hljs-keyword">const</span> player = <span class="hljs-title class_">MediaPlayer</span>().<span class="hljs-title function_">create</span>();
+
+player.<span class="hljs-title function_">initialize</span>(video, <span class="hljs-string">&quot;/live.mpd&quot;</span>, <span class="hljs-literal">false</span>);
+<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;pagehide&quot;</span>, <span class="hljs-function">() =&gt;</span> player.<span class="hljs-title function_">destroy</span>(), { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });</code></pre>
+<p>What that swap does not carry is the live half. Where hls.js reports <code>Infinity</code> for a live
+manifest, dash.js reports the length of the rewind window instead: a manifest declaring
+<code>timeShiftBufferDepth=&quot;PT10M&quot;</code> arrived here as <code>634.566</code>, a number rather than an
+endlessness. <code>is-live</code> therefore never comes on, and a live DASH stream plays as a ten-minute
+file — the scrubber above works, but there is no <strong>Live</strong> badge, no <code>goLive</code>, no
+<code>behindLive</code>, and the duration slides as segments expire. Telling the two apart would mean
+asking a library what kind of stream it is, and this element knows about no libraries. So:
+either loader for playback, hls.js if the live half matters. And with the script blocked a
+DASH page shows an empty box in every browser, Safari included — there is no native path to
+degrade onto at all.</p>
 <p>Order does not matter, which is the part that usually costs a library an option. Metadata
 arriving is five different events and all of them route to the same idempotent handler, so
 the controls come up whenever the manifest resolves — before this element upgrades or long
@@ -1831,6 +1852,7 @@ is a check by hand, and this one was run: a live manifest with a ten-minute rewi
 Safari, which plays HLS natively, and in Chrome, which reaches it through hls.js. In both the
 first duration the element saw was <code>Infinity</code>, so <code>is-live</code> came on rather than latching a
 bogus number; the window drove the scrubber; skipping backwards landed inside it and stayed.
+The DASH figure above came out of the same check, in Chrome, against two dynamic manifests.
 <a href="https://github.com/stamat/media-player/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> says how
 to run that check yourself. It is not run on every release, so if it breaks for you, that is
 an issue worth filing.</p>
