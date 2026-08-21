@@ -1045,10 +1045,11 @@ element nothing. What that leaves is motion with no way to stop it on a page wit
 JavaScript, and if that matters for yours, the markup that survives is a `<video controls>`
 with no `autoplay` — a different design, not this one with a flag flipped.
 
-Nothing here reads `prefers-reduced-motion`, this element included: `autoplay` is an
-attribute and no media query reaches it. The button is the mechanism WCAG asks for, and a
-page that wants the preference honoured on top of it starts the video from its own script
-rather than from the attribute.
+`prefers-reduced-motion` cannot reach the playback: `autoplay` is an attribute and no media
+query undoes one. The theme does read the preference — its transitions and the overlay
+chip's hover go still under it — but the video plays regardless. The button is the mechanism
+WCAG asks for, and a page that wants the preference honoured on top of it starts the video
+from its own script rather than from the attribute.
 
 ## What it borrows
 

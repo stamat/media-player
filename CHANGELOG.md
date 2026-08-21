@@ -70,7 +70,9 @@ for the person who wrote the code.
 - **The manual says only true things about the element again.** The refusals list described
   `keys` — an attribute that shipped in 1.1.0 and is documented at length two sections up —
   as the feature this project declined to build; the bullet now names what is actually
-  refused, the ready-made key map.
+  refused, the ready-made key map. The claim that nothing reads `prefers-reduced-motion` is
+  scoped to the playback it was about — the theme has honoured the preference for its own
+  transitions all along.
 
 - **A `<track>` appended after the upgrade renders its cues.** The cue listener rode
   `static wires`, which hydrargyri scans once at upgrade — a `<track>` a script appends

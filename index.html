@@ -1032,10 +1032,11 @@ that silently does nothing. The loop still plays; <code>autoplay</code> is the b
 element nothing. What that leaves is motion with no way to stop it on a page with no
 JavaScript, and if that matters for yours, the markup that survives is a <code>&lt;video controls&gt;</code>
 with no <code>autoplay</code> — a different design, not this one with a flag flipped.</p>
-<p>Nothing here reads <code>prefers-reduced-motion</code>, this element included: <code>autoplay</code> is an
-attribute and no media query reaches it. The button is the mechanism WCAG asks for, and a
-page that wants the preference honoured on top of it starts the video from its own script
-rather than from the attribute.</p>
+<p><code>prefers-reduced-motion</code> cannot reach the playback: <code>autoplay</code> is an attribute and no media
+query undoes one. The theme does read the preference — its transitions and the overlay
+chip&#39;s hover go still under it — but the video plays regardless. The button is the mechanism
+WCAG asks for, and a page that wants the preference honoured on top of it starts the video
+from its own script rather than from the attribute.</p>
 <h2 id="what-it-borrows">What it borrows<a class="heading-anchor" href="#what-it-borrows" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The player draws almost nothing itself. The parts that have an
 <a href="https://www.w3.org/WAI/ARIA/apg/patterns/">APG pattern</a> behind them are elementals, each
