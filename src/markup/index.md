@@ -1720,8 +1720,7 @@ below, full URLs and all.
 
 Or from a CDN as a module, no install and no build step — the stylesheets come the same
 way, from each package's `dist/`. The pins take fixes and refuse breakage: `@1` follows
-every 1.x release, and the elementals' `@0.11` follows patches only, because a 0.x minor is
-allowed to break:
+every 1.x release of both packages and stops at the next major:
 
 ```html
 <script type="module">
@@ -1733,19 +1732,19 @@ allowed to break:
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/slider.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/slider.min.css"
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/progress.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/progress.min.css"
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/toolbar.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/toolbar.min.css"
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/tooltip.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/tooltip.min.css"
 />
 
 <link
@@ -1754,15 +1753,15 @@ allowed to break:
 /><!-- the look; optional -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/slider-theme.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/slider-theme.min.css"
 /><!-- optional -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/progress-theme.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/progress-theme.min.css"
 /><!-- optional -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@0.11/dist/elementals/tooltip-theme.min.css"
+  href="https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/tooltip-theme.min.css"
 /><!-- optional, but a bubble nothing paints is text over the row -->
 ```
 

@@ -11,6 +11,12 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+### Changed
+
+- **The elementals ride `@1` on the CDN.** book-of-elementals left 0.x, so the install
+  block's `@0.11` patch pin — right while a 0.x minor could break — would now only withhold
+  fixes; both packages pin `@1` and stop at the next major.
+
 ## [1.2.0] - 2026-08-21
 
 ### Changed
