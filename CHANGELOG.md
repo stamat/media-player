@@ -13,6 +13,13 @@ for the person who wrote the code.
 
 ### Fixed
 
+- **A sub-threshold level in the store cannot wedge the mute button.** `applyVolume` snaps
+  a level under 0.1 to zero, but `restore` remembered the raw stored value — an entry
+  another script wrote as `0.05` on the shared key muted the player and handed every unmute
+  a level that clamped straight back to silence. The remembered level is clamped now, and a
+  level that clamps to zero is not remembered at all; this element itself never stores one.
+  No DOM or CSS output changes.
+
 - **An author's `muted` outranks the shared store.** The default storage key is shared by
   every player on a site, so the level a visitor dragged on one page unmuted the background
   video another page deliberately ships `muted` — and an autoplaying loop is stopped by its
@@ -31,9 +38,10 @@ for the person who wrote the code.
   `muted` and no level — `rememberVolume` never writes a zero — and `restore` waited for a
   stored level before acting on either flag, so the one mute a fresh player could make was
   forgotten by the next visit. The flag is restored on its own now; unmuting after it
-  returns to full, there being no remembered level to return to. No new DOM or CSS hooks,
-  but `volume-state` now reads `mute` at first paint for that returning visitor, where it
-  read the unmuted state before.
+  returns to the level the element already had — a page may have set one before the
+  upgrade — and to full only where there is truly nothing to return to. No new DOM or CSS
+  hooks, but `volume-state` now reads `mute` at first paint for that returning visitor,
+  where it read the unmuted state before.
 
 - **`goLive` is public in the manifest again.** The 1.1.0 handler shipped marked private in
   `custom-elements.json`: the live recipe writes `on="click:goLive"` and the reference lists

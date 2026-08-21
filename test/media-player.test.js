@@ -705,7 +705,30 @@ describe('volume', () => {
     expect(media.muted).toBe(true);
     expect(media.volume).toBe(0);
     revisit.toggleMute();
-    expect(media.volume).toBe(1); // no remembered level to return to; full is the honest default
+    expect(media.volume).toBe(1); // the element's own level from before the mute — full here
+  });
+
+  test('unmuting a lone restored mute returns to the level the element had, not to full', () => {
+    localStorage.setItem('media-player-muted', 'true');
+    const media = fakeMedia();
+    media.volume = 0.2; // the page's own level, set before the upgrade
+    const player = mount(media);
+    expect(media.muted).toBe(true);
+    player.toggleMute();
+    expect(media.volume).toBe(0.2);
+  });
+
+  test('a stored sub-threshold level cannot become a mute the button never undoes', () => {
+    // `applyVolume` snaps below 0.1 to zero; remembering the raw value would hand every
+    // unmute a level that clamps straight back to silence. This element never stores one —
+    // the entry is shared, and a page can.
+    localStorage.setItem('media-player-volume', '0.05');
+    const media = fakeMedia();
+    const player = mount(media);
+    expect(media.muted).toBe(true); // 0.05 clamps to zero on the way in
+    player.toggleMute();
+    expect(media.muted).toBe(false);
+    expect(media.volume).toBe(1); // nothing worth remembering was stored
   });
 
   test('a mute survives a reload, and unmuting after it returns to the old level rather than full blast', () => {

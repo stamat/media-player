@@ -2422,9 +2422,14 @@ var MediaPlayer = class extends HgElement {
   restore() {
     const volume = this.read("volume");
     const muted = this.read("muted");
-    if (muted === true || this.media.defaultMuted) this.applyVolume(0, false);
-    else if (typeof volume === "number") this.applyVolume(volume, false);
-    if (typeof volume === "number" && volume > 0) this.lastVolume = volume;
+    if (muted === true || this.media.defaultMuted) {
+      if (this.media.volume > 0) this.lastVolume = this.media.volume;
+      this.applyVolume(0, false);
+    } else if (typeof volume === "number") {
+      this.applyVolume(volume, false);
+    }
+    const level = typeof volume === "number" ? clampVolume(volume) : 0;
+    if (level > 0) this.lastVolume = level;
     this.syncVolume();
   }
   /** Something was pressed, dragged or toggled. One event, so a page can log all of it. */

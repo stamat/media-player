@@ -1442,9 +1442,21 @@ export class MediaPlayer extends HgElement {
     // background video another page deliberately ships silent — autoplay itself depends on
     // that attribute holding. A `storage-key` of the player's own is how a remembered
     // unmute gets to win instead.
-    if (muted === true || this.media.defaultMuted) this.applyVolume(0, false);
-    else if (typeof volume === 'number') this.applyVolume(volume, false);
-    if (typeof volume === 'number' && volume > 0) this.lastVolume = volume;
+    if (muted === true || this.media.defaultMuted) {
+      // The level to return to on unmute, read before the mute writes zero over it — the
+      // page may have set one on the element, and with nothing else remembered
+      // `toggleMute` would otherwise jump to full.
+      if (this.media.volume > 0) this.lastVolume = this.media.volume;
+      this.applyVolume(0, false);
+    } else if (typeof volume === 'number') {
+      this.applyVolume(volume, false);
+    }
+    // Clamped the way `applyVolume` clamps what it applies: remembering a raw
+    // sub-threshold level would hand every unmute a value that clamps straight back to
+    // zero — a mute the mute button cannot undo. `rememberVolume` never writes one, but
+    // the entry is shared and a page can.
+    const level = typeof volume === 'number' ? clampVolume(volume) : 0;
+    if (level > 0) this.lastVolume = level;
     this.syncVolume();
   }
 
