@@ -688,8 +688,8 @@ describe('the end of the track', () => {
   test('a track that finished leaves the scrubber at the end it reached, not a step short of it', () => {
     const media = fakeMedia('audio', { duration: 100 });
     const player = mount(media);
-    // Where the last animation frame left it: a fraction short, and floored to a whole
-    // second by the scrubber, so the thumb would stop one step from the end.
+    // Where the last animation frame left it: a fraction short of the end, and no later
+    // frame comes to close the gap.
     player.paint(99.87);
     player.onEnded();
     expect(player.currentTime).toBe(100);
@@ -711,12 +711,12 @@ describe('the value bubble', () => {
   });
 });
 
-describe('the scrubber drawing one position rather than two', () => {
-  test('the thumb and the played bar are handed the same whole second, so they cannot disagree on screen', () => {
+describe('the floor formatter, kept for markup written before the glide', () => {
+  test('floor hands back the whole second below, the number a truncating clock shows', () => {
     const player = mount(fakeMedia());
     const floor = MediaPlayer.formatters.floor;
-    // A range with step="1" snaps an assignment to the NEAREST step: unfloored, 3.6 is a
-    // thumb at 4 beside a bar at 3.6, a whole step apart.
+    // No sample pipes it any more — the scrubber's step="any" wants the fraction — but
+    // markup copied from an earlier version still writes `|floor` on the scrubber's binds.
     expect(floor(3.6)).toBe(3);
     expect(floor(3.2)).toBe(3);
     expect(player.formatters.floor).toBe(floor);
@@ -787,26 +787,32 @@ describe('the buffered bar', () => {
   });
 });
 
+/** A real slider-elemental around the sample's scrubber input, ready to append. */
+function scrubberSlider() {
+  const slider = document.createElement('slider-elemental');
+  slider.className = 'media-player-scrubber';
+  slider.innerHTML =
+    '<input type="range" min="0" step="any" value="0" aria-label="Seek" bind="duration:attr#max;currentTime:prop#value" />';
+  return slider;
+}
+
+/** A player mounted around a fake media element and a real scrubber slider. */
+function mountWithScrubber(media = fakeMedia('audio', { duration: 120 })) {
+  const player = document.createElement('media-player');
+  player.appendChild(media);
+  const slider = scrubberSlider();
+  player.appendChild(slider);
+  document.body.appendChild(player);
+  return { player, slider, input: slider.querySelector('input') };
+}
+
 describe('the slider fills follow scripted writes', () => {
   // A value written into a range input from script fires no event, so slider-elemental
   // cannot see it on its own — the player calls the slider's public apply() after every
   // write. These mount a real slider-elemental, which jsdom runs fine: apply() reads the
   // inputs and writes custom properties, no layout involved.
-  function scrubberSlider() {
-    const slider = document.createElement('slider-elemental');
-    slider.className = 'media-player-scrubber';
-    slider.innerHTML =
-      '<input type="range" min="0" step="1" value="0" aria-label="Seek" bind="duration:attr#max|floor;currentTime:prop#value|floor" />';
-    return slider;
-  }
-
   test('a seek from script drags the fill with the thumb, though the input fires no event for it', () => {
-    const media = fakeMedia('audio', { duration: 120 });
-    const player = document.createElement('media-player');
-    player.appendChild(media);
-    const slider = scrubberSlider();
-    player.appendChild(slider);
-    document.body.appendChild(player);
+    const { player, slider } = mountWithScrubber();
 
     player.seekTo(30);
     expect(slider.style.getPropertyValue('--slider-elemental-end')).toBe('0.25');
@@ -836,6 +842,57 @@ describe('the slider fills follow scripted writes', () => {
       player.seekTo(10);
       player.onVolumeChange();
     }).not.toThrow();
+  });
+});
+
+describe('the step under the hand', () => {
+  // At rest the scrubber carries step="any" so the clock's fractional writes land
+  // unsnapped; beginScrub flips it to whole seconds for the length of a press. Whether a
+  // browser re-snaps the value the instant step changes is a real-browser question jsdom
+  // cannot answer — that part is checked by hand, not here.
+  test('the clock hands the input the fraction itself, so the thumb can glide between seconds', () => {
+    const { player, input } = mountWithScrubber();
+    player.paint(3.6);
+    expect(input.value).toBe('3.6');
+  });
+
+  test('a pointer landing on the scrubber snaps its step to whole seconds, and letting go frees it', () => {
+    const { player, input } = mountWithScrubber();
+    player.beginScrub({ type: 'pointerdown', target: input });
+    expect(input.step).toBe('1');
+    player.endScrub();
+    expect(input.step).toBe('any');
+  });
+
+  test('a seek key snaps the step before the press moves the thumb, and its keyup frees it', () => {
+    const { player, input } = mountWithScrubber();
+    player.beginScrub({ type: 'keydown', key: 'ArrowRight', target: input });
+    expect(input.step).toBe('1');
+    player.endScrub();
+    expect(input.step).toBe('any');
+  });
+
+  test('a Tab passing through leaves the step alone — its keyup would land on the next control and never free it', () => {
+    const { player, input } = mountWithScrubber();
+    player.beginScrub({ type: 'keydown', key: 'Tab', target: input });
+    expect(input.step).toBe('any');
+  });
+
+  test('markup still written step="1" gets its own step back, not any', () => {
+    const { player, input } = mountWithScrubber();
+    input.step = '1';
+    player.beginScrub({ type: 'pointerdown', target: input });
+    expect(input.step).toBe('1');
+    player.endScrub();
+    expect(input.step).toBe('1');
+  });
+
+  test('a held key re-arms every repeat without forgetting the resting step', () => {
+    const { player, input } = mountWithScrubber();
+    player.beginScrub({ type: 'keydown', key: 'ArrowRight', target: input });
+    player.beginScrub({ type: 'keydown', key: 'ArrowRight', target: input });
+    player.endScrub();
+    expect(input.step).toBe('any');
   });
 });
 

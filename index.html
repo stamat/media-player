@@ -105,19 +105,22 @@ knob spliced into the markup would not survive the next <code>play</code>.</p>
           <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;buffered:prop#value;duration:prop#max&quot;</span>
         &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">progress</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">progress-elemental</span>&gt;</span>
-      <span class="hljs-comment">&lt;!-- `|floor` hands the input whole seconds: a `step=&quot;1&quot;` range snaps to the nearest
-           step, so an unfloored 3.6 is a thumb at 4 beside a clock reading 00:03.
+      <span class="hljs-comment">&lt;!-- `step=&quot;any&quot;` lets the clock&#x27;s fractional writes land unsnapped, so the thumb
+           glides with playback instead of jumping once a second. A hand is the exception:
+           `beginScrub` flips the step to whole seconds the moment a pointer or a seek key
+           lands, and `endScrub` puts `any` back — a drag and the arrows move per second,
+           the tooltip reads whole seconds regardless.
            `pointerup@document` as well as `change`: a thumb picked up and put back where it
            started fires no `change`, and the clock would stay stopped over playing audio. --&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
         <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span>
         <span class="hljs-attr">min</span>=<span class="hljs-string">&quot;0&quot;</span>
-        <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;1&quot;</span>
+        <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;any&quot;</span>
         <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0&quot;</span>
         <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Seek&quot;</span>
         <span class="hljs-attr">disabled</span>
-        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration:attr#max|floor;currentTime:prop#value|floor&quot;</span>
-        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub&quot;</span>
+        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration:attr#max;currentTime:prop#value&quot;</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub&quot;</span>
       /&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
 
@@ -461,12 +464,12 @@ controls that fade out while playing — only when it wrapped a <code>&lt;video&
       <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
         <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;range&quot;</span>
         <span class="hljs-attr">min</span>=<span class="hljs-string">&quot;0&quot;</span>
-        <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;1&quot;</span>
+        <span class="hljs-attr">step</span>=<span class="hljs-string">&quot;any&quot;</span>
         <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0&quot;</span>
         <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Seek&quot;</span>
         <span class="hljs-attr">disabled</span>
-        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration:attr#max|floor;currentTime:prop#value|floor&quot;</span>
-        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub&quot;</span>
+        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;duration:attr#max;currentTime:prop#value&quot;</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub&quot;</span>
       /&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
 
@@ -760,7 +763,7 @@ testable right here rather than in a file you have to build yourself.</p>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
     <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
       <progress-elemental><progress value="0" max="1" bind="buffered:prop#value;duration:prop#max"></progress></progress-elemental>
-      <input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
+      <input type="range" min="0" step="any" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
     </slider-elemental>
     <tooltip-elemental>
       <button on="click:skipBackward" key="ArrowLeft" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
@@ -1308,6 +1311,10 @@ already wired is skipped, never doubled.</p>
 <td>move by the <code>skip</code> attribute&#39;s seconds, ten by default; both decline on a live stream</td>
 </tr>
 <tr>
+<td><code>pointerdown:beginScrub</code>, <code>keydown:beginScrub</code></td>
+<td>a hand landed: flip the scrubber&#39;s <code>step=&quot;any&quot;</code> to whole seconds before the press moves the value, so a drag and the arrows move per second while playback between them glides free — a keydown that is not a seek key is ignored</td>
+</tr>
+<tr>
 <td><code>input:scrub</code></td>
 <td>the thumb moved: paint the clock, and do not seek until the drag ends</td>
 </tr>
@@ -1317,7 +1324,7 @@ already wired is skipped, never doubled.</p>
 </tr>
 <tr>
 <td><code>pointerup@document:endScrub</code>, <code>keyup:endScrub</code></td>
-<td>the drag ended, whatever it did to the value — on the document because a drag very often ends with the pointer somewhere else</td>
+<td>the drag ended, whatever it did to the value — on the document because a drag very often ends with the pointer somewhere else; puts the resting step back</td>
 </tr>
 <tr>
 <td><code>input:setVolume</code></td>
@@ -1400,7 +1407,10 @@ which is the pair of them behind one control.</p>
 </tbody></table>
 <p>Three formatters pipe a bind: <code>|time</code> writes seconds as a clock, <code>|floor</code> a whole number,
 and <code>|pressed</code> a boolean as the literal <code>&quot;true&quot;</code>/<code>&quot;false&quot;</code> that a toggle&#39;s <code>aria-pressed</code>
-wants — the captions and fullscreen buttons in the video sample are wired with it.</p>
+wants — the captions and fullscreen buttons in the video sample are wired with it. No
+sample pipes <code>|floor</code> any more — the scrubber&#39;s <code>step=&quot;any&quot;</code> wants the fraction — but it
+stays for markup written against an earlier version, which piped it on the scrubber&#39;s
+binds.</p>
 <h2 id="labels-in-another-language">Labels in another language<a class="heading-anchor" href="#labels-in-another-language" tabindex="-1" aria-hidden="true"></a></h2>
 <p><code>playLabel</code>, <code>muteLabel</code> and <code>captionsLabel</code> speak English. To localize, skip the bind and
 let the button name itself from its content — the attribute hooks already swap which half is

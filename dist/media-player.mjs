@@ -1574,6 +1574,7 @@ var MediaPlayer = class extends HgElement {
     this.isVideo = this.media.tagName === "VIDEO";
     this.frame = 0;
     this.linger = null;
+    this.scrubStep = null;
     this.scrubber = this.querySelector(".media-player-scrubber");
     this.volumeSlider = this.querySelector(".media-player-volume");
     if (this.isVideo) {
@@ -1923,6 +1924,28 @@ var MediaPlayer = class extends HgElement {
     this.tick();
   }
   /**
+   * A hand landed on the scrubber: snap its step to whole seconds before the press moves it.
+   *
+   * At rest the input carries `step="any"`, so the clock's fractional writes land unsnapped
+   * and the thumb glides between seconds. Granularity for a person is a different choice —
+   * a drag that lands on 3.6 and an arrow that nudges by whatever the browser fancies for
+   * `any` are both worse than the whole second — so the step flips to `1` here and
+   * `endDrag` puts the resting value back. `pointerdown` and `keydown` both run before the
+   * browser moves the value, which is what lets the flip land in time.
+   *
+   * Keydown is filtered to the keys a range spends on itself: a Tab passing through would
+   * flip the step and carry its `keyup` to the next control, and with no `endScrub` ever
+   * firing the clock would be back to snapping until the next real drag.
+   *
+   * The resting step is read off the input rather than assumed, so markup still carrying
+   * `step="1"` from before the glide keeps exactly the behaviour it wrote.
+   */
+  beginScrub(event) {
+    if (event.type === "keydown" && !ARROW_KEYS.has((event.key || "").toLowerCase())) return;
+    if (!this.scrubStep) this.scrubStep = event.target.step || "any";
+    event.target.step = "1";
+  }
+  /**
    * Dragging the scrubber: paint the labels, do not seek until the drag ends.
    *
    * The value is kept here rather than read back off the input when the drag commits. Two
@@ -1962,6 +1985,11 @@ var MediaPlayer = class extends HgElement {
    * and the second would seek to wherever the restarted clock had already written.
    */
   endDrag() {
+    if (this.scrubStep) {
+      const input = this.scrubber?.querySelector("input[type=range]");
+      if (input) input.step = this.scrubStep;
+      this.scrubStep = null;
+    }
     const seconds = this.pendingSeek;
     if (seconds === null || seconds === void 0) {
       this.resume();
@@ -2257,12 +2285,12 @@ __publicField(MediaPlayer, "wires", {
 __publicField(MediaPlayer, "formatters", {
   time: (value) => formatTime(value),
   /**
-   * Whole seconds for the scrubber's range input.
+   * Whole numbers for any bind that wants them.
    *
-   * A `step="1"` range snaps what it is assigned to the **nearest** step while the clock
-   * label truncates, so an unfloored 3.6 is a thumb at 4 beside a label reading 00:03 —
-   * the thumb a second ahead of the clock it sits next to, twice a second. Floored first,
-   * the input is handed the number the label shows.
+   * The samples stopped piping it when the scrubber moved to `step="any"` — a `step="1"`
+   * range snaps what it is assigned to the **nearest** step while the clock label
+   * truncates, and `|floor` was what kept the two on the same second. It stays public
+   * because markup copied before the glide still pipes it.
    */
   floor: (value) => Number.isFinite(value) ? Math.floor(value) : value,
   /**

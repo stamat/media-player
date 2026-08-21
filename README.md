@@ -29,10 +29,10 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
       <input
         type="range"
         min="0"
-        step="1"
+        step="any"
         aria-label="Seek"
         bind="duration:attr#max;currentTime:prop#value"
-        on="input:scrub;change:seek"
+        on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
       />
     </slider-elemental>
     <button on="click:togglePlay" bind="playLabel:attr#aria-label">▶</button>

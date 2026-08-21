@@ -11,6 +11,21 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+### Changed
+
+- **The thumb glides.** The clock has always painted every animation frame, but the
+  scrubber's `step="1"` snapped each write to a whole second, so the thumb jumped once a
+  second over a smoothly filling bar. The samples now write `step="any"` and drop the
+  `|floor` pipes from the scrubber's binds, and the thumb moves with the frame. A hand
+  still works per second: the new `beginScrub` handler — wired as
+  `pointerdown:beginScrub;keydown:beginScrub` in every sample — flips the step to whole
+  seconds before a press moves the value, and `endScrub` puts the resting step back, so a
+  drag and the arrow keys land on whole seconds and the tooltip reads a whole-second clock
+  either way. Markup from an earlier version keeps exactly the behaviour it wrote:
+  `beginScrub` restores whatever step it found, and `|floor` stays a public formatter. No
+  CSS output changes; the DOM change is the scrubber input's `step` attribute moving
+  between `any` and `1` while a press holds it.
+
 ## [1.0.0] - 2026-08-20
 
 ### Added

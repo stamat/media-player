@@ -68,19 +68,22 @@ knob spliced into the markup would not survive the next `play`.
           bind="buffered:prop#value;duration:prop#max"
         ></progress>
       </progress-elemental>
-      <!-- `|floor` hands the input whole seconds: a `step="1"` range snaps to the nearest
-           step, so an unfloored 3.6 is a thumb at 4 beside a clock reading 00:03.
+      <!-- `step="any"` lets the clock's fractional writes land unsnapped, so the thumb
+           glides with playback instead of jumping once a second. A hand is the exception:
+           `beginScrub` flips the step to whole seconds the moment a pointer or a seek key
+           lands, and `endScrub` puts `any` back — a drag and the arrows move per second,
+           the tooltip reads whole seconds regardless.
            `pointerup@document` as well as `change`: a thumb picked up and put back where it
            started fires no `change`, and the clock would stay stopped over playing audio. -->
       <input
         type="range"
         min="0"
-        step="1"
+        step="any"
         value="0"
         aria-label="Seek"
         disabled
-        bind="duration:attr#max|floor;currentTime:prop#value|floor"
-        on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
+        bind="duration:attr#max;currentTime:prop#value"
+        on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
       />
     </slider-elemental>
 
@@ -445,12 +448,12 @@ controls that fade out while playing — only when it wrapped a `<video>`.
       <input
         type="range"
         min="0"
-        step="1"
+        step="any"
         value="0"
         aria-label="Seek"
         disabled
-        bind="duration:attr#max|floor;currentTime:prop#value|floor"
-        on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
+        bind="duration:attr#max;currentTime:prop#value"
+        on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub"
       />
     </slider-elemental>
 
@@ -754,7 +757,7 @@ testable right here rather than in a file you have to build yourself.
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
     <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
       <progress-elemental><progress value="0" max="1" bind="buffered:prop#value;duration:prop#max"></progress></progress-elemental>
-      <input type="range" min="0" step="1" value="0" aria-label="Seek" disabled bind="duration:attr#max|floor;currentTime:prop#value|floor" on="input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
+      <input type="range" min="0" step="any" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
     </slider-elemental>
     <tooltip-elemental>
       <button on="click:skipBackward" key="ArrowLeft" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
@@ -1216,9 +1219,10 @@ already wired is skipped, never doubled.
 | `click:togglePlay`                              | plays a paused player, pauses a playing one                                                                                                      |
 | `click:stop`                                    | pauses and returns to the start — a live stream has no start to return to, so there it only pauses                                               |
 | `click:skipForward`, `click:skipBackward`       | move by the `skip` attribute's seconds, ten by default; both decline on a live stream                                                            |
+| `pointerdown:beginScrub`, `keydown:beginScrub`  | a hand landed: flip the scrubber's `step="any"` to whole seconds before the press moves the value, so a drag and the arrows move per second while playback between them glides free — a keydown that is not a seek key is ignored |
 | `input:scrub`                                   | the thumb moved: paint the clock, and do not seek until the drag ends                                                                            |
 | `change:seek`                                   | the drag committed: seek to the value under the thumb                                                                                            |
-| `pointerup@document:endScrub`, `keyup:endScrub` | the drag ended, whatever it did to the value — on the document because a drag very often ends with the pointer somewhere else                    |
+| `pointerup@document:endScrub`, `keyup:endScrub` | the drag ended, whatever it did to the value — on the document because a drag very often ends with the pointer somewhere else; puts the resting step back |
 | `input:setVolume`                               | the sound follows the thumb immediately; the write to storage waits for the drag to settle                                                       |
 | `click:volumeUp`, `click:volumeDown`            | one tenth of full per press, climbing from zero when muted rather than jumping back — for a volume UI with no slider, or a `keys` entry; the samples bind them to the up and down arrows |
 | `click:toggleMute`                              | mute, and back to the level it remembered                                                                                                        |
@@ -1251,7 +1255,10 @@ which is the pair of them behind one control.
 
 Three formatters pipe a bind: `|time` writes seconds as a clock, `|floor` a whole number,
 and `|pressed` a boolean as the literal `"true"`/`"false"` that a toggle's `aria-pressed`
-wants — the captions and fullscreen buttons in the video sample are wired with it.
+wants — the captions and fullscreen buttons in the video sample are wired with it. No
+sample pipes `|floor` any more — the scrubber's `step="any"` wants the fraction — but it
+stays for markup written against an earlier version, which piped it on the scrubber's
+binds.
 
 ## Labels in another language
 

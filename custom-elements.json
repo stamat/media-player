@@ -192,7 +192,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ time: (value) => formatTime(value), /** * Whole seconds for the scrubber's range input. * * A `step=\"1\"` range snaps what it is assigned to the **nearest** step while the clock * label truncates, so an unfloored 3.6 is a thumb at 4 beside a label reading 00:03 — * the thumb a second ahead of the clock it sits next to, twice a second. Floored first, * the input is handed the number the label shows. */ floor: (value) => (Number.isFinite(value) ? Math.floor(value) : value), /** * For `attr#aria-pressed` binds on toggle buttons. ARIA wants the literal strings * \"true\" and \"false\" — a raw boolean bind would write an empty attribute for true and * remove it for false, and a removed `aria-pressed` reads as \"not a toggle at all\". */ pressed: (value) => (value ? 'true' : 'false') }",
+              "default": "{ time: (value) => formatTime(value), /** * Whole numbers for any bind that wants them. * * The samples stopped piping it when the scrubber moved to `step=\"any\"` — a `step=\"1\"` * range snaps what it is assigned to the **nearest** step while the clock label * truncates, and `|floor` was what kept the two on the same second. It stays public * because markup copied before the glide still pipes it. */ floor: (value) => (Number.isFinite(value) ? Math.floor(value) : value), /** * For `attr#aria-pressed` binds on toggle buttons. ARIA wants the literal strings * \"true\" and \"false\" — a raw boolean bind would write an empty attribute for true and * remove it for false, and a removed `aria-pressed` reads as \"not a toggle at all\". */ pressed: (value) => (value ? 'true' : 'false') }",
               "privacy": "private"
             },
             {
@@ -354,6 +354,17 @@
               "kind": "method",
               "name": "resume",
               "description": "Start or restart the clock, exactly once.\n\nCancel before scheduling, always: `tick` schedules the next frame from inside itself, so\na second entry point that only called `tick` would leave two loops running and the\nhandle to just one of them.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "beginScrub",
+              "parameters": [
+                {
+                  "name": "event"
+                }
+              ],
+              "description": "A hand landed on the scrubber: snap its step to whole seconds before the press moves it.\n\nAt rest the input carries `step=\"any\"`, so the clock's fractional writes land unsnapped\nand the thumb glides between seconds. Granularity for a person is a different choice —\na drag that lands on 3.6 and an arrow that nudges by whatever the browser fancies for\n`any` are both worse than the whole second — so the step flips to `1` here and\n`endDrag` puts the resting value back. `pointerdown` and `keydown` both run before the\nbrowser moves the value, which is what lets the flip land in time.\n\nKeydown is filtered to the keys a range spends on itself: a Tab passing through would\nflip the step and carry its `keyup` to the next control, and with no `endScrub` ever\nfiring the clock would be back to snapping until the next real drag.\n\nThe resting step is read off the input rather than assumed, so markup still carrying\n`step=\"1\"` from before the glide keeps exactly the behaviour it wrote.",
               "privacy": "private"
             },
             {
