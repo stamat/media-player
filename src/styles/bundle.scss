@@ -1,3 +1,5 @@
+/*! Includes book-of-elementals' slider, progress, toolbar and tooltip sheets, at the version this package was built against. Do not load beside your own copy of them. */
+
 // Every structure sheet the player needs, as one file: the four elementals it is built out
 // of, and its own. For a page with no build step, where each `@use` below is otherwise a
 // `<link>` of its own — five requests, five gzip streams that share no window between them,

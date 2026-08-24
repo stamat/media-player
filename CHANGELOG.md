@@ -12,14 +12,22 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Two bundled stylesheets, so a page links two sheets instead of nine.**
   `media-player-element/bundle.css` is `style.css` with the four elemental structure sheets
   folded in, and `bundle-theme.css` is `theme.css` with theirs — the same CSS, compiled
-  together. Nine files gzip to 6.0KB because each compresses alone; the two bundles gzip to
-  4.3KB, so the shorter block is the smaller download as well. Nothing is removed: every
-  sheet is still published on its own for a page that wants only some of them, and the
-  script was already one file with the elementals compiled into it. One catch worth knowing
-  before you skip the look — the split is by kind, not by what you can live without, so the
-  tooltip's colours are in the theme bundle while its structure sheet only places the bubble.
-  Take `bundle.css` alone and set `--tooltip-elemental-surface` and
-  `--tooltip-elemental-color`, or there is unpainted text over the control row.
+  together, declaration for declaration. Nine files gzip to 6.0KB because each compresses
+  alone; the two bundles gzip to 4.4KB, so the shorter block is the smaller download as
+  well. Nothing is removed: every sheet is still published on its own, and the script was
+  already one file with the elementals compiled into it.
+
+  **Not for a project that already uses book-of-elementals.** The elemental CSS inside a
+  bundle is frozen at the version this package was built against, and the file cannot tell
+  you which — so linking one beside your own copy puts two versions of the same selectors on
+  the page, with link order deciding and nothing reporting it. Take `style.scss` and
+  `theme.scss` there and `@use` them next to the sheets you already have. Both bundles say so
+  in a comment at the top for whoever meets the duplicate rules in devtools first.
+
+  One more catch if you take `bundle.css` without the look: the split is by kind, not by what
+  you can live without, so the tooltip's colours are in the theme bundle while its structure
+  sheet only places the bubble. Set `--tooltip-elemental-surface` and
+  `--tooltip-elemental-color` yourself, or there is unpainted text over the control row.
 
 ### Changed
 

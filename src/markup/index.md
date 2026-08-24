@@ -1708,6 +1708,14 @@ alone and there is unpainted text floating over the control row rather than a bu
 paint `--tooltip-elemental-surface` and `--tooltip-elemental-color` yourself if you skip
 the look. Nothing else in here needs you to.
 
+**If book-of-elementals is already in your project, take `style.scss` and `theme.scss`
+rather than the bundles.** Three quarters of `bundle-theme.css` is elemental CSS, frozen at
+whatever version this element was built against — and nothing in the file says which, since
+the banner carries this package's version and not that one. Load it beside your own copy and
+there are two versions of the same selectors on one page, link order deciding which wins, and
+nothing anywhere reporting it. `@use` the two unbundled sheets next to the elemental sheets
+you already have instead: one copy of each, at the version you picked.
+
 The `href`s above are bare specifiers for a bundler to resolve. From a CDN they are two full
 URLs, no install and no build step, and the module beside them is one file — the elementals
 are compiled into it:
@@ -1729,13 +1737,12 @@ are compiled into it:
 That pin takes fixes and refuses breakage: `@1` follows every 1.x release and stops at the
 next major.
 
-Every sheet a bundle is made of is still published on its own — `media-player-element`'s
-`style.css` and `theme.css`, and `style.css`/`theme.css` under each elemental in
-[book-of-elementals](https://github.com/stamat/book-of-elementals). Link those instead if
-you want only some of them; it is the same CSS, and nine `<link>`s rather than two. The
-bundles are the smaller download as well as the shorter block — nine files gzip to 6.0KB
-against the bundles' 4.3KB, because each compresses alone and shares no window with the
-next.
+Every sheet is published on its own either way — this package's `style.css` and `theme.css`,
+and `style.css`/`theme.css` under each elemental in
+[book-of-elementals](https://github.com/stamat/book-of-elementals) — so a page wanting only
+some of them links those. What the bundles buy a page wanting all of them is nine `<link>`s
+becoming two, and 6.0KB of gzip becoming 4.4KB, because nine files each compress alone and
+share no window with the next.
 
 ## What editors read
 
