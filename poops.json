@@ -83,7 +83,7 @@
         "title": "Media Player",
         "brand": "media-player",
         "brandMark": "\u25b6",
-        "description": "A media player you write in HTML \u2014 one custom element over the <audio> or <video> you already wrote.",
+        "description": "A media player you write in HTML — one custom element over the <audio> or <video> you already wrote.",
         "lang": "en",
         "url": "https://stamat.github.io/media-player",
         "repo": "https://github.com/stamat/media-player",
