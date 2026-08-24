@@ -315,7 +315,7 @@ knob spliced into the markup would not survive the next <code>play</code>.</p>
     <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">toolbar-elemental</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
-</code-preview><pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player-element&quot;</span>;</code></pre>
+</code-preview><pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player-element&#x27;</span>;</code></pre>
 <!-- The `-hljs` build, not the small one: this page's fences are highlighted at build time
      and it ships no runtime highlighter, so without the bundled copy the code would keep the
      colour it was baked with and stop recolouring the moment a reader typed. -->
@@ -1787,19 +1787,19 @@ and a scrubber over a rewind window binds the first two where a file&#39;s scrub
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-  <span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player-element&quot;</span>;
-  <span class="hljs-keyword">import</span> <span class="hljs-title class_">Hls</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;hls.js&quot;</span>;
+  <span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player-element&#x27;</span>;
+  <span class="hljs-keyword">import</span> <span class="hljs-title class_">Hls</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;hls.js&#x27;</span>;
 
-  <span class="hljs-keyword">const</span> video = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&quot;media-player video&quot;</span>);
-  <span class="hljs-keyword">const</span> manifest = <span class="hljs-string">&quot;/live.m3u8&quot;</span>;
+  <span class="hljs-keyword">const</span> video = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;media-player video&#x27;</span>);
+  <span class="hljs-keyword">const</span> manifest = <span class="hljs-string">&#x27;/live.m3u8&#x27;</span>;
 
-  <span class="hljs-keyword">if</span> (video.<span class="hljs-title function_">canPlayType</span>(<span class="hljs-string">&quot;application/vnd.apple.mpegurl&quot;</span>)) {
+  <span class="hljs-keyword">if</span> (video.<span class="hljs-title function_">canPlayType</span>(<span class="hljs-string">&#x27;application/vnd.apple.mpegurl&#x27;</span>)) {
     video.<span class="hljs-property">src</span> = manifest; <span class="hljs-comment">// Safari and iOS play HLS without help</span>
   } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Hls</span>.<span class="hljs-title function_">isSupported</span>()) {
     <span class="hljs-keyword">const</span> hls = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Hls</span>();
     hls.<span class="hljs-title function_">loadSource</span>(manifest);
     hls.<span class="hljs-title function_">attachMedia</span>(video);
-    <span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;pagehide&quot;</span>, <span class="hljs-function">() =&gt;</span> hls.<span class="hljs-title function_">destroy</span>(), { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });
+    <span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;pagehide&#x27;</span>, <span class="hljs-function">() =&gt;</span> hls.<span class="hljs-title function_">destroy</span>(), { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });
   }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 <p>The <code>disabled</code> attributes are the author being honest: nothing on that row can do anything
@@ -1818,14 +1818,14 @@ and a thumbnail sheet is cut from a file that has ended for the second.</p>
 <p><strong>DASH swaps the script and nothing else.</strong> The markup above, the <code>&lt;style&gt;</code> and every binding
 stay exactly as they are — only the loader changes, and the native branch goes, because no
 browser plays DASH without a library:</p>
-<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player-element&quot;</span>;
-<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MediaPlayer</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dashjs&quot;</span>;
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player-element&#x27;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MediaPlayer</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;dashjs&#x27;</span>;
 
-<span class="hljs-keyword">const</span> video = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&quot;media-player video&quot;</span>);
+<span class="hljs-keyword">const</span> video = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;media-player video&#x27;</span>);
 <span class="hljs-keyword">const</span> player = <span class="hljs-title class_">MediaPlayer</span>().<span class="hljs-title function_">create</span>();
 
-player.<span class="hljs-title function_">initialize</span>(video, <span class="hljs-string">&quot;/live.mpd&quot;</span>, <span class="hljs-literal">false</span>);
-<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;pagehide&quot;</span>, <span class="hljs-function">() =&gt;</span> player.<span class="hljs-title function_">destroy</span>(), { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });</code></pre>
+player.<span class="hljs-title function_">initialize</span>(video, <span class="hljs-string">&#x27;/live.mpd&#x27;</span>, <span class="hljs-literal">false</span>);
+<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;pagehide&#x27;</span>, <span class="hljs-function">() =&gt;</span> player.<span class="hljs-title function_">destroy</span>(), { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });</code></pre>
 <p>What that swap does not carry is the live half. Where hls.js reports <code>Infinity</code> for a live
 manifest, dash.js reports the length of the rewind window instead: a manifest declaring
 <code>timeShiftBufferDepth=&quot;PT10M&quot;</code> arrived here as <code>634.566</code>, a number rather than an
@@ -1903,7 +1903,7 @@ map would spend letters on every page that never asked for them.</li>
 </ul>
 <h2 id="install">Install<a class="heading-anchor" href="#install" tabindex="-1" aria-hidden="true"></a></h2>
 <pre><code class="hljs language-bash">npm install media-player-element</code></pre>
-<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player-element&quot;</span>;</code></pre>
+<pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player-element&#x27;</span>;</code></pre>
 <p>The elementals ride along — importing <code>media-player-element</code> defines the slider, the progress bar,
 the toolbar and the tooltip too. Their stylesheets do not: each elemental draws its own
 track, thumb, bar or bubble, so every one of those sheets would otherwise be a <code>&lt;link&gt;</code> of
@@ -1948,7 +1948,7 @@ package declares.</p>
 URLs, no install and no build step, and the module beside them is one file — the elementals
 are compiled into it:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-  <span class="hljs-keyword">import</span> <span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs&quot;</span>;
+  <span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs&#x27;</span>;
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>

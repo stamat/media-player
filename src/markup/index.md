@@ -283,7 +283,7 @@ knob spliced into the markup would not survive the next `play`.
 </code-preview>
 
 ```js
-import "media-player-element";
+import 'media-player-element';
 ```
 
 <!-- The `-hljs` build, not the small one: this page's fences are highlighted at build time
@@ -1553,19 +1553,19 @@ and a scrubber over a rewind window binds the first two where a file's scrubber 
 </style>
 
 <script type="module">
-  import "media-player-element";
-  import Hls from "hls.js";
+  import 'media-player-element';
+  import Hls from 'hls.js';
 
-  const video = document.querySelector("media-player video");
-  const manifest = "/live.m3u8";
+  const video = document.querySelector('media-player video');
+  const manifest = '/live.m3u8';
 
-  if (video.canPlayType("application/vnd.apple.mpegurl")) {
+  if (video.canPlayType('application/vnd.apple.mpegurl')) {
     video.src = manifest; // Safari and iOS play HLS without help
   } else if (Hls.isSupported()) {
     const hls = new Hls();
     hls.loadSource(manifest);
     hls.attachMedia(video);
-    addEventListener("pagehide", () => hls.destroy(), { once: true });
+    addEventListener('pagehide', () => hls.destroy(), { once: true });
   }
 </script>
 ```
@@ -1591,14 +1591,14 @@ stay exactly as they are — only the loader changes, and the native branch goes
 browser plays DASH without a library:
 
 ```js
-import "media-player-element";
-import { MediaPlayer } from "dashjs";
+import 'media-player-element';
+import { MediaPlayer } from 'dashjs';
 
-const video = document.querySelector("media-player video");
+const video = document.querySelector('media-player video');
 const player = MediaPlayer().create();
 
-player.initialize(video, "/live.mpd", false);
-addEventListener("pagehide", () => player.destroy(), { once: true });
+player.initialize(video, '/live.mpd', false);
+addEventListener('pagehide', () => player.destroy(), { once: true });
 ```
 
 What that swap does not carry is the live half. Where hls.js reports `Infinity` for a live
@@ -1682,7 +1682,7 @@ npm install media-player-element
 ```
 
 ```js
-import "media-player-element";
+import 'media-player-element';
 ```
 
 The elementals ride along — importing `media-player-element` defines the slider, the progress bar,
@@ -1740,7 +1740,7 @@ are compiled into it:
 
 ```html
 <script type="module">
-  import "https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs";
+  import 'https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs';
 </script>
 <link
   rel="stylesheet"
