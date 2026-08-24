@@ -1934,8 +1934,9 @@ below, full URLs and all.</p>
   <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/tooltip/theme.css&quot;</span>
 /&gt;</span><span class="hljs-comment">&lt;!-- optional, but a bubble nothing paints is text over the row --&gt;</span></code></pre>
 <p>Or from a CDN as a module, no install and no build step — the stylesheets come the same
-way, from each package&#39;s <code>dist/</code>. The pins take fixes and refuse breakage: <code>@1</code> follows
-every 1.x release of both packages and stops at the next major:</p>
+way, from each package&#39;s <code>dist/</code>. The pins take fixes and refuse breakage: a major-version
+pin follows every release inside it and stops at the next major, which is why the two
+packages are on different numbers — <code>@1</code> for this one, <code>@2</code> for the elementals:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
   <span class="hljs-keyword">import</span> <span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs&quot;</span>;
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
@@ -1945,19 +1946,19 @@ every 1.x release of both packages and stops at the next major:</p>
 /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/slider.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/slider.min.css&quot;</span>
 /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/progress.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/progress.min.css&quot;</span>
 /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/toolbar.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/toolbar.min.css&quot;</span>
 /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/tooltip.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/tooltip.min.css&quot;</span>
 /&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
@@ -1966,15 +1967,15 @@ every 1.x release of both packages and stops at the next major:</p>
 /&gt;</span><span class="hljs-comment">&lt;!-- the look; optional --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/slider-theme.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/slider-theme.min.css&quot;</span>
 /&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/progress-theme.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/progress-theme.min.css&quot;</span>
 /&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@1/dist/elementals/tooltip-theme.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/tooltip-theme.min.css&quot;</span>
 /&gt;</span><span class="hljs-comment">&lt;!-- optional, but a bubble nothing paints is text over the row --&gt;</span></code></pre>
 <h2 id="what-editors-read">What editors read<a class="heading-anchor" href="#what-editors-read" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The package ships a

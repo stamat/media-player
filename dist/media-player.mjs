@@ -652,6 +652,15 @@ function placeSubmenu(item, panel, viewport, rtl) {
   };
 }
 
+// node_modules/book-of-elementals/src/core.js
+function define2(tag, ctor) {
+  if (typeof document === "undefined" || document.readyState !== "loading") {
+    define(tag, ctor);
+    return;
+  }
+  document.addEventListener("DOMContentLoaded", () => define(tag, ctor), { once: true });
+}
+
 // node_modules/book-of-elementals/src/elementals/slider/index.js
 function ratio(value, min, max) {
   if (!(max > min) || !Number.isFinite(value)) return 0;
@@ -680,10 +689,15 @@ function nearerThumb(value, start, end) {
   if (toStart === toEnd) return value > end ? "end" : "start";
   return toStart < toEnd ? "start" : "end";
 }
-function alongTrack(x, left, width, thumb, rtl) {
-  const travel = width - thumb;
+function trackAxis(writingMode, rect, box, x, y) {
+  const vertical = /^(vertical|sideways)/.test(String(writingMode || ""));
+  if (vertical) return { vertical, coord: y, start: rect.top, size: rect.height, thumb: box.width };
+  return { vertical, coord: x, start: rect.left, size: rect.width, thumb: box.height };
+}
+function alongTrack(coord, start, size, thumb, rtl) {
+  const travel = size - thumb;
   if (!(travel > 0)) return 0;
-  const along = (x - left - thumb / 2) / travel;
+  const along = (coord - start - thumb / 2) / travel;
   return Math.min(Math.max(rtl ? 1 - along : along, 0), 1);
 }
 function decimals(value) {
@@ -705,11 +719,11 @@ function snapToStep(value, min, max, step, direction) {
 function stepOf(input) {
   return input.step === "any" ? 0 : bound(input.step, 1);
 }
-function thumbUnder(x, left, width, thumb, ratios, rtl) {
-  const travel = Math.max(width - thumb, 0);
+function thumbUnder(coord, start, size, thumb, ratios, rtl) {
+  const travel = Math.max(size - thumb, 0);
   for (let i = 0; i < ratios.length; i++) {
     const at = rtl ? 1 - ratios[i] : ratios[i];
-    if (Math.abs(x - (left + thumb / 2 + at * travel)) <= thumb / 2) return i;
+    if (Math.abs(coord - (start + thumb / 2 + at * travel)) <= thumb / 2) return i;
   }
   return -1;
 }
@@ -758,10 +772,31 @@ var SliderElemental = class extends ElementBase {
   set gap(value) {
     this.setAttribute("gap", value);
   }
-  /** Whether the control runs right to left. Computed style rather than `:dir()`, which
-   * throws on the browsers that do not know it instead of quietly not matching. */
+  /**
+   * The two things about this element's own layout that the arithmetic needs: which way the
+   * track runs, and which end of it is the start.
+   *
+   * One read, because everything that measures wants both, and a computed style is the one
+   * thing here that can make the browser recalculate one. Computed style rather than
+   * `:dir()`, which throws on the browsers that do not know it instead of quietly not
+   * matching. Read from this element and not from an input: the track and the fill are drawn
+   * on this box in logical properties, so this is the writing mode they resolve against, and
+   * an input turned on its side by itself would be a thumb running one way over a track
+   * running the other.
+   */
+  get layout() {
+    if (typeof getComputedStyle !== "function") return { rtl: false, writingMode: "" };
+    const style = getComputedStyle(this);
+    return { rtl: style.direction === "rtl", writingMode: style.writingMode };
+  }
+  /** Whether the control runs right to left. */
   get rtl() {
-    return typeof getComputedStyle === "function" && getComputedStyle(this).direction === "rtl";
+    return this.layout.rtl;
+  }
+  /** The writing mode the control is laid out in, which is what says whether the track runs
+   * across the page or down it. */
+  get writingMode() {
+    return this.layout.writingMode;
   }
   connectedCallback() {
     if (this.initialized) return;
@@ -777,8 +812,9 @@ var SliderElemental = class extends ElementBase {
     this.onTooltipDown = this.onTooltipDown.bind(this);
     this.onTooltipUp = this.onTooltipUp.bind(this);
     this.tooltipX = null;
+    this.tooltipY = null;
     this.tooltipElement = null;
-    this.format = null;
+    if (!("format" in this)) this.format = null;
     this.dragging = -1;
     this.pressed = false;
     this.addEventListener("input", this.onInput, true);
@@ -880,7 +916,8 @@ var SliderElemental = class extends ElementBase {
     for (let i = 0; i < outputs.length && i < inputs.length; i++) {
       outputs[i].textContent = inputs[i].value;
     }
-    if (this.tooltipX !== null) this.showTooltipAt(this.tooltipX);
+    if (this.dragging >= 0) this.showDraggedValue();
+    else if (this.tooltipX !== null) this.showTooltipAt(this.tooltipX, this.tooltipY);
   }
   /**
    * Put the value bubble in, or take it out, to match the `tooltip` attribute.
@@ -907,7 +944,7 @@ var SliderElemental = class extends ElementBase {
       this.addEventListener("pointercancel", this.onTooltipUp);
     }
     if (!wanted) this.removeTooltip();
-    if (this.tooltipElement && this.tooltipX !== null) this.showTooltipAt(this.tooltipX);
+    if (this.tooltipElement && this.tooltipX !== null) this.showTooltipAt(this.tooltipX, this.tooltipY);
   }
   /** The bubble and the listeners that draw it, gone together. The element wrote the bubble,
    * so the element is what takes it back off the page. */
@@ -921,21 +958,48 @@ var SliderElemental = class extends ElementBase {
     this.tooltipElement.remove();
     this.tooltipElement = null;
     this.tooltipX = null;
+    this.tooltipY = null;
     this.dragging = -1;
     this.pressed = false;
   }
   onPointerMove(e) {
     if (e.pointerType === "touch" && !this.pressed) return;
     this.tooltipX = e.clientX;
-    this.showTooltipAt(e.clientX);
+    this.tooltipY = e.clientY;
+    if (this.dragging >= 0) return;
+    this.showTooltipAt(e.clientX, e.clientY);
+  }
+  /**
+   * Redraw the bubble for the thumb being dragged, from the value alone.
+   *
+   * Nothing here measures, and that is the point: a pinned bubble sits at `ratio` of the
+   * scale and reads out the input's own text, both of which are on the input already. The
+   * two attributes saying which way it is nudged are not rewritten either - they were read
+   * live when the press drew the bubble, and neither the writing mode nor the direction
+   * changes while a thumb is held.
+   *
+   * Only for a bubble that is already showing: `tooltip="track"` alone hides it on a thumb,
+   * and a drag is not the moment to overrule that.
+   */
+  showDraggedValue() {
+    const bubble = this.tooltipElement;
+    if (!bubble || bubble.hidden) return;
+    const inputs = this.inputs;
+    const input = inputs[this.dragging];
+    if (!input) return;
+    const min = bound(inputs[0].min, 0);
+    const max = bound(inputs[0].max, 100);
+    bubble.textContent = this.formatValue(Number(input.value), input.value);
+    bubble.style.setProperty("--slider-elemental-at", ratio(bound(input.value, min), min, max));
   }
   /** A press pins the bubble to whatever it is about to drag, for as long as it is held. */
   onTooltipDown(e) {
     this.pressed = true;
-    const m = this.metrics(e.clientX);
+    const m = this.metrics(e.clientX, e.clientY);
     this.dragging = m ? draggedThumb(m.under, m.inputs.length) : -1;
     this.tooltipX = e.clientX;
-    this.showTooltipAt(e.clientX);
+    this.tooltipY = e.clientY;
+    this.showTooltipAt(e.clientX, e.clientY, m);
   }
   /**
    * Let go, and where the pointer is decides again - including that it may have been let go
@@ -960,31 +1024,33 @@ var SliderElemental = class extends ElementBase {
     }
     const rect = this.getBoundingClientRect();
     const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-    if (inside) this.showTooltipAt(e.clientX);
+    if (inside) this.showTooltipAt(e.clientX, e.clientY);
     else this.onPointerLeave();
   }
   onPointerLeave() {
     if (this.dragging >= 0) return;
     this.tooltipX = null;
+    this.tooltipY = null;
     if (this.tooltipElement) this.tooltipElement.hidden = true;
   }
   /**
-   * Everything a bubble is drawn from, measured in one go: the scale, where each thumb sits
-   * on it, and which one a pointer at `x` is over. `null` where there is nothing to measure.
+   * Everything a bubble is drawn from, measured in one go: the axis the track is on, the
+   * scale, where each thumb sits on it, and which one a pointer at `x`, `y` is over. `null`
+   * where there is nothing to measure.
    */
-  metrics(x) {
+  metrics(x, y) {
     const inputs = this.inputs;
     if (!inputs.length) return null;
     const rect = this.getBoundingClientRect();
-    const thumb = inputs[0].getBoundingClientRect().height;
-    const rtl = this.rtl;
+    const { rtl, writingMode } = this.layout;
+    const axis = trackAxis(writingMode, rect, inputs[0].getBoundingClientRect(), x, y);
     const min = bound(inputs[0].min, 0);
     const max = bound(inputs[0].max, 100);
     const ratios = inputs.map((input) => ratio(bound(input.value, min), min, max));
-    return { inputs, rect, thumb, rtl, min, max, ratios, under: thumbUnder(x, rect.left, rect.width, thumb, ratios, rtl) };
+    return { inputs, rect, axis, rtl, min, max, ratios, under: thumbUnder(axis.coord, axis.start, axis.size, axis.thumb, ratios, rtl) };
   }
   /**
-   * Draw the bubble for a pointer at `x`, in viewport coordinates, or hide it where the
+   * Draw the bubble for a pointer at `x`, `y`, in viewport coordinates, or hide it where the
    * attribute did not ask for a bubble at that spot.
    *
    * A thumb reads out its input's own `value`, which the browser has already put on a step
@@ -996,10 +1062,10 @@ var SliderElemental = class extends ElementBase {
    * to, and it holds until the release. Without it the bubble answers where the pointer is,
    * which during a drag is beside the thumb half the time.
    */
-  showTooltipAt(x) {
+  showTooltipAt(x, y, measured) {
     const bubble = this.tooltipElement;
     if (!bubble) return;
-    const m = this.metrics(x);
+    const m = measured || this.metrics(x, y);
     if (!m) return;
     const modes = tooltipModes(this.getAttribute("tooltip"));
     const over = this.dragging >= 0 && this.dragging < m.inputs.length ? this.dragging : m.under;
@@ -1012,11 +1078,13 @@ var SliderElemental = class extends ElementBase {
     let text = over < 0 ? "" : m.inputs[over].value;
     let value = over < 0 ? 0 : Number(m.inputs[over].value);
     if (over < 0) {
-      at = alongTrack(x, m.rect.left, m.rect.width, m.thumb, m.rtl);
+      at = alongTrack(m.axis.coord, m.axis.start, m.axis.size, m.axis.thumb, m.rtl);
       value = snapToStep(m.min + at * (m.max - m.min), m.min, m.max, stepOf(m.inputs[0]));
       text = String(value);
     }
     bubble.dataset.tooltip = on;
+    bubble.toggleAttribute("data-vertical", m.axis.vertical);
+    bubble.toggleAttribute("data-reversed", m.rtl);
     bubble.textContent = this.formatValue(value, text);
     bubble.style.setProperty("--slider-elemental-at", at);
     bubble.hidden = false;
@@ -1046,11 +1114,12 @@ var SliderElemental = class extends ElementBase {
     const inputs = this.inputs;
     if (inputs.length < 2) return;
     const rect = this.getBoundingClientRect();
-    const thumb = inputs[0].getBoundingClientRect().height;
-    if (rect.width <= thumb) return;
+    const { rtl, writingMode } = this.layout;
+    const axis = trackAxis(writingMode, rect, inputs[0].getBoundingClientRect(), e.clientX, e.clientY);
+    if (axis.size <= axis.thumb) return;
     const min = bound(inputs[0].min, 0);
     const max = bound(inputs[0].max, 100);
-    const value = min + alongTrack(e.clientX, rect.left, rect.width, thumb, this.rtl) * (max - min);
+    const value = min + alongTrack(axis.coord, axis.start, axis.size, axis.thumb, rtl) * (max - min);
     const input = inputs[nearerThumb(value, bound(inputs[0].value, min), bound(inputs[1].value, max)) === "start" ? 0 : 1];
     input.value = value;
     e.preventDefault();
@@ -1059,7 +1128,7 @@ var SliderElemental = class extends ElementBase {
     input.dispatchEvent(new Event("change", { bubbles: true }));
   }
 };
-define("slider-elemental", SliderElemental);
+define2("slider-elemental", SliderElemental);
 
 // node_modules/book-of-elementals/src/elementals/progress/index.js
 function percent(value, max) {
@@ -1170,7 +1239,7 @@ var ProgressElemental = class extends ElementBase {
     this.style.setProperty("--progress-elemental-buffer", `${percent(buffer, max)}%`);
   }
 };
-define("progress-elemental", ProgressElemental);
+define2("progress-elemental", ProgressElemental);
 
 // node_modules/book-of-elementals/src/elementals/toolbar/index.js
 function toolbarKey(key, vertical) {
@@ -1261,7 +1330,7 @@ var ToolbarElemental = class extends ElementBase {
     controls[to].focus();
   }
 };
-define("toolbar-elemental", ToolbarElemental);
+define2("toolbar-elemental", ToolbarElemental);
 
 // node_modules/book-of-elementals/src/elementals/tooltip/index.js
 function titleRole(trigger) {
@@ -1516,7 +1585,7 @@ var TooltipElemental = class extends ElementBase {
     );
   }
 };
-define("tooltip-elemental", TooltipElemental);
+define2("tooltip-elemental", TooltipElemental);
 
 // src/scripts/media-player.js
 var LIVE_DURATION = 2 ** 32;

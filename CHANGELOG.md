@@ -13,9 +13,14 @@ for the person who wrote the code.
 
 ### Changed
 
-- **The elementals ride `@1` on the CDN.** book-of-elementals left 0.x, so the install
-  block's `@0.11` patch pin — right while a 0.x minor could break — would now only withhold
-  fixes; both packages pin `@1` and stop at the next major.
+- **book-of-elementals is a 2.x dependency, and rides `@2` on the CDN.** It left 0.x and
+  then 1.x while this element sat on `^1.0.0`, so the install block's `@0.11` patch pin —
+  right while a 0.x minor could break — was withholding fixes rather than refusing
+  breakage. Each package now pins its own major and stops at the next: `@1` for this one,
+  `@2` for the elementals. Nothing on the page changes shape. The 2.0 break is a slider that
+  turns down the page with `writing-mode`, which renamed arguments on functions this element
+  does not call and added attributes to a bubble it does not style; the custom properties,
+  the element names and the SCSS entry points are the same ones.
 
 ## [1.2.0] - 2026-08-21
 
