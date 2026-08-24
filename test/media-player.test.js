@@ -1968,6 +1968,21 @@ test('importing the player defines every element its samples are written with', 
   expect(missing).toEqual([]);
 });
 
+test('the structure bundle carries a sheet for every elemental the module imports', async () => {
+  // The bundle is the one file a page with no build step links, and nothing it contains is
+  // exercised by any other test: the docs page compiles its own stylesheet, so a fifth
+  // elemental imported here and forgotten in `bundle.scss` ships an unstyled control to
+  // exactly the authors who took the shortest install, with the build and this suite green.
+  // Equality both ways — a sheet left behind for an element nothing defines is dead CSS in
+  // a file whose whole argument is its size.
+  const { readFile } = await import('node:fs/promises');
+  const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
+  const imported = [...(await read('../src/scripts/media-player.js')).matchAll(/^import 'book-of-elementals\/([a-z-]+)';$/gm)];
+  const bundled = [...(await read('../src/styles/bundle.scss')).matchAll(/^@use "book-of-elementals\/src\/elementals\/([a-z-]+)\/index"/gm)];
+  expect(imported.map((m) => m[1]).sort()).not.toEqual([]);
+  expect(bundled.map((m) => m[1]).sort()).toEqual(imported.map((m) => m[1]).sort());
+});
+
 test('every name the manifest publishes as public API is still a method on the element', async () => {
   // A rename here fails nothing on its own: the old name stays in the allow-list, the
   // renamed method matches nothing, and it silently turns private — dropping out of every

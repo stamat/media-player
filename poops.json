@@ -1,51 +1,73 @@
 {
-  "scripts": [{
-    "in": "src/scripts/media-player.js",
-    "out": "dist/media-player.mjs",
-    "options": {
-      "sourcemap": true,
-      "minify": true,
-      "justMinified": false,
-      "format": "esm",
-      "target": "es2020",
-      "bundle": true
+  "scripts": [
+    {
+      "in": "src/scripts/media-player.js",
+      "out": "dist/media-player.mjs",
+      "options": {
+        "sourcemap": true,
+        "minify": true,
+        "justMinified": false,
+        "format": "esm",
+        "target": "es2020",
+        "bundle": true
+      }
+    },
+    {
+      "in": "node_modules/poops-docs-theme/src/prose.ts",
+      "out": "js/prose.js",
+      "options": {
+        "minify": true,
+        "justMinified": true,
+        "format": "iife"
+      }
     }
-  },
-  {
-    "in": "node_modules/poops-docs-theme/src/prose.ts",
-    "out": "js/prose.js",
-    "options": {
-      "minify": true,
-      "justMinified": true,
-      "format": "iife"
+  ],
+  "styles": [
+    {
+      "in": "src/styles/index.scss",
+      "out": "dist/media-player.css",
+      "options": {
+        "sourcemap": true,
+        "minify": true,
+        "justMinified": false
+      }
+    },
+    {
+      "in": "src/styles/theme.scss",
+      "out": "dist/media-player-theme.css",
+      "options": {
+        "sourcemap": true,
+        "minify": true,
+        "justMinified": false
+      }
+    },
+    {
+      "in": "src/styles/bundle.scss",
+      "out": "dist/media-player.bundle.css",
+      "options": {
+        "sourcemap": false,
+        "minify": true,
+        "justMinified": false
+      }
+    },
+    {
+      "in": "src/styles/bundle-theme.scss",
+      "out": "dist/media-player-theme.bundle.css",
+      "options": {
+        "sourcemap": false,
+        "minify": true,
+        "justMinified": false
+      }
+    },
+    {
+      "in": "src/styles/prose.scss",
+      "out": "css/prose.css",
+      "options": {
+        "minify": true,
+        "justMinified": true
+      }
     }
-  }],
-  "styles": [{
-    "in": "src/styles/index.scss",
-    "out": "dist/media-player.css",
-    "options": {
-      "sourcemap": true,
-      "minify": true,
-      "justMinified": false
-    }
-  },
-  {
-    "in": "src/styles/theme.scss",
-    "out": "dist/media-player-theme.css",
-    "options": {
-      "sourcemap": true,
-      "minify": true,
-      "justMinified": false
-    }
-  },
-  {
-    "in": "src/styles/prose.scss",
-    "out": "css/prose.css",
-    "options": {
-      "minify": true,
-      "justMinified": true
-    }
-  }],
+  ],
   "copy": {
     "in": [
       "node_modules/code-preview-element/dist/code-preview-hljs.min.js",
@@ -60,17 +82,24 @@
       "site": {
         "title": "Media Player",
         "brand": "media-player",
-        "brandMark": "▶",
-        "description": "A media player you write in HTML — one custom element over the <audio> or <video> you already wrote.",
+        "brandMark": "\u25b6",
+        "description": "A media player you write in HTML \u2014 one custom element over the <audio> or <video> you already wrote.",
         "lang": "en",
         "url": "https://stamat.github.io/media-player",
         "repo": "https://github.com/stamat/media-player",
         "branch": "main",
         "iconLinks": [
-          { "title": "npm", "url": "https://www.npmjs.com/package/media-player-element", "icon": "npm" }
+          {
+            "title": "npm",
+            "url": "https://www.npmjs.com/package/media-player-element",
+            "icon": "npm"
+          }
         ],
         "builtWith": [
-          { "title": "code-preview-element", "url": "https://github.com/stamat/code-preview-element" }
+          {
+            "title": "code-preview-element",
+            "url": "https://github.com/stamat/code-preview-element"
+          }
         ]
       }
     }

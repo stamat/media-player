@@ -5,22 +5,31 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project
 follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-**How to use it:** land changes under `## [Unreleased]`, grouped under _Added_, _Changed_,
-_Deprecated_, _Removed_, _Fixed_ or _Security_. Write entries for the person upgrading, not
-for the person who wrote the code.
+**How to use it:** land changes under `## [Unreleased]
 
-## [Unreleased]
+### Added
+
+- **Two bundled stylesheets, so a page links two sheets instead of nine.**
+  `media-player-element/bundle.css` is `style.css` with the four elemental structure sheets
+  folded in, and `bundle-theme.css` is `theme.css` with theirs — the same CSS, compiled
+  together. Nine files gzip to 6.0KB because each compresses alone; the two bundles gzip to
+  4.3KB, so the shorter block is the smaller download as well. Nothing is removed: every
+  sheet is still published on its own for a page that wants only some of them, and the
+  script was already one file with the elementals compiled into it. One catch worth knowing
+  before you skip the look — the split is by kind, not by what you can live without, so the
+  tooltip's colours are in the theme bundle while its structure sheet only places the bubble.
+  Take `bundle.css` alone and set `--tooltip-elemental-surface` and
+  `--tooltip-elemental-color`, or there is unpainted text over the control row.
 
 ### Changed
 
-- **book-of-elementals is a 2.x dependency, and rides `@2` on the CDN.** It left 0.x and
-  then 1.x while this element sat on `^1.0.0`, so the install block's `@0.11` patch pin —
-  right while a 0.x minor could break — was withholding fixes rather than refusing
-  breakage. Each package now pins its own major and stops at the next: `@1` for this one,
-  `@2` for the elementals. Nothing on the page changes shape. The 2.0 break is a slider that
-  turns down the page with `writing-mode`, which renamed arguments on functions this element
-  does not call and added attributes to a bubble it does not style; the custom properties,
-  the element names and the SCSS entry points are the same ones.
+- **book-of-elementals is a 2.x dependency.** It left 0.x and then 1.x while this element sat
+  on `^1.0.0`, so the install block's `@0.11` patch pin — right while a 0.x minor could break
+  — was withholding fixes rather than refusing breakage. The 2.0 break is a slider that turns
+  down the page with `writing-mode`, which renamed arguments on functions this element does
+  not call and added attributes to a bubble it does not style; the custom properties, the
+  element names and the SCSS entry points are the same ones, so nothing on the page changes
+  shape.
 
 ## [1.2.0] - 2026-08-21
 

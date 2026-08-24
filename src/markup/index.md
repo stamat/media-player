@@ -1687,41 +1687,30 @@ import "media-player-element";
 
 The elementals ride along — importing `media-player-element` defines the slider, the progress bar,
 the toolbar and the tooltip too. Their stylesheets do not: each elemental draws its own
-track, thumb, bar or bubble, so its sheet loads beside this one. The tooltip is the one
-whose theme is not really optional: its own sheet places the bubble and leaves the painting
-to the theme, so without it there is unpainted text over the control row. The `href`s are
-bare specifiers for a bundler to resolve — a page with no build step takes the CDN block
-below, full URLs and all.
+track, thumb, bar or bubble, so every one of those sheets would otherwise be a `<link>` of
+its own. Two bundles carry them instead: `bundle.css` is this element's `style.css` with the
+four elemental structure sheets folded in, and `bundle-theme.css` is its `theme.css` with
+theirs. The rest of this page names the two halves unbundled, which is the same CSS.
 
 ```html
-<link rel="stylesheet" href="media-player-element/style.css" />
-<link rel="stylesheet" href="book-of-elementals/slider/style.css" />
-<link rel="stylesheet" href="book-of-elementals/progress/style.css" />
-<link rel="stylesheet" href="book-of-elementals/toolbar/style.css" />
-<link rel="stylesheet" href="book-of-elementals/tooltip/style.css" />
-
+<link rel="stylesheet" href="media-player-element/bundle.css" />
 <link
   rel="stylesheet"
-  href="media-player-element/theme.css"
+  href="media-player-element/bundle-theme.css"
 /><!-- the look; optional -->
-<link
-  rel="stylesheet"
-  href="book-of-elementals/slider/theme.css"
-/><!-- optional -->
-<link
-  rel="stylesheet"
-  href="book-of-elementals/progress/theme.css"
-/><!-- optional -->
-<link
-  rel="stylesheet"
-  href="book-of-elementals/tooltip/theme.css"
-/><!-- optional, but a bubble nothing paints is text over the row -->
 ```
 
-Or from a CDN as a module, no install and no build step — the stylesheets come the same
-way, from each package's `dist/`. The pins take fixes and refuse breakage: a major-version
-pin follows every release inside it and stops at the next major, which is why the two
-packages are on different numbers — `@1` for this one, `@2` for the elementals:
+`bundle-theme.css` is optional the way `theme.css` alone is: a page that already has a
+design system takes the first and writes its own colours. With one catch, because the split
+is by kind rather than by what you can live without — the tooltip's colours are in the theme
+bundle, and the tooltip's structure sheet only places the bubble. Take the structure bundle
+alone and there is unpainted text floating over the control row rather than a bubble, so
+paint `--tooltip-elemental-surface` and `--tooltip-elemental-color` yourself if you skip
+the look. Nothing else in here needs you to.
+
+The `href`s above are bare specifiers for a bundler to resolve. From a CDN they are two full
+URLs, no install and no build step, and the module beside them is one file — the elementals
+are compiled into it:
 
 ```html
 <script type="module">
@@ -1729,42 +1718,24 @@ packages are on different numbers — `@1` for this one, `@2` for the elementals
 </script>
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.css"
+  href="https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.bundle.min.css"
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/slider.min.css"
-/>
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/progress.min.css"
-/>
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/toolbar.min.css"
-/>
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/tooltip.min.css"
-/>
-
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player-theme.min.css"
+  href="https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player-theme.bundle.min.css"
 /><!-- the look; optional -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/slider-theme.min.css"
-/><!-- optional -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/progress-theme.min.css"
-/><!-- optional -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/tooltip-theme.min.css"
-/><!-- optional, but a bubble nothing paints is text over the row -->
 ```
+
+That pin takes fixes and refuses breakage: `@1` follows every 1.x release and stops at the
+next major.
+
+Every sheet a bundle is made of is still published on its own — `media-player-element`'s
+`style.css` and `theme.css`, and `style.css`/`theme.css` under each elemental in
+[book-of-elementals](https://github.com/stamat/book-of-elementals). Link those instead if
+you want only some of them; it is the same CSS, and nine `<link>`s rather than two. The
+bundles are the smaller download as well as the shorter block — nine files gzip to 6.0KB
+against the bundles' 4.3KB, because each compresses alone and shares no window with the
+next.
 
 ## What editors read
 

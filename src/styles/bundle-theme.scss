@@ -1,0 +1,19 @@
+// The optional look as one file: the player's theme and the elemental themes it hands off
+// to. Optional as a whole, exactly as the player's theme alone is — a page that already has
+// a design system links the structure bundle and none of this.
+
+// The toolbar's theme is deliberately not among them. It draws a border and its own button
+// chrome, and the player's theme already gives the control row a surface — a border around a
+// surface is two looks on one bar.
+@use "book-of-elementals/src/elementals/slider/theme" as slider-theme;
+@use "book-of-elementals/src/elementals/progress/theme" as progress-theme;
+
+// The one piece of this file that is not really optional, which is why it is worth naming
+// rather than leaving to be discovered: the tooltip's structure sheet only places the
+// bubble and leaves every colour to this, so a page taking the structure bundle without
+// this one gets unpainted text floating over the control row instead of a bubble. Nothing
+// here paints one either, and nothing should — a tooltip is the one box that has to stay
+// legible over whatever it covers, which that sheet already solves with `Canvas` and
+// `CanvasText`.
+@use "book-of-elementals/src/elementals/tooltip/theme" as tooltip-theme;
+@use "./theme";

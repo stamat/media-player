@@ -1906,77 +1906,45 @@ map would spend letters on every page that never asked for them.</li>
 <pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;media-player-element&quot;</span>;</code></pre>
 <p>The elementals ride along — importing <code>media-player-element</code> defines the slider, the progress bar,
 the toolbar and the tooltip too. Their stylesheets do not: each elemental draws its own
-track, thumb, bar or bubble, so its sheet loads beside this one. The tooltip is the one
-whose theme is not really optional: its own sheet places the bubble and leaves the painting
-to the theme, so without it there is unpainted text over the control row. The <code>href</code>s are
-bare specifiers for a bundler to resolve — a page with no build step takes the CDN block
-below, full URLs and all.</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/style.css&quot;</span> /&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/slider/style.css&quot;</span> /&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/progress/style.css&quot;</span> /&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/toolbar/style.css&quot;</span> /&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/tooltip/style.css&quot;</span> /&gt;</span>
-
+track, thumb, bar or bubble, so every one of those sheets would otherwise be a <code>&lt;link&gt;</code> of
+its own. Two bundles carry them instead: <code>bundle.css</code> is this element&#39;s <code>style.css</code> with the
+four elemental structure sheets folded in, and <code>bundle-theme.css</code> is its <code>theme.css</code> with
+theirs. The rest of this page names the two halves unbundled, which is the same CSS.</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/bundle.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/theme.css&quot;</span>
-/&gt;</span><span class="hljs-comment">&lt;!-- the look; optional --&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/slider/theme.css&quot;</span>
-/&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/progress/theme.css&quot;</span>
-/&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;book-of-elementals/tooltip/theme.css&quot;</span>
-/&gt;</span><span class="hljs-comment">&lt;!-- optional, but a bubble nothing paints is text over the row --&gt;</span></code></pre>
-<p>Or from a CDN as a module, no install and no build step — the stylesheets come the same
-way, from each package&#39;s <code>dist/</code>. The pins take fixes and refuse breakage: a major-version
-pin follows every release inside it and stops at the next major, which is why the two
-packages are on different numbers — <code>@1</code> for this one, <code>@2</code> for the elementals:</p>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/bundle-theme.css&quot;</span>
+/&gt;</span><span class="hljs-comment">&lt;!-- the look; optional --&gt;</span></code></pre>
+<p><code>bundle-theme.css</code> is optional the way <code>theme.css</code> alone is: a page that already has a
+design system takes the first and writes its own colours. With one catch, because the split
+is by kind rather than by what you can live without — the tooltip&#39;s colours are in the theme
+bundle, and the tooltip&#39;s structure sheet only places the bubble. Take the structure bundle
+alone and there is unpainted text floating over the control row rather than a bubble, so
+paint <code>--tooltip-elemental-surface</code> and <code>--tooltip-elemental-color</code> yourself if you skip
+the look. Nothing else in here needs you to.</p>
+<p>The <code>href</code>s above are bare specifiers for a bundler to resolve. From a CDN they are two full
+URLs, no install and no build step, and the module beside them is one file — the elementals
+are compiled into it:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
   <span class="hljs-keyword">import</span> <span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs&quot;</span>;
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.bundle.min.css&quot;</span>
 /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/slider.min.css&quot;</span>
-/&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/progress.min.css&quot;</span>
-/&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/toolbar.min.css&quot;</span>
-/&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/tooltip.min.css&quot;</span>
-/&gt;</span>
-
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player-theme.min.css&quot;</span>
-/&gt;</span><span class="hljs-comment">&lt;!-- the look; optional --&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/slider-theme.min.css&quot;</span>
-/&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/progress-theme.min.css&quot;</span>
-/&gt;</span><span class="hljs-comment">&lt;!-- optional --&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">link</span>
-  <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/book-of-elementals@2/dist/elementals/tooltip-theme.min.css&quot;</span>
-/&gt;</span><span class="hljs-comment">&lt;!-- optional, but a bubble nothing paints is text over the row --&gt;</span></code></pre>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player-theme.bundle.min.css&quot;</span>
+/&gt;</span><span class="hljs-comment">&lt;!-- the look; optional --&gt;</span></code></pre>
+<p>That pin takes fixes and refuses breakage: <code>@1</code> follows every 1.x release and stops at the
+next major.</p>
+<p>Every sheet a bundle is made of is still published on its own — <code>media-player-element</code>&#39;s
+<code>style.css</code> and <code>theme.css</code>, and <code>style.css</code>/<code>theme.css</code> under each elemental in
+<a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a>. Link those instead if
+you want only some of them; it is the same CSS, and nine <code>&lt;link&gt;</code>s rather than two. The
+bundles are the smaller download as well as the shorter block — nine files gzip to 6.0KB
+against the bundles&#39; 4.3KB, because each compresses alone and shares no window with the
+next.</p>
 <h2 id="what-editors-read">What editors read<a class="heading-anchor" href="#what-editors-read" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The package ships a
 <a href="https://github.com/webcomponents/custom-elements-manifest">custom elements manifest</a> as

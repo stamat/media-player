@@ -1,7 +1,7 @@
 {
   "name": "media-player-element",
   "version": "1.2.0",
-  "description": "A media player you write in HTML — one custom element over the <audio> or <video> you already wrote",
+  "description": "A media player you write in HTML \u2014 one custom element over the <audio> or <video> you already wrote",
   "type": "module",
   "main": "src/scripts/media-player.js",
   "style": "src/styles/index.scss",
@@ -10,8 +10,10 @@
     ".": "./src/scripts/media-player.js",
     "./style.scss": "./src/styles/index.scss",
     "./style.css": "./dist/media-player.css",
+    "./bundle.css": "./dist/media-player.bundle.css",
     "./theme.scss": "./src/styles/theme.scss",
     "./theme.css": "./dist/media-player-theme.css",
+    "./bundle-theme.css": "./dist/media-player-theme.bundle.css",
     "./custom-elements.json": "./custom-elements.json",
     "./package.json": "./package.json"
   },
@@ -25,7 +27,11 @@
     "dist/media-player.css",
     "dist/media-player.min.css",
     "dist/media-player-theme.css",
-    "dist/media-player-theme.min.css"
+    "dist/media-player-theme.min.css",
+    "dist/media-player.bundle.css",
+    "dist/media-player.bundle.min.css",
+    "dist/media-player-theme.bundle.css",
+    "dist/media-player-theme.bundle.min.css"
   ],
   "homepage": "https://stamat.github.io/media-player/",
   "repository": {
