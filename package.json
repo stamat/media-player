@@ -1,6 +1,6 @@
 {
   "name": "media-player-element",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "A media player you write in HTML — one custom element over the <audio> or <video> you already wrote",
   "type": "module",
   "main": "src/scripts/media-player.js",
