@@ -1708,13 +1708,31 @@ alone and there is unpainted text floating over the control row rather than a bu
 paint `--tooltip-elemental-surface` and `--tooltip-elemental-color` yourself if you skip
 the look. Nothing else in here needs you to.
 
-**If book-of-elementals is already in your project, take `style.scss` and `theme.scss`
-rather than the bundles.** Three quarters of `bundle-theme.css` is elemental CSS, frozen at
-whatever version this element was built against — and nothing in the file says which, since
-the banner carries this package's version and not that one. Load it beside your own copy and
-there are two versions of the same selectors on one page, link order deciding which wins, and
-nothing anywhere reporting it. `@use` the two unbundled sheets next to the elemental sheets
-you already have instead: one copy of each, at the version you picked.
+**If book-of-elementals or hydrargyri is already in your project, install from npm and take
+`style.scss` and `theme.scss` — not the CDN module, and not the bundles.** Both bake a copy
+of those packages in, and a second copy of either is a problem the page will not report.
+
+In the stylesheets it is version skew. Three quarters of `bundle-theme.css` is elemental CSS,
+frozen at whatever version this element was built against — and nothing in the file says
+which, since the banner carries this package's version and not that one. Load it beside your
+own copy and two versions of the same selectors are on one page, link order deciding which
+wins.
+
+In the module it is worse, because it is not only bytes. Nothing throws — registration is
+guarded, so the second `slider-elemental` is dropped and whichever script ran first owns the
+tag, leaving you a mix. But two copies of hydrargyri keep two separate registers of which
+tags are hydrargyri's, and that register is how an element knows a node belongs to a nested
+element rather than to itself. Split it and the outer element writes into the inner one's
+`bind` nodes: a `<media-player>` nested inside an element of your own has its controls
+written over by that element, and the only sign is a warning in the console about a bind
+naming a property the wrong element does not have.
+
+Installing from npm fixes both. This package's main entry is unbundled source importing
+`hydrargyri` and `book-of-elementals/*` by bare specifier, so your bundler resolves them to
+your copy — one of each, at the version you picked. Both are `peerDependencies` here, so an
+installer that cannot reconcile your version with this one says so rather than quietly
+nesting a second. That does mean your book-of-elementals major has to match the one this
+package declares.
 
 The `href`s above are bare specifiers for a bundler to resolve. From a CDN they are two full
 URLs, no install and no build step, and the module beside them is one file — the elementals

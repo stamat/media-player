@@ -1968,6 +1968,23 @@ test('importing the player defines every element its samples are written with', 
   expect(missing).toEqual([]);
 });
 
+test('every package the element imports at runtime is declared as a peer, not a dependency', async () => {
+  // Both of these claim globals a page has only one of — `customElements` for the elemental
+  // tags, hydrargyri's own register of which tags are hydrargyri's — so a second copy is a
+  // bug rather than wasted bytes, and `dependencies` is what lets an installer nest one
+  // silently. Nothing fails when it regresses: `npm install --save` writes the wrong stanza,
+  // the build still bundles, and the break only shows on somebody else's page. The walk is
+  // over bare specifiers, so a new runtime import declared nowhere fails here too.
+  const { readFile } = await import('node:fs/promises');
+  const source = await readFile(new URL('../src/scripts/media-player.js', import.meta.url), 'utf8');
+  const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+  const bare = [...source.matchAll(/^import\s(?:.*?\sfrom\s)?'([^.'][^']*)';$/gm)]
+    .map(([, spec]) => (spec.startsWith('@') ? spec.split('/').slice(0, 2) : [spec.split('/')[0]]).join('/'));
+  expect([...new Set(bare)].sort()).toEqual(['book-of-elementals', 'hydrargyri']);
+  expect(pkg.dependencies).toBeUndefined();
+  expect([...new Set(bare)].filter((name) => !pkg.peerDependencies?.[name])).toEqual([]);
+});
+
 test('the structure bundle carries a sheet for every elemental the module imports', async () => {
   // The bundle is the one file a page with no build step links, and nothing it contains is
   // exercised by any other test: the docs page compiles its own stylesheet, so a fifth

@@ -1,7 +1,7 @@
 {
   "name": "media-player-element",
   "version": "1.2.0",
-  "description": "A media player you write in HTML — one custom element over the <audio> or <video> you already wrote",
+  "description": "A media player you write in HTML \u2014 one custom element over the <audio> or <video> you already wrote",
   "type": "module",
   "main": "src/scripts/media-player.js",
   "style": "src/styles/index.scss",
@@ -66,16 +66,18 @@
     "testEnvironment": "jsdom",
     "transform": {}
   },
-  "dependencies": {
+  "peerDependencies": {
     "book-of-elementals": "^2.0.1",
     "hydrargyri": "^2.2.0"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@eslint/js": "^10.0.1",
+    "book-of-elementals": "^2.0.1",
     "code-preview-element": "^3.0.2",
     "es-check": "^9.6.4",
     "eslint": "^10.7.0",
+    "hydrargyri": "^2.2.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.0.0",
     "poops": "^3.0.0",

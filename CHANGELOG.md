@@ -31,7 +31,20 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- **book-of-elementals is a 2.x dependency.** It left 0.x and then 1.x while this element sat
+- **book-of-elementals and hydrargyri are `peerDependencies` now, not `dependencies`.**
+  Both register into globals a page has only one of — `customElements` for the elemental
+  tags, and hydrargyri's own register of which tags are hydrargyri's — so a second copy is
+  never harmless. The elemental case is quiet: registration is guarded, the second
+  `slider-elemental` is dropped, and whichever script ran first owns the tag. The hydrargyri
+  case is not quiet at all, because that register is how an element tells a node of its own
+  from one belonging to a nested element; split across two copies, an outer element writes
+  into a nested `<media-player>`'s `bind` nodes and overwrites its controls, with nothing but
+  a confusing console warning to go on. As peers, an installer that cannot reconcile your
+  version with this one says so at install time instead. **If you install with something that
+  does not add peers for you, add both yourself** — and if you were on book-of-elementals 1.x,
+  you now have to move to 2.x rather than silently getting a nested second copy.
+
+- **book-of-elementals moved to 2.x.** It left 0.x and then 1.x while this element sat
   on `^1.0.0`, so the install block's `@0.11` patch pin — right while a 0.x minor could break
   — was withholding fixes rather than refusing breakage. The 2.0 break is a slider that turns
   down the page with `writing-mode`, which renamed arguments on functions this element does
