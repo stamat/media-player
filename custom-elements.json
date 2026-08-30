@@ -212,7 +212,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ [MEDIA_SELECTOR]: 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;webkitplaybacktargetavailabilitychanged:onAirplayTargets;webkitcurrentplaybacktargetiswirelesschanged:onAirplayChange;error:onError', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay', // The same click for a custom media element, which never sees it: the structure sheet // gives it no pointer input, because its cross-origin iframe would keep the click, so // the click lands on this element's own box. ':scope': 'click:onPictureClick' }",
+              "default": "{ [MEDIA_SELECTOR]: 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;error:onError', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay', // The same click for a custom media element, which never sees it: the structure sheet // gives it no pointer input, because its cross-origin iframe would keep the click, so // the click lands on this element's own box. ':scope': 'click:onPictureClick' }",
               "description": "The media element's wiring, attached by hydrargyri at upgrade rather than written in\nevery sample — plumbing with nothing in it for an author to choose, and one pair\nforgotten in an `on=` was a player that half-worked with nothing saying why. A pair the\nmedia element's own `on` attribute still carries is skipped, so markup predating this\nkeeps firing once.",
               "privacy": "private"
             },
@@ -637,21 +637,17 @@
             {
               "kind": "method",
               "name": "showAirplayPicker",
-              "description": "The system route picker — AirPlay, and whatever else WebKit lists in it.\n\nNot a toggle, which is why it is not named like one: the picker is the way back to the\ndevice as well as the way out to the receiver, so there is one direction to ask for and\nthe platform owns the other. It needs a gesture behind it, the way fullscreen does, and\nthere is no promise to catch — WebKit returns nothing and reports a refusal by simply\nnot opening.\n\nWebKit-only, and no other engine has announced an equivalent. `no-airplay` is what says\nso, and it is set until the availability event says otherwise, so a Chrome that never\nfires one keeps the button hidden rather than dead."
+              "description": "The system device picker, off the standard [Remote Playback\nAPI](https://w3c.github.io/remote-playback/) rather than WebKit's prefixed one.\n\nNamed for AirPlay because that is what a person looking for this button calls it, but\n`remote.prompt()` is one door onto two things: an AirPlay receiver in Safari, a\nChromecast in Chrome. The prefixed `webkitShowPlaybackTargetPicker` reached only the\nfirst, and every browser that has it has had this since Safari 13.1 — so there is no\nfallback path here, only the standard one.\n\nNot a toggle, which is why it is not named like one: the picker is the way back to the\ndevice as well as the way out to the receiver, so there is one direction to ask for and\nthe platform owns the other.\n\nA dismissed picker rejects with `NotAllowedError`, which is a person changing their\nmind rather than a failure — warning on it would put a console line under every closed\npicker. The rest warn the way a refused `play` does: no gesture behind the call is\n`InvalidAccessError`, and a second press while the first picker is still up is\n`OperationError`."
             },
             {
               "kind": "method",
-              "name": "onAirplayTargets",
-              "parameters": [
-                {
-                  "name": "event"
-                }
-              ],
+              "name": "watchRemote",
+              "description": "Watch the network for somewhere to send this, and follow the route once it is picked.\n\n`no-airplay` starts set on every connect and the platform answers: `watchAvailability`\nqueues a callback with the *current* availability the moment it is registered, so a\nreconnect re-answers itself and there is no stale attribute to carry across a DOM move.\nA browser without the API — Firefox, at time of writing — registers nothing and the\nbutton stays hidden rather than dead.\n\nThe two rejections are opposite answers and must not be collapsed.\n`InvalidStateError` is `disableRemotePlayback` on the media element, the author's own\nopt-out and the exact twin of the `disablePictureInPicture` `no-pip` already reads — the\nbutton goes. `NotSupportedError` is the user agent saying it cannot watch *continuously*\nwhile still opening a picker on demand, so hiding the button on it would hide one that\nworks; it stays, and what it lists is the picker's problem.\n\nThe `connect` and `disconnect` events fire on the `RemotePlayback` object rather than on\nthe media element, which is why they are listeners here instead of pairs in\n`static wires` — nothing in that map can name a target that is not an element.",
               "privacy": "private"
             },
             {
               "kind": "method",
-              "name": "onAirplayChange",
+              "name": "unwatchRemote",
               "privacy": "private"
             },
             {
@@ -847,7 +843,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Playback is going to an AirPlay receiver. CSS hook; the element sets it.",
+              "description": "Playback is going to a remote device — an AirPlay receiver on WebKit, a Chromecast on Chrome. CSS hook; the element sets it.",
               "name": "is-airplay",
               "x-code-preview": {
                 "hidden": true
@@ -857,7 +853,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Nothing to send to: a browser that is not WebKit, or a WebKit with no receiver on the network. Audio as well as video, unlike the other two. CSS hook for hiding the button that would do nothing; the element sets it, and it starts set.",
+              "description": "Nothing to send to: no device on the network, a media element carrying `disableRemotePlayback`, or a browser without the Remote Playback API. Audio as well as video, unlike the other two. CSS hook for hiding the button that would do nothing; the element sets it, and it starts set.",
               "name": "no-airplay",
               "x-code-preview": {
                 "hidden": true

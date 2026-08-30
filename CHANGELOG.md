@@ -72,28 +72,37 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   warns the way a refused `play` does — no user gesture behind the call is the usual reason —
   rather than leaving a button that looks like it worked.
 
-- **AirPlay, on a button you write.** `click:showAirplayPicker` opens the system route
-  picker, and `is-airplay` is the hook a stylesheet holds the button down with — it follows
-  the route, so a receiver picked in the picker, taken away by the system, or claimed by
-  another page moves it too. Not a toggle, and the name says so: the picker is the way back
-  to the device as well as the way out to the receiver, so there is one direction to ask for
+- **AirPlay and Chromecast, on a button you write.** `click:showAirplayPicker` opens the
+  system device picker through the standard
+  [Remote Playback API](https://w3c.github.io/remote-playback/) — one door onto an AirPlay
+  receiver in Safari and a Chromecast in Chrome — and `is-airplay` is the hook a stylesheet
+  holds the button down with. It follows the route rather than the press, so a device picked
+  in the picker, dropped by the system, or claimed by another page moves it too, and
+  `connecting` is not yet `connected`. Not a toggle, and the name says so: the picker is the
+  way back to the device as well as the way out to it, so there is one direction to ask for
   and the platform owns the other. Unlike the window and the fullscreen, it is not the video
-  half — AirPlay carries an `<audio>` to a speaker the same way.
+  half — the route carries an `<audio>` to a speaker the same way. The attributes and the
+  handler keep the short name because that is what people search for; the sample's *label*
+  says "Play on a device", because the same button lists Chromecasts.
 
-  `no-airplay` is the hook for hiding it, and it starts **set**. WebKit only looks for
-  receivers once something listens for `webkitplaybacktargetavailabilitychanged`, then
-  answers with one — that listener is the element's own, declared in `static wires`, so
-  nothing is asked of your markup — and until the answer lands there is nothing to send to.
-  A browser that is not WebKit never fires it and the button stays hidden rather than sitting
-  there dead; a Safari whose last receiver left the network gets it set again. The manual
-  writes the rule that hides it once, off the handler name rather than a class you have to
-  invent, and this page uses that same rule on its own samples.
+  `no-airplay` is the hook for hiding it, and it starts **set** on every connect.
+  `watchAvailability` hands back the current answer the moment the element registers for it,
+  so a move in the DOM re-answers itself and there is no stale attribute to carry across one.
+  Firefox has no Remote Playback API at all and the button stays hidden rather than sitting
+  there dead. Two rejections are opposite answers and are treated as such:
+  `disableRemotePlayback` on your media element takes the button away — the exact twin of the
+  `disablePictureInPicture` `no-pip` already reads — while a user agent that cannot watch
+  *continuously* keeps it, because its picker still opens on demand. A picker someone closes
+  without choosing says nothing; every other refusal warns the way a refused `play` does.
+
+  The manual writes the rule that hides the button once, off the handler name rather than a
+  class you have to invent, and this page uses that same rule on its own samples.
 
   The cost is a row one control longer where the button shows. The video sample's six 32px
   buttons and its clock already come to the 306px a 360px phone leaves; a seventh is 40px
-  more, so that phone in Safari with a receiver on the network wraps to a third line. The
-  manual says so where it measures the row, and the fix is the one it already names — drop a
-  control or move the clock.
+  more, so that phone with a device on the network wraps to a third line. The manual says so
+  where it measures the row, and the fix is the one it already names — drop a control or move
+  the clock.
 
 - **Playback speed, as a `<select>` you write.** `change:setRate` takes the speed off the
   control's own `value` and `playbackRate` is the state to bind back to it. The rates are

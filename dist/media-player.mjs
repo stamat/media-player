@@ -1698,7 +1698,6 @@ var MediaPlayer = class extends HgElement {
       this.captionsVisible = false;
       this.captionText = null;
       this.thumbs = null;
-      this.noAirplay = true;
     }
     this.media = media;
     this.isVideo = !/(^|-)audio$/.test(this.media.localName);
@@ -1712,7 +1711,6 @@ var MediaPlayer = class extends HgElement {
       this.noFullscreen = !(document.fullscreenEnabled || this.media.webkitEnterFullscreen);
       this.noPip = !(document.pictureInPictureEnabled && this.media.requestPictureInPicture && !this.media.disablePictureInPicture);
     }
-    this.noAirplay ?? (this.noAirplay = true);
     this.noRate = typeof this.media.playbackRate !== "number";
     this.playbackRate = this.noRate ? 1 : this.media.playbackRate;
     this.hadControls = this.media.controls;
@@ -1722,6 +1720,7 @@ var MediaPlayer = class extends HgElement {
     this.media.textTracks?.addEventListener?.("addtrack", this.onTrackAdded);
     this.track?.addEventListener?.("cuechange", this.onTrackCue);
     this.watchViewport();
+    this.watchRemote();
     if (this.isReady) {
       this.resume();
       if (this.isPlaying) this.claimSession();
@@ -1750,6 +1749,7 @@ var MediaPlayer = class extends HgElement {
     this.media?.textTracks?.removeEventListener?.("addtrack", this.onTrackAdded);
     this.track?.removeEventListener?.("cuechange", this.onTrackCue);
     this.viewport?.disconnect();
+    this.unwatchRemote();
     if (this.media && this.hadControls) this.media.controls = true;
   }
   attributeChanged(name) {
@@ -2558,33 +2558,81 @@ var MediaPlayer = class extends HgElement {
     this.isPip = document.pictureInPictureElement === this.media;
   }
   /**
-   * The system route picker — AirPlay, and whatever else WebKit lists in it.
+   * The system device picker, off the standard [Remote Playback
+   * API](https://w3c.github.io/remote-playback/) rather than WebKit's prefixed one.
+   *
+   * Named for AirPlay because that is what a person looking for this button calls it, but
+   * `remote.prompt()` is one door onto two things: an AirPlay receiver in Safari, a
+   * Chromecast in Chrome. The prefixed `webkitShowPlaybackTargetPicker` reached only the
+   * first, and every browser that has it has had this since Safari 13.1 — so there is no
+   * fallback path here, only the standard one.
    *
    * Not a toggle, which is why it is not named like one: the picker is the way back to the
    * device as well as the way out to the receiver, so there is one direction to ask for and
-   * the platform owns the other. It needs a gesture behind it, the way fullscreen does, and
-   * there is no promise to catch — WebKit returns nothing and reports a refusal by simply
-   * not opening.
+   * the platform owns the other.
    *
-   * WebKit-only, and no other engine has announced an equivalent. `no-airplay` is what says
-   * so, and it is set until the availability event says otherwise, so a Chrome that never
-   * fires one keeps the button hidden rather than dead.
+   * A dismissed picker rejects with `NotAllowedError`, which is a person changing their
+   * mind rather than a failure — warning on it would put a console line under every closed
+   * picker. The rest warn the way a refused `play` does: no gesture behind the call is
+   * `InvalidAccessError`, and a second press while the first picker is still up is
+   * `OperationError`.
    */
   showAirplayPicker() {
-    if (this.noAirplay || !this.media?.webkitShowPlaybackTargetPicker) return;
-    this.media.webkitShowPlaybackTargetPicker();
+    const remote = this.media?.remote;
+    if (this.noAirplay || !remote) return;
+    remote.prompt().catch((error) => {
+      if (error?.name === "NotAllowedError") return;
+      console.warn("media-player: remote playback was refused \u2014", error?.message || error);
+    });
     this.interaction("airplay");
   }
-  // A receiver appearing on the network and the last one leaving it are the same question,
-  // and WebKit answers both here — including the first time, right after the wire is
-  // attached, which is where the button gets its answer at all.
-  onAirplayTargets(event) {
-    this.noAirplay = event?.availability !== "available";
+  /**
+   * Watch the network for somewhere to send this, and follow the route once it is picked.
+   *
+   * `no-airplay` starts set on every connect and the platform answers: `watchAvailability`
+   * queues a callback with the *current* availability the moment it is registered, so a
+   * reconnect re-answers itself and there is no stale attribute to carry across a DOM move.
+   * A browser without the API — Firefox, at time of writing — registers nothing and the
+   * button stays hidden rather than dead.
+   *
+   * The two rejections are opposite answers and must not be collapsed.
+   * `InvalidStateError` is `disableRemotePlayback` on the media element, the author's own
+   * opt-out and the exact twin of the `disablePictureInPicture` `no-pip` already reads — the
+   * button goes. `NotSupportedError` is the user agent saying it cannot watch *continuously*
+   * while still opening a picker on demand, so hiding the button on it would hide one that
+   * works; it stays, and what it lists is the picker's problem.
+   *
+   * The `connect` and `disconnect` events fire on the `RemotePlayback` object rather than on
+   * the media element, which is why they are listeners here instead of pairs in
+   * `static wires` — nothing in that map can name a target that is not an element.
+   */
+  watchRemote() {
+    this.unwatchRemote();
+    this.noAirplay = true;
+    const remote = this.media?.remote;
+    if (!remote) return;
+    this.remote = remote;
+    this.onRemoteState = () => {
+      this.isAirplay = remote.state === "connected";
+    };
+    remote.addEventListener("connect", this.onRemoteState);
+    remote.addEventListener("disconnect", this.onRemoteState);
+    remote.watchAvailability((available) => {
+      this.noAirplay = !available;
+    }).then((id) => {
+      if (this.remote === remote) this.remoteWatch = id;
+      else remote.cancelWatchAvailability(id);
+    }).catch((error) => {
+      this.noAirplay = error?.name !== "NotSupportedError";
+    });
   }
-  // The route, not the press: picking a receiver from the picker, the system taking it away,
-  // and another page claiming it all arrive here and nowhere else.
-  onAirplayChange() {
-    this.isAirplay = !!this.media?.webkitCurrentPlaybackTargetIsWireless;
+  unwatchRemote() {
+    if (!this.remote) return;
+    this.remote.removeEventListener("connect", this.onRemoteState);
+    this.remote.removeEventListener("disconnect", this.onRemoteState);
+    if (this.remoteWatch !== void 0) this.remote.cancelWatchAvailability(this.remoteWatch);
+    this.remote = null;
+    this.remoteWatch = void 0;
   }
   /**
    * Playback speed, off whatever control the author bound to it.
@@ -2738,7 +2786,7 @@ __publicField(MediaPlayer, "properties", [
  * keeps firing once.
  */
 __publicField(MediaPlayer, "wires", {
-  [MEDIA_SELECTOR]: "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;webkitplaybacktargetavailabilitychanged:onAirplayTargets;webkitcurrentplaybacktargetiswirelesschanged:onAirplayChange;error:onError",
+  [MEDIA_SELECTOR]: "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;error:onError",
   // The picture is the same button the overlay is, once the overlay has stepped out of the
   // way: clicking a playing video pauses it, and the overlay comes back over the frame it
   // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so

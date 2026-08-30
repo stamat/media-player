@@ -45,8 +45,9 @@
 }
 
 // The page acting as its own author. `no-airplay` is a hook the element writes and nobody
-// hides for you, and this one has to be hidden or every browser but Safari carries a dead
-// button through the samples. The handler name is the selector rather than a class, so the
+// hides for you, and this one has to be hidden or every reader with no Apple TV or Chromecast
+// on the network carries a dead button through the samples — which is most of them, and all
+// of Firefox. The handler name is the selector rather than a class, so the
 // rule holds for markup copied out of this page unchanged; the `:has()` half takes the
 // `<tooltip-elemental>` wrapper with it, since hiding the button alone leaves its gap in the
 // row. Here rather than in the structure sheet: which controls a row keeps is the author's

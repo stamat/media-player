@@ -346,7 +346,7 @@ carries outgrows it, and the theme's buttons are 32px: the video sample's six of
 the clock come to 306px, which is what a 360px phone leaves. Below that they wrap to a third
 row, and the fix is to drop a control from the row or move the clock out of it. The AirPlay
 button is a seventh wherever it shows at all — 40px more by the same arithmetic, button plus
-gap — so a 360px phone in Safari with a receiver on the network is over the line and wraps.
+gap — so a 360px phone with an Apple TV or a Chromecast to reach is over the line and wraps.
 Which is the row paying for a control the same phone would otherwise have no way to reach,
 and the reason the button is hidden the rest of the time rather than merely disabled.
 
@@ -761,16 +761,17 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
       </button>
       <span>Picture in picture</span>
     </tooltip-elemental>
-    <!-- The one control here that is not the video's: AirPlay carries an `<audio>` to a
-         speaker the same way. It is also the one with no second direction to press — the
-         system picker is the way back as well as the way out — so it is `aria-haspopup`
-         beside its `aria-pressed`, and the label never changes. Hidden where there is
-         nothing to send to, which is every browser but Safari and a Safari with no receiver
-         on the network: the rule for that is under Attributes it writes. -->
+    <!-- The one control here that is not the video's: the route carries an `<audio>` to a
+         speaker the same way it carries a `<video>` to a screen. It is also the one with no
+         second direction to press — the system picker is the way back as well as the way out
+         — so it is `aria-haspopup` beside its `aria-pressed`, and the label never changes.
+         The label says device rather than AirPlay because the same button lists Chromecasts
+         in Chrome; the handler keeps the shorter name. Hidden where there is nothing to send
+         to: the rule for that is under Attributes it writes. -->
     <tooltip-elemental>
       <button
         on="click:showAirplayPicker"
-        aria-label="AirPlay"
+        aria-label="Play on a device"
         aria-haspopup="true"
         bind="isAirplay:attr#aria-pressed|pressed"
         disabled
@@ -780,7 +781,7 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
           <path d="m12 15 5 6H7z" />
         </svg>
       </button>
-      <span>AirPlay</span>
+      <span>Play on a device</span>
     </tooltip-elemental>
     <tooltip-elemental>
       <button
@@ -1139,8 +1140,8 @@ testable right here rather than in a file you have to build yourself.
       <span>Picture in picture</span>
     </tooltip-elemental>
     <tooltip-elemental>
-      <button on="click:showAirplayPicker" aria-label="AirPlay" aria-haspopup="true" bind="isAirplay:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="m12 15 5 6H7z"/></svg></button>
-      <span>AirPlay</span>
+      <button on="click:showAirplayPicker" aria-label="Play on a device" aria-haspopup="true" bind="isAirplay:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="m12 15 5 6H7z"/></svg></button>
+      <span>Play on a device</span>
     </tooltip-elemental>
     <tooltip-elemental>
       <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><span class="media-player-captions-icon-off"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="media-player-captions-icon-on"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z"/></svg></span></button>
@@ -1627,8 +1628,8 @@ against them.
 | `no-fullscreen`                                    | fullscreen has no door to open — an iframe without `allow="fullscreen"` is the common way; hide your fullscreen button on it |
 | `is-pip`                                           | the video is in the browser's picture-in-picture window — it follows the platform, so a window opened or closed from the browser's own control moves it too |
 | `no-pip`                                           | no picture-in-picture window to open — an `<audio>`, an embed, a media element carrying `disablePictureInPicture`, or a browser without it; hide the button on it |
-| `is-airplay`                                       | playback is going to an AirPlay receiver — it follows the route, so a receiver picked from the system picker or taken away by it moves it too |
-| `no-airplay`                                       | nothing to send to: a browser that is not WebKit, or a WebKit with no receiver on the network. It starts set and only the browser's availability event clears it, so hide the button on it |
+| `is-airplay`                                       | playback is going to a device — an AirPlay receiver on WebKit, a Chromecast on Chrome. It follows the route, so a device picked or dropped outside this page moves it too; `connecting` is not yet `connected` |
+| `no-airplay`                                       | nothing to send to: no device on the network, a media element carrying `disableRemotePlayback`, or a browser without the [Remote Playback API](https://w3c.github.io/remote-playback/) — Firefox, at time of writing. It starts set on every connect and the platform answers, so hide the button on it |
 | `no-rate`                                          | the media element has no `playbackRate` to set, which an embed standing in for a `<video>` does not; hide the speed control on it |
 | `has-captions`, `captions-visible`                 | a caption track was found, in the markup or in the media element's track list; captions are on                               |
 | `volume-state`                                     | `mute`, `mid` or `full`, for a three-icon volume button                                                                      |
@@ -1645,9 +1646,10 @@ media-player[no-airplay] :is([on*="showAirplayPicker"], :has([on*="showAirplayPi
 
 The `:has()` half is for the `<tooltip-elemental>` around the button — hiding the button
 alone would leave its bubble's gap in the row. This page writes exactly that rule for its own
-samples, which is why the AirPlay button in the row above is there in Safari with an Apple TV
-on the network and absent everywhere else. `no-airplay` is the only one of the four that is
-not about video: AirPlay carries an `<audio>` to a speaker, so an audio row can offer it too.
+samples, which is why the device button in the row above appears when there is an Apple TV or
+a Chromecast to reach and is absent otherwise. `no-airplay` is the only one of the four that
+is not about video: the route carries an `<audio>` to a speaker, so an audio row can offer it
+too.
 
 Four you do set: `skip` is how many seconds a skip button moves (default `10`);
 `storage-key` is the prefix for the remembered volume, mute and captions state — set it per
@@ -1778,7 +1780,7 @@ already wired is skipped, never doubled.
 | `click:goLive`                                  | back to the live edge of a stream with a rewind window; does nothing on a file, or on a stream with no window to have left                       |
 | `click:toggleFullscreen`                        | the player element, or the video itself on an iPhone, which has never allowed anything else                                                      |
 | `click:togglePictureInPicture`                  | the floating window the browser keeps above everything else; video only, and it warns rather than going quiet when the browser refuses — a request with no user gesture behind it is the usual reason |
-| `click:showAirplayPicker`                       | the system route picker — AirPlay, and whatever else WebKit lists in it. Audio as well as video, and not a toggle: the picker is the way back to the device as well as the way out, so the platform owns that half. WebKit-only; it needs a gesture behind it, and does nothing at all while `no-airplay` is set |
+| `click:showAirplayPicker`                       | the system device picker, off the standard [Remote Playback API](https://w3c.github.io/remote-playback/) — AirPlay in Safari, Chromecast in Chrome. Audio as well as video, and not a toggle: the picker is the way back to the device as well as the way out, so the platform owns that half. It needs a gesture behind it, does nothing at all while `no-airplay` is set, and warns on a refusal that is not simply someone closing the picker |
 | `change:setRate`                                | playback speed, off the control's own `value` — a `<select>`'s in the samples; anything that is not a positive, finite number is dropped |
 
 **On `<media-player>` itself:**
@@ -1859,7 +1861,7 @@ win.
 
 |                                    | media-player                                            | [Plyr](https://github.com/sampotts/plyr)             | [media-chrome](https://github.com/muxinc/media-chrome) | [Vidstack](https://vidstack.io)      | [Video.js](https://videojs.com)        |
 | ---------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ | ------------------------------------ | -------------------------------------- |
-| **Size, gzipped**                  | **14.3 kB**                                             | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
+| **Size, gzipped**                  | **14.4 kB**                                             | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
 | **You write the controls**         | yes, as the only way                                    | no — a `controls` array, or an HTML string in config | yes, from its components                               | no — layouts                         | no                                     |
 | **Shadow DOM**                     | never                                                   | never                                                | yes                                                    | yes                                  | no                                     |
 | **Page plays with no script**      | yes                                                     | yes, if you keep `controls`                          | no — its starter `<video>` has none                    | no                                   | yes                                    |

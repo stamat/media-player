@@ -368,7 +368,7 @@ carries outgrows it, and the theme&#39;s buttons are 32px: the video sample&#39;
 the clock come to 306px, which is what a 360px phone leaves. Below that they wrap to a third
 row, and the fix is to drop a control from the row or move the clock out of it. The AirPlay
 button is a seventh wherever it shows at all — 40px more by the same arithmetic, button plus
-gap — so a 360px phone in Safari with a receiver on the network is over the line and wraps.
+gap — so a 360px phone with an Apple TV or a Chromecast to reach is over the line and wraps.
 Which is the row paying for a control the same phone would otherwise have no way to reach,
 and the reason the button is hidden the rest of the time rather than merely disabled.</p>
 <p>Which is also why the scrubber is moved in the markup rather than with <code>order</code>. Reordering a
@@ -777,16 +777,17 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
       <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Picture in picture<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
-    <span class="hljs-comment">&lt;!-- The one control here that is not the video&#x27;s: AirPlay carries an `&lt;audio&gt;` to a
-         speaker the same way. It is also the one with no second direction to press — the
-         system picker is the way back as well as the way out — so it is `aria-haspopup`
-         beside its `aria-pressed`, and the label never changes. Hidden where there is
-         nothing to send to, which is every browser but Safari and a Safari with no receiver
-         on the network: the rule for that is under Attributes it writes. --&gt;</span>
+    <span class="hljs-comment">&lt;!-- The one control here that is not the video&#x27;s: the route carries an `&lt;audio&gt;` to a
+         speaker the same way it carries a `&lt;video&gt;` to a screen. It is also the one with no
+         second direction to press — the system picker is the way back as well as the way out
+         — so it is `aria-haspopup` beside its `aria-pressed`, and the label never changes.
+         The label says device rather than AirPlay because the same button lists Chromecasts
+         in Chrome; the handler keeps the shorter name. Hidden where there is nothing to send
+         to: the rule for that is under Attributes it writes. --&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
         <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:showAirplayPicker&quot;</span>
-        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;AirPlay&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Play on a device&quot;</span>
         <span class="hljs-attr">aria-haspopup</span>=<span class="hljs-string">&quot;true&quot;</span>
         <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isAirplay:attr#aria-pressed|pressed&quot;</span>
         <span class="hljs-attr">disabled</span>
@@ -796,7 +797,7 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
           <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;m12 15 5 6H7z&quot;</span> /&gt;</span>
         <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>AirPlay<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Play on a device<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
@@ -1142,8 +1143,8 @@ testable right here rather than in a file you have to build yourself.</p>
       <span>Picture in picture</span>
     </tooltip-elemental>
     <tooltip-elemental>
-      <button on="click:showAirplayPicker" aria-label="AirPlay" aria-haspopup="true" bind="isAirplay:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="m12 15 5 6H7z"/></svg></button>
-      <span>AirPlay</span>
+      <button on="click:showAirplayPicker" aria-label="Play on a device" aria-haspopup="true" bind="isAirplay:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="m12 15 5 6H7z"/></svg></button>
+      <span>Play on a device</span>
     </tooltip-elemental>
     <tooltip-elemental>
       <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><span class="media-player-captions-icon-off"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="media-player-captions-icon-on"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z"/></svg></span></button>
@@ -1676,11 +1677,11 @@ against them.</p>
 </tr>
 <tr>
 <td><code>is-airplay</code></td>
-<td>playback is going to an AirPlay receiver — it follows the route, so a receiver picked from the system picker or taken away by it moves it too</td>
+<td>playback is going to a device — an AirPlay receiver on WebKit, a Chromecast on Chrome. It follows the route, so a device picked or dropped outside this page moves it too; <code>connecting</code> is not yet <code>connected</code></td>
 </tr>
 <tr>
 <td><code>no-airplay</code></td>
-<td>nothing to send to: a browser that is not WebKit, or a WebKit with no receiver on the network. It starts set and only the browser&#39;s availability event clears it, so hide the button on it</td>
+<td>nothing to send to: no device on the network, a media element carrying <code>disableRemotePlayback</code>, or a browser without the <a href="https://w3c.github.io/remote-playback/">Remote Playback API</a> — Firefox, at time of writing. It starts set on every connect and the platform answers, so hide the button on it</td>
 </tr>
 <tr>
 <td><code>no-rate</code></td>
@@ -1703,9 +1704,10 @@ nothing to keep in step with the markup:</p>
 }</code></pre>
 <p>The <code>:has()</code> half is for the <code>&lt;tooltip-elemental&gt;</code> around the button — hiding the button
 alone would leave its bubble&#39;s gap in the row. This page writes exactly that rule for its own
-samples, which is why the AirPlay button in the row above is there in Safari with an Apple TV
-on the network and absent everywhere else. <code>no-airplay</code> is the only one of the four that is
-not about video: AirPlay carries an <code>&lt;audio&gt;</code> to a speaker, so an audio row can offer it too.</p>
+samples, which is why the device button in the row above appears when there is an Apple TV or
+a Chromecast to reach and is absent otherwise. <code>no-airplay</code> is the only one of the four that
+is not about video: the route carries an <code>&lt;audio&gt;</code> to a speaker, so an audio row can offer it
+too.</p>
 <p>Four you do set: <code>skip</code> is how many seconds a skip button moves (default <code>10</code>);
 <code>storage-key</code> is the prefix for the remembered volume, mute and captions state — set it per
 player, or two players on one page will share one volume; <code>keys</code> maps a key to an action
@@ -1920,7 +1922,7 @@ already wired is skipped, never doubled.</p>
 </tr>
 <tr>
 <td><code>click:showAirplayPicker</code></td>
-<td>the system route picker — AirPlay, and whatever else WebKit lists in it. Audio as well as video, and not a toggle: the picker is the way back to the device as well as the way out, so the platform owns that half. WebKit-only; it needs a gesture behind it, and does nothing at all while <code>no-airplay</code> is set</td>
+<td>the system device picker, off the standard <a href="https://w3c.github.io/remote-playback/">Remote Playback API</a> — AirPlay in Safari, Chromecast in Chrome. Audio as well as video, and not a toggle: the picker is the way back to the device as well as the way out, so the platform owns that half. It needs a gesture behind it, does nothing at all while <code>no-airplay</code> is set, and warns on a refusal that is not simply someone closing the picker</td>
 </tr>
 <tr>
 <td><code>change:setRate</code></td>
@@ -2048,7 +2050,7 @@ win.</p>
 </thead>
 <tbody><tr>
 <td><strong>Size, gzipped</strong></td>
-<td><strong>14.3 kB</strong></td>
+<td><strong>14.4 kB</strong></td>
 <td>32 kB</td>
 <td>42 kB</td>
 <td>40 kB</td>

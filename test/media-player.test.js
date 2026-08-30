@@ -10,11 +10,13 @@
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
  * track — the one the author marked `default`, and the one a streaming library adds after
  * the upgrade with no `<track>` behind it — the video controls' hide timer, the labels the buttons announce themselves by, the
- * keys a control claims and the presses that are somebody else's, the AirPlay route against
- * stubbed WebKit events — the picker itself is Safari's and opens nowhere here, so what is
- * proved is that nothing is offered until the browser says there is a receiver, that an
- * `<audio>` is offered it too, and that `is-airplay` follows the route rather than the press —
- * the OS media panel against
+ * keys a control claims and the presses that are somebody else's, the remote-playback route
+ * against a stubbed `RemotePlayback` — the picker itself is the platform's and opens nowhere
+ * here, so what is proved is the wiring around it: nothing offered until availability says
+ * there is a device, an `<audio>` offered it too, `disableRemotePlayback` and a browser that
+ * cannot watch continuously answered oppositely, `is-airplay` following the route rather than
+ * the press, a dismissed picker staying quiet, and the watch cancelled on the way out even
+ * when its id lands after the player has gone — the OS media panel against
  * a stubbed `navigator.mediaSession`, the slider fills caught up through slider-elemental's
  * own `apply()` after scripted writes, the scrubber frame previews against stubbed
  * thumbnail cues — jsdom fetches and parses no VTT, so the browser's cue loading itself is
@@ -1878,76 +1880,161 @@ describe('the picture-in-picture window', () => {
 });
 
 describe('the AirPlay route', () => {
-  /** The availability event, which carries the whole answer on a property of its own. */
-  function availability(value) {
-    return Object.assign(new Event('webkitplaybacktargetavailabilitychanged'), { availability: value });
+  /**
+   * A `RemotePlayback` object the way the spec draws one: `watchAvailability` queues the
+   * current availability at the callback before its promise resolves the id, which is the
+   * ordering the element's cancel path has to survive.
+   */
+  function fakeRemote({ available = false, watch = 'ok' } = {}) {
+    const remote = new EventTarget();
+    remote.state = 'disconnected';
+    remote.prompt = jest.fn(() => Promise.resolve());
+    remote.cancelWatchAvailability = jest.fn();
+    remote.watchAvailability = jest.fn((callback) => {
+      if (watch !== 'ok') return Promise.reject(Object.assign(new Error('no'), { name: watch }));
+      callback(available);
+      return Promise.resolve(7);
+    });
+    remote.announce = (state) => {
+      remote.state = state;
+      remote.dispatchEvent(new Event(state === 'connected' ? 'connect' : 'disconnect'));
+    };
+    return remote;
   }
 
-  function airplayMedia(tag = 'video') {
+  function remoteMedia(tag = 'video', options) {
     const media = fakeMedia(tag);
-    media.webkitShowPlaybackTargetPicker = jest.fn();
-    media.webkitCurrentPlaybackTargetIsWireless = false;
+    media.remote = fakeRemote(options);
     return media;
   }
 
   test('nothing is offered until the browser says there is somewhere to send it', () => {
-    const media = airplayMedia();
+    const media = remoteMedia('video', { available: false });
     const player = mount(media);
     expect(player.hasAttribute('no-airplay')).toBe(true);
     player.showAirplayPicker();
-    expect(media.webkitShowPlaybackTargetPicker).not.toHaveBeenCalled();
+    expect(media.remote.prompt).not.toHaveBeenCalled();
+  });
 
-    media.dispatchEvent(availability('available'));
+  test('a device on the network brings the button back, and the press opens the picker', () => {
+    const media = remoteMedia('video', { available: true });
+    const player = mount(media);
     expect(player.hasAttribute('no-airplay')).toBe(false);
     player.showAirplayPicker();
-    expect(media.webkitShowPlaybackTargetPicker).toHaveBeenCalled();
+    expect(media.remote.prompt).toHaveBeenCalled();
   });
 
-  test('the last receiver leaving the network takes the button with it', () => {
-    const media = airplayMedia();
+  test('the last device leaving the network takes the button with it', () => {
+    const media = remoteMedia('video', { available: true });
     const player = mount(media);
-    media.dispatchEvent(availability('available'));
-    media.dispatchEvent(availability('not-available'));
+    // The callback the element handed over is the platform's to call again.
+    media.remote.watchAvailability.mock.calls[0][0](false);
     expect(player.hasAttribute('no-airplay')).toBe(true);
   });
 
-  test('a browser that never fires the event keeps the button hidden rather than dead', () => {
+  test('a browser with no Remote Playback API keeps the button hidden rather than dead', () => {
     const player = mount(fakeMedia('video'));
     expect(player.hasAttribute('no-airplay')).toBe(true);
     expect(() => player.showAirplayPicker()).not.toThrow();
   });
 
   test('an audio player is offered the route too, unlike the window and the fullscreen', () => {
-    const media = airplayMedia('audio');
+    const media = remoteMedia('audio', { available: true });
     const player = mount(media);
-    media.dispatchEvent(availability('available'));
     expect(player.hasAttribute('no-airplay')).toBe(false);
     player.showAirplayPicker();
-    expect(media.webkitShowPlaybackTargetPicker).toHaveBeenCalled();
+    expect(media.remote.prompt).toHaveBeenCalled();
+  });
+
+  test('the author saying disableRemotePlayback is the button going, not the watch failing quietly', async () => {
+    const media = remoteMedia('video', { watch: 'InvalidStateError' });
+    const player = mount(media);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(player.hasAttribute('no-airplay')).toBe(true);
+  });
+
+  test('a browser that cannot watch continuously keeps the button, because its picker still opens', async () => {
+    const media = remoteMedia('video', { watch: 'NotSupportedError' });
+    const player = mount(media);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(player.hasAttribute('no-airplay')).toBe(false);
+    player.showAirplayPicker();
+    expect(media.remote.prompt).toHaveBeenCalled();
   });
 
   test('the attribute follows the route rather than the press', () => {
-    const media = airplayMedia();
+    const media = remoteMedia('video', { available: true });
     const player = mount(media);
-    media.dispatchEvent(availability('available'));
     player.showAirplayPicker();
-    // The picker opened; nothing is playing anywhere else until the platform says so, which
-    // is also how a receiver picked outside this page arrives.
+    // The picker is up; nothing is playing anywhere else until the platform says so, which
+    // is also how a device picked outside this page arrives.
     expect(player.hasAttribute('is-airplay')).toBe(false);
 
-    media.webkitCurrentPlaybackTargetIsWireless = true;
-    media.dispatchEvent(new Event('webkitcurrentplaybacktargetiswirelesschanged'));
+    media.remote.announce('connected');
     expect(player.hasAttribute('is-airplay')).toBe(true);
 
-    media.webkitCurrentPlaybackTargetIsWireless = false;
-    media.dispatchEvent(new Event('webkitcurrentplaybacktargetiswirelesschanged'));
+    media.remote.announce('disconnected');
     expect(player.hasAttribute('is-airplay')).toBe(false);
   });
 
-  test('a press announces itself the way the other controls do', () => {
-    const media = airplayMedia();
+  test('connecting is not yet connected', () => {
+    const media = remoteMedia('video', { available: true });
     const player = mount(media);
-    media.dispatchEvent(availability('available'));
+    media.remote.state = 'connecting';
+    media.remote.dispatchEvent(new Event('connect'));
+    expect(player.hasAttribute('is-airplay')).toBe(false);
+  });
+
+  test('a picker someone closed without choosing is not a failure and says nothing', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const media = remoteMedia('video', { available: true });
+    media.remote.prompt = () => Promise.reject(Object.assign(new Error('denied'), { name: 'NotAllowedError' }));
+    mount(media).showAirplayPicker();
+
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  test('a refusal that is not a dismissal warns rather than going quiet', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const media = remoteMedia('video', { available: true });
+    media.remote.prompt = () => Promise.reject(Object.assign(new Error('no user gesture'), { name: 'InvalidAccessError' }));
+    mount(media).showAirplayPicker();
+
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('remote playback was refused'), 'no user gesture');
+    warn.mockRestore();
+  });
+
+  test('a player taken off the page stops watching the network', async () => {
+    const media = remoteMedia('video', { available: true });
+    const player = mount(media);
+    await Promise.resolve();
+    player.remove();
+    expect(media.remote.cancelWatchAvailability).toHaveBeenCalledWith(7);
+    // The route is nobody's to report once the listeners are off.
+    media.remote.announce('connected');
+    expect(player.hasAttribute('is-airplay')).toBe(false);
+  });
+
+  test('a watch whose id lands after the player left is cancelled rather than leaked', async () => {
+    const media = remoteMedia('video', { available: true });
+    const player = mount(media);
+    player.remove();
+    // The id resolves a task later than the callback did — after the disconnect, here.
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(media.remote.cancelWatchAvailability).toHaveBeenCalledWith(7);
+  });
+
+  test('a press announces itself the way the other controls do', () => {
+    const media = remoteMedia('video', { available: true });
+    const player = mount(media);
     const seen = [];
     player.addEventListener('media-player-interaction', (event) => seen.push(event.detail.type));
     player.showAirplayPicker();
