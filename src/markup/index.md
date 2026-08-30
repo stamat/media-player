@@ -775,7 +775,11 @@ of those goes where the `<video>` goes, marked `class="media-player-media"`, bec
 name can say what an element answers to. Same wires, same properties, same bargain:
 `controls` comes off at upgrade and goes back on removal, which on these elements reloads
 their iframe with the platform's own chrome, and the video half comes on unless the name ends
-in `-audio`.
+in `-audio`. The structure sheet sizes it like a `<video>` — full width, `16 / 9` until your
+sheet says otherwise; what the element does to itself is its own.
+[`<video-background>`](https://github.com/stamat/video-background) speaks the same API and
+drops in the same way, with its `unstyled` attribute on so it sits in the flow rather than
+behind the page.
 
 ```html
 <script type="module" src="https://cdn.jsdelivr.net/npm/youtube-video-element@1"></script>

@@ -18,7 +18,10 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   removal, which on those elements reloads their iframe with the platform's own chrome. One
   that upgrades after the player did is left alone until it has — `controls` written first
   would be an own property shadowing the accessor the definition brings, and the platform's
-  chrome would load under yours with nothing warning.
+  chrome would load under yours with nothing warning. The structure sheet sizes such an
+  element like a `<video>` — full width, `16 / 9` until you say otherwise. What the element
+  does to itself is its own business: `<video-background>` lays itself over its parent as
+  a background, and its `unstyled` attribute is what puts it in the player's flow.
 
   **What stays out:** the elements themselves. Nothing here loads a platform script or knows
   a platform by name, so the page with the script blocked is now that element's promise to

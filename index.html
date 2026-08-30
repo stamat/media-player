@@ -782,7 +782,11 @@ of those goes where the <code>&lt;video&gt;</code> goes, marked <code>class=&quo
 name can say what an element answers to. Same wires, same properties, same bargain:
 <code>controls</code> comes off at upgrade and goes back on removal, which on these elements reloads
 their iframe with the platform&#39;s own chrome, and the video half comes on unless the name ends
-in <code>-audio</code>.</p>
+in <code>-audio</code>. The structure sheet sizes it like a <code>&lt;video&gt;</code> — full width, <code>16 / 9</code> until your
+sheet says otherwise; what the element does to itself is its own.
+<a href="https://github.com/stamat/video-background"><code>&lt;video-background&gt;</code></a> speaks the same API and
+drops in the same way, with its <code>unstyled</code> attribute on so it sits in the flow rather than
+behind the page.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/youtube-video-element@1&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>

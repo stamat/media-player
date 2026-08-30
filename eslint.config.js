@@ -22,7 +22,7 @@ const browserGlobals = {
 };
 
 export default [
-  { ignores: ['dist/**', 'js/**', 'css/**', 'node_modules/**'] },
+  { ignores: ['dist/**', 'js/**', 'css/**', 'node_modules/**', '_sitecheck/**'] },
   js.configs.recommended,
   {
     files: ['src/**/*.js'],
