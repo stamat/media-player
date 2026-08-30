@@ -784,7 +784,7 @@ decides whether the thing behind it is YouTube, Vimeo or a plain video file. It 
 weigh the preference accordingly — everything claimed for it below was measured in a browser,
 and the two players under this paragraph are the measurement.
 
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script src='https://cdn.jsdelivr.net/npm/video-background-element@1'&gt;&lt;/script&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script src='https://cdn.jsdelivr.net/npm/video-background-element@1.1.0'&gt;&lt;/script&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
 <style>
@@ -794,7 +794,7 @@ and the two players under this paragraph are the measurement.
 </style>
 
 <media-player tabindex="0" role="region" aria-label="YouTube player" media-title="Family Guy: McStroke (Clip)" artist="TBS" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
-  <video-background class="media-player-media" unstyled fit-box load-background lazyloading always-play autoplay="false" loop="false" muted="false" src="https://www.youtube.com/watch?v=UIyoNvInzCI"></video-background>
+  <video-background class="media-player-media" unstyled fit-box load-background lazyloading pause-offscreen="false" autoplay="false" loop="false" muted="false" src="https://www.youtube.com/watch?v=UIyoNvInzCI"></video-background>
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
     <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
@@ -833,7 +833,7 @@ Vimeo is that markup with a Vimeo link in it. Nothing else moves — not the scr
 the attributes, not one line of the control row. Press **Edit** on either and paste the other
 platform's link over the `src` to watch that happen:
 
-<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script src='https://cdn.jsdelivr.net/npm/video-background-element@1'&gt;&lt;/script&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script src='https://cdn.jsdelivr.net/npm/video-background-element@1.1.0'&gt;&lt;/script&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
 
 ```html
 <style>
@@ -843,7 +843,7 @@ platform's link over the `src` to watch that happen:
 </style>
 
 <media-player tabindex="0" role="region" aria-label="Vimeo player" media-title="Minions: Paint" artist="Vimeo Staff Picks" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
-  <video-background class="media-player-media" unstyled fit-box load-background lazyloading always-play autoplay="false" loop="false" muted="false" src="https://vimeo.com/137250145"></video-background>
+  <video-background class="media-player-media" unstyled fit-box load-background lazyloading pause-offscreen="false" autoplay="false" loop="false" muted="false" src="https://vimeo.com/137250145"></video-background>
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
     <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
@@ -883,7 +883,7 @@ published bundle carries its one dependency inside it, so no bare import is left
 browser to resolve.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/video-background-element@1"></script>
+<script src="https://cdn.jsdelivr.net/npm/video-background-element@1.1.0"></script>
 ```
 
 The eight attributes on the element are it being talked out of being a background, which is
@@ -896,12 +896,14 @@ autoplays, loops and starts muted; a player does none of the three until it is t
 is what `autoplay="false"`, `loop="false"` and `muted="false"` say. `load-background` is the
 poster: the element hides its own first frame until playback starts, so without it the box is
 blank until you press play. `lazyloading` puts `loading="lazy"` on the iframe, which is what
-keeps two embeds off this page until they scroll into view. And `always-play` takes the
-scroll gate off: a background pauses itself the moment it leaves the viewport, which is
-thrift when nobody asked for it and rudeness once somebody has pressed play — with the
-attribute on, the element builds no `IntersectionObserver` at all and playback is the
-listener's to stop. It cannot start anything on its own here, because that path is gated on
-`autoplay` as well, and `autoplay` is off.
+keeps two embeds off this page until they scroll into view. And `pause-offscreen="false"`
+takes the scroll gate off: a background stops itself the moment it leaves the viewport, which
+is thrift when nobody asked for it and rudeness once somebody has pressed play — written off,
+the element builds no `IntersectionObserver` at all and playback is the listener's to stop.
+It cannot start anything on its own here either, because that path is gated on `autoplay` as
+well, and `autoplay` is off. This element has an attribute of the same name and the opposite
+default, [below](#attributes-it-writes) — a background yields the moment it is out of sight,
+a player does not until you ask it to.
 
 **What those two frames cost, named rather than buried.** Every other sample on this page runs
 on files this repository built, and the only thing the page itself fetches from anywhere else
@@ -1516,11 +1518,22 @@ against them.
 | `has-captions`, `captions-visible`                 | a caption track was found, in the markup or in the media element's track list; captions are on                               |
 | `volume-state`                                     | `mute`, `mid` or `full`, for a three-icon volume button                                                                      |
 
-Three you do set: `skip` is how many seconds a skip button moves (default `10`);
+Four you do set: `skip` is how many seconds a skip button moves (default `10`);
 `storage-key` is the prefix for the remembered volume, mute and captions state — set it per
-player, or two players on one page will share one volume; and `keys` maps a key to an action
-no visible control names, covered under the keys section above. Four more, for what the lock
-screen shows, are in the next section.
+player, or two players on one page will share one volume; `keys` maps a key to an action
+no visible control names, covered under the keys section above; and `pause-offscreen` stops
+playback once the player has scrolled out of view. Four more, for what the lock screen shows,
+are in the next section.
+
+`pause-offscreen` is off unless you write it, and the default is the argument: the opposite
+one would have this element decide that a podcast stops when the page scrolls past the
+controls, which is the single thing an audio player is most often left running for. Write it
+on a video and a listener who scrolls away gets silence instead of a soundtrack over the next
+section. It pauses and nothing more — what scrolls back into view is a paused player with its
+controls up, because playing again on the way back would need the element to tell a
+scroll-pause from your own press, and that is state to keep in step for a behaviour nobody can
+ask for on its own. A browser without `IntersectionObserver` never pauses, which is the
+behaviour of leaving the attribute off.
 
 ## On the lock screen
 

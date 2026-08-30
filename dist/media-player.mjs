@@ -1716,6 +1716,7 @@ var MediaPlayer = class extends HgElement {
     this.onTrackCue = (event) => this.onCue(event);
     this.media.textTracks?.addEventListener?.("addtrack", this.onTrackAdded);
     this.track?.addEventListener?.("cuechange", this.onTrackCue);
+    this.watchViewport();
     if (this.isReady) {
       this.resume();
       if (this.isPlaying) this.claimSession();
@@ -1743,7 +1744,37 @@ var MediaPlayer = class extends HgElement {
     this.releaseSession();
     this.media?.textTracks?.removeEventListener?.("addtrack", this.onTrackAdded);
     this.track?.removeEventListener?.("cuechange", this.onTrackCue);
+    this.viewport?.disconnect();
     if (this.media && this.hadControls) this.media.controls = true;
+  }
+  attributeChanged(name) {
+    if (name === "pause-offscreen") this.watchViewport();
+  }
+  /**
+   * Stop playing once the player has scrolled away, for the author who asked for it.
+   *
+   * Off unless the attribute is written, because the opposite default would be this element
+   * deciding that a podcast stops when the page scrolls past the controls — the one thing an
+   * audio player is most often left running for. A background loop wants the reverse and
+   * says so in its own markup; a player the listener started is theirs to stop.
+   *
+   * It pauses and does nothing else. Playing again on the way back would need this to tell a
+   * scroll-pause from the listener's own press, which is state to keep in step for a
+   * behaviour nobody can ask for separately — so what comes back into view is a paused
+   * player with its controls up, which is what a paused player looks like anywhere else.
+   *
+   * Rebuilt rather than toggled, so the observer exists only while it is wanted, and a
+   * browser without `IntersectionObserver` gets no gate rather than a broken one: nothing
+   * pauses, which is the behaviour of the default.
+   */
+  watchViewport() {
+    this.viewport?.disconnect();
+    this.viewport = null;
+    if (!this.pauseOffscreen || typeof IntersectionObserver === "undefined") return;
+    this.viewport = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting && this.media && !this.media.paused) this.pause();
+    });
+    this.viewport.observe(this);
   }
   /**
    * Metadata has arrived. Idempotent, because five different events mean it.
@@ -2583,7 +2614,8 @@ __publicField(MediaPlayer, "attributes", [
   "has-captions",
   "captions-visible",
   "volume-state",
-  "skip"
+  "skip",
+  "pause-offscreen"
 ]);
 /**
  * State that never reaches the DOM.

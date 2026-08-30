@@ -191,7 +191,7 @@
                 "text": "array"
               },
               "static": true,
-              "default": "[ 'is-ready', 'is-playing', 'is-buffering', 'is-error', 'is-live', 'is-video', 'is-fullscreen', 'no-fullscreen', 'controls-shown', 'poster-hidden', 'has-captions', 'captions-visible', 'volume-state', 'skip' ]",
+              "default": "[ 'is-ready', 'is-playing', 'is-buffering', 'is-error', 'is-live', 'is-video', 'is-fullscreen', 'no-fullscreen', 'controls-shown', 'poster-hidden', 'has-captions', 'captions-visible', 'volume-state', 'skip', 'pause-offscreen' ]",
               "privacy": "private"
             },
             {
@@ -234,6 +234,22 @@
             {
               "kind": "method",
               "name": "disconnected",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "attributeChanged",
+              "parameters": [
+                {
+                  "name": "name"
+                }
+              ],
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "watchViewport",
+              "description": "Stop playing once the player has scrolled away, for the author who asked for it.\n\nOff unless the attribute is written, because the opposite default would be this element\ndeciding that a podcast stops when the page scrolls past the controls — the one thing an\naudio player is most often left running for. A background loop wants the reverse and\nsays so in its own markup; a player the listener started is theirs to stop.\n\nIt pauses and does nothing else. Playing again on the way back would need this to tell a\nscroll-pause from the listener's own press, which is state to keep in step for a\nbehaviour nobody can ask for separately — so what comes back into view is a paused\nplayer with its controls up, which is what a paused player looks like anywhere else.\n\nRebuilt rather than toggled, so the observer exists only while it is wanted, and a\nbrowser without `IntersectionObserver` gets no gate rather than a broken one: nothing\npauses, which is the behaviour of the default.",
               "privacy": "private"
             },
             {
@@ -820,6 +836,16 @@
               },
               "description": "Seconds a skip button moves. Defaults to 10.",
               "name": "skip"
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Pause when the player scrolls out of view. Off unless written; it does not start anything again on the way back, and a browser without `IntersectionObserver` never pauses.",
+              "name": "pause-offscreen",
+              "x-code-preview": {
+                "hidden": true
+              }
             },
             {
               "type": {

@@ -61,6 +61,27 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   sheet only places the bubble. Set `--tooltip-elemental-surface` and
   `--tooltip-elemental-color` yourself, or there is unpainted text over the control row.
 
+- **`pause-offscreen` stops playback once the player has scrolled out of view.** Off unless
+  you write it, and the default is the whole argument: the opposite one would have this
+  element decide that a podcast stops when the page scrolls past its controls, which is the
+  one thing an audio player is most often left running for. On a video it is usually what you
+  want — a listener who scrolls away gets silence rather than a soundtrack over the next
+  section.
+
+  It pauses and does nothing else. What scrolls back into view is a paused player with its
+  controls up, because starting again would need the element to tell a scroll-pause from your
+  own press, and that is state to keep in step for a behaviour nobody can ask for separately.
+  The observer is built and torn down as the attribute is written and removed, so toggling it
+  at runtime works rather than silently doing nothing; a browser with no
+  `IntersectionObserver` gets no gate at all, which is the behaviour of leaving it off.
+
+  **Not to be confused with the attribute of the same name on
+  [`<video-background>`](https://github.com/stamat/video-background-element), which defaults
+  to `true`.** Same name, opposite default, and both are right: a background is decoration
+  that should yield the moment it is out of sight, and a player is something a listener
+  started on purpose. The samples on the manual page write `pause-offscreen="false"` on the
+  embed for exactly that reason.
+
 ### Changed
 
 - **book-of-elementals and hydrargyri are `peerDependencies` now, not `dependencies`.**

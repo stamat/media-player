@@ -1676,6 +1676,75 @@ describe('video controls that hide themselves', () => {
   });
 });
 
+/**
+ * jsdom implements no `IntersectionObserver` and lays nothing out, so there is no viewport to
+ * scroll and no crossing to observe. The stub keeps the constructed observers so a test can
+ * call the callback the way the platform would, which leaves what the platform decides —
+ * when a crossing has happened — a browser's to prove.
+ */
+describe('pausing when the player scrolls away', () => {
+  let observers;
+
+  beforeEach(() => {
+    observers = [];
+    globalThis.IntersectionObserver = class {
+      constructor(callback) {
+        this.callback = callback;
+        observers.push(this);
+      }
+      observe() {}
+      disconnect() {
+        this.stopped = true;
+      }
+    };
+  });
+
+  afterEach(() => {
+    delete globalThis.IntersectionObserver;
+  });
+
+  test('a player told to pause off-screen stops when it leaves the viewport, and does not start itself again on the way back', () => {
+    const media = fakeMedia('video');
+    const player = mount(media);
+    player.setAttribute('pause-offscreen', '');
+    media.play();
+
+    observers.at(-1).callback([{ isIntersecting: false }]);
+    expect(media.paused).toBe(true);
+
+    observers.at(-1).callback([{ isIntersecting: true }]);
+    expect(media.paused).toBe(true);
+  });
+
+  test('a player never told to watches nothing at all', () => {
+    mount(fakeMedia('video'));
+    expect(observers).toHaveLength(0);
+  });
+
+  test('taking the attribute back off takes the observer down with it, and so does leaving the page', () => {
+    const player = mount(fakeMedia('video'));
+    player.setAttribute('pause-offscreen', '');
+    expect(observers).toHaveLength(1);
+
+    player.removeAttribute('pause-offscreen');
+    expect(observers[0].stopped).toBe(true);
+
+    player.setAttribute('pause-offscreen', '');
+    player.remove();
+    expect(observers.at(-1).stopped).toBe(true);
+  });
+
+  test('an off-screen player that was already paused is left alone rather than paused again', () => {
+    const media = fakeMedia('video');
+    const player = mount(media);
+    player.setAttribute('pause-offscreen', '');
+    const pauses = jest.spyOn(media, 'pause');
+
+    observers.at(-1).callback([{ isIntersecting: false }]);
+    expect(pauses).not.toHaveBeenCalled();
+  });
+});
+
 describe('the focus the overlay takes with it', () => {
   /**
    * A video player whose overlay holds focus, the way pressing it to play leaves it.

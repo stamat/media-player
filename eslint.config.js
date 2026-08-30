@@ -15,6 +15,7 @@ const browserGlobals = {
   console: 'readonly',
   localStorage: 'readonly',
   matchMedia: 'readonly',
+  IntersectionObserver: 'readonly',
   requestAnimationFrame: 'readonly',
   cancelAnimationFrame: 'readonly',
   setTimeout: 'readonly',

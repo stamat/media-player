@@ -334,6 +334,7 @@ export const MEDIA_SELECTOR = 'audio, video, .media-player-media';
  * @attr {boolean} captions-visible - Captions are on. Persisted; the element sets it.
  * @attr {string} volume-state - `mute`, `mid` or `full`, for the three-icon volume button. CSS hook; the element sets it.
  * @attr {number} skip - Seconds a skip button moves. Defaults to 10.
+ * @attr {boolean} pause-offscreen - Pause when the player scrolls out of view. Off unless written; it does not start anything again on the way back, and a browser without `IntersectionObserver` never pauses.
  * @attr {string} media-title - What the OS media panel calls this. Falls back to the media element's own `title`.
  * @attr {string} artist - Who made it, for the OS media panel.
  * @attr {string} album - What it came from, for the OS media panel.
@@ -374,7 +375,8 @@ export class MediaPlayer extends HgElement {
     'has-captions',
     'captions-visible',
     'volume-state',
-    'skip'
+    'skip',
+    'pause-offscreen'
   ];
 
   /**
@@ -518,6 +520,11 @@ export class MediaPlayer extends HgElement {
     // stop rendering after a move, silently.
     this.track?.addEventListener?.('cuechange', this.onTrackCue);
 
+    // Here rather than past the reconnect return below: `disconnected` took the observer
+    // down on the way out, and an attribute written in the markup never reaches
+    // `attributeChanged` — that one only fires once the element is initialised.
+    this.watchViewport();
+
     // A move in the DOM is a disconnect and a connect, and hydrargyri runs this method on
     // both connects. A player that was already ready keeps its state: resetting it here
     // would wedge the duration at zero, because `loaded` cannot run twice — so a reconnect
@@ -568,9 +575,41 @@ export class MediaPlayer extends HgElement {
     this.releaseSession();
     this.media?.textTracks?.removeEventListener?.('addtrack', this.onTrackAdded);
     this.track?.removeEventListener?.('cuechange', this.onTrackCue);
+    this.viewport?.disconnect();
     // Put the page back the way it was found: an element removed from the DOM should leave
     // a media element that still plays, not a controlless one.
     if (this.media && this.hadControls) this.media.controls = true;
+  }
+
+  attributeChanged(name) {
+    if (name === 'pause-offscreen') this.watchViewport();
+  }
+
+  /**
+   * Stop playing once the player has scrolled away, for the author who asked for it.
+   *
+   * Off unless the attribute is written, because the opposite default would be this element
+   * deciding that a podcast stops when the page scrolls past the controls — the one thing an
+   * audio player is most often left running for. A background loop wants the reverse and
+   * says so in its own markup; a player the listener started is theirs to stop.
+   *
+   * It pauses and does nothing else. Playing again on the way back would need this to tell a
+   * scroll-pause from the listener's own press, which is state to keep in step for a
+   * behaviour nobody can ask for separately — so what comes back into view is a paused
+   * player with its controls up, which is what a paused player looks like anywhere else.
+   *
+   * Rebuilt rather than toggled, so the observer exists only while it is wanted, and a
+   * browser without `IntersectionObserver` gets no gate rather than a broken one: nothing
+   * pauses, which is the behaviour of the default.
+   */
+  watchViewport() {
+    this.viewport?.disconnect();
+    this.viewport = null;
+    if (!this.pauseOffscreen || typeof IntersectionObserver === 'undefined') return;
+    this.viewport = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting && this.media && !this.media.paused) this.pause();
+    });
+    this.viewport.observe(this);
   }
 
   /**
