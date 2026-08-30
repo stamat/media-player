@@ -619,7 +619,7 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
-            viewBox="0 0 24 24"
+            viewBox="1 3 22 18"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
@@ -719,7 +719,11 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
       >
         <!-- Two badges, one shown at a time off `captions-visible` — the same trick the
              play/pause button uses. Outlined while captions are off, solid while they are
-             on, so the state survives a stylesheet with no accent in it. -->
+             on, so the state survives a stylesheet with no accent in it. The viewBox is
+             cropped to the badge rather than left at `0 0 24 24`: a wide short glyph inside
+             a square box is scaled by its height, so a full-square viewBox draws it two
+             thirds the size of the square icons beside it and the button reads as smaller
+             than its neighbours. -->
         <span class="media-player-captions-icon-off">
           <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2" />
@@ -731,7 +735,7 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
              painted in a second colour, so whatever is behind the button shows through them
              — the accent flood when it is pressed, the page when it is not. -->
         <span class="media-player-captions-icon-on">
-          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18">
             <path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z" />
           </svg>
         </span>
@@ -1109,7 +1113,7 @@ testable right here rather than in a file you have to build yourself.
       <span>Picture in picture</span>
     </tooltip-elemental>
     <tooltip-elemental>
-      <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><span class="media-player-captions-icon-off"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="media-player-captions-icon-on"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z"/></svg></span></button>
+      <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><span class="media-player-captions-icon-off"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="media-player-captions-icon-on"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z"/></svg></span></button>
       <span bind="captionsLabel">Enable captions</span>
     </tooltip-elemental>
     <tooltip-elemental>
