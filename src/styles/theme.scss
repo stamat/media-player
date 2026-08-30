@@ -54,6 +54,28 @@ media-player progress-elemental {
   --progress-elemental-track: transparent;
 }
 
+// Both knobs only under the pointer — the seek one and the volume one, since two bars in a
+// row with one knob between them reads as the other being broken. A bar nobody is aiming at
+// is a position line; the knob is what says it can be dragged, and it says it where the
+// pointer already is. Only the colour goes — the thumb keeps its size, so the rail, the fill
+// and the buffered bar, every one of them inset by half a thumb, stay put and nothing moves
+// when it appears. `:focus-within` because a keyboard has no pointer and the thumb it is
+// nudging has to be visible; `input:active` because a drag that wanders off the track
+// vertically still holds the button and is still a drag. `hover: hover` because a phone would
+// otherwise get bars with no knobs at all, and forced colours are left alone, where the
+// mode's own thumb colour is the one thing making the control findable on a repainted track.
+@media (hover: hover) and (not (forced-colors: active)) {
+  media-player slider-elemental {
+    --slider-elemental-thumb: transparent;
+  }
+
+  media-player slider-elemental:hover,
+  media-player slider-elemental:focus-within,
+  media-player slider-elemental:has(input:active) {
+    --slider-elemental-thumb: var(--slider-elemental-fill);
+  }
+}
+
 media-player .media-player-controls {
   padding: var(--media-player-gap);
   border-radius: var(--media-player-radius);

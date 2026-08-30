@@ -365,6 +365,16 @@ media-player progress-elemental {
   --progress-elemental-track: transparent;
 }
 
+@media (hover: hover) and (not (forced-colors: active)) {
+  media-player slider-elemental {
+    --slider-elemental-thumb: transparent;
+  }
+  media-player slider-elemental:hover,
+  media-player slider-elemental:focus-within,
+  media-player slider-elemental:has(input:active) {
+    --slider-elemental-thumb: var(--slider-elemental-fill);
+  }
+}
 media-player .media-player-controls {
   padding: var(--media-player-gap);
   border-radius: var(--media-player-radius);

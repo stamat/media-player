@@ -1688,9 +1688,10 @@ last. A live stream gets no seek buttons, because there is nowhere on it to seek
 ## What the theme takes
 
 `theme.css` speaks the register Plyr made the standard: a flat compact bar, controls that
-flood with the accent under the pointer, a slim rounded track carrying an accent thumb,
-video controls on a bottom gradient with a centred play chip. The speed `<select>` loses
-its native chrome to `appearance: none` and is drawn as one more button in that row —
+flood with the accent under the pointer, a slim rounded track whose accent thumb comes up
+under the pointer with it, video controls on a bottom gradient with a centred play chip.
+The speed `<select>` loses its native chrome to `appearance: none` and is drawn as one more
+button in that row —
 the rate and no arrow, because `currentColor` reaches neither a `background-image` nor a
 pseudo-element a `<select>` renders. Where Plyr hardcodes white
 and slate, this sheet uses `Canvas` and `CanvasText`, so the same look follows the page
@@ -1710,6 +1711,21 @@ properties — the first five live in the theme, the last two in the structure s
 | `--media-player-radius`     | `0.5rem`     | the control row's corners, and the video's                                                                                                     |
 | `--media-player-gap`        | `0.5rem`     | between controls                                                                                                                               |
 | `--media-player-fade`       | `0.2s`       | how long the video controls take to fade out                                                                                                   |
+
+Neither knob is drawn all the time: a bar nobody is aiming at is a position line, and the
+knob — the scrubber's and the volume's alike — appears when the pointer arrives over its
+slider. Nothing moves when it does; only its colour changes, so the track, the played fill
+and the buffered bar, all three inset by half a thumb, sit where they sat. Keyboard focus
+counts as aiming at it, and so does a drag still holding the button after the pointer has
+slid off the track. Two places keep the knobs out of that rule: a touch device, which has no
+hover to bring one back, and forced colours, where the mode's own thumb colour is what makes
+the control findable at all. To have them always, put the colour back:
+
+```css
+media-player slider-elemental {
+  --slider-elemental-thumb: var(--slider-elemental-fill);
+}
+```
 
 ## Handlers you can name
 

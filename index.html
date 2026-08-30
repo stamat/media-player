@@ -1753,9 +1753,10 @@ cannot say:</p>
 last. A live stream gets no seek buttons, because there is nowhere on it to seek to.</p>
 <h2 id="what-the-theme-takes">What the theme takes<a class="heading-anchor" href="#what-the-theme-takes" tabindex="-1" aria-hidden="true"></a></h2>
 <p><code>theme.css</code> speaks the register Plyr made the standard: a flat compact bar, controls that
-flood with the accent under the pointer, a slim rounded track carrying an accent thumb,
-video controls on a bottom gradient with a centred play chip. The speed <code>&lt;select&gt;</code> loses
-its native chrome to <code>appearance: none</code> and is drawn as one more button in that row —
+flood with the accent under the pointer, a slim rounded track whose accent thumb comes up
+under the pointer with it, video controls on a bottom gradient with a centred play chip.
+The speed <code>&lt;select&gt;</code> loses its native chrome to <code>appearance: none</code> and is drawn as one more
+button in that row —
 the rate and no arrow, because <code>currentColor</code> reaches neither a <code>background-image</code> nor a
 pseudo-element a <code>&lt;select&gt;</code> renders. Where Plyr hardcodes white
 and slate, this sheet uses <code>Canvas</code> and <code>CanvasText</code>, so the same look follows the page
@@ -1808,6 +1809,17 @@ properties — the first five live in the theme, the last two in the structure s
 <td>how long the video controls take to fade out</td>
 </tr>
 </tbody></table>
+<p>Neither knob is drawn all the time: a bar nobody is aiming at is a position line, and the
+knob — the scrubber&#39;s and the volume&#39;s alike — appears when the pointer arrives over its
+slider. Nothing moves when it does; only its colour changes, so the track, the played fill
+and the buffered bar, all three inset by half a thumb, sit where they sat. Keyboard focus
+counts as aiming at it, and so does a drag still holding the button after the pointer has
+slid off the track. Two places keep the knobs out of that rule: a touch device, which has no
+hover to bring one back, and forced colours, where the mode&#39;s own thumb colour is what makes
+the control findable at all. To have them always, put the colour back:</p>
+<pre><code class="hljs language-css">media-player slider-elemental {
+  <span class="hljs-attr">--slider-elemental-thumb</span>: <span class="hljs-built_in">var</span>(--slider-elemental-fill);
+}</code></pre>
 <h2 id="handlers-you-can-name">Handlers you can name<a class="heading-anchor" href="#handlers-you-can-name" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The samples above are the working answer; this is the index — every name <code>on=</code> can call, for
 the moment you are building a control row no sample here draws. It is the list

@@ -156,6 +156,18 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- **`theme.css` draws the knobs only where the pointer is** — the scrubber's and the
+  volume's both, because two bars in one row with a knob on only one of them reads as the
+  other being broken. A bar nobody is aiming at is a position line; the knob is what says the
+  thing can be dragged, and it now says it where you already are. Only the thumb's colour
+  changes, so the track, the played fill and the buffered bar — all three inset by half a
+  thumb — stay exactly where they were and nothing shifts as one appears. Keyboard focus
+  counts as aiming at it, and so does a drag still holding the button after the pointer has
+  slid off the track. Two exemptions: a touch device, which has no hover to bring a knob
+  back, and forced colours, where the mode's own thumb colour is the one thing making the
+  control findable. `--slider-elemental-thumb: var(--slider-elemental-fill)` on
+  `media-player slider-elemental` puts the old behaviour back in one declaration.
+
 - **book-of-elementals and hydrargyri are `peerDependencies` now, not `dependencies`.**
   Both register into globals a page has only one of — `customElements` for the elemental
   tags, and hydrargyri's own register of which tags are hydrargyri's — so a second copy is
