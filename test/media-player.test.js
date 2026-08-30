@@ -248,6 +248,20 @@ describe('a custom element that speaks the media API', () => {
     expect(player.duration).toBe(120);
   });
 
+  test('one that emits play a beat before its own paused flips still gets a clock, because playing starts it too', () => {
+    defineFakeElement('early-play-video');
+    const media = fakeElement('early-play-video');
+    const player = mount(media);
+
+    media.state.currentTime = 42;
+    media.dispatchEvent(new Event('play'));
+    expect(player.currentTime).toBe(0);
+
+    media.state.paused = false;
+    media.dispatchEvent(new Event('playing'));
+    expect(player.currentTime).toBe(42);
+  });
+
   test('a player removed while still waiting on the upgrade leaves the element alone when it comes', async () => {
     const media = fakeElement('gone-video');
     const player = mount(media);

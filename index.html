@@ -338,7 +338,7 @@ one browser setting from proof.</p>
 
 <details class="toc-disclosure" open>
   <summary>On this page</summary>
-  <nav class="toc" aria-label="On this page"><ul><li class="toc-h2"><a href="#two-rows-and-what-a-phone-changes">Two rows, and what a phone changes</a></li><li class="toc-h2"><a href="#the-part-that-matters-most">The part that matters most</a></li><li class="toc-h2"><a href="#one-element-both-media">One element, both media</a></li><li class="toc-h2"><a href="#twelve-minutes-from-someone-elses-server">Twelve minutes, from someone else&#39;s server</a></li><li class="toc-h2"><a href="#frames-on-the-scrubber">Frames on the scrubber</a></li><li class="toc-h2"><a href="#a-background-loop-and-the-one-button-it-owes-you">A background loop, and the one button it owes you</a></li><li class="toc-h2"><a href="#what-it-borrows">What it borrows</a></li><li class="toc-h2"><a href="#keys-the-buttons-carry">Keys the buttons carry</a></li><li class="toc-h3"><a href="#which-keydown-you-bind-is-the-whole-scope">Which keydown you bind is the whole scope</a></li><li class="toc-h3"><a href="#what-a-press-has-to-get-past-first">What a press has to get past first</a></li><li class="toc-h2"><a href="#tooltips-on-the-controls">Tooltips on the controls</a></li><li class="toc-h2"><a href="#attributes-it-writes">Attributes it writes</a></li><li class="toc-h2"><a href="#on-the-lock-screen">On the lock screen</a></li><li class="toc-h2"><a href="#what-the-theme-takes">What the theme takes</a></li><li class="toc-h2"><a href="#handlers-you-can-name">Handlers you can name</a></li><li class="toc-h2"><a href="#state-you-can-bind">State you can bind</a></li><li class="toc-h2"><a href="#labels-in-another-language">Labels in another language</a></li><li class="toc-h2"><a href="#events">Events</a></li><li class="toc-h2"><a href="#against-the-alternatives">Against the alternatives</a></li><li class="toc-h2"><a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a></li><li class="toc-h2"><a href="#what-it-does-not-do">What it does not do</a></li><li class="toc-h2"><a href="#install">Install</a></li><li class="toc-h2"><a href="#what-editors-read">What editors read</a></li><li class="toc-h2"><a href="#questions">Questions</a></li><li class="toc-h2"><a href="#license">License</a></li></ul></nav>
+  <nav class="toc" aria-label="On this page"><ul><li class="toc-h2"><a href="#two-rows-and-what-a-phone-changes">Two rows, and what a phone changes</a></li><li class="toc-h2"><a href="#the-part-that-matters-most">The part that matters most</a></li><li class="toc-h2"><a href="#one-element-both-media">One element, both media</a></li><li class="toc-h3"><a href="#one-tag-for-youtube-vimeo-and-a-file">One tag for YouTube, Vimeo and a file</a></li><li class="toc-h3"><a href="#what-the-embed-costs-either-way">What the embed costs, either way</a></li><li class="toc-h2"><a href="#twelve-minutes-from-someone-elses-server">Twelve minutes, from someone else&#39;s server</a></li><li class="toc-h2"><a href="#frames-on-the-scrubber">Frames on the scrubber</a></li><li class="toc-h2"><a href="#a-background-loop-and-the-one-button-it-owes-you">A background loop, and the one button it owes you</a></li><li class="toc-h2"><a href="#what-it-borrows">What it borrows</a></li><li class="toc-h2"><a href="#keys-the-buttons-carry">Keys the buttons carry</a></li><li class="toc-h3"><a href="#which-keydown-you-bind-is-the-whole-scope">Which keydown you bind is the whole scope</a></li><li class="toc-h3"><a href="#what-a-press-has-to-get-past-first">What a press has to get past first</a></li><li class="toc-h2"><a href="#tooltips-on-the-controls">Tooltips on the controls</a></li><li class="toc-h2"><a href="#attributes-it-writes">Attributes it writes</a></li><li class="toc-h2"><a href="#on-the-lock-screen">On the lock screen</a></li><li class="toc-h2"><a href="#what-the-theme-takes">What the theme takes</a></li><li class="toc-h2"><a href="#handlers-you-can-name">Handlers you can name</a></li><li class="toc-h2"><a href="#state-you-can-bind">State you can bind</a></li><li class="toc-h2"><a href="#labels-in-another-language">Labels in another language</a></li><li class="toc-h2"><a href="#events">Events</a></li><li class="toc-h2"><a href="#against-the-alternatives">Against the alternatives</a></li><li class="toc-h2"><a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a></li><li class="toc-h2"><a href="#what-it-does-not-do">What it does not do</a></li><li class="toc-h2"><a href="#install">Install</a></li><li class="toc-h2"><a href="#what-editors-read">What editors read</a></li><li class="toc-h2"><a href="#questions">Questions</a></li><li class="toc-h2"><a href="#license">License</a></li></ul></nav>
 </details>
 <h2 id="two-rows-and-what-a-phone-changes">Two rows, and what a phone changes<a class="heading-anchor" href="#two-rows-and-what-a-phone-changes" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The scrubber is first in that markup on purpose. <code>style.css</code> gives it a whole flex line, so
@@ -783,10 +783,7 @@ name can say what an element answers to. Same wires, same properties, same barga
 <code>controls</code> comes off at upgrade and goes back on removal, which on these elements reloads
 their iframe with the platform&#39;s own chrome, and the video half comes on unless the name ends
 in <code>-audio</code>. The structure sheet sizes it like a <code>&lt;video&gt;</code> — full width, <code>16 / 9</code> until your
-sheet says otherwise; what the element does to itself is its own.
-<a href="https://github.com/stamat/video-background"><code>&lt;video-background&gt;</code></a> speaks the same API and
-drops in the same way, with its <code>unstyled</code> attribute on so it sits in the flow rather than
-behind the page.</p>
+sheet says otherwise; what the element does to itself is its own.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/youtube-video-element@1/+esm&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
@@ -800,16 +797,120 @@ behind the page.</p>
 <p><code>/+esm</code> is not decoration: the package&#39;s plain build imports a helper by bare name, which
 a browser cannot resolve, and the element then never defines — with this one waiting on
 it politely and nothing in the console. The <code>+esm</code> build has the import rewritten.</p>
-<p>What the swap costs is the promise at the top of this page. The page plays with the script
-blocked is now <code>&lt;youtube-video&gt;</code>&#39;s to keep, and it does not: until its own module runs it is
-a blank box, the way a <code>&lt;video src=&quot;stream.m3u8&quot;&gt;</code> is in Chrome until hls.js runs. What it
-changes is where a click goes: the embed gets no pointer input at all — the structure sheet
-says <code>pointer-events: none</code> on it, because a cross-origin iframe keeps every click and
-passes nothing out — so a click on the picture lands on the player and pauses, as on a
-<code>&lt;video&gt;</code>; whatever the platform would have done with that click is not on offer. The order of the two
-scripts does not matter: a <code>&lt;youtube-video&gt;</code> that upgrades after the player did is left
-alone until it has, then read the same way. Not a live sample, because it would put a third
-party&#39;s module on this page, and the page loads nothing it does not build.</p>
+<h3 id="one-tag-for-youtube-vimeo-and-a-file">One tag for YouTube, Vimeo and a file<a class="heading-anchor" href="#one-tag-for-youtube-vimeo-and-a-file" tabindex="-1" aria-hidden="true"></a></h3>
+<p><a href="https://github.com/stamat/video-background-element"><code>&lt;video-background&gt;</code></a> speaks the same API
+and drops into the same slot, and where media-elements ships an element per platform it
+answers to all of them from one tag: the <code>src</code> decides whether the thing behind it is
+YouTube, Vimeo or a plain video file. It is mine, so weigh the preference accordingly — what
+follows is measured, not asserted.</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/video-background-element@1&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">video-background</span>
+    <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-media&quot;</span>
+    <span class="hljs-attr">unstyled</span> <span class="hljs-attr">fit-box</span>
+    <span class="hljs-attr">autoplay</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">loop</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">muted</span>=<span class="hljs-string">&quot;false&quot;</span>
+    <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://www.youtube.com/watch?v=rubNgGj3pYo&quot;</span>
+  &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video-background</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-poster&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;poster.jpg&quot;</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">&quot;&quot;</span> /&gt;</span>
+  <span class="hljs-comment">&lt;!-- the overlay and the control row from the sample above, copied whole --&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
+<p>Vimeo is that markup with a Vimeo link in it. Nothing else moves — not the script tag, not
+the attributes, not one line of the control row:</p>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">video-background</span>
+  <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-media&quot;</span>
+  <span class="hljs-attr">unstyled</span> <span class="hljs-attr">fit-box</span>
+  <span class="hljs-attr">autoplay</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">loop</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">muted</span>=<span class="hljs-string">&quot;false&quot;</span>
+  <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://vimeo.com/137250145&quot;</span>
+&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video-background</span>&gt;</span></code></pre>
+<p>A plain <code>&lt;script&gt;</code>, not a module, and no <code>/+esm</code> to remember: the published bundle carries
+its one dependency inside it, so there is no bare import left for the browser to resolve.</p>
+<p>The five attributes are the element being talked out of being a background, which is the one
+thing it was written to be. <code>unstyled</code> drops the absolute, full-bleed positioning it would
+otherwise take, and the <code>position: relative</code> it would write onto its parent, so it sits in
+the flow and the structure sheet&#39;s <code>16 / 9</code> is what sizes it. <code>fit-box</code> fills that box
+instead of overscanning past it — the overscan exists to push a platform&#39;s edge chrome out
+of a background&#39;s crop, and here the box <em>is</em> the picture, so cropping it is loss. And a
+background autoplays, loops and starts muted; a player does none of the three until it is
+told to, which is what <code>autoplay=&quot;false&quot;</code>, <code>loop=&quot;false&quot;</code> and <code>muted=&quot;false&quot;</code> say. The poster
+is the player&#39;s own <code>&lt;img class=&quot;media-player-poster&quot;&gt;</code>, because the element hides its first
+frame until playback starts — its <code>load-background</code> attribute would fetch the platform&#39;s
+thumbnail, but <code>unstyled</code> drops the <code>background-size: cover</code> that places it, and the picture
+tiles.</p>
+<p>Which route to take, both measured under this player against the same 2:30 YouTube video:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>&lt;video-background&gt;</code></th>
+<th>media-elements</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>YouTube, Vimeo, a video file</strong></td>
+<td>one tag, chosen by <code>src</code></td>
+<td><code>&lt;youtube-video&gt;</code>, <code>&lt;vimeo-video&gt;</code>, and a plain <code>&lt;video&gt;</code> — a separate script each</td>
+</tr>
+<tr>
+<td><strong>HLS, DASH, and the long tail</strong></td>
+<td>no</td>
+<td><code>&lt;hls-video&gt;</code>, <code>&lt;dash-video&gt;</code>, and a dozen more</td>
+</tr>
+<tr>
+<td><strong>How it loads</strong></td>
+<td>one plain <code>&lt;script&gt;</code>, dependency bundled in</td>
+<td><code>&lt;script type=&quot;module&quot;&gt;</code>, and <code>/+esm</code> on jsdelivr or it never defines</td>
+</tr>
+<tr>
+<td><strong>Gzipped</strong></td>
+<td>10.2 kB, all three platforms</td>
+<td>3.8 kB for YouTube alone, and again for each further platform</td>
+</tr>
+<tr>
+<td><strong>Clock and scrubber</strong></td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><strong>Buffered bar</strong></td>
+<td>never fills</td>
+<td>fills</td>
+</tr>
+<tr>
+<td><strong>Captions</strong></td>
+<td>no</td>
+<td><code>textTracks</code> is there; it was empty on this video</td>
+</tr>
+<tr>
+<td><strong>Whose it is</strong></td>
+<td>mine</td>
+<td>Mux&#39;s</td>
+</tr>
+</tbody></table>
+<p>Take media-elements when the format matters — HLS and DASH have no answer in the other
+column, and one platform on a page is the smaller download. Take <code>&lt;video-background&gt;</code> when
+what you want is a YouTube and a Vimeo behaving alike under markup you wrote once.</p>
+<h3 id="what-the-embed-costs-either-way">What the embed costs, either way<a class="heading-anchor" href="#what-the-embed-costs-either-way" tabindex="-1" aria-hidden="true"></a></h3>
+<p>The promise at the top of this page is the first casualty, and it is now the embed&#39;s to keep
+rather than this element&#39;s. Until the third-party script runs, the box is blank the way a
+<code>&lt;video src=&quot;stream.m3u8&quot;&gt;</code> is in Chrome until hls.js runs — a poster is what stands there
+instead, and there is nothing under it to play.</p>
+<p>The click on the picture changes hands too. The structure sheet gives a <code>.media-player-media</code>
+no pointer input, because a cross-origin iframe keeps every click it gets and passes nothing
+out, so the click lands on the player&#39;s own box and pauses, as on a <code>&lt;video&gt;</code> — whatever the
+platform would have done with it is not on offer. <code>is-live</code> never comes on for either route:
+that reads <code>seekable</code>, and an embed has none, so the live section below has nothing to say
+about a platform stream.</p>
+<p>Two more are <code>&lt;video-background&gt;</code>&#39;s alone, and both are silent rather than broken. The
+buffered bar stays empty: it is painted from <code>progress</code>, which the element does not emit —
+YouTube&#39;s loaded fraction is sitting on the element to read, with no event announcing it. And
+there are no <code>textTracks</code>, so the captions button toggles nothing and the scrubber previews
+no frames. Bind them and they sit there inert; leave them out of the row for an embed and
+nothing is missing.</p>
+<p>The order of the two scripts does not matter either way: an embed that upgrades after the
+player did is left alone until it has, then read the same way. None of this is a live sample,
+because a live one would put a third party&#39;s module and a third party&#39;s iframe on this page,
+and the page loads nothing it does not build.</p>
 <h2 id="twelve-minutes-from-someone-elses-server">Twelve minutes, from someone else&#39;s server<a class="heading-anchor" href="#twelve-minutes-from-someone-elses-server" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Twelve seconds proves the wiring and proves nothing about the seeking. A local file that
 short never buffers, and a clock reading <code>00:00 / 00:12</code> never needs the minutes it can show.
@@ -1726,7 +1827,7 @@ win.</p>
 </tr>
 <tr>
 <td><strong>YouTube, Vimeo, HLS, DASH</strong></td>
-<td>via media-elements, or hls.js on your <code>&lt;video&gt;</code></td>
+<td>via media-elements or <code>&lt;video-background&gt;</code>, hls.js on your <code>&lt;video&gt;</code></td>
 <td>YouTube, Vimeo</td>
 <td>via a provider</td>
 <td>all of them</td>
@@ -1758,10 +1859,12 @@ elementals&#39; four structure sheets 1.3 kB and their three themes 2.5 kB more,
 its own the way a browser fetches it. Every one of those numbers moves with a release;
 measure before quoting.</p>
 <p>Where this loses is the bottom of that table, and it loses there on purpose. YouTube and
-Vimeo arrive the way they arrive in media-chrome — an element from
-<a href="https://github.com/muxinc/media-elements">media-elements</a> that speaks the media API,
-dropped in where the <code>&lt;video&gt;</code> goes — and with the script blocked that element is a blank
-box, which is the promise at the top of this page handed to someone else.
+Vimeo arrive the way they arrive in media-chrome — an element that speaks the media API,
+dropped in where the <code>&lt;video&gt;</code> goes, from
+<a href="https://github.com/muxinc/media-elements">media-elements</a> or from
+<a href="https://github.com/stamat/video-background-element"><code>&lt;video-background&gt;</code></a> — and with the
+script blocked that element is a blank box, which is the promise at the top of this page
+handed to someone else.
 <strong><a href="https://github.com/sampotts/plyr">Plyr</a> is the answer when the embed must play with no
 script at all</strong>, since it enhances the <code>&lt;iframe&gt;</code> you already wrote, and Video.js for the
 long tail of formats and plugins. None of that is planned here.</p>
@@ -1932,7 +2035,8 @@ what you do not want.</li>
 <li><strong>Streaming formats and embeds of its own.</strong> HLS, DASH, YouTube and Vimeo each need a
 third-party script, and nothing here ships one or knows one by name. What composes is
 anything that speaks the media API: hls.js on the <code>&lt;video&gt;</code> you wrote, or a
-<code>&lt;youtube-video&gt;</code> from media-elements marked <code>media-player-media</code>.
+<code>&lt;youtube-video&gt;</code> from media-elements — or a <code>&lt;video-background&gt;</code>, which answers for
+YouTube and Vimeo from one tag — marked <code>media-player-media</code>.
 <a href="#one-element-both-media">One element, both media</a> shows the second,
 <a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a> the
 first, and both say what a blocked script leaves behind.</li>
@@ -2040,9 +2144,11 @@ element&#39;s — see <a href="#live-and-the-streams-it-does-not-carry">Live, an
 written to make them: attach hls.js or dash.js to the <code>&lt;video&gt;</code> you wrote, because this
 element only ever reads the media element and never touches its <code>src</code>. YouTube and Vimeo
 are one step over — media-elements ships <code>&lt;youtube-video&gt;</code> and <code>&lt;vimeo-video&gt;</code> with the
-media API on them, and this element wraps one marked <code>class=&quot;media-player-media&quot;</code> the way it
-wraps a <code>&lt;video&gt;</code>. <a href="#one-element-both-media">One element, both media</a> has the markup and
-what it costs.</p>
+media API on them, and
+<a href="https://github.com/stamat/video-background-element"><code>&lt;video-background&gt;</code></a> answers for both
+from one tag; this element wraps either marked <code>class=&quot;media-player-media&quot;</code> the way it wraps
+a <code>&lt;video&gt;</code>. <a href="#one-element-both-media">One element, both media</a> has the markup for both,
+measured side by side, and what each costs.</p>
 <p>One half does not survive DASH. hls.js reports an endless duration for a live manifest and
 dash.js reports the rewind window&#39;s length, so <code>is-live</code> never comes on there. The worked
 recipe and that limit are in

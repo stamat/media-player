@@ -20,8 +20,12 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   would be an own property shadowing the accessor the definition brings, and the platform's
   chrome would load under yours with nothing warning. The structure sheet sizes such an
   element like a `<video>` — full width, `16 / 9` until you say otherwise. What the element
-  does to itself is its own business: `<video-background>` lays itself over its parent as
-  a background, and its `unstyled` attribute is what puts it in the player's flow.
+  does to itself is its own business:
+  [`<video-background>`](https://github.com/stamat/video-background-element) lays itself over
+  its parent as a background, and `unstyled fit-box` with `autoplay`, `loop` and `muted` all
+  `"false"` is what talks it into being a player instead. That one answers for YouTube, Vimeo
+  and a video file from a single tag, chosen by `src`, where media-elements ships an element
+  and a script per platform; the page has both recipes and the measured trade between them.
 
   **What stays out:** the elements themselves. Nothing here loads a platform script or knows
   a platform by name, so the page with the script blocked is now that element's promise to
@@ -74,6 +78,19 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   not call and added attributes to a bubble it does not style; the custom properties, the
   element names and the SCSS entry points are the same ones, so nothing on the page changes
   shape.
+
+### Fixed
+
+- **A custom media element that fires `play` before its own `paused` flips no longer freezes
+  the clock.** The animation frame that paints the position bails on a paused element and
+  does not schedule the frame that would try again, and `play` was the only way into that
+  loop — so an element announcing playback a beat ahead of its own state left the clock on
+  `00:00` and the thumb at the start for the whole track, with the picture playing above it
+  and every other reading correct. A `<video>` cannot do this; the platform settles `paused`
+  before it fires. A wrapper around someone else's player can and does — `<video-background>`
+  on a Vimeo link is where this was found. `playing`, which means playback actually began, is
+  a second way into the loop now; it cancels before it schedules, so the two entry points
+  cannot leave two loops running.
 
 ## [1.2.0] - 2026-08-21
 

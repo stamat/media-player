@@ -777,9 +777,6 @@ name can say what an element answers to. Same wires, same properties, same barga
 their iframe with the platform's own chrome, and the video half comes on unless the name ends
 in `-audio`. The structure sheet sizes it like a `<video>` — full width, `16 / 9` until your
 sheet says otherwise; what the element does to itself is its own.
-[`<video-background>`](https://github.com/stamat/video-background) speaks the same API and
-drops in the same way, with its `unstyled` attribute on so it sits in the flow rather than
-behind the page.
 
 ```html
 <script type="module" src="https://cdn.jsdelivr.net/npm/youtube-video-element@1/+esm"></script>
@@ -798,16 +795,99 @@ behind the page.
 a browser cannot resolve, and the element then never defines — with this one waiting on
 it politely and nothing in the console. The `+esm` build has the import rewritten.
 
-What the swap costs is the promise at the top of this page. The page plays with the script
-blocked is now `<youtube-video>`'s to keep, and it does not: until its own module runs it is
-a blank box, the way a `<video src="stream.m3u8">` is in Chrome until hls.js runs. What it
-changes is where a click goes: the embed gets no pointer input at all — the structure sheet
-says `pointer-events: none` on it, because a cross-origin iframe keeps every click and
-passes nothing out — so a click on the picture lands on the player and pauses, as on a
-`<video>`; whatever the platform would have done with that click is not on offer. The order of the two
-scripts does not matter: a `<youtube-video>` that upgrades after the player did is left
-alone until it has, then read the same way. Not a live sample, because it would put a third
-party's module on this page, and the page loads nothing it does not build.
+### One tag for YouTube, Vimeo and a file
+
+[`<video-background>`](https://github.com/stamat/video-background-element) speaks the same API
+and drops into the same slot, and where media-elements ships an element per platform it
+answers to all of them from one tag: the `src` decides whether the thing behind it is
+YouTube, Vimeo or a plain video file. It is mine, so weigh the preference accordingly — what
+follows is measured, not asserted.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/video-background-element@1"></script>
+
+<media-player tabindex="0" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+  <video-background
+    class="media-player-media"
+    unstyled fit-box
+    autoplay="false" loop="false" muted="false"
+    src="https://www.youtube.com/watch?v=rubNgGj3pYo"
+  ></video-background>
+  <img class="media-player-poster" src="poster.jpg" alt="" />
+  <!-- the overlay and the control row from the sample above, copied whole -->
+</media-player>
+```
+
+Vimeo is that markup with a Vimeo link in it. Nothing else moves — not the script tag, not
+the attributes, not one line of the control row:
+
+```html
+<video-background
+  class="media-player-media"
+  unstyled fit-box
+  autoplay="false" loop="false" muted="false"
+  src="https://vimeo.com/137250145"
+></video-background>
+```
+
+A plain `<script>`, not a module, and no `/+esm` to remember: the published bundle carries
+its one dependency inside it, so there is no bare import left for the browser to resolve.
+
+The five attributes are the element being talked out of being a background, which is the one
+thing it was written to be. `unstyled` drops the absolute, full-bleed positioning it would
+otherwise take, and the `position: relative` it would write onto its parent, so it sits in
+the flow and the structure sheet's `16 / 9` is what sizes it. `fit-box` fills that box
+instead of overscanning past it — the overscan exists to push a platform's edge chrome out
+of a background's crop, and here the box _is_ the picture, so cropping it is loss. And a
+background autoplays, loops and starts muted; a player does none of the three until it is
+told to, which is what `autoplay="false"`, `loop="false"` and `muted="false"` say. The poster
+is the player's own `<img class="media-player-poster">`, because the element hides its first
+frame until playback starts — its `load-background` attribute would fetch the platform's
+thumbnail, but `unstyled` drops the `background-size: cover` that places it, and the picture
+tiles.
+
+Which route to take, both measured under this player against the same 2:30 YouTube video:
+
+| | `<video-background>` | media-elements |
+| --- | --- | --- |
+| **YouTube, Vimeo, a video file** | one tag, chosen by `src` | `<youtube-video>`, `<vimeo-video>`, and a plain `<video>` — a separate script each |
+| **HLS, DASH, and the long tail** | no | `<hls-video>`, `<dash-video>`, and a dozen more |
+| **How it loads** | one plain `<script>`, dependency bundled in | `<script type="module">`, and `/+esm` on jsdelivr or it never defines |
+| **Gzipped** | 10.2 kB, all three platforms | 3.8 kB for YouTube alone, and again for each further platform |
+| **Clock and scrubber** | yes | yes |
+| **Buffered bar** | never fills | fills |
+| **Captions** | no | `textTracks` is there; it was empty on this video |
+| **Whose it is** | mine | Mux's |
+
+Take media-elements when the format matters — HLS and DASH have no answer in the other
+column, and one platform on a page is the smaller download. Take `<video-background>` when
+what you want is a YouTube and a Vimeo behaving alike under markup you wrote once.
+
+### What the embed costs, either way
+
+The promise at the top of this page is the first casualty, and it is now the embed's to keep
+rather than this element's. Until the third-party script runs, the box is blank the way a
+`<video src="stream.m3u8">` is in Chrome until hls.js runs — a poster is what stands there
+instead, and there is nothing under it to play.
+
+The click on the picture changes hands too. The structure sheet gives a `.media-player-media`
+no pointer input, because a cross-origin iframe keeps every click it gets and passes nothing
+out, so the click lands on the player's own box and pauses, as on a `<video>` — whatever the
+platform would have done with it is not on offer. `is-live` never comes on for either route:
+that reads `seekable`, and an embed has none, so the live section below has nothing to say
+about a platform stream.
+
+Two more are `<video-background>`'s alone, and both are silent rather than broken. The
+buffered bar stays empty: it is painted from `progress`, which the element does not emit —
+YouTube's loaded fraction is sitting on the element to read, with no event announcing it. And
+there are no `textTracks`, so the captions button toggles nothing and the scrubber previews
+no frames. Bind them and they sit there inert; leave them out of the row for an embed and
+nothing is missing.
+
+The order of the two scripts does not matter either way: an embed that upgrades after the
+player did is left alone until it has, then read the same way. None of this is a live sample,
+because a live one would put a third party's module and a third party's iframe on this page,
+and the page loads nothing it does not build.
 
 ## Twelve minutes, from someone else's server
 
@@ -1508,7 +1588,7 @@ win.
 | **Your CSS reaches every part**    | yes                                                     | yes                                                  | through `::part()` and the variables it chose          | partly                               | yes                                    |
 | **Scrubber frame previews**        | yes — your box, the browser's VTT parser                | yes — its own VTT parser                             | yes, inside its time range                             | yes — VTT, sprites, storyboards      | a community plugin                     |
 | **Built from reusable primitives** | yes — the sliders ship separately                       | no                                                   | no                                                     | no                                   | no                                     |
-| **YouTube, Vimeo, HLS, DASH**      | via media-elements, or hls.js on your `<video>`         | YouTube, Vimeo                                       | via a provider                                         | all of them                          | via plugins                            |
+| **YouTube, Vimeo, HLS, DASH**      | via media-elements or `<video-background>`, hls.js on your `<video>` | YouTube, Vimeo                                       | via a provider                                         | all of them                          | via plugins                            |
 | **Ecosystem**                      | none                                                    | large                                                | Mux's                                                  | large                                | the largest                            |
 | **Pick it when**                   | the markup is yours and must survive without the script | you want one line and a good default                 | you want composable parts and accept a shadow root     | you are building an app around media | you need every format and every plugin |
 
@@ -1522,10 +1602,12 @@ its own the way a browser fetches it. Every one of those numbers moves with a re
 measure before quoting.
 
 Where this loses is the bottom of that table, and it loses there on purpose. YouTube and
-Vimeo arrive the way they arrive in media-chrome — an element from
-[media-elements](https://github.com/muxinc/media-elements) that speaks the media API,
-dropped in where the `<video>` goes — and with the script blocked that element is a blank
-box, which is the promise at the top of this page handed to someone else.
+Vimeo arrive the way they arrive in media-chrome — an element that speaks the media API,
+dropped in where the `<video>` goes, from
+[media-elements](https://github.com/muxinc/media-elements) or from
+[`<video-background>`](https://github.com/stamat/video-background-element) — and with the
+script blocked that element is a blank box, which is the promise at the top of this page
+handed to someone else.
 **[Plyr](https://github.com/sampotts/plyr) is the answer when the embed must play with no
 script at all**, since it enhances the `<iframe>` you already wrote, and Video.js for the
 long tail of formats and plugins. None of that is planned here.
@@ -1712,7 +1794,8 @@ Each of these is a decision, not a gap waiting for a pull request.
 - **Streaming formats and embeds of its own.** HLS, DASH, YouTube and Vimeo each need a
   third-party script, and nothing here ships one or knows one by name. What composes is
   anything that speaks the media API: hls.js on the `<video>` you wrote, or a
-  `<youtube-video>` from media-elements marked `media-player-media`.
+  `<youtube-video>` from media-elements — or a `<video-background>`, which answers for
+  YouTube and Vimeo from one tag — marked `media-player-media`.
   [One element, both media](#one-element-both-media) shows the second,
   [Live, and the streams it does not carry](#live-and-the-streams-it-does-not-carry) the
   first, and both say what a blocked script leaves behind.
@@ -1853,9 +1936,11 @@ Nothing here ships any of them, and none is coming. But all four compose, and no
 written to make them: attach hls.js or dash.js to the `<video>` you wrote, because this
 element only ever reads the media element and never touches its `src`. YouTube and Vimeo
 are one step over — media-elements ships `<youtube-video>` and `<vimeo-video>` with the
-media API on them, and this element wraps one marked `class="media-player-media"` the way it
-wraps a `<video>`. [One element, both media](#one-element-both-media) has the markup and
-what it costs.
+media API on them, and
+[`<video-background>`](https://github.com/stamat/video-background-element) answers for both
+from one tag; this element wraps either marked `class="media-player-media"` the way it wraps
+a `<video>`. [One element, both media](#one-element-both-media) has the markup for both,
+measured side by side, and what each costs.
 
 One half does not survive DASH. hls.js reports an endless duration for a live manifest and
 dash.js reports the rewind window's length, so `is-live` never comes on there. The worked

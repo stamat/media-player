@@ -1003,8 +1003,19 @@ export class MediaPlayer extends HgElement {
     this.isBuffering = true;
   }
 
+  /**
+   * Playback is actually running — and the second way into the clock.
+   *
+   * `play` is not proof the clock can start. A `<video>` has its `paused` false before the
+   * event fires, but a custom media element wrapping someone else's player may emit `play`
+   * a beat ahead of its own state, and `tick` bails on a paused element without scheduling
+   * the frame that would try again: one early read and the thumb never moves. `playing` is
+   * the event that means playback began, so it starts the loop too. `resume` cancels before
+   * it schedules, so the two entry points cannot leave two loops running.
+   */
   onPlaying() {
     this.isBuffering = false;
+    this.resume();
   }
 
   /**
