@@ -768,15 +768,163 @@ sheet.
 
 The third thing it wraps is not a native element at all. YouTube, Vimeo, HLS and the rest
 each need a third-party script driving something, and this element ships none and knows none
-by name — what it knows is the media API.
-[media-elements](https://github.com/muxinc/media-elements) publishes one element per platform
-with that API on it — `<youtube-video>`, `<vimeo-video>`, `<hls-video>` among them — and any
-of those goes where the `<video>` goes, marked `class="media-player-media"`, because no tag
-name can say what an element answers to. Same wires, same properties, same bargain:
-`controls` comes off at upgrade and goes back on removal, which on these elements reloads
-their iframe with the platform's own chrome, and the video half comes on unless the name ends
-in `-audio`. The structure sheet sizes it like a `<video>` — full width, `16 / 9` until your
-sheet says otherwise; what the element does to itself is its own.
+by name — what it knows is the media API. Any element carrying that API goes where the
+`<video>` goes, marked `class="media-player-media"`, because no tag name can say what an
+element answers to. Same wires, same properties, same bargain: `controls` comes off at upgrade
+and goes back on removal, which on these elements reloads their iframe with the platform's own
+chrome, and the video half comes on unless the name ends in `-audio`. The structure sheet
+sizes it like a `<video>` — full width, `16 / 9` until your sheet says otherwise; what the
+element does to itself is its own.
+
+### YouTube and Vimeo, from one tag
+
+[`<video-background>`](https://github.com/stamat/video-background-element) speaks that API and
+drops into that slot, and it answers for all three sources from a single tag: the `src`
+decides whether the thing behind it is YouTube, Vimeo or a plain video file. It is mine, so
+weigh the preference accordingly — everything claimed for it below was measured in a browser,
+and the two players under this paragraph are the measurement.
+
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script src='https://cdn.jsdelivr.net/npm/video-background-element@1'&gt;&lt;/script&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+
+```html
+<style>
+  /* `unstyled` drops the element's own sheet, and `load-background` places the thumbnail
+     through it. Two declarations buy that back; without them the picture tiles. */
+  media-player video-background { background-size: cover; background-position: center; }
+</style>
+
+<media-player tabindex="0" role="region" aria-label="YouTube player" media-title="Family Guy: McStroke (Clip)" artist="TBS" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+  <video-background class="media-player-media" unstyled fit-box load-background lazyloading always-play autoplay="false" loop="false" muted="false" src="https://www.youtube.com/watch?v=UIyoNvInzCI"></video-background>
+  <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
+  <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
+    <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
+      <progress-elemental><progress value="0" max="1" bind="buffered:prop#value;duration:prop#max"></progress></progress-elemental>
+      <input type="range" min="0" step="any" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
+    </slider-elemental>
+    <tooltip-elemental>
+      <button on="click:skipBackward" key="ArrowLeft" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+      <span>Skip backward</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button on="click:togglePlay" key=" " bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
+      <span bind="playLabel">Play</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button on="click:skipForward" key="ArrowRight" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
+      <span>Skip forward</span>
+    </tooltip-elemental>
+    <span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+    <tooltip-elemental>
+      <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
+      <span bind="muteLabel">Mute</span>
+    </tooltip-elemental>
+    <slider-elemental class="media-player-volume" tooltip="thumb"><input type="range" min="0" max="100" step="5" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
+    <tooltip-elemental>
+      <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+      <span>Fullscreen</span>
+    </tooltip-elemental>
+  </toolbar-elemental>
+</media-player>
+```
+
+</code-preview>
+
+Vimeo is that markup with a Vimeo link in it. Nothing else moves — not the script tag, not
+the attributes, not one line of the control row. Press **Edit** on either and paste the other
+platform's link over the `src` to watch that happen:
+
+<code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script src='https://cdn.jsdelivr.net/npm/video-background-element@1'&gt;&lt;/script&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;">
+
+```html
+<style>
+  /* `unstyled` drops the element's own sheet, and `load-background` places the thumbnail
+     through it. Two declarations buy that back; without them the picture tiles. */
+  media-player video-background { background-size: cover; background-position: center; }
+</style>
+
+<media-player tabindex="0" role="region" aria-label="Vimeo player" media-title="Minions: Paint" artist="Vimeo Staff Picks" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+  <video-background class="media-player-media" unstyled fit-box load-background lazyloading always-play autoplay="false" loop="false" muted="false" src="https://vimeo.com/137250145"></video-background>
+  <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
+  <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
+    <slider-elemental class="media-player-scrubber" tooltip="thumb track" bind="timeFormatter:prop#format">
+      <progress-elemental><progress value="0" max="1" bind="buffered:prop#value;duration:prop#max"></progress></progress-elemental>
+      <input type="range" min="0" step="any" value="0" aria-label="Seek" disabled bind="duration:attr#max;currentTime:prop#value" on="pointerdown:beginScrub;keydown:beginScrub;input:scrub;change:seek;pointerup@document:endScrub;keyup:endScrub" />
+    </slider-elemental>
+    <tooltip-elemental>
+      <button on="click:skipBackward" key="ArrowLeft" aria-label="Skip backward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+      <span>Skip backward</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button on="click:togglePlay" key=" " bind="playLabel:attr#aria-label" disabled><span class="media-player-play-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg></span><span class="media-player-pause-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect fill="currentColor" x="14" y="3" width="5" height="18" rx="1"/><rect fill="currentColor" x="5" y="3" width="5" height="18" rx="1"/></svg></span></button>
+      <span bind="playLabel">Play</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button on="click:skipForward" key="ArrowRight" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
+      <span>Skip forward</span>
+    </tooltip-elemental>
+    <span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+    <tooltip-elemental>
+      <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
+      <span bind="muteLabel">Mute</span>
+    </tooltip-elemental>
+    <slider-elemental class="media-player-volume" tooltip="thumb"><input type="range" min="0" max="100" step="5" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
+    <tooltip-elemental>
+      <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+      <span>Fullscreen</span>
+    </tooltip-elemental>
+  </toolbar-elemental>
+</media-player>
+```
+
+</code-preview>
+
+Both frames load one plain `<script>`, not a module, and there is no `/+esm` to remember: the
+published bundle carries its one dependency inside it, so no bare import is left for the
+browser to resolve.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/video-background-element@1"></script>
+```
+
+The eight attributes on the element are it being talked out of being a background, which is
+the one thing it was written to be. `unstyled` drops the absolute, full-bleed positioning it would
+otherwise take, and the `position: relative` it would write onto its parent, so it sits in the
+flow and the structure sheet's `16 / 9` is what sizes it. `fit-box` fills that box instead of
+overscanning past it — the overscan exists to push a platform's edge chrome out of a
+background's crop, and here the box _is_ the picture, so cropping it is loss. A background
+autoplays, loops and starts muted; a player does none of the three until it is told to, which
+is what `autoplay="false"`, `loop="false"` and `muted="false"` say. `load-background` is the
+poster: the element hides its own first frame until playback starts, so without it the box is
+blank until you press play. `lazyloading` puts `loading="lazy"` on the iframe, which is what
+keeps two embeds off this page until they scroll into view. And `always-play` takes the
+scroll gate off: a background pauses itself the moment it leaves the viewport, which is
+thrift when nobody asked for it and rudeness once somebody has pressed play — with the
+attribute on, the element builds no `IntersectionObserver` at all and playback is the
+listener's to stop. It cannot start anything on its own here, because that path is gated on
+`autoplay` as well, and `autoplay` is off.
+
+**What those two frames cost, named rather than buried.** Every other sample on this page runs
+on files this repository built, and the only thing the page itself fetches from anywhere else
+is the Tears of Steel video further down. These two do not: inside each frame the browser
+pulls `video-background-element` from jsdelivr, then an embed from `youtube-nocookie.com` or
+`player.vimeo.com` — the privacy-preserving domains, which is that element's `no-cookie`
+default, with `dnt=1` on the Vimeo one. The posters go further afield, and one of them to a
+party neither you nor the platform runs: YouTube's thumbnail comes from `img.youtube.com`,
+Vimeo's from `vumbnail.com`, a proxy the element falls back on because Vimeo publishes no
+thumbnail URL you can build from an id. The frames are not a sandbox and are not sold as one:
+`<code-preview>` renders through `srcdoc` with no `sandbox` attribute, so the element's script
+runs on this origin the way every other script here does. What the nesting buys is narrower
+and real — the embed inside is cross-origin and can reach nothing out here, and neither
+iframe loads at all until you scroll to it. If that is not a trade you want on your own page,
+drop `load-background`, put an `<img class="media-player-poster">` you host in its place, and
+nothing else in the recipe moves.
+
+### Every other platform
+
+`<video-background>` stops at three sources. HLS, DASH, Wistia, Twitch and the long tail have
+no answer in it, and [media-elements](https://github.com/muxinc/media-elements) is where they
+live — one element per platform, `<youtube-video>`, `<vimeo-video>`, `<hls-video>` and a dozen
+more, each with the media API on it, each dropped in the same slot and marked the same way.
 
 ```html
 <script type="module" src="https://cdn.jsdelivr.net/npm/youtube-video-element@1/+esm"></script>
@@ -785,83 +933,31 @@ sheet says otherwise; what the element does to itself is its own.
   <youtube-video
     class="media-player-media"
     controls
-    src="https://www.youtube.com/watch?v=rubNgGj3pYo"
+    src="https://www.youtube.com/watch?v=UIyoNvInzCI"
   ></youtube-video>
-  <!-- the overlay and the control row from the sample above, copied whole -->
+  <!-- the overlay and the control row from the samples above, copied whole -->
 </media-player>
 ```
 
-`/+esm` is not decoration: the package's plain build imports a helper by bare name, which
-a browser cannot resolve, and the element then never defines — with this one waiting on
-it politely and nothing in the console. The `+esm` build has the import rewritten.
+`/+esm` is not decoration: the package's plain build imports a helper by bare name, which a
+browser cannot resolve, and the element then never defines — with this one waiting on it
+politely and nothing in the console. The `+esm` build has the import rewritten.
 
-### One tag for YouTube, Vimeo and a file
-
-[`<video-background>`](https://github.com/stamat/video-background-element) speaks the same API
-and drops into the same slot, and where media-elements ships an element per platform it
-answers to all of them from one tag: the `src` decides whether the thing behind it is
-YouTube, Vimeo or a plain video file. It is mine, so weigh the preference accordingly — what
-follows is measured, not asserted.
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/video-background-element@1"></script>
-
-<media-player tabindex="0" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
-  <video-background
-    class="media-player-media"
-    unstyled fit-box
-    autoplay="false" loop="false" muted="false"
-    src="https://www.youtube.com/watch?v=rubNgGj3pYo"
-  ></video-background>
-  <img class="media-player-poster" src="poster.jpg" alt="" />
-  <!-- the overlay and the control row from the sample above, copied whole -->
-</media-player>
-```
-
-Vimeo is that markup with a Vimeo link in it. Nothing else moves — not the script tag, not
-the attributes, not one line of the control row:
-
-```html
-<video-background
-  class="media-player-media"
-  unstyled fit-box
-  autoplay="false" loop="false" muted="false"
-  src="https://vimeo.com/137250145"
-></video-background>
-```
-
-A plain `<script>`, not a module, and no `/+esm` to remember: the published bundle carries
-its one dependency inside it, so there is no bare import left for the browser to resolve.
-
-The five attributes are the element being talked out of being a background, which is the one
-thing it was written to be. `unstyled` drops the absolute, full-bleed positioning it would
-otherwise take, and the `position: relative` it would write onto its parent, so it sits in
-the flow and the structure sheet's `16 / 9` is what sizes it. `fit-box` fills that box
-instead of overscanning past it — the overscan exists to push a platform's edge chrome out
-of a background's crop, and here the box _is_ the picture, so cropping it is loss. And a
-background autoplays, loops and starts muted; a player does none of the three until it is
-told to, which is what `autoplay="false"`, `loop="false"` and `muted="false"` say. The poster
-is the player's own `<img class="media-player-poster">`, because the element hides its first
-frame until playback starts — its `load-background` attribute would fetch the platform's
-thumbnail, but `unstyled` drops the `background-size: cover` that places it, and the picture
-tiles.
-
-Which route to take, both measured under this player against the same 2:30 YouTube video:
+Which route to take, both measured under this player against the same 58-second YouTube clip:
 
 | | `<video-background>` | media-elements |
 | --- | --- | --- |
 | **YouTube, Vimeo, a video file** | one tag, chosen by `src` | `<youtube-video>`, `<vimeo-video>`, and a plain `<video>` — a separate script each |
 | **HLS, DASH, and the long tail** | no | `<hls-video>`, `<dash-video>`, and a dozen more |
 | **How it loads** | one plain `<script>`, dependency bundled in | `<script type="module">`, and `/+esm` on jsdelivr or it never defines |
-| **Gzipped** | 10.2 kB, all three platforms | 3.8 kB for YouTube alone, and again for each further platform |
+| **Gzipped** | 10.2 kB, all three sources | 3.8 kB for YouTube alone, and again for each further platform |
 | **Clock and scrubber** | yes | yes |
-| **Buffered bar** | never fills | fills |
-| **Captions** | no | `textTracks` is there; it was empty on this video |
+| **Buffered bar** | never fills | fills — 37s of 58 read on the clip above |
+| **Captions** | no `textTracks` at all | a `textTracks` list that stayed empty here |
 | **Whose it is** | mine | Mux's |
 
-Take media-elements when the format matters — HLS and DASH have no answer in the other
-column, and one platform on a page is the smaller download. Take `<video-background>` when
-what you want is a YouTube and a Vimeo behaving alike under markup you wrote once.
+Take media-elements when the format decides it — HLS and DASH have no other answer here, and
+one platform on a page is the smaller download either way.
 
 ### What the embed costs, either way
 
@@ -877,17 +973,29 @@ platform would have done with it is not on offer. `is-live` never comes on for e
 that reads `seekable`, and an embed has none, so the live section below has nothing to say
 about a platform stream.
 
-Two more are `<video-background>`'s alone, and both are silent rather than broken. The
-buffered bar stays empty: it is painted from `progress`, which the element does not emit —
-YouTube's loaded fraction is sitting on the element to read, with no event announcing it. And
-there are no `textTracks`, so the captions button toggles nothing and the scrubber previews
-no frames. Bind them and they sit there inert; leave them out of the row for an embed and
-nothing is missing.
+The buffered bar is `<video-background>`'s alone, and it is silent rather than broken: the bar
+is painted from `progress`, which that element does not emit, so it never fills. YouTube's
+loaded fraction is sitting on the element the whole time with no event announcing it. A
+`<youtube-video>` does emit one, and its bar fills.
+
+Captions are neither route's, whatever the table above might suggest at a glance. A
+`<video-background>` has no `textTracks` at all, so the button toggles nothing. A
+`<youtube-video>` has the list and it came back empty on this clip; on another video it filled
+with five entries carrying no cues, which put exactly as much text on screen — none. Whatever
+the platform is drawing over its own picture, it is not arriving here as a track this element
+can read, so the captions button and the scrubber's frame previews have nothing behind them on
+either route.
 
 The order of the two scripts does not matter either way: an embed that upgrades after the
-player did is left alone until it has, then read the same way. None of this is a live sample,
-because a live one would put a third party's module and a third party's iframe on this page,
-and the page loads nothing it does not build.
+player did is left alone until it has, then read the same way — which is a thing the two
+frames above prove rather than assert, since neither of them controls which script the
+browser finishes with first.
+
+Two of those costs are visible in the frames above rather than described: the buffered bar
+under the scrubber never fills, and the captions button is the one control missing from a row
+otherwise copied whole from the starter. It is missing on purpose. Put it back and it renders,
+focuses and announces itself correctly, and toggles nothing at all — which is worse than not
+shipping it.
 
 ## Twelve minutes, from someone else's server
 
@@ -1588,7 +1696,7 @@ win.
 | **Your CSS reaches every part**    | yes                                                     | yes                                                  | through `::part()` and the variables it chose          | partly                               | yes                                    |
 | **Scrubber frame previews**        | yes — your box, the browser's VTT parser                | yes — its own VTT parser                             | yes, inside its time range                             | yes — VTT, sprites, storyboards      | a community plugin                     |
 | **Built from reusable primitives** | yes — the sliders ship separately                       | no                                                   | no                                                     | no                                   | no                                     |
-| **YouTube, Vimeo, HLS, DASH**      | via media-elements or `<video-background>`, hls.js on your `<video>` | YouTube, Vimeo                                       | via a provider                                         | all of them                          | via plugins                            |
+| **YouTube, Vimeo, HLS, DASH**      | via `<video-background>` or media-elements, hls.js on your `<video>` | YouTube, Vimeo                                       | via a provider                                         | all of them                          | via plugins                            |
 | **Ecosystem**                      | none                                                    | large                                                | Mux's                                                  | large                                | the largest                            |
 | **Pick it when**                   | the markup is yours and must survive without the script | you want one line and a good default                 | you want composable parts and accept a shadow root     | you are building an app around media | you need every format and every plugin |
 
@@ -1604,10 +1712,9 @@ measure before quoting.
 Where this loses is the bottom of that table, and it loses there on purpose. YouTube and
 Vimeo arrive the way they arrive in media-chrome — an element that speaks the media API,
 dropped in where the `<video>` goes, from
-[media-elements](https://github.com/muxinc/media-elements) or from
-[`<video-background>`](https://github.com/stamat/video-background-element) — and with the
-script blocked that element is a blank box, which is the promise at the top of this page
-handed to someone else.
+[`<video-background>`](https://github.com/stamat/video-background-element) or from
+[media-elements](https://github.com/muxinc/media-elements) — and with the script blocked that
+element is a blank box, which is the promise at the top of this page handed to someone else.
 **[Plyr](https://github.com/sampotts/plyr) is the answer when the embed must play with no
 script at all**, since it enhances the `<iframe>` you already wrote, and Video.js for the
 long tail of formats and plugins. None of that is planned here.
@@ -1794,8 +1901,8 @@ Each of these is a decision, not a gap waiting for a pull request.
 - **Streaming formats and embeds of its own.** HLS, DASH, YouTube and Vimeo each need a
   third-party script, and nothing here ships one or knows one by name. What composes is
   anything that speaks the media API: hls.js on the `<video>` you wrote, or a
-  `<youtube-video>` from media-elements — or a `<video-background>`, which answers for
-  YouTube and Vimeo from one tag — marked `media-player-media`.
+  `<video-background>`, which answers for YouTube and Vimeo from one tag — or a
+  `<youtube-video>` from media-elements for the rest — marked `media-player-media`.
   [One element, both media](#one-element-both-media) shows the second,
   [Live, and the streams it does not carry](#live-and-the-streams-it-does-not-carry) the
   first, and both say what a blocked script leaves behind.
@@ -1935,12 +2042,12 @@ element's — see [Live, and the streams it does not carry](#live-and-the-stream
 Nothing here ships any of them, and none is coming. But all four compose, and no seam was
 written to make them: attach hls.js or dash.js to the `<video>` you wrote, because this
 element only ever reads the media element and never touches its `src`. YouTube and Vimeo
-are one step over — media-elements ships `<youtube-video>` and `<vimeo-video>` with the
-media API on them, and
+are one step over —
 [`<video-background>`](https://github.com/stamat/video-background-element) answers for both
-from one tag; this element wraps either marked `class="media-player-media"` the way it wraps
-a `<video>`. [One element, both media](#one-element-both-media) has the markup for both,
-measured side by side, and what each costs.
+from one tag, and media-elements ships `<youtube-video>`, `<vimeo-video>` and a dozen more
+with the media API on them; this element wraps either marked `class="media-player-media"` the
+way it wraps a `<video>`. [One element, both media](#one-element-both-media) has both recipes
+as live players, measured side by side, and what each costs.
 
 One half does not survive DASH. hls.js reports an endless duration for a live manifest and
 dash.js reports the rewind window's length, so `is-live` never comes on there. The worked
