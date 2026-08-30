@@ -787,7 +787,7 @@ sheet says otherwise; what the element does to itself is its own.
 <a href="https://github.com/stamat/video-background"><code>&lt;video-background&gt;</code></a> speaks the same API and
 drops in the same way, with its <code>unstyled</code> attribute on so it sits in the flow rather than
 behind the page.</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/youtube-video-element@1&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/youtube-video-element@1/+esm&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">youtube-video</span>
@@ -797,14 +797,16 @@ behind the page.</p>
   &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">youtube-video</span>&gt;</span>
   <span class="hljs-comment">&lt;!-- the overlay and the control row from the sample above, copied whole --&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
-<p>Two things the swap costs, and both are the platform&#39;s rather than this element&#39;s. The
-promise at the top of this page — the page plays with the script blocked — is now
-<code>&lt;youtube-video&gt;</code>&#39;s to keep, and it does not: until its own module runs it is a blank box,
-the way a <code>&lt;video src=&quot;stream.m3u8&quot;&gt;</code> is in Chrome until hls.js runs. And the embed gets
-no pointer input at all — the structure sheet says <code>pointer-events: none</code> on it, because a
-cross-origin iframe keeps every click and passes nothing out — so a click on the picture
-lands on the player and pauses, as on a <code>&lt;video&gt;</code>; whatever the platform would have done
-with that click is not on offer. The order of the two
+<p><code>/+esm</code> is not decoration: the package&#39;s plain build imports a helper by bare name, which
+a browser cannot resolve, and the element then never defines — with this one waiting on
+it politely and nothing in the console. The <code>+esm</code> build has the import rewritten.</p>
+<p>What the swap costs is the promise at the top of this page. The page plays with the script
+blocked is now <code>&lt;youtube-video&gt;</code>&#39;s to keep, and it does not: until its own module runs it is
+a blank box, the way a <code>&lt;video src=&quot;stream.m3u8&quot;&gt;</code> is in Chrome until hls.js runs. What it
+changes is where a click goes: the embed gets no pointer input at all — the structure sheet
+says <code>pointer-events: none</code> on it, because a cross-origin iframe keeps every click and
+passes nothing out — so a click on the picture lands on the player and pauses, as on a
+<code>&lt;video&gt;</code>; whatever the platform would have done with that click is not on offer. The order of the two
 scripts does not matter: a <code>&lt;youtube-video&gt;</code> that upgrades after the player did is left
 alone until it has, then read the same way. Not a live sample, because it would put a third
 party&#39;s module on this page, and the page loads nothing it does not build.</p>
@@ -2040,7 +2042,7 @@ element only ever reads the media element and never touches its <code>src</code>
 are one step over — media-elements ships <code>&lt;youtube-video&gt;</code> and <code>&lt;vimeo-video&gt;</code> with the
 media API on them, and this element wraps one marked <code>class=&quot;media-player-media&quot;</code> the way it
 wraps a <code>&lt;video&gt;</code>. <a href="#one-element-both-media">One element, both media</a> has the markup and
-the two things it costs.</p>
+what it costs.</p>
 <p>One half does not survive DASH. hls.js reports an endless duration for a live manifest and
 dash.js reports the rewind window&#39;s length, so <code>is-live</code> never comes on there. The worked
 recipe and that limit are in

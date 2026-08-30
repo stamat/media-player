@@ -782,7 +782,7 @@ drops in the same way, with its `unstyled` attribute on so it sits in the flow r
 behind the page.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/youtube-video-element@1"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/youtube-video-element@1/+esm"></script>
 
 <media-player tabindex="0" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
   <youtube-video
@@ -794,14 +794,17 @@ behind the page.
 </media-player>
 ```
 
-Two things the swap costs, and both are the platform's rather than this element's. The
-promise at the top of this page — the page plays with the script blocked — is now
-`<youtube-video>`'s to keep, and it does not: until its own module runs it is a blank box,
-the way a `<video src="stream.m3u8">` is in Chrome until hls.js runs. And the embed gets
-no pointer input at all — the structure sheet says `pointer-events: none` on it, because a
-cross-origin iframe keeps every click and passes nothing out — so a click on the picture
-lands on the player and pauses, as on a `<video>`; whatever the platform would have done
-with that click is not on offer. The order of the two
+`/+esm` is not decoration: the package's plain build imports a helper by bare name, which
+a browser cannot resolve, and the element then never defines — with this one waiting on
+it politely and nothing in the console. The `+esm` build has the import rewritten.
+
+What the swap costs is the promise at the top of this page. The page plays with the script
+blocked is now `<youtube-video>`'s to keep, and it does not: until its own module runs it is
+a blank box, the way a `<video src="stream.m3u8">` is in Chrome until hls.js runs. What it
+changes is where a click goes: the embed gets no pointer input at all — the structure sheet
+says `pointer-events: none` on it, because a cross-origin iframe keeps every click and
+passes nothing out — so a click on the picture lands on the player and pauses, as on a
+`<video>`; whatever the platform would have done with that click is not on offer. The order of the two
 scripts does not matter: a `<youtube-video>` that upgrades after the player did is left
 alone until it has, then read the same way. Not a live sample, because it would put a third
 party's module on this page, and the page loads nothing it does not build.
@@ -1852,7 +1855,7 @@ element only ever reads the media element and never touches its `src`. YouTube a
 are one step over — media-elements ships `<youtube-video>` and `<vimeo-video>` with the
 media API on them, and this element wraps one marked `class="media-player-media"` the way it
 wraps a `<video>`. [One element, both media](#one-element-both-media) has the markup and
-the two things it costs.
+what it costs.
 
 One half does not survive DASH. hls.js reports an endless duration for a live manifest and
 dash.js reports the rewind window's length, so `is-live` never comes on there. The worked
