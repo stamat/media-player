@@ -165,6 +165,17 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- **The volume slider also goes when the row is too narrow for it, not only where the pointer
+  is coarse.** A container query on the control row rather than a breakpoint, because the width
+  that decides is the player's own: a 400px player in a wide page crowds exactly the way a phone
+  does, and a window's width knows nothing about either. Measured on the video sample with the
+  theme loaded — the buttons wrapped to a third line at 505px of player width with the slider in
+  the row and at 425px without it, so the row now holds two lines down to about 425px instead of
+  505px. **CSS:** `.media-player-controls` gains `container-type: inline-size`, safe there for
+  the reason it is on the scrubber — the row's width never came from its contents — and
+  `container-type` rather than `contain: layout`, which would make the row the containing block
+  for the `position: fixed` tooltip bubbles inside it. The mute button stays at every width.
+
 - **`theme.css` draws the knobs only where the pointer is** — the scrubber's and the
   volume's both, because two bars in one row with a knob on only one of them reads as the
   other being broken. A bar nobody is aiming at is a position line; the knob is what says the
@@ -190,15 +201,32 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   does not add peers for you, add both yourself** — and if you were on book-of-elementals 1.x,
   you now have to move to 2.x rather than silently getting a nested second copy.
 
-- **book-of-elementals moved to 2.x.** It left 0.x and then 1.x while this element sat
+- **book-of-elementals moved to 3.x.** It left 0.x, then 1.x, then 2.x while this element sat
   on `^1.0.0`, so the install block's `@0.11` patch pin — right while a 0.x minor could break
-  — was withholding fixes rather than refusing breakage. The 2.0 break is a slider that turns
-  down the page with `writing-mode`, which renamed arguments on functions this element does
-  not call and added attributes to a bubble it does not style; the custom properties, the
-  element names and the SCSS entry points are the same ones, so nothing on the page changes
-  shape.
+  — was withholding fixes rather than refusing breakage. Neither major since touches the four
+  elementals loaded here: the 2.0 break is a slider that turns down the page with
+  `writing-mode`, which renamed arguments on functions this element does not call and added
+  attributes to a bubble it does not style, and the 3.0 break drops a deprecated attribute
+  from the disclosure, menu and navbar and redraws the splitter's seam, neither of which this
+  package loads. The custom properties, the element names and the SCSS entry points are the
+  same ones, so nothing on the page changes shape.
 
 ### Fixed
+
+- **The video controls no longer stay invisible where nothing hovers.** The row fades in on
+  `mousemove` and a touch device sends none, so five seconds into playback on a phone it went
+  away and the only way back was a tap on the picture — which pauses the video to do it, since
+  that is the same tap. **CSS:** under `@media (hover: none)` the row does not fade at all, the
+  way a phone player's chrome does not. Keyed on hover rather than on the pointer, so a laptop
+  with a touchscreen keeps the fade it can still drive.
+
+- **The arrow keys reach the controls sitting past a hidden one.** `<toolbar-elemental>`
+  walked every control in the row whether it was on screen or not, and `focus()` on a hidden
+  button does nothing — so on every browser but Safari, where `no-airplay` takes the AirPlay
+  button out of the row, a right arrow from picture-in-picture moved nothing and fullscreen
+  was off the keyboard altogether, the bar's roving `tabindex` having already taken it out of
+  Tab's reach. Fixed in book-of-elementals 3.1.1, which is the floor this release now asks
+  for; nothing in this repository changed.
 
 - **The scrubber's value bubble no longer gets a slice cut off it at either end of the
   track.** `<slider-elemental>` centres the bubble on the thumb and lets it hang off its own

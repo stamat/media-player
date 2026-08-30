@@ -156,6 +156,27 @@ media-player .media-player-media {
   }
 }
 
+// And it goes again when the row runs out of room for it, whatever the pointer is. The width
+// that decides is the player's own, not the window's — a 400px player in a wide page crowds
+// exactly like a phone does — so this is a container query rather than a breakpoint. Measured
+// on the sample row with the theme loaded: the buttons wrap to a third line at 505px of player
+// width with the slider in the row and at 425px without it, so 32rem drops it just before the
+// wrap it would otherwise cause. The mute button stays, as above.
+// Containment is safe on this element for the reason it is on the scrubber: the row is a
+// block-level flex container in the audio shape and stretched edge to edge in the video one,
+// so its width never came from its contents. `container-type` and not `contain: layout`,
+// which would also make this row the containing block for the tooltip bubbles inside it —
+// they are `position: fixed` and script-positioned in viewport coordinates.
+.media-player-controls {
+  container-type: inline-size;
+}
+
+@container (max-width: 32rem) {
+  .media-player-volume {
+    display: none;
+  }
+}
+
 // Two clusters on the row under the scrubber: the transport and its clock at the start,
 // everything else at the end. One auto margin opens the gap — `justify-content:
 // space-between` would spread all six controls evenly instead of splitting them in two. The
@@ -238,6 +259,18 @@ media-player[is-video] .media-player-controls {
 media-player[is-video][controls-shown] .media-player-controls,
 media-player[is-video] .media-player-controls:focus-within {
   opacity: 1;
+}
+
+// Where nothing hovers, nothing drives the fade. `mousemove` is the only thing that brings
+// the row back mid-playback, and a touch device sends none — so once the linger timer takes
+// it away the only way back is a tap on the picture, which pauses the video to do it. The
+// row stays up instead, the way a phone player's does. `hover: none` rather than
+// `pointer: coarse`: a laptop with a touchscreen has a pointer that hovers, and keeps the
+// fade.
+@media (hover: none) {
+  media-player[is-video] .media-player-controls {
+    opacity: 1;
+  }
 }
 
 .media-player-poster {

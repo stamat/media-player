@@ -77,6 +77,15 @@ media-player .media-player-media {
     display: none;
   }
 }
+.media-player-controls {
+  container-type: inline-size;
+}
+
+@container (max-width: 32rem) {
+  .media-player-volume {
+    display: none;
+  }
+}
 .media-player-time {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -137,6 +146,11 @@ media-player[is-video] .media-player-controls:focus-within {
   opacity: 1;
 }
 
+@media (hover: none) {
+  media-player[is-video] .media-player-controls {
+    opacity: 1;
+  }
+}
 .media-player-poster {
   position: absolute;
   inset: 0;
