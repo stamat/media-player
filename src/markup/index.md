@@ -1599,6 +1599,17 @@ beside it. `theme.css` then takes the caret back off the bubbles inside a player
 buttons a few pixels apart is not ambiguous about which one a bubble belongs to, and the
 player this is a rewrite of drew a plain rounded box too.
 
+The bubble on the scrubber is not one of these. That one is `<slider-elemental>`'s own,
+asked for by `tooltip="thumb track"` and reading out the second under the pointer, and it is
+centred on the thumb — which at either end of the track puts half of it outside the slider's
+box, where a video player clips it, since a player clips its own box to get the corners
+right over the picture. `style.css` clamps it inside the track instead, off
+`--slider-elemental-at`, the ratio that slider publishes for the purpose. Nothing measures
+and no script runs: the bound is `clamp()` against the track's own length, so a number that
+grows from `9:59` to `10:00` is held on the width it actually has. In the middle of the
+track the bubble is left exactly where the slider put it, and a player too narrow to hold
+the bubble at all parks it at the start rather than sliding it about.
+
 ## Attributes it writes
 
 These land on the `<media-player>` element as CSS hooks. You do not set them — you style

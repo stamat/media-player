@@ -191,6 +191,18 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The scrubber's value bubble no longer gets a slice cut off it at either end of the
+  track.** `<slider-elemental>` centres the bubble on the thumb and lets it hang off its own
+  box, which is right for a slider in a page and wrong inside a video player: the player
+  clips its box to keep the corners over the picture, so the last thumb-width of the track
+  showed a chopped bubble — measured at 2px on `0:00` and 5px on `12:14`, growing with the
+  label. **CSS:** `style.css` clamps it inside the track, off `--slider-elemental-at`, and
+  `.media-player-scrubber` gains `container-type: inline-size`, which the clamp needs to
+  weigh the bubble's own width against the track's length. Nothing measures and no script
+  runs; the middle of the track is untouched, and a track narrower than the bubble parks it
+  at the start. The clamp lives here rather than in book-of-elementals because a bubble
+  hanging off a slider is only wrong where something clips it.
+
 - **A custom media element that fires `play` before its own `paused` flips no longer freezes
   the clock.** The animation frame that paints the position bails on a paused element and
   does not schedule the frame that would try again, and `play` was the only way into that

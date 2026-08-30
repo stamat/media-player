@@ -28,8 +28,10 @@
  * calling it with a stubbed event, but a `<track>` in jsdom never fires one, so the
  * platform's dispatch stays a browser's to prove. The animation-frame clock is not covered
  * either: what it guarantees is smoothness, and a test of `requestAnimationFrame` under
- * fake timers proves the timer works rather than that the thumb moves. All three want a
- * browser.
+ * fake timers proves the timer works rather than that the thumb moves. Nor the clamp that
+ * keeps the slider's value bubble inside the track at either end: it is a `clamp()` in the
+ * structure sheet weighing the bubble's own rendered width against the track's length, and
+ * jsdom resolves neither. All four want a browser.
  */
 
 import { jest } from '@jest/globals';

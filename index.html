@@ -1614,6 +1614,16 @@ elementals it is the <em>theme</em> that paints the bubble at all, which the ins
 beside it. <code>theme.css</code> then takes the caret back off the bubbles inside a player: a row of
 buttons a few pixels apart is not ambiguous about which one a bubble belongs to, and the
 player this is a rewrite of drew a plain rounded box too.</p>
+<p>The bubble on the scrubber is not one of these. That one is <code>&lt;slider-elemental&gt;</code>&#39;s own,
+asked for by <code>tooltip=&quot;thumb track&quot;</code> and reading out the second under the pointer, and it is
+centred on the thumb — which at either end of the track puts half of it outside the slider&#39;s
+box, where a video player clips it, since a player clips its own box to get the corners
+right over the picture. <code>style.css</code> clamps it inside the track instead, off
+<code>--slider-elemental-at</code>, the ratio that slider publishes for the purpose. Nothing measures
+and no script runs: the bound is <code>clamp()</code> against the track&#39;s own length, so a number that
+grows from <code>9:59</code> to <code>10:00</code> is held on the width it actually has. In the middle of the
+track the bubble is left exactly where the slider put it, and a player too narrow to hold
+the bubble at all parks it at the start rather than sliding it about.</p>
 <h2 id="attributes-it-writes">Attributes it writes<a class="heading-anchor" href="#attributes-it-writes" tabindex="-1" aria-hidden="true"></a></h2>
 <p>These land on the <code>&lt;media-player&gt;</code> element as CSS hooks. You do not set them — you style
 against them.</p>

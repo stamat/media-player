@@ -73,6 +73,43 @@ media-player .media-player-media {
   position: relative;
   flex: 1 1 100%;
   min-width: 0;
+
+  // For the value bubble's clamp below, which needs the track's length in a unit it can use.
+  // Safe on this element and not in general: the scrubber takes a whole flex line, so its
+  // width never came from its contents, which is the one thing inline-size containment
+  // takes away.
+  container-type: inline-size;
+}
+
+// The slider's own value bubble, kept inside the player. slider-elemental centres it on the
+// thumb and lets it hang off both ends of its own box — right for a slider standing in a
+// page, wrong inside a video player, which clips (`overflow: hidden`, for the corners over
+// the picture) and took a few pixels off the bubble over the last thumb-width of the track.
+// So the clamp is the player's to write rather than the slider's, off `--slider-elemental-at`,
+// the ratio that sheet places the bubble by.
+
+// `cqi` is what makes it CSS at all: a percentage inside `translate` is the bubble's own
+// width, which is exactly the number that has to be weighed against the track's length here,
+// so the track's length has to arrive in some other unit. Nothing measures, and nothing has
+// to — the browser resolves the bubble's own width per frame, so a number that grows from
+// `9:59` to `10:00` is clamped on its real width and not on a remembered one.
+.media-player-scrubber > output[data-tooltip]:not([data-vertical]) {
+  --media-player-tooltip-at: calc(var(--slider-elemental-at, 0) * (100cqi - var(--slider-elemental-thumb-size, 1rem)) + var(--slider-elemental-thumb-size, 1rem) / 2);
+
+  // Left alone in the middle — `-50%` is the slider's own centring, and the bounds only bite
+  // within half a bubble of either end. A track narrower than the bubble asks for a floor
+  // above its own ceiling, where `clamp()` returns the floor: the bubble parks at the start
+  // of the track rather than jumping about.
+  translate: clamp(calc(-1 * var(--media-player-tooltip-at)), -50%, calc(100cqi - var(--media-player-tooltip-at) - 100%));
+}
+
+// The same clamp mirrored, because `translate` is the one thing in the placement with no
+// logical form: right to left, the slider hangs the bubble off the other edge and centres it
+// with `+50%`, so a rule written for one direction pushes the bubble a whole bubble wide off
+// the thumb in the other. `data-reversed` is the slider's own answer to which way it is —
+// read from the computed `direction`, so a control turned round in CSS alone still matches.
+.media-player-scrubber > output[data-tooltip][data-reversed]:not([data-vertical]) {
+  translate: clamp(calc(var(--media-player-tooltip-at) + 100% - 100cqi), 50%, var(--media-player-tooltip-at));
 }
 
 // The buffered bar, behind the range input. Only the buffered bar: the played fill and the
