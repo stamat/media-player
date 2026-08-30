@@ -2120,7 +2120,7 @@ written.
   <a href="https://lucide.dev">Lucide</a>, ISC.</p>
 {% endset %}
 {# The filter emits a bare `<nav><ul>`, so the disclosure is wrapped around it here rather
-   than asked of it. Open, because twenty-two sections are the reason this exists — but two
+   than asked of it. Open, because twenty-eight sections are the reason this exists — but two
    columns on a wide viewport, or the map is a screenful before the article starts. #}
 <details class="toc-disclosure" open>
   <summary>On this page</summary>

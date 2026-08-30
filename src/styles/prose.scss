@@ -127,19 +127,24 @@
 }
 
 // No left rule on the list: the container's border already fences it off. The indent is the
-// caret's width plus its gap, so links start where the title they belong to starts.
+// caret's width plus its gap, so links start where the title they belong to starts and the
+// markers hang left into that same column.
 .toc {
   padding: 0 1rem 1rem;
 }
 
+// Markers kept rather than stripped: Safari drops list semantics from a `list-style: none`
+// list, so a map of twenty-eight links stops being announced as a list at all. A dash rather
+// than a disc, to read as the article's own punctuation does — Safari before 17.2 takes no
+// string here and falls back to the disc, which is the same list either way.
 .toc ul {
   margin: 0 0 0 1.5rem;
   padding: 0;
-  list-style: none;
+  list-style-type: "– ";
 }
 
-// Twenty-two sections open at once is a screenful before the article. Columns rather than a
-// scroller or a closed default: the whole map stays visible and the height halves.
+// Twenty-eight sections open at once is a screenful before the article. Columns rather
+// than a scroller or a closed default: the whole map stays visible and the height halves.
 @media (width >= 48rem) {
   .toc ul {
     columns: 2;
@@ -159,8 +164,10 @@
   padding: 0.2rem 0;
 }
 
-.toc .toc-h3 a {
-  padding-left: 1rem;
+// The row indents, marker included — indenting the link alone would leave every marker in
+// one column with nothing showing which level a link sits at.
+.toc .toc-h3 {
+  margin-left: 1rem;
 }
 
 // The questions at the end: the same disclosure worn as a run of rows rather than one box —
