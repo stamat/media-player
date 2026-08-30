@@ -1698,6 +1698,7 @@ var MediaPlayer = class extends HgElement {
       this.captionsVisible = false;
       this.captionText = null;
       this.thumbs = null;
+      this.noAirplay = true;
     }
     this.media = media;
     this.isVideo = !/(^|-)audio$/.test(this.media.localName);
@@ -1711,6 +1712,7 @@ var MediaPlayer = class extends HgElement {
       this.noFullscreen = !(document.fullscreenEnabled || this.media.webkitEnterFullscreen);
       this.noPip = !(document.pictureInPictureEnabled && this.media.requestPictureInPicture && !this.media.disablePictureInPicture);
     }
+    this.noAirplay ?? (this.noAirplay = true);
     this.noRate = typeof this.media.playbackRate !== "number";
     this.playbackRate = this.noRate ? 1 : this.media.playbackRate;
     this.hadControls = this.media.controls;
@@ -2556,6 +2558,35 @@ var MediaPlayer = class extends HgElement {
     this.isPip = document.pictureInPictureElement === this.media;
   }
   /**
+   * The system route picker — AirPlay, and whatever else WebKit lists in it.
+   *
+   * Not a toggle, which is why it is not named like one: the picker is the way back to the
+   * device as well as the way out to the receiver, so there is one direction to ask for and
+   * the platform owns the other. It needs a gesture behind it, the way fullscreen does, and
+   * there is no promise to catch — WebKit returns nothing and reports a refusal by simply
+   * not opening.
+   *
+   * WebKit-only, and no other engine has announced an equivalent. `no-airplay` is what says
+   * so, and it is set until the availability event says otherwise, so a Chrome that never
+   * fires one keeps the button hidden rather than dead.
+   */
+  showAirplayPicker() {
+    if (this.noAirplay || !this.media?.webkitShowPlaybackTargetPicker) return;
+    this.media.webkitShowPlaybackTargetPicker();
+    this.interaction("airplay");
+  }
+  // A receiver appearing on the network and the last one leaving it are the same question,
+  // and WebKit answers both here — including the first time, right after the wire is
+  // attached, which is where the button gets its answer at all.
+  onAirplayTargets(event) {
+    this.noAirplay = event?.availability !== "available";
+  }
+  // The route, not the press: picking a receiver from the picker, the system taking it away,
+  // and another page claiming it all arrive here and nowhere else.
+  onAirplayChange() {
+    this.isAirplay = !!this.media?.webkitCurrentPlaybackTargetIsWireless;
+  }
+  /**
    * Playback speed, off whatever control the author bound to it.
    *
    * The value is read from the event rather than taken as an argument, because the control
@@ -2664,6 +2695,8 @@ __publicField(MediaPlayer, "attributes", [
   "no-fullscreen",
   "is-pip",
   "no-pip",
+  "is-airplay",
+  "no-airplay",
   "no-rate",
   "controls-shown",
   "poster-hidden",
@@ -2705,7 +2738,7 @@ __publicField(MediaPlayer, "properties", [
  * keeps firing once.
  */
 __publicField(MediaPlayer, "wires", {
-  [MEDIA_SELECTOR]: "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;error:onError",
+  [MEDIA_SELECTOR]: "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;webkitplaybacktargetavailabilitychanged:onAirplayTargets;webkitcurrentplaybacktargetiswirelesschanged:onAirplayChange;error:onError",
   // The picture is the same button the overlay is, once the overlay has stepped out of the
   // way: clicking a playing video pauses it, and the overlay comes back over the frame it
   // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so

@@ -366,7 +366,11 @@ pixels of something meant to be dragged.</p>
 <p>Two is the floor rather than a promise. The line under the scrubber wraps again when what it
 carries outgrows it, and the theme&#39;s buttons are 32px: the video sample&#39;s six of them and
 the clock come to 306px, which is what a 360px phone leaves. Below that they wrap to a third
-row, and the fix is to drop a control from the row or move the clock out of it.</p>
+row, and the fix is to drop a control from the row or move the clock out of it. The AirPlay
+button is a seventh wherever it shows at all — 40px more by the same arithmetic, button plus
+gap — so a 360px phone in Safari with a receiver on the network is over the line and wraps.
+Which is the row paying for a control the same phone would otherwise have no way to reach,
+and the reason the button is hidden the rest of the time rather than merely disabled.</p>
 <p>Which is also why the scrubber is moved in the markup rather than with <code>order</code>. Reordering a
 flex line visually leaves the tab sequence in the old order, and a keyboard user would read
 the bar top-to-bottom while tabbing it bottom-to-top. Put it where you want it and both agree.</p>
@@ -402,7 +406,8 @@ the AA minimum of 24px, and short of <a href="https://www.w3.org/WAI/WCAG22/Unde
 the AAA 44px — Apple asks the same 44pt, Google a step more at 48dp. 44px was tried and the row could
 not afford it — six targets and the clock come to 343px where a 393px phone gives the bar
 338px, so the fullscreen button wrapped to a third line and clawing it back cost the gap
-between every button. If your row is short enough to pay for it, the AAA size is two
+between every button. A seventh at that size is 52px more again, which no phone in this
+measurement has. If your row is short enough to pay for it, the AAA size is two
 declarations:</p>
 <pre><code class="hljs language-css"><span class="hljs-keyword">@media</span> (<span class="hljs-attribute">pointer</span>: coarse) {
   media-player <span class="hljs-selector-class">.media-player-controls</span> <span class="hljs-selector-tag">button</span> {
@@ -723,9 +728,9 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
       <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;2&quot;</span>&gt;</span>2<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
 
-    <span class="hljs-comment">&lt;!-- The three a video adds. The label stays put and `aria-pressed` carries the state —
-         which is also the hook the theme keeps the hover flood on. `|pressed` turns the
-         bind&#x27;s boolean into ARIA&#x27;s &quot;true&quot;/&quot;false&quot;. --&gt;</span>
+    <span class="hljs-comment">&lt;!-- The four a video adds, though the last of them is not video-only. The label stays
+         put and `aria-pressed` carries the state — which is also the hook the theme keeps
+         the hover flood on. `|pressed` turns the bind&#x27;s boolean into ARIA&#x27;s &quot;true&quot;/&quot;false&quot;. --&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
         <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:toggleCaptions&quot;</span>
@@ -771,6 +776,27 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
         <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Picture in picture<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- The one control here that is not the video&#x27;s: AirPlay carries an `&lt;audio&gt;` to a
+         speaker the same way. It is also the one with no second direction to press — the
+         system picker is the way back as well as the way out — so it is `aria-haspopup`
+         beside its `aria-pressed`, and the label never changes. Hidden where there is
+         nothing to send to, which is every browser but Safari and a Safari with no receiver
+         on the network: the rule for that is under Attributes it writes. --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:showAirplayPicker&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;AirPlay&quot;</span>
+        <span class="hljs-attr">aria-haspopup</span>=<span class="hljs-string">&quot;true&quot;</span>
+        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isAirplay:attr#aria-pressed|pressed&quot;</span>
+        <span class="hljs-attr">disabled</span>
+      &gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;m12 15 5 6H7z&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>AirPlay<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
@@ -1114,6 +1140,10 @@ testable right here rather than in a file you have to build yourself.</p>
     <tooltip-elemental>
       <button on="click:togglePictureInPicture" aria-label="Picture in picture" bind="isPip:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4"/><rect width="10" height="7" x="12" y="13" rx="2"/></svg></button>
       <span>Picture in picture</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button on="click:showAirplayPicker" aria-label="AirPlay" aria-haspopup="true" bind="isAirplay:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="m12 15 5 6H7z"/></svg></button>
+      <span>AirPlay</span>
     </tooltip-elemental>
     <tooltip-elemental>
       <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><span class="media-player-captions-icon-off"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="media-player-captions-icon-on"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z"/></svg></span></button>
@@ -1635,6 +1665,14 @@ against them.</p>
 <td>no picture-in-picture window to open — an <code>&lt;audio&gt;</code>, an embed, a media element carrying <code>disablePictureInPicture</code>, or a browser without it; hide the button on it</td>
 </tr>
 <tr>
+<td><code>is-airplay</code></td>
+<td>playback is going to an AirPlay receiver — it follows the route, so a receiver picked from the system picker or taken away by it moves it too</td>
+</tr>
+<tr>
+<td><code>no-airplay</code></td>
+<td>nothing to send to: a browser that is not WebKit, or a WebKit with no receiver on the network. It starts set and only the browser&#39;s availability event clears it, so hide the button on it</td>
+</tr>
+<tr>
 <td><code>no-rate</code></td>
 <td>the media element has no <code>playbackRate</code> to set, which an embed standing in for a <code>&lt;video&gt;</code> does not; hide the speed control on it</td>
 </tr>
@@ -1647,6 +1685,17 @@ against them.</p>
 <td><code>mute</code>, <code>mid</code> or <code>full</code>, for a three-icon volume button</td>
 </tr>
 </tbody></table>
+<p>The four <code>no-</code> hooks are yours to act on, and one rule covers a control however it is
+wrapped — the handler you already wrote is the selector, so there is no class to invent and
+nothing to keep in step with the markup:</p>
+<pre><code class="hljs language-css">media-player<span class="hljs-selector-attr">[no-airplay]</span> <span class="hljs-selector-pseudo">:is</span>(<span class="hljs-selector-attr">[on*=<span class="hljs-string">&quot;showAirplayPicker&quot;</span>]</span>, <span class="hljs-selector-pseudo">:has</span>(<span class="hljs-selector-attr">[on*=<span class="hljs-string">&quot;showAirplayPicker&quot;</span>]</span>)) {
+  <span class="hljs-attribute">display</span>: none;
+}</code></pre>
+<p>The <code>:has()</code> half is for the <code>&lt;tooltip-elemental&gt;</code> around the button — hiding the button
+alone would leave its bubble&#39;s gap in the row. This page writes exactly that rule for its own
+samples, which is why the AirPlay button in the row above is there in Safari with an Apple TV
+on the network and absent everywhere else. <code>no-airplay</code> is the only one of the four that is
+not about video: AirPlay carries an <code>&lt;audio&gt;</code> to a speaker, so an audio row can offer it too.</p>
 <p>Four you do set: <code>skip</code> is how many seconds a skip button moves (default <code>10</code>);
 <code>storage-key</code> is the prefix for the remembered volume, mute and captions state — set it per
 player, or two players on one page will share one volume; <code>keys</code> maps a key to an action
@@ -1848,6 +1897,10 @@ already wired is skipped, never doubled.</p>
 <td>the floating window the browser keeps above everything else; video only, and it warns rather than going quiet when the browser refuses — a request with no user gesture behind it is the usual reason</td>
 </tr>
 <tr>
+<td><code>click:showAirplayPicker</code></td>
+<td>the system route picker — AirPlay, and whatever else WebKit lists in it. Audio as well as video, and not a toggle: the picker is the way back to the device as well as the way out, so the platform owns that half. WebKit-only; it needs a gesture behind it, and does nothing at all while <code>no-airplay</code> is set</td>
+</tr>
+<tr>
 <td><code>change:setRate</code></td>
 <td>playback speed, off the control&#39;s own <code>value</code> — a <code>&lt;select&gt;</code>&#39;s in the samples; anything that is not a positive, finite number is dropped</td>
 </tr>
@@ -1949,11 +2002,13 @@ two spans and one <code>display</code> rule of your own.</p>
 <p><code>media-player-ready</code> when the duration is known, and <code>media-player-interaction</code> for
 everything a person did — <code>{ type, value }</code> in <code>detail</code>, where <code>type</code> is one of <code>play</code>,
 <code>pause</code>, <code>stop</code>, <code>seek</code>, <code>skip-forward</code>, <code>skip-backward</code>, <code>volume</code>, <code>volume-up</code>,
-<code>volume-down</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>, <code>pip</code>, <code>rate</code>, <code>go-live</code>, <code>captions-on</code>,
-<code>captions-off</code>. Both bubble
+<code>volume-down</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>, <code>pip</code>, <code>airplay</code>, <code>rate</code>, <code>go-live</code>,
+<code>captions-on</code>, <code>captions-off</code>. Both bubble
 from the element, not from <code>document</code>. A <code>fullscreen</code> or <code>pip</code> event says which way in
 <code>value</code> — <code>true</code> entering, <code>false</code> leaving — a <code>rate</code> event carries the new speed, and a
-volume drag settles into one <code>volume</code> event, not one per pixel.</p>
+volume drag settles into one <code>volume</code> event, not one per pixel. An <code>airplay</code> event carries no
+value: what it reports is that the picker was opened, and whether a receiver was picked in it
+is <code>is-airplay</code> afterwards.</p>
 <h2 id="against-the-alternatives">Against the alternatives<a class="heading-anchor" href="#against-the-alternatives" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Drawn on this player&#39;s axes, which is the caveat to read it with: a row is here because this
 project has an opinion about it, and the rows it has no answer for are the ones the others
@@ -1971,7 +2026,7 @@ win.</p>
 </thead>
 <tbody><tr>
 <td><strong>Size, gzipped</strong></td>
-<td><strong>13.5 kB</strong></td>
+<td><strong>14.3 kB</strong></td>
 <td>32 kB</td>
 <td>42 kB</td>
 <td>40 kB</td>

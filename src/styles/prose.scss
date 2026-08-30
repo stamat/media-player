@@ -44,6 +44,18 @@
   margin-block: 1.75rem;
 }
 
+// The page acting as its own author. `no-airplay` is a hook the element writes and nobody
+// hides for you, and this one has to be hidden or every browser but Safari carries a dead
+// button through the samples. The handler name is the selector rather than a class, so the
+// rule holds for markup copied out of this page unchanged; the `:has()` half takes the
+// `<tooltip-elemental>` wrapper with it, since hiding the button alone leaves its gap in the
+// row. Here rather than in the structure sheet: which controls a row keeps is the author's
+// call, and the same is true of `no-pip`, `no-rate` and `no-fullscreen`, which this page has
+// nothing to hide for.
+media-player[no-airplay] :is([on*="showAirplayPicker"], :has([on*="showAirplayPicker"])) {
+  display: none;
+}
+
 // The on-this-page map, wrapped around the `toc` filter's bare `<nav><ul>`. The filter's
 // markup is styled by the theme's *docs* bundle, where the nav sits in a sidebar under the
 // page's own nav link and that link is its title. This page links only the prose half and

@@ -30,6 +30,7 @@ export const PUBLIC = new Set([
   'toggleCaptions',
   'toggleFullscreen',
   'togglePictureInPicture',
+  'showAirplayPicker',
   'showControls',
   'onLoaded',
   'onPlay',

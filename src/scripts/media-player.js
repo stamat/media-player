@@ -330,6 +330,8 @@ export const MEDIA_SELECTOR = 'audio, video, .media-player-media';
  * @attr {boolean} no-fullscreen - Fullscreen has no door to open here — an iframe without `allow="fullscreen"` is the common way. CSS hook for hiding the button that would do nothing; the element sets it.
  * @attr {boolean} is-pip - The video is in the browser's picture-in-picture window. CSS hook; the element sets it.
  * @attr {boolean} no-pip - Picture-in-picture has no window to open — an embed, an `<audio>`, a media element carrying `disablePictureInPicture`, or a browser without it. CSS hook for hiding the button that would do nothing; the element sets it.
+ * @attr {boolean} is-airplay - Playback is going to an AirPlay receiver. CSS hook; the element sets it.
+ * @attr {boolean} no-airplay - Nothing to send to: a browser that is not WebKit, or a WebKit with no receiver on the network. Audio as well as video, unlike the other two. CSS hook for hiding the button that would do nothing; the element sets it, and it starts set.
  * @attr {boolean} no-rate - The media element has no `playbackRate` to set, which an embed standing in for a `<video>` does not. CSS hook for hiding the speed control; the element sets it.
  * @attr {boolean} controls-shown - The video controls are up. CSS hook; the element sets it.
  * @attr {boolean} poster-hidden - The poster has been played past. CSS hook; the element sets it. The click-to-play overlay is not hidden by it — that one follows `is-playing`, so it returns whenever a video pauses.
@@ -375,6 +377,8 @@ export class MediaPlayer extends HgElement {
     'no-fullscreen',
     'is-pip',
     'no-pip',
+    'is-airplay',
+    'no-airplay',
     'no-rate',
     'controls-shown',
     'poster-hidden',
@@ -419,7 +423,7 @@ export class MediaPlayer extends HgElement {
    */
   static wires = {
     [MEDIA_SELECTOR]:
-      'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;error:onError',
+      'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;webkitplaybacktargetavailabilitychanged:onAirplayTargets;webkitcurrentplaybacktargetiswirelesschanged:onAirplayChange;error:onError',
     // The picture is the same button the overlay is, once the overlay has stepped out of the
     // way: clicking a playing video pauses it, and the overlay comes back over the frame it
     // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
@@ -488,6 +492,7 @@ export class MediaPlayer extends HgElement {
       this.captionsVisible = false;
       this.captionText = null;
       this.thumbs = null;
+      this.noAirplay = true;
     }
     this.media = media;
 
@@ -513,6 +518,15 @@ export class MediaPlayer extends HgElement {
       // same dead control as one the browser cannot open.
       this.noPip = !(document.pictureInPictureEnabled && this.media.requestPictureInPicture && !this.media.disablePictureInPicture);
     }
+
+    // Not inside the video half: AirPlay carries an `<audio>` to a speaker the same way it
+    // carries a `<video>` to a screen. WebKit only starts watching the network once
+    // something listens for the availability event — the wire above is what makes that
+    // happen — and answers with one, so until it lands there is nothing to send to and no
+    // button worth showing. `??=` rather than an assignment: a move in the DOM does not
+    // change what is on the network, and the listener that already answered will not answer
+    // again for a second connect.
+    this.noAirplay ??= true;
 
     // An embed has no rate to set: writing `playbackRate` on a custom media element that
     // does not implement it lands as an own property, changes nothing, and reports the new
@@ -1556,6 +1570,38 @@ export class MediaPlayer extends HgElement {
   // control on the floating window, or another video taking the slot away.
   onPipChange() {
     this.isPip = document.pictureInPictureElement === this.media;
+  }
+
+  /**
+   * The system route picker — AirPlay, and whatever else WebKit lists in it.
+   *
+   * Not a toggle, which is why it is not named like one: the picker is the way back to the
+   * device as well as the way out to the receiver, so there is one direction to ask for and
+   * the platform owns the other. It needs a gesture behind it, the way fullscreen does, and
+   * there is no promise to catch — WebKit returns nothing and reports a refusal by simply
+   * not opening.
+   *
+   * WebKit-only, and no other engine has announced an equivalent. `no-airplay` is what says
+   * so, and it is set until the availability event says otherwise, so a Chrome that never
+   * fires one keeps the button hidden rather than dead.
+   */
+  showAirplayPicker() {
+    if (this.noAirplay || !this.media?.webkitShowPlaybackTargetPicker) return;
+    this.media.webkitShowPlaybackTargetPicker();
+    this.interaction('airplay');
+  }
+
+  // A receiver appearing on the network and the last one leaving it are the same question,
+  // and WebKit answers both here — including the first time, right after the wire is
+  // attached, which is where the button gets its answer at all.
+  onAirplayTargets(event) {
+    this.noAirplay = event?.availability !== 'available';
+  }
+
+  // The route, not the press: picking a receiver from the picker, the system taking it away,
+  // and another page claiming it all arrive here and nowhere else.
+  onAirplayChange() {
+    this.isAirplay = !!this.media?.webkitCurrentPlaybackTargetIsWireless;
   }
 
   /**

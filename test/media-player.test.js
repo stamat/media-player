@@ -10,7 +10,11 @@
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
  * track — the one the author marked `default`, and the one a streaming library adds after
  * the upgrade with no `<track>` behind it — the video controls' hide timer, the labels the buttons announce themselves by, the
- * keys a control claims and the presses that are somebody else's, the OS media panel against
+ * keys a control claims and the presses that are somebody else's, the AirPlay route against
+ * stubbed WebKit events — the picker itself is Safari's and opens nowhere here, so what is
+ * proved is that nothing is offered until the browser says there is a receiver, that an
+ * `<audio>` is offered it too, and that `is-airplay` follows the route rather than the press —
+ * the OS media panel against
  * a stubbed `navigator.mediaSession`, the slider fills caught up through slider-elemental's
  * own `apply()` after scripted writes, the scrubber frame previews against stubbed
  * thumbnail cues — jsdom fetches and parses no VTT, so the browser's cue loading itself is
@@ -1868,6 +1872,84 @@ describe('the picture-in-picture window', () => {
     await Promise.resolve();
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('picture-in-picture was refused'), 'no user gesture');
     warn.mockRestore();
+  });
+});
+
+describe('the AirPlay route', () => {
+  /** The availability event, which carries the whole answer on a property of its own. */
+  function availability(value) {
+    return Object.assign(new Event('webkitplaybacktargetavailabilitychanged'), { availability: value });
+  }
+
+  function airplayMedia(tag = 'video') {
+    const media = fakeMedia(tag);
+    media.webkitShowPlaybackTargetPicker = jest.fn();
+    media.webkitCurrentPlaybackTargetIsWireless = false;
+    return media;
+  }
+
+  test('nothing is offered until the browser says there is somewhere to send it', () => {
+    const media = airplayMedia();
+    const player = mount(media);
+    expect(player.hasAttribute('no-airplay')).toBe(true);
+    player.showAirplayPicker();
+    expect(media.webkitShowPlaybackTargetPicker).not.toHaveBeenCalled();
+
+    media.dispatchEvent(availability('available'));
+    expect(player.hasAttribute('no-airplay')).toBe(false);
+    player.showAirplayPicker();
+    expect(media.webkitShowPlaybackTargetPicker).toHaveBeenCalled();
+  });
+
+  test('the last receiver leaving the network takes the button with it', () => {
+    const media = airplayMedia();
+    const player = mount(media);
+    media.dispatchEvent(availability('available'));
+    media.dispatchEvent(availability('not-available'));
+    expect(player.hasAttribute('no-airplay')).toBe(true);
+  });
+
+  test('a browser that never fires the event keeps the button hidden rather than dead', () => {
+    const player = mount(fakeMedia('video'));
+    expect(player.hasAttribute('no-airplay')).toBe(true);
+    expect(() => player.showAirplayPicker()).not.toThrow();
+  });
+
+  test('an audio player is offered the route too, unlike the window and the fullscreen', () => {
+    const media = airplayMedia('audio');
+    const player = mount(media);
+    media.dispatchEvent(availability('available'));
+    expect(player.hasAttribute('no-airplay')).toBe(false);
+    player.showAirplayPicker();
+    expect(media.webkitShowPlaybackTargetPicker).toHaveBeenCalled();
+  });
+
+  test('the attribute follows the route rather than the press', () => {
+    const media = airplayMedia();
+    const player = mount(media);
+    media.dispatchEvent(availability('available'));
+    player.showAirplayPicker();
+    // The picker opened; nothing is playing anywhere else until the platform says so, which
+    // is also how a receiver picked outside this page arrives.
+    expect(player.hasAttribute('is-airplay')).toBe(false);
+
+    media.webkitCurrentPlaybackTargetIsWireless = true;
+    media.dispatchEvent(new Event('webkitcurrentplaybacktargetiswirelesschanged'));
+    expect(player.hasAttribute('is-airplay')).toBe(true);
+
+    media.webkitCurrentPlaybackTargetIsWireless = false;
+    media.dispatchEvent(new Event('webkitcurrentplaybacktargetiswirelesschanged'));
+    expect(player.hasAttribute('is-airplay')).toBe(false);
+  });
+
+  test('a press announces itself the way the other controls do', () => {
+    const media = airplayMedia();
+    const player = mount(media);
+    media.dispatchEvent(availability('available'));
+    const seen = [];
+    player.addEventListener('media-player-interaction', (event) => seen.push(event.detail.type));
+    player.showAirplayPicker();
+    expect(seen).toEqual(['airplay']);
   });
 });
 
