@@ -134,6 +134,70 @@ media-player button:disabled {
   cursor: default;
 }
 
+// Speed reads as one more button in the row, and `appearance: none` is what gets it there:
+// the platform's chrome — a bevelled grey box on one OS, a pill on another — is the one
+// control here that would not follow `--media-player-color`, and on the video bar it lands
+// as a light box on a dark gradient. The arrow goes with the chrome and none is drawn back
+// in, because there is nowhere to hang one that follows the ink: `currentColor` cannot reach
+// a `background-image`, and a `<select>` renders no pseudo-element of its own. What is left
+// is the value, which is the whole label — the shape the captions and PiP buttons make.
+media-player .media-player-rate {
+  appearance: none;
+
+  // A `<select>` is as wide as its longest option, so a chip reading `1\d7` sits in a box cut
+  // for `1.25\d7` and looks mis-centred beside square buttons. This is the platform's own answer
+  // — Baseline since June 2026, and a browser without it keeps the widest-option width, which
+  // is a slightly roomy chip rather than a broken one.
+  field-sizing: content;
+  padding: 0.4375rem 0.5rem;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8125rem;
+
+  // 1.125rem of line and this padding is the 2rem box a 1.125rem glyph makes, so the chip
+  // stands exactly as tall as the buttons beside it whatever `normal` works out to for the
+  // page's font.
+  line-height: 1.125rem;
+
+  // Both, because they answer for different halves of the control: `text-align` centres the
+  // options in the list the platform opens, `text-align-last` is the one that reaches the
+  // selected value sitting in the closed box.
+  text-align: center;
+  text-align-last: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+// The dropdown is the platform's own window rather than part of the bar, and it takes its
+// paint from this element: white ink on no background is an invisible list on the video
+// half. `Canvas` and `CanvasText` are what a native list is drawn in, and they follow the
+// page into dark mode and forced colours the way the rest of this sheet does.
+media-player .media-player-rate option {
+  background: Canvas;
+  color: CanvasText;
+}
+
+// `:enabled` on the flood, because the flood says the control is live and it is not until
+// metadata arrives — the readiness gate is what takes `disabled` off.
+media-player .media-player-rate:enabled:hover,
+media-player .media-player-rate:focus-visible {
+  background: var(--media-player-accent);
+  color: var(--media-player-accent-ink);
+}
+
+media-player .media-player-rate:focus-visible {
+  outline: 2px solid var(--media-player-accent);
+  outline-offset: 2px;
+}
+
+media-player .media-player-rate:disabled {
+  color: color-mix(in srgb, var(--media-player-color) 45%, transparent);
+  cursor: default;
+}
+
 // Size only — no fill or stroke, so both filled icon sets and stroke sets (the samples use
 // Lucide) keep the colour handling they carry in their own attributes. The transition puts
 // the glyph's paint on the same clock as the button's flood, whichever attribute carries it.

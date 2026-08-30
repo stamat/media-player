@@ -25,11 +25,11 @@ Now it is given a new life as open source, dogfooding [hydrargyri](https://githu
 The sample below is not a picture of one. It is the page's only copy of that markup, rendered
 in an isolated frame by [`<code-preview>`](https://github.com/stamat/code-preview-element) —
 press **Edit** and what you type is what plays. The **Options** tab beside it is the same
-`custom-elements.json` this package ships, turned into controls: the seven attributes an author
+`custom-elements.json` this package ships, turned into controls: the eight attributes an author
 writes and the seven custom properties the theme takes, each with what the manifest says its
 type is. An attribute knob rewrites the markup above it, so the code tab stays the truth; a
 custom property is not part of the sample, so it writes a rule into the frame and prints that
-rule for you to copy. The thirteen attributes the element writes for itself are left out — a
+rule for you to copy. The sixteen attributes the element writes for itself are left out — a
 knob spliced into the markup would not survive the next `play`.
 
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
@@ -276,6 +276,23 @@ knob spliced into the markup would not survive the next `play`.
         on="input:setVolume"
       />
     </slider-elemental>
+
+    <!-- Speed, and an audio player is where it earns its place. A native `<select>`: the
+         dropdown, its keyboard handling and the picker a phone puts up are the platform's,
+         and the rates are `<option>`s you edit rather than a list this element holds. -->
+    <select
+      class="media-player-rate"
+      aria-label="Speed"
+      disabled
+      bind="playbackRate:prop#value"
+      on="change:setRate"
+    >
+      <option value="0.5">0.5&times;</option>
+      <option value="1" selected>1&times;</option>
+      <option value="1.25">1.25&times;</option>
+      <option value="1.5">1.5&times;</option>
+      <option value="2">2&times;</option>
+    </select>
   </toolbar-elemental>
 </media-player>
 ```
@@ -672,7 +689,25 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
       />
     </slider-elemental>
 
-    <!-- The two a video adds. The label stays put and `aria-pressed` carries the state —
+    <!-- Speed is a native `<select>`: the dropdown, its keyboard handling and the picker a
+         phone puts up are the platform's, and the rates are `<option>`s you edit rather
+         than a list this element holds. `no-rate` is the hook for hiding it where the
+         media element has no `playbackRate` to set. -->
+    <select
+      class="media-player-rate"
+      aria-label="Speed"
+      disabled
+      bind="playbackRate:prop#value"
+      on="change:setRate"
+    >
+      <option value="0.5">0.5&times;</option>
+      <option value="1" selected>1&times;</option>
+      <option value="1.25">1.25&times;</option>
+      <option value="1.5">1.5&times;</option>
+      <option value="2">2&times;</option>
+    </select>
+
+    <!-- The three a video adds. The label stays put and `aria-pressed` carries the state —
          which is also the hook the theme keeps the hover flood on. `|pressed` turns the
          bind's boolean into ARIA's "true"/"false". -->
     <tooltip-elemental>
@@ -682,23 +717,40 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
         bind="captionsVisible:attr#aria-pressed|pressed"
         disabled
       >
-        <svg
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <rect width="18" height="14" x="3" y="5" rx="2" ry="2" />
-          <path d="M7 15h4M15 15h2M7 11h2M13 11h4" />
-        </svg>
+        <!-- Two badges, one shown at a time off `captions-visible` — the same trick the
+             play/pause button uses. Outlined while captions are off, solid while they are
+             on, so the state survives a stylesheet with no accent in it. -->
+        <span class="media-player-captions-icon-off">
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2" />
+            <path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </span>
+        <!-- The letters are knocked out of the badge with `fill-rule="evenodd"` rather than
+             painted in a second colour, so whatever is behind the button shows through them
+             — the accent flood when it is pressed, the page when it is not. -->
+        <span class="media-player-captions-icon-on">
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z" />
+          </svg>
+        </span>
       </button>
       <span><span bind="captionsLabel">Enable captions</span></span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button
+        on="click:togglePictureInPicture"
+        aria-label="Picture in picture"
+        bind="isPip:attr#aria-pressed|pressed"
+        disabled
+      >
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4" />
+          <rect width="10" height="7" x="12" y="13" rx="2" />
+        </svg>
+      </button>
+      <span>Picture in picture</span>
     </tooltip-elemental>
     <tooltip-elemental>
       <button
@@ -988,6 +1040,14 @@ the platform is drawing over its own picture, it is not arriving here as a track
 can read, so the captions button and the scrubber's frame previews have nothing behind them on
 either route.
 
+Speed and picture-in-picture go the same way, and the element says so rather than leaving you
+to find out: an embed gets `no-rate`, because writing `playbackRate` on an element that does
+not implement it lands as an own property and reads the new number back — a control that lies
+is worse than one that is missing — and `no-pip`, because the floating window is the
+browser's to open over a `<video>` and there is no `<video>` here. That is why the rows in
+those two frames are three controls shorter than the starter above. Bind them anyway and they
+render, focus and announce themselves correctly while doing nothing at all.
+
 The order of the two scripts does not matter either way: an embed that upgrades after the
 player did is left alone until it has, then read the same way — which is a thing the two
 frames above prove rather than assert, since neither of them controls which script the
@@ -1043,8 +1103,13 @@ testable right here rather than in a file you have to build yourself.
       <span bind="muteLabel">Mute</span>
     </tooltip-elemental>
     <slider-elemental class="media-player-volume" tooltip="thumb"><input type="range" min="0" max="100" step="5" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
+    <select class="media-player-rate" aria-label="Speed" disabled bind="playbackRate:prop#value" on="change:setRate"><option value="0.5">0.5&times;</option><option value="1" selected>1&times;</option><option value="1.25">1.25&times;</option><option value="1.5">1.5&times;</option><option value="2">2&times;</option></select>
     <tooltip-elemental>
-      <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg></button>
+      <button on="click:togglePictureInPicture" aria-label="Picture in picture" bind="isPip:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4"/><rect width="10" height="7" x="12" y="13" rx="2"/></svg></button>
+      <span>Picture in picture</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><span class="media-player-captions-icon-off"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="media-player-captions-icon-on"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z"/></svg></span></button>
       <span bind="captionsLabel">Enable captions</span>
     </tooltip-elemental>
     <tooltip-elemental>
@@ -1515,6 +1580,9 @@ against them.
 | `is-video`                                         | it wrapped a `<video>`                                                                                                       |
 | `is-fullscreen`, `controls-shown`, `poster-hidden` | the video half — `poster-hidden` covers the poster only, the overlay follows `is-playing`                                     |
 | `no-fullscreen`                                    | fullscreen has no door to open — an iframe without `allow="fullscreen"` is the common way; hide your fullscreen button on it |
+| `is-pip`                                           | the video is in the browser's picture-in-picture window — it follows the platform, so a window opened or closed from the browser's own control moves it too |
+| `no-pip`                                           | no picture-in-picture window to open — an `<audio>`, an embed, a media element carrying `disablePictureInPicture`, or a browser without it; hide the button on it |
+| `no-rate`                                          | the media element has no `playbackRate` to set, which an embed standing in for a `<video>` does not; hide the speed control on it |
 | `has-captions`, `captions-visible`                 | a caption track was found, in the markup or in the media element's track list; captions are on                               |
 | `volume-state`                                     | `mute`, `mid` or `full`, for a three-icon volume button                                                                      |
 
@@ -1569,7 +1637,10 @@ last. A live stream gets no seek buttons, because there is nowhere on it to seek
 
 `theme.css` speaks the register Plyr made the standard: a flat compact bar, controls that
 flood with the accent under the pointer, a slim rounded track carrying an accent thumb,
-video controls on a bottom gradient with a centred play chip. Where Plyr hardcodes white
+video controls on a bottom gradient with a centred play chip. The speed `<select>` loses
+its native chrome to `appearance: none` and is drawn as one more button in that row —
+the rate and no arrow, because `currentColor` reaches neither a `background-image` nor a
+pseudo-element a `<select>` renders. Where Plyr hardcodes white
 and slate, this sheet uses `Canvas` and `CanvasText`, so the same look follows the page
 into dark mode and forced colours — dark mode as the page declares it, `color-scheme:
 dark`, which is what flips the system pair; a class-toggled theme that never sets it keeps
@@ -1627,6 +1698,8 @@ already wired is skipped, never doubled.
 | `click:toggleCaptions`                          | captions on and off; needs a track the button governs — `captions`, `subtitles` or a bare `<track>`, the `default` one or the first written: [the FAQ names the rule](#faq-captions) |
 | `click:goLive`                                  | back to the live edge of a stream with a rewind window; does nothing on a file, or on a stream with no window to have left                       |
 | `click:toggleFullscreen`                        | the player element, or the video itself on an iPhone, which has never allowed anything else                                                      |
+| `click:togglePictureInPicture`                  | the floating window the browser keeps above everything else; video only, and it warns rather than going quiet when the browser refuses — a request with no user gesture behind it is the usual reason |
+| `change:setRate`                                | playback speed, off the control's own `value` — a `<select>`'s in the samples; anything that is not a positive, finite number is dropped |
 
 **On `<media-player>` itself:**
 
@@ -1652,11 +1725,13 @@ which is the pair of them behind one control.
 | `volumePercent`                           | `0`–`100`, for a volume slider's `value`                                                                                            |
 | `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next                                                                                             |
 | `captionText`                             | the active cue                                                                                                                      |
+| `playbackRate`                            | the speed the media is playing at, `1` being normal — bound to a `<select>`'s `value` in the samples, and it follows the media element rather than the control, so a rate changed anywhere else lands on it |
 | `timeFormatter`                           | the `formatTime` function itself — hand it to the scrubber's `prop#format` and the value bubble reads `01:12` instead of `72`       |
 
 Three formatters pipe a bind: `|time` writes seconds as a clock, `|floor` a whole number,
 and `|pressed` a boolean as the literal `"true"`/`"false"` that a toggle's `aria-pressed`
-wants — the captions and fullscreen buttons in the video sample are wired with it. No
+wants — the captions, picture-in-picture and fullscreen buttons in the video sample are
+wired with it. No
 sample pipes `|floor` any more — the scrubber's `step="any"` wants the fraction — but it
 stays for markup written against an earlier version, which piped it on the scrubber's
 binds.
@@ -1688,11 +1763,11 @@ two spans and one `display` rule of your own.
 `media-player-ready` when the duration is known, and `media-player-interaction` for
 everything a person did — `{ type, value }` in `detail`, where `type` is one of `play`,
 `pause`, `stop`, `seek`, `skip-forward`, `skip-backward`, `volume`, `volume-up`,
-`volume-down`, `mute`, `unmute`, `fullscreen`, `go-live`, `captions-on`, `captions-off`. Both
-bubble
-from the element, not from `document`. A `fullscreen` event says which way in `value` —
-`true` entering, `false` leaving — and a volume drag settles into one `volume` event, not
-one per pixel.
+`volume-down`, `mute`, `unmute`, `fullscreen`, `pip`, `rate`, `go-live`, `captions-on`,
+`captions-off`. Both bubble
+from the element, not from `document`. A `fullscreen` or `pip` event says which way in
+`value` — `true` entering, `false` leaving — a `rate` event carries the new speed, and a
+volume drag settles into one `volume` event, not one per pixel.
 
 ## Against the alternatives
 
@@ -2028,7 +2103,7 @@ The samples at the top of this page read it too. Their **Options** tab is genera
 this file and nothing else, which is the reason to ship one rather than invent a format: the
 knobs cannot describe an element this page no longer has. What the panel leaves out is in
 the file as well, under an `x-code-preview` key the schema permits and every other tool
-ignores — the thirteen CSS hooks stay documented for a stylesheet and are marked hidden for
+ignores — the sixteen CSS hooks stay documented for a stylesheet and are marked hidden for
 the panel, because they are the element's to write and not an author's.
 
 What any given editor does with it is its own business, and none of it is required to use
@@ -2130,7 +2205,8 @@ written.
 
 <p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> ©
   <a href="https://github.com/stamat">Stamat</a>. The icons in the samples are
-  <a href="https://lucide.dev">Lucide</a>, ISC.</p>
+  <a href="https://lucide.dev">Lucide</a>, ISC — except the CC badge on the captions button,
+  which is drawn here because Lucide has no lettered one.</p>
 {% endset %}
 {# The filter emits a bare `<nav><ul>`, so the disclosure is wrapped around it here rather
    than asked of it. Open, because twenty-eight sections are the reason this exists — but two

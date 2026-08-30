@@ -149,6 +149,20 @@ media-player .media-player-play-icon {
   display: block;
 }
 
+// The same two-icon trick for captions, off `captions-visible` rather than `is-playing`.
+// The badge is outlined while captions are off and solid while they are on, so the state
+// reads without colour — a toggle that only floods with the accent says nothing on a page
+// that took the theme's colours off, and nothing at all in a high-contrast mode.
+media-player .media-player-captions-icon-on,
+media-player[captions-visible] .media-player-captions-icon-off {
+  display: none;
+}
+
+media-player[captions-visible] .media-player-captions-icon-on,
+media-player .media-player-captions-icon-off {
+  display: block;
+}
+
 media-player .media-player-volume-icon {
   display: none;
 }

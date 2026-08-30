@@ -66,11 +66,11 @@ Now it is given a new life as open source, dogfooding <a href="https://github.co
 <p>The sample below is not a picture of one. It is the page&#39;s only copy of that markup, rendered
 in an isolated frame by <a href="https://github.com/stamat/code-preview-element"><code>&lt;code-preview&gt;</code></a> —
 press <strong>Edit</strong> and what you type is what plays. The <strong>Options</strong> tab beside it is the same
-<code>custom-elements.json</code> this package ships, turned into controls: the seven attributes an author
+<code>custom-elements.json</code> this package ships, turned into controls: the eight attributes an author
 writes and the seven custom properties the theme takes, each with what the manifest says its
 type is. An attribute knob rewrites the markup above it, so the code tab stays the truth; a
 custom property is not part of the sample, so it writes a rule into the frame and prints that
-rule for you to copy. The thirteen attributes the element writes for itself are left out — a
+rule for you to copy. The sixteen attributes the element writes for itself are left out — a
 knob spliced into the markup would not survive the next <code>play</code>.</p>
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it.
@@ -313,6 +313,23 @@ knob spliced into the markup would not survive the next <code>play</code>.</p>
         <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;input:setVolume&quot;</span>
       /&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
+
+    <span class="hljs-comment">&lt;!-- Speed, and an audio player is where it earns its place. A native `&lt;select&gt;`: the
+         dropdown, its keyboard handling and the picker a phone puts up are the platform&#x27;s,
+         and the rates are `&lt;option&gt;`s you edit rather than a list this element holds. --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">select</span>
+      <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-rate&quot;</span>
+      <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Speed&quot;</span>
+      <span class="hljs-attr">disabled</span>
+      <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playbackRate:prop#value&quot;</span>
+      <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;change:setRate&quot;</span>
+    &gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.5&quot;</span>&gt;</span>0.5<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1&quot;</span> <span class="hljs-attr">selected</span>&gt;</span>1<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1.25&quot;</span>&gt;</span>1.25<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1.5&quot;</span>&gt;</span>1.5<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;2&quot;</span>&gt;</span>2<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">toolbar-elemental</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
 </code-preview><pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player-element&#x27;</span>;</code></pre>
@@ -688,7 +705,25 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
       /&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span>
 
-    <span class="hljs-comment">&lt;!-- The two a video adds. The label stays put and `aria-pressed` carries the state —
+    <span class="hljs-comment">&lt;!-- Speed is a native `&lt;select&gt;`: the dropdown, its keyboard handling and the picker a
+         phone puts up are the platform&#x27;s, and the rates are `&lt;option&gt;`s you edit rather
+         than a list this element holds. `no-rate` is the hook for hiding it where the
+         media element has no `playbackRate` to set. --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">select</span>
+      <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-rate&quot;</span>
+      <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Speed&quot;</span>
+      <span class="hljs-attr">disabled</span>
+      <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playbackRate:prop#value&quot;</span>
+      <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;change:setRate&quot;</span>
+    &gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.5&quot;</span>&gt;</span>0.5<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1&quot;</span> <span class="hljs-attr">selected</span>&gt;</span>1<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1.25&quot;</span>&gt;</span>1.25<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1.5&quot;</span>&gt;</span>1.5<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;2&quot;</span>&gt;</span>2<span class="hljs-symbol">&amp;times;</span><span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
+
+    <span class="hljs-comment">&lt;!-- The three a video adds. The label stays put and `aria-pressed` carries the state —
          which is also the hook the theme keeps the hover flood on. `|pressed` turns the
          bind&#x27;s boolean into ARIA&#x27;s &quot;true&quot;/&quot;false&quot;. --&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
@@ -698,23 +733,40 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
         <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;captionsVisible:attr#aria-pressed|pressed&quot;</span>
         <span class="hljs-attr">disabled</span>
       &gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
-          <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
-          <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
-          <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span>
-          <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span>
-          <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>
-          <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span>
-          <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span>
-          <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span>
-          <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span>
-          <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>
-        &gt;</span>
-          <span class="hljs-tag">&lt;<span class="hljs-name">rect</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;18&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;14&quot;</span> <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;3&quot;</span> <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">ry</span>=<span class="hljs-string">&quot;2&quot;</span> /&gt;</span>
-          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M7 15h4M15 15h2M7 11h2M13 11h4&quot;</span> /&gt;</span>
-        <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+        <span class="hljs-comment">&lt;!-- Two badges, one shown at a time off `captions-visible` — the same trick the
+             play/pause button uses. Outlined while captions are off, solid while they are
+             on, so the state survives a stylesheet with no accent in it. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-captions-icon-off&quot;</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">rect</span> <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;3&quot;</span> <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;5&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;18&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;14&quot;</span> <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;3&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> /&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-comment">&lt;!-- The letters are knocked out of the badge with `fill-rule=&quot;evenodd&quot;` rather than
+             painted in a second colour, so whatever is behind the button shows through them
+             — the accent flood when it is pressed, the page when it is not. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-captions-icon-on&quot;</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">fill-rule</span>=<span class="hljs-string">&quot;evenodd&quot;</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;captionsLabel&quot;</span>&gt;</span>Enable captions<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
+        <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePictureInPicture&quot;</span>
+        <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Picture in picture&quot;</span>
+        <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isPip:attr#aria-pressed|pressed&quot;</span>
+        <span class="hljs-attr">disabled</span>
+      &gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;24&quot;</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">&quot;0 0 24 24&quot;</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">&quot;none&quot;</span> <span class="hljs-attr">stroke</span>=<span class="hljs-string">&quot;currentColor&quot;</span> <span class="hljs-attr">stroke-width</span>=<span class="hljs-string">&quot;2&quot;</span> <span class="hljs-attr">stroke-linecap</span>=<span class="hljs-string">&quot;round&quot;</span> <span class="hljs-attr">stroke-linejoin</span>=<span class="hljs-string">&quot;round&quot;</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">d</span>=<span class="hljs-string">&quot;M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4&quot;</span> /&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">rect</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;10&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;7&quot;</span> <span class="hljs-attr">x</span>=<span class="hljs-string">&quot;12&quot;</span> <span class="hljs-attr">y</span>=<span class="hljs-string">&quot;13&quot;</span> <span class="hljs-attr">rx</span>=<span class="hljs-string">&quot;2&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Picture in picture<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
@@ -996,6 +1048,13 @@ with five entries carrying no cues, which put exactly as much text on screen —
 the platform is drawing over its own picture, it is not arriving here as a track this element
 can read, so the captions button and the scrubber&#39;s frame previews have nothing behind them on
 either route.</p>
+<p>Speed and picture-in-picture go the same way, and the element says so rather than leaving you
+to find out: an embed gets <code>no-rate</code>, because writing <code>playbackRate</code> on an element that does
+not implement it lands as an own property and reads the new number back — a control that lies
+is worse than one that is missing — and <code>no-pip</code>, because the floating window is the
+browser&#39;s to open over a <code>&lt;video&gt;</code> and there is no <code>&lt;video&gt;</code> here. That is why the rows in
+those two frames are three controls shorter than the starter above. Bind them anyway and they
+render, focus and announce themselves correctly while doing nothing at all.</p>
 <p>The order of the two scripts does not matter either way: an embed that upgrades after the
 player did is left alone until it has, then read the same way — which is a thing the two
 frames above prove rather than assert, since neither of them controls which script the
@@ -1047,8 +1106,13 @@ testable right here rather than in a file you have to build yourself.</p>
       <span bind="muteLabel">Mute</span>
     </tooltip-elemental>
     <slider-elemental class="media-player-volume" tooltip="thumb"><input type="range" min="0" max="100" step="5" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
+    <select class="media-player-rate" aria-label="Speed" disabled bind="playbackRate:prop#value" on="change:setRate"><option value="0.5">0.5&times;</option><option value="1" selected>1&times;</option><option value="1.25">1.25&times;</option><option value="1.5">1.5&times;</option><option value="2">2&times;</option></select>
     <tooltip-elemental>
-      <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg></button>
+      <button on="click:togglePictureInPicture" aria-label="Picture in picture" bind="isPip:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4"/><rect width="10" height="7" x="12" y="13" rx="2"/></svg></button>
+      <span>Picture in picture</span>
+    </tooltip-elemental>
+    <tooltip-elemental>
+      <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><span class="media-player-captions-icon-off"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="media-player-captions-icon-on"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z"/></svg></span></button>
       <span bind="captionsLabel">Enable captions</span>
     </tooltip-elemental>
     <tooltip-elemental>
@@ -1559,6 +1623,18 @@ against them.</p>
 <td>fullscreen has no door to open — an iframe without <code>allow=&quot;fullscreen&quot;</code> is the common way; hide your fullscreen button on it</td>
 </tr>
 <tr>
+<td><code>is-pip</code></td>
+<td>the video is in the browser&#39;s picture-in-picture window — it follows the platform, so a window opened or closed from the browser&#39;s own control moves it too</td>
+</tr>
+<tr>
+<td><code>no-pip</code></td>
+<td>no picture-in-picture window to open — an <code>&lt;audio&gt;</code>, an embed, a media element carrying <code>disablePictureInPicture</code>, or a browser without it; hide the button on it</td>
+</tr>
+<tr>
+<td><code>no-rate</code></td>
+<td>the media element has no <code>playbackRate</code> to set, which an embed standing in for a <code>&lt;video&gt;</code> does not; hide the speed control on it</td>
+</tr>
+<tr>
 <td><code>has-captions</code>, <code>captions-visible</code></td>
 <td>a caption track was found, in the markup or in the media element&#39;s track list; captions are on</td>
 </tr>
@@ -1625,7 +1701,10 @@ last. A live stream gets no seek buttons, because there is nowhere on it to seek
 <h2 id="what-the-theme-takes">What the theme takes<a class="heading-anchor" href="#what-the-theme-takes" tabindex="-1" aria-hidden="true"></a></h2>
 <p><code>theme.css</code> speaks the register Plyr made the standard: a flat compact bar, controls that
 flood with the accent under the pointer, a slim rounded track carrying an accent thumb,
-video controls on a bottom gradient with a centred play chip. Where Plyr hardcodes white
+video controls on a bottom gradient with a centred play chip. The speed <code>&lt;select&gt;</code> loses
+its native chrome to <code>appearance: none</code> and is drawn as one more button in that row —
+the rate and no arrow, because <code>currentColor</code> reaches neither a <code>background-image</code> nor a
+pseudo-element a <code>&lt;select&gt;</code> renders. Where Plyr hardcodes white
 and slate, this sheet uses <code>Canvas</code> and <code>CanvasText</code>, so the same look follows the page
 into dark mode and forced colours — dark mode as the page declares it, <code>color-scheme: dark</code>, which is what flips the system pair; a class-toggled theme that never sets it keeps
 a light bar on a dark page. It reaches one thing it does not own: the caret comes off
@@ -1760,6 +1839,14 @@ already wired is skipped, never doubled.</p>
 <td><code>click:toggleFullscreen</code></td>
 <td>the player element, or the video itself on an iPhone, which has never allowed anything else</td>
 </tr>
+<tr>
+<td><code>click:togglePictureInPicture</code></td>
+<td>the floating window the browser keeps above everything else; video only, and it warns rather than going quiet when the browser refuses — a request with no user gesture behind it is the usual reason</td>
+</tr>
+<tr>
+<td><code>change:setRate</code></td>
+<td>playback speed, off the control&#39;s own <code>value</code> — a <code>&lt;select&gt;</code>&#39;s in the samples; anything that is not a positive, finite number is dropped</td>
+</tr>
 </tbody></table>
 <p><strong>On <code>&lt;media-player&gt;</code> itself:</strong></p>
 <table>
@@ -1823,13 +1910,18 @@ which is the pair of them behind one control.</p>
 <td>the active cue</td>
 </tr>
 <tr>
+<td><code>playbackRate</code></td>
+<td>the speed the media is playing at, <code>1</code> being normal — bound to a <code>&lt;select&gt;</code>&#39;s <code>value</code> in the samples, and it follows the media element rather than the control, so a rate changed anywhere else lands on it</td>
+</tr>
+<tr>
 <td><code>timeFormatter</code></td>
 <td>the <code>formatTime</code> function itself — hand it to the scrubber&#39;s <code>prop#format</code> and the value bubble reads <code>01:12</code> instead of <code>72</code></td>
 </tr>
 </tbody></table>
 <p>Three formatters pipe a bind: <code>|time</code> writes seconds as a clock, <code>|floor</code> a whole number,
 and <code>|pressed</code> a boolean as the literal <code>&quot;true&quot;</code>/<code>&quot;false&quot;</code> that a toggle&#39;s <code>aria-pressed</code>
-wants — the captions and fullscreen buttons in the video sample are wired with it. No
+wants — the captions, picture-in-picture and fullscreen buttons in the video sample are
+wired with it. No
 sample pipes <code>|floor</code> any more — the scrubber&#39;s <code>step=&quot;any&quot;</code> wants the fraction — but it
 stays for markup written against an earlier version, which piped it on the scrubber&#39;s
 binds.</p>
@@ -1853,11 +1945,11 @@ two spans and one <code>display</code> rule of your own.</p>
 <p><code>media-player-ready</code> when the duration is known, and <code>media-player-interaction</code> for
 everything a person did — <code>{ type, value }</code> in <code>detail</code>, where <code>type</code> is one of <code>play</code>,
 <code>pause</code>, <code>stop</code>, <code>seek</code>, <code>skip-forward</code>, <code>skip-backward</code>, <code>volume</code>, <code>volume-up</code>,
-<code>volume-down</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>, <code>go-live</code>, <code>captions-on</code>, <code>captions-off</code>. Both
-bubble
-from the element, not from <code>document</code>. A <code>fullscreen</code> event says which way in <code>value</code> —
-<code>true</code> entering, <code>false</code> leaving — and a volume drag settles into one <code>volume</code> event, not
-one per pixel.</p>
+<code>volume-down</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>, <code>pip</code>, <code>rate</code>, <code>go-live</code>, <code>captions-on</code>,
+<code>captions-off</code>. Both bubble
+from the element, not from <code>document</code>. A <code>fullscreen</code> or <code>pip</code> event says which way in
+<code>value</code> — <code>true</code> entering, <code>false</code> leaving — a <code>rate</code> event carries the new speed, and a
+volume drag settles into one <code>volume</code> event, not one per pixel.</p>
 <h2 id="against-the-alternatives">Against the alternatives<a class="heading-anchor" href="#against-the-alternatives" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Drawn on this player&#39;s axes, which is the caveat to read it with: a row is here because this
 project has an opinion about it, and the rows it has no answer for are the ones the others
@@ -2228,7 +2320,7 @@ do not name as private, so an editor offering completions offers <code>togglePla
 this file and nothing else, which is the reason to ship one rather than invent a format: the
 knobs cannot describe an element this page no longer has. What the panel leaves out is in
 the file as well, under an <code>x-code-preview</code> key the schema permits and every other tool
-ignores — the thirteen CSS hooks stay documented for a stylesheet and are marked hidden for
+ignores — the sixteen CSS hooks stay documented for a stylesheet and are marked hidden for
 the panel, because they are the element&#39;s to write and not an author&#39;s.</p>
 <p>What any given editor does with it is its own business, and none of it is required to use
 the element: the manifest is a description, not a runtime.</p>
@@ -2298,7 +2390,8 @@ written.</p>
 </div><h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
 <p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> ©
   <a href="https://github.com/stamat">Stamat</a>. The icons in the samples are
-  <a href="https://lucide.dev">Lucide</a>, ISC.</p>
+  <a href="https://lucide.dev">Lucide</a>, ISC — except the CC badge on the captions button,
+  which is drawn here because Lucide has no lettered one.</p>
 
 
 

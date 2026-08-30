@@ -328,6 +328,9 @@ export const MEDIA_SELECTOR = 'audio, video, .media-player-media';
  * @attr {boolean} is-video - The wrapped element is a `<video>`, or a custom media element not named `-audio`. CSS hook; the element sets it.
  * @attr {boolean} is-fullscreen - CSS hook; the element sets it.
  * @attr {boolean} no-fullscreen - Fullscreen has no door to open here — an iframe without `allow="fullscreen"` is the common way. CSS hook for hiding the button that would do nothing; the element sets it.
+ * @attr {boolean} is-pip - The video is in the browser's picture-in-picture window. CSS hook; the element sets it.
+ * @attr {boolean} no-pip - Picture-in-picture has no window to open — an embed, an `<audio>`, a media element carrying `disablePictureInPicture`, or a browser without it. CSS hook for hiding the button that would do nothing; the element sets it.
+ * @attr {boolean} no-rate - The media element has no `playbackRate` to set, which an embed standing in for a `<video>` does not. CSS hook for hiding the speed control; the element sets it.
  * @attr {boolean} controls-shown - The video controls are up. CSS hook; the element sets it.
  * @attr {boolean} poster-hidden - The poster has been played past. CSS hook; the element sets it. The click-to-play overlay is not hidden by it — that one follows `is-playing`, so it returns whenever a video pauses.
  * @attr {boolean} has-captions - A caption track was found, so a captions button is worth showing. CSS hook; the element sets it.
@@ -370,6 +373,9 @@ export class MediaPlayer extends HgElement {
     'is-video',
     'is-fullscreen',
     'no-fullscreen',
+    'is-pip',
+    'no-pip',
+    'no-rate',
     'controls-shown',
     'poster-hidden',
     'has-captions',
@@ -400,6 +406,7 @@ export class MediaPlayer extends HgElement {
     'muteLabel',
     'captionsLabel',
     'captionText',
+    'playbackRate',
     'timeFormatter'
   ];
 
@@ -412,7 +419,7 @@ export class MediaPlayer extends HgElement {
    */
   static wires = {
     [MEDIA_SELECTOR]:
-      'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;error:onError',
+      'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;error:onError',
     // The picture is the same button the overlay is, once the overlay has stepped out of the
     // way: clicking a playing video pauses it, and the overlay comes back over the frame it
     // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
@@ -501,7 +508,17 @@ export class MediaPlayer extends HgElement {
     // button that would silently do nothing.
     if (this.isVideo) {
       this.noFullscreen = !(document.fullscreenEnabled || this.media.webkitEnterFullscreen);
+      // `disablePictureInPicture` is the author's own opt-out on the media element, and it
+      // belongs in the same answer: a button the page keeps but the element refuses is the
+      // same dead control as one the browser cannot open.
+      this.noPip = !(document.pictureInPictureEnabled && this.media.requestPictureInPicture && !this.media.disablePictureInPicture);
     }
+
+    // An embed has no rate to set: writing `playbackRate` on a custom media element that
+    // does not implement it lands as an own property, changes nothing, and reports the new
+    // number back when read — a speed control that lies rather than one that is missing.
+    this.noRate = typeof this.media.playbackRate !== 'number';
+    this.playbackRate = this.noRate ? 1 : this.media.playbackRate;
 
     // The author writes `controls` so the page works before this runs; taking it off is the
     // first thing the upgrade does, and the last thing undone if the element is removed.
@@ -1508,6 +1525,62 @@ export class MediaPlayer extends HgElement {
 
   onFullscreenChange() {
     this.isFullscreen = document.fullscreenElement === this;
+  }
+
+  /**
+   * The floating window the browser keeps above everything else.
+   *
+   * `=== this.media`, the same reasoning fullscreen uses: one document holds one
+   * picture-in-picture element, so another video already in it is swapped rather than
+   * closed. The request is a promise and it rejects for reasons the page cannot see coming
+   * — no user gesture behind the call, a policy that forbids it — so it warns the way a
+   * refused `play` does instead of failing silently.
+   */
+  togglePictureInPicture() {
+    if (!this.isVideo || this.noPip || !this.media) return;
+
+    if (document.pictureInPictureElement === this.media) {
+      document.exitPictureInPicture();
+      this.interaction('pip', false);
+      return;
+    }
+
+    this.media.requestPictureInPicture().catch((error) => {
+      console.warn('media-player: picture-in-picture was refused —', error?.message || error);
+    });
+    this.interaction('pip', true);
+  }
+
+  // Both platform events route here: what the attribute says is where the picture is, and
+  // that is one question however it got there — a button on this page, the browser's own
+  // control on the floating window, or another video taking the slot away.
+  onPipChange() {
+    this.isPip = document.pictureInPictureElement === this.media;
+  }
+
+  /**
+   * Playback speed, off whatever control the author bound to it.
+   *
+   * The value is read from the event rather than taken as an argument, because the control
+   * this is written on is a `<select>` in the page's own markup and its `value` is a string.
+   * Anything that does not parse to a positive, finite number is dropped: a rate of zero is
+   * `pause()` spelled in a way that leaves the button lying, and a negative one plays
+   * nowhere in every engine.
+   */
+  setRate(event) {
+    const rate = Number(event?.target?.value);
+    if (!this.media || this.noRate || !Number.isFinite(rate) || rate <= 0) return;
+    this.media.playbackRate = rate;
+    this.interaction('rate', rate);
+  }
+
+  // The media element is what holds the rate, so this is what a bound control reads — the
+  // browser's own speed menu and a second player moving it both arrive here, and the
+  // `<select>` follows rather than drifting from what is playing.
+  onRateChange() {
+    if (!this.media || this.noRate) return;
+    this.playbackRate = this.media.playbackRate;
+    this.updatePositionState();
   }
 
   // VIDEO CONTROLS THAT HIDE THEMSELVES

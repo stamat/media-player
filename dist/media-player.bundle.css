@@ -224,6 +224,16 @@ media-player .media-player-play-icon {
   display: block;
 }
 
+media-player .media-player-captions-icon-on,
+media-player[captions-visible] .media-player-captions-icon-off {
+  display: none;
+}
+
+media-player[captions-visible] .media-player-captions-icon-on,
+media-player .media-player-captions-icon-off {
+  display: block;
+}
+
 media-player .media-player-volume-icon {
   display: none;
 }

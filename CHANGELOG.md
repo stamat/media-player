@@ -61,6 +61,55 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   sheet only places the bubble. Set `--tooltip-elemental-surface` and
   `--tooltip-elemental-color` yourself, or there is unpainted text over the control row.
 
+- **Picture-in-picture, on a button you write.** `click:togglePictureInPicture` opens the
+  floating window the browser keeps above everything else, and `is-pip` is the hook a
+  stylesheet holds the button down with. The attribute follows the platform's own
+  `enterpictureinpicture` and `leavepictureinpicture` rather than the press, so a window
+  opened — or taken away — from the browser's own control, or by a second video claiming the
+  one slot a document has, moves it too. `no-pip` says there is no window to open at all:
+  an `<audio>`, an embed standing in for a `<video>`, a media element carrying
+  `disablePictureInPicture`, or a browser without the API. A request the browser refuses
+  warns the way a refused `play` does — no user gesture behind the call is the usual reason —
+  rather than leaving a button that looks like it worked.
+
+- **Playback speed, as a `<select>` you write.** `change:setRate` takes the speed off the
+  control's own `value` and `playbackRate` is the state to bind back to it. The rates are
+  `<option>`s in your markup, not a list this element holds, which is the same bargain as the
+  rest of the row: the dropdown, its keyboard handling and the picker a phone puts up are all
+  the platform's, and nothing here re-implements them. `playbackRate` follows the *media
+  element* rather than the control, so a rate changed anywhere else — the browser's own speed
+  menu, a script, a second player — lands on the bound control instead of drifting from it.
+  Anything that is not a positive, finite number is dropped: zero is `pause()` spelled so the
+  button lies about it.
+
+  `no-rate` is the hook for hiding the control where there is nothing to set. An embed that
+  stands in for a `<video>` has no `playbackRate`, so the write lands as an own property,
+  changes nothing, and reads the new number back — a speed control that reports a lie is worse
+  than one that is not there.
+
+  The optional theme dresses it as one more button on the row. `appearance: none` takes the
+  platform's chrome off, so the control follows `--media-player-color` like everything beside
+  it rather than landing as a bevelled grey box on the video bar's gradient, and it floods
+  with the accent under the pointer the way the buttons do, sized to the rate showing rather
+  than to the longest one in the list — `field-sizing: content`, Baseline since June 2026,
+  and a browser without it gets the roomier box it would have had anyway. No arrow is drawn back in:
+  `currentColor` reaches neither a `background-image` nor a pseudo-element, which a `<select>`
+  does not render anyway — so the value is the whole label. The dropdown itself is painted
+  `Canvas` on `CanvasText`, because the platform's window takes its ink from the control and
+  white on nothing is an invisible list over a video. The structure sheet ships none of this:
+  without the theme you get the browser's own select, which is what the split promises.
+
+- **The captions button is a CC badge now, outlined off and solid on.** The Lucide `captions`
+  glyph said *captions* by drawing a box with dashes in it; the state was carried entirely by
+  the accent flood the theme puts behind a pressed toggle. That is nothing at all on a page
+  that took the theme's colours off, and nothing in a forced-colours mode. Two badges swapped
+  off `captions-visible` — the same trick the play/pause button already used — say it in
+  shape instead. **If your stylesheet targeted the old single `<svg>` inside that button, it
+  now finds `.media-player-captions-icon-off` and `.media-player-captions-icon-on` around
+  two.** The letters are knocked out of the solid badge with `fill-rule="evenodd"` rather
+  than painted in a second colour, so whatever is behind the button shows through them and no
+  accent override can leave them invisible.
+
 - **`pause-offscreen` stops playback once the player has scrolled out of view.** Off unless
   you write it, and the default is the whole argument: the opposite one would have this
   element decide that a podcast stops when the page scrolls past its controls, which is the

@@ -191,7 +191,7 @@
                 "text": "array"
               },
               "static": true,
-              "default": "[ 'is-ready', 'is-playing', 'is-buffering', 'is-error', 'is-live', 'is-video', 'is-fullscreen', 'no-fullscreen', 'controls-shown', 'poster-hidden', 'has-captions', 'captions-visible', 'volume-state', 'skip', 'pause-offscreen' ]",
+              "default": "[ 'is-ready', 'is-playing', 'is-buffering', 'is-error', 'is-live', 'is-video', 'is-fullscreen', 'no-fullscreen', 'is-pip', 'no-pip', 'no-rate', 'controls-shown', 'poster-hidden', 'has-captions', 'captions-visible', 'volume-state', 'skip', 'pause-offscreen' ]",
               "privacy": "private"
             },
             {
@@ -201,7 +201,7 @@
                 "text": "array"
               },
               "static": true,
-              "default": "[ 'currentTime', 'remaining', 'duration', 'seekableStart', 'seekableEnd', 'behindLive', 'buffered', 'volumePercent', 'playLabel', 'muteLabel', 'captionsLabel', 'captionText', 'timeFormatter' ]",
+              "default": "[ 'currentTime', 'remaining', 'duration', 'seekableStart', 'seekableEnd', 'behindLive', 'buffered', 'volumePercent', 'playLabel', 'muteLabel', 'captionsLabel', 'captionText', 'playbackRate', 'timeFormatter' ]",
               "description": "State that never reaches the DOM.\n\n`currentTime` moves sixty times a second while playing. Reflected to an attribute that\nwould be sixty `setAttribute` calls a second, every one of them waking anything watching\nthe subtree — so the values that move fast live here, and only the flags CSS needs are\nattributes.",
               "privacy": "private"
             },
@@ -212,7 +212,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ [MEDIA_SELECTOR]: 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;error:onError', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay', // The same click for a custom media element, which never sees it: the structure sheet // gives it no pointer input, because its cross-origin iframe would keep the click, so // the click lands on this element's own box. ':scope': 'click:onPictureClick' }",
+              "default": "{ [MEDIA_SELECTOR]: 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;error:onError', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay', // The same click for a custom media element, which never sees it: the structure sheet // gives it no pointer input, because its cross-origin iframe would keep the click, so // the click lands on this element's own box. ':scope': 'click:onPictureClick' }",
               "description": "The media element's wiring, attached by hydrargyri at upgrade rather than written in\nevery sample — plumbing with nothing in it for an author to choose, and one pair\nforgotten in an `on=` was a player that half-worked with nothing saying why. A pair the\nmedia element's own `on` attribute still carries is skipped, so markup predating this\nkeeps firing once.",
               "privacy": "private"
             },
@@ -627,6 +627,29 @@
             },
             {
               "kind": "method",
+              "name": "togglePictureInPicture",
+              "description": "The floating window the browser keeps above everything else.\n\n`=== this.media`, the same reasoning fullscreen uses: one document holds one\npicture-in-picture element, so another video already in it is swapped rather than\nclosed. The request is a promise and it rejects for reasons the page cannot see coming\n— no user gesture behind the call, a policy that forbids it — so it warns the way a\nrefused `play` does instead of failing silently."
+            },
+            {
+              "kind": "method",
+              "name": "onPipChange"
+            },
+            {
+              "kind": "method",
+              "name": "setRate",
+              "parameters": [
+                {
+                  "name": "event"
+                }
+              ],
+              "description": "Playback speed, off whatever control the author bound to it.\n\nThe value is read from the event rather than taken as an argument, because the control\nthis is written on is a `<select>` in the page's own markup and its `value` is a string.\nAnything that does not parse to a positive, finite number is dropped: a rate of zero is\n`pause()` spelled in a way that leaves the button lying, and a negative one plays\nnowhere in every engine."
+            },
+            {
+              "kind": "method",
+              "name": "onRateChange"
+            },
+            {
+              "kind": "method",
               "name": "showControls",
               "description": "Show the controls, and start the clock that takes them away again.\n\nA paused video keeps them: the timer is only started while something is playing, so a\nplayer sitting paused never hides the button that would start it."
             },
@@ -784,6 +807,36 @@
               "type": {
                 "text": "boolean"
               },
+              "description": "The video is in the browser's picture-in-picture window. CSS hook; the element sets it.",
+              "name": "is-pip",
+              "x-code-preview": {
+                "hidden": true
+              }
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Picture-in-picture has no window to open — an embed, an `<audio>`, a media element carrying `disablePictureInPicture`, or a browser without it. CSS hook for hiding the button that would do nothing; the element sets it.",
+              "name": "no-pip",
+              "x-code-preview": {
+                "hidden": true
+              }
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
+              "description": "The media element has no `playbackRate` to set, which an embed standing in for a `<video>` does not. CSS hook for hiding the speed control; the element sets it.",
+              "name": "no-rate",
+              "x-code-preview": {
+                "hidden": true
+              }
+            },
+            {
+              "type": {
+                "text": "boolean"
+              },
               "description": "The video controls are up. CSS hook; the element sets it.",
               "name": "controls-shown",
               "x-code-preview": {
@@ -842,10 +895,7 @@
                 "text": "boolean"
               },
               "description": "Pause when the player scrolls out of view. Off unless written; it does not start anything again on the way back, and a browser without `IntersectionObserver` never pauses.",
-              "name": "pause-offscreen",
-              "x-code-preview": {
-                "hidden": true
-              }
+              "name": "pause-offscreen"
             },
             {
               "type": {

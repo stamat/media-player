@@ -20,6 +20,7 @@ export const PUBLIC = new Set([
   'volumeDown',
   'toggleMute',
   'setVolume',
+  'setRate',
   'beginScrub',
   'scrub',
   'seek',
@@ -28,6 +29,7 @@ export const PUBLIC = new Set([
   'endPreview',
   'toggleCaptions',
   'toggleFullscreen',
+  'togglePictureInPicture',
   'showControls',
   'onLoaded',
   'onPlay',
@@ -39,13 +41,15 @@ export const PUBLIC = new Set([
   'onVolumeChange',
   'onCue',
   'onFullscreenChange',
+  'onPipChange',
+  'onRateChange',
   'onKeyDown'
 ]);
 
 /**
  * What an author is allowed to type into the opening tag.
  *
- * The other thirteen attributes are CSS hooks the element writes for itself, and a knob is a
+ * The other sixteen attributes are CSS hooks the element writes for itself, and a knob is a
  * splice into the sample's source: turning `is-playing` on would put a word in the markup
  * that the next `play` event overwrites, so the panel would be offering a control that
  * cannot hold. They stay in the manifest — a stylesheet needs them documented — and are
@@ -53,6 +57,7 @@ export const PUBLIC = new Set([
  */
 export const AUTHORED = new Set([
   'skip',
+  'pause-offscreen',
   'media-title',
   'artist',
   'album',

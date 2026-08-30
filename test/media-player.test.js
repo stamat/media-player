@@ -44,6 +44,7 @@ function fakeMedia(tag = 'audio', { duration = 120, paused = true } = {}) {
   let currentTime = 0;
   let volume = 1;
   let muted = false;
+  let playbackRate = 1;
   Object.defineProperties(media, {
     duration: { get: () => duration, configurable: true },
     readyState: { get: () => 1, configurable: true },
@@ -51,6 +52,7 @@ function fakeMedia(tag = 'audio', { duration = 120, paused = true } = {}) {
     currentTime: { get: () => currentTime, set: (v) => { currentTime = v; }, configurable: true },
     volume: { get: () => volume, set: (v) => { volume = v; }, configurable: true },
     muted: { get: () => muted, set: (v) => { muted = v; }, configurable: true },
+    playbackRate: { get: () => playbackRate, set: (v) => { playbackRate = v; }, configurable: true },
     buffered: { get: () => ({ length: 0 }), configurable: true }
   });
   media.play = () => { paused = false; };
@@ -1742,6 +1744,130 @@ describe('pausing when the player scrolls away', () => {
 
     observers.at(-1).callback([{ isIntersecting: false }]);
     expect(pauses).not.toHaveBeenCalled();
+  });
+});
+
+describe('playback speed', () => {
+  // The control the samples bind is a `<select>`, so the value arrives as a string off the
+  // event rather than as a number in an argument — which is the whole reason `setRate`
+  // parses at all.
+  const change = (value) => ({ target: { value } });
+
+  test('a speed control writes through to the media element, and the element follows the media back', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    expect(player.playbackRate).toBe(1);
+
+    player.setRate(change('1.5'));
+    expect(media.playbackRate).toBe(1.5);
+
+    // The platform is what announces the change, including one this element did not make.
+    media.playbackRate = 0.5;
+    media.dispatchEvent(new Event('ratechange'));
+    expect(player.playbackRate).toBe(0.5);
+  });
+
+  test('a rate that is not a positive number is dropped rather than written', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+
+    for (const value of ['0', '-1', 'fast', '', 'Infinity']) {
+      player.setRate(change(value));
+      expect(media.playbackRate).toBe(1);
+    }
+  });
+
+  test('a media element with no playbackRate says so, and nothing is written to it', () => {
+    defineFakeElement('rateless-video');
+    const media = fakeElement('rateless-video');
+    const player = mount(media);
+
+    expect(player.hasAttribute('no-rate')).toBe(true);
+    expect(player.playbackRate).toBe(1);
+
+    player.setRate(change('2'));
+    expect(media.playbackRate).toBeUndefined();
+  });
+
+  test('a <video> that has one does not carry the hook', () => {
+    const player = mount(fakeMedia('video'));
+    expect(player.hasAttribute('no-rate')).toBe(false);
+  });
+});
+
+describe('the picture-in-picture window', () => {
+  let media;
+  let player;
+  let requested;
+
+  function enablePip(on = true) {
+    document.pictureInPictureEnabled = on;
+    document.exitPictureInPicture = jest.fn(() => {
+      document.pictureInPictureElement = null;
+    });
+    document.pictureInPictureElement = null;
+    media = fakeMedia('video');
+    requested = jest.fn(() => {
+      document.pictureInPictureElement = media;
+      return Promise.resolve();
+    });
+    if (on) media.requestPictureInPicture = requested;
+    player = mount(media);
+  }
+
+  afterEach(() => {
+    delete document.pictureInPictureEnabled;
+    delete document.pictureInPictureElement;
+    delete document.exitPictureInPicture;
+  });
+
+  test('the button opens the window, and the attribute follows the platform rather than the press', () => {
+    enablePip();
+    expect(player.hasAttribute('no-pip')).toBe(false);
+
+    player.togglePictureInPicture();
+    expect(requested).toHaveBeenCalled();
+    // Nothing is assumed from the call: the attribute waits for the event the browser fires,
+    // which is also what a window opened from the browser's own control arrives as.
+    expect(player.hasAttribute('is-pip')).toBe(false);
+
+    media.dispatchEvent(new Event('enterpictureinpicture'));
+    expect(player.hasAttribute('is-pip')).toBe(true);
+
+    player.togglePictureInPicture();
+    expect(document.exitPictureInPicture).toHaveBeenCalled();
+    media.dispatchEvent(new Event('leavepictureinpicture'));
+    expect(player.hasAttribute('is-pip')).toBe(false);
+  });
+
+  test('a player with no window to open says so and the press does nothing', () => {
+    enablePip(false);
+    expect(player.hasAttribute('no-pip')).toBe(true);
+    expect(() => player.togglePictureInPicture()).not.toThrow();
+    expect(requested).not.toHaveBeenCalled();
+  });
+
+  test('an audio player never offers one', () => {
+    document.pictureInPictureEnabled = true;
+    const sound = fakeMedia('audio');
+    sound.requestPictureInPicture = jest.fn();
+    const audioPlayer = mount(sound);
+    audioPlayer.togglePictureInPicture();
+    expect(sound.requestPictureInPicture).not.toHaveBeenCalled();
+  });
+
+  test('a refused request warns rather than going quiet', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    document.pictureInPictureEnabled = true;
+    document.pictureInPictureElement = null;
+    const video = fakeMedia('video');
+    video.requestPictureInPicture = () => Promise.reject(new Error('no user gesture'));
+    mount(video).togglePictureInPicture();
+
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('picture-in-picture was refused'), 'no user gesture');
+    warn.mockRestore();
   });
 });
 
