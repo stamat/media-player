@@ -26,9 +26,10 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   **What stays out:** the elements themselves. Nothing here loads a platform script or knows
   a platform by name, so the page with the script blocked is now that element's promise to
   keep — a `<youtube-video>` is a blank box until its own module runs, the way a
-  `<video src="stream.m3u8">` is in Chrome until hls.js runs. Click-to-pause on the picture is
-  the other loss: the iframe inside their shadow root takes the click, and whether the
-  platform toggles on it is the platform's rule. `is-video` reads off the name now — a custom
+  `<video src="stream.m3u8">` is in Chrome until hls.js runs. The embed itself gets no pointer
+  input — `pointer-events: none` in the structure sheet, since a cross-origin iframe keeps
+  every click — so a click on the picture lands on the player's box and pauses, as on a
+  `<video>`. `is-video` reads off the name now — a custom
   element counts as video unless it ends in `-audio`.
 
 - **Two bundled stylesheets, so a page links two sheets instead of nine.**

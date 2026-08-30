@@ -415,7 +415,11 @@ export class MediaPlayer extends HgElement {
     // way: clicking a playing video pauses it, and the overlay comes back over the frame it
     // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
     // the pair would be a listener on nothing.
-    video: 'click:togglePlay'
+    video: 'click:togglePlay',
+    // The same click for a custom media element, which never sees it: the structure sheet
+    // gives it no pointer input, because its cross-origin iframe would keep the click, so
+    // the click lands on this element's own box.
+    ':scope': 'click:onPictureClick'
   };
 
   static formatters = {
@@ -615,6 +619,16 @@ export class MediaPlayer extends HgElement {
     this.isError = true;
     if (this.hadControls) this.media.controls = true;
     console.warn('media-player: the media failed to load —', this.media.error.message || `code ${this.media.error.code}`);
+  }
+
+  /**
+   * A click on the box itself, which is the picture of a custom media element — the media
+   * child takes no pointer input, so the click falls through to here. Only the box: a
+   * control inside is its own target, and an audio player has no picture to click.
+   */
+  onPictureClick(event) {
+    if (event.target !== this || !this.isVideo) return;
+    this.togglePlay();
   }
 
   // PLAYBACK

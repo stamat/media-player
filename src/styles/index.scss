@@ -45,6 +45,11 @@ media-player .media-player-media {
 // Sixteen by nine is what the platforms cut for; a page with another cut overrides it by name.
 media-player .media-player-media {
   aspect-ratio: 16 / 9;
+
+  // No pointer input for the embed: a cross-origin iframe keeps every click it gets and
+  // passes nothing out, so the click on the picture lands on the player's own box instead,
+  // where `onPictureClick` answers it the way a click on a `<video>` is answered.
+  pointer-events: none;
 }
 
 // Two rows without a width breakpoint anywhere in here: the scrubber is written first in

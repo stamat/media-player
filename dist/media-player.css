@@ -25,6 +25,7 @@ media-player .media-player-media {
 
 media-player .media-player-media {
   aspect-ratio: 16/9;
+  pointer-events: none;
 }
 
 .media-player-controls {

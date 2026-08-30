@@ -195,6 +195,24 @@ describe('a custom element that speaks the media API', () => {
     expect(media.hasAttribute('controls')).toBe(true);
   });
 
+  test('a click on the picture of a custom media element toggles it — its iframe would keep the click, so the box answers — while a control inside, and an audio player, do not', () => {
+    defineFakeElement('clicked-video');
+    const media = fakeElement('clicked-video');
+    const player = mount(media);
+    const control = document.createElement('button');
+    player.appendChild(control);
+    player.dispatchEvent(new Event('click', { bubbles: true }));
+    expect(media.paused).toBe(false);
+    control.click();
+    expect(media.paused).toBe(false);
+
+    defineFakeElement('clicked-audio');
+    const sound = fakeElement('clicked-audio');
+    const audioPlayer = mount(sound);
+    audioPlayer.dispatchEvent(new Event('click', { bubbles: true }));
+    expect(sound.paused).toBe(true);
+  });
+
   test('one whose name ends in -audio is the audio half', () => {
     defineFakeElement('fake-audio');
     const player = mount(fakeElement('fake-audio'));

@@ -212,7 +212,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ [MEDIA_SELECTOR]: 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;error:onError', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay' }",
+              "default": "{ [MEDIA_SELECTOR]: 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;error:onError', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay', // The same click for a custom media element, which never sees it: the structure sheet // gives it no pointer input, because its cross-origin iframe would keep the click, so // the click lands on this element's own box. ':scope': 'click:onPictureClick' }",
               "description": "The media element's wiring, attached by hydrargyri at upgrade rather than written in\nevery sample — plumbing with nothing in it for an author to choose, and one pair\nforgotten in an `on=` was a player that half-worked with nothing saying why. A pair the\nmedia element's own `on` attribute still carries is skipped, so markup predating this\nkeeps firing once.",
               "privacy": "private"
             },
@@ -246,6 +246,17 @@
               "kind": "method",
               "name": "onError",
               "description": "The media element gave up — a 404, a codec it refuses, a decode that died. The custom\nrow waits on `isReady`, which now never comes, and the upgrade already took the native\ncontrols off — so without this, failure is a black box: no controls of either kind, no\nattribute, no message. Fail loud, and hand back the one thing that still works: the\nnative controls draw the browser's own error state.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "onPictureClick",
+              "parameters": [
+                {
+                  "name": "event"
+                }
+              ],
+              "description": "A click on the box itself, which is the picture of a custom media element — the media\nchild takes no pointer input, so the click falls through to here. Only the box: a\ncontrol inside is its own target, and an audio player has no picture to click.",
               "privacy": "private"
             },
             {

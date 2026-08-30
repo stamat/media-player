@@ -797,9 +797,11 @@ behind the page.
 Two things the swap costs, and both are the platform's rather than this element's. The
 promise at the top of this page — the page plays with the script blocked — is now
 `<youtube-video>`'s to keep, and it does not: until its own module runs it is a blank box,
-the way a `<video src="stream.m3u8">` is in Chrome until hls.js runs. And a click on the
-picture never reaches this element, because the iframe inside their shadow root takes it;
-whether the platform pauses on that click is the platform's rule. The order of the two
+the way a `<video src="stream.m3u8">` is in Chrome until hls.js runs. And the embed gets
+no pointer input at all — the structure sheet says `pointer-events: none` on it, because a
+cross-origin iframe keeps every click and passes nothing out — so a click on the picture
+lands on the player and pauses, as on a `<video>`; whatever the platform would have done
+with that click is not on offer. The order of the two
 scripts does not matter: a `<youtube-video>` that upgrades after the player did is left
 alone until it has, then read the same way. Not a live sample, because it would put a third
 party's module on this page, and the page loads nothing it does not build.
