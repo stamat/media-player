@@ -2,7 +2,8 @@
  * What the player guarantees, and what is left to a browser.
  *
  * Covered here: the progressive-enhancement contract (native controls off on upgrade, back
- * on the way out), the wiring the element declares itself (`static wires`, so the media
+ * on the way out), the third kind of media element — a custom element speaking the media API,
+ * marked `media-player-media`, including one that upgrades after the player did — the wiring the element declares itself (`static wires`, so the media
  * element needs no `on=`, and a click on the picture toggles playback), readiness from any of
  * the five metadata events, live streams and the rewind window that decides how much of one
  * can be reached, the volume
@@ -110,6 +111,136 @@ describe('the progressive-enhancement contract', () => {
     expect(player.duration).toBe(120);
     expect(player.isReady).toBe(true);
     expect(media.controls).toBe(false);
+  });
+});
+
+/**
+ * A custom element speaking the media API — what `<youtube-video>` or `<vimeo-video>` from
+ * media-elements is. jsdom has no such element, so this is `fakeMedia` as a class: the
+ * accessors sit on the prototype the way theirs do, and `controls` reflects the attribute
+ * the way theirs does. One tag per definition — a registry entry cannot be replaced.
+ */
+function defineFakeElement(tag, { duration = 120 } = {}) {
+  customElements.define(
+    tag,
+    class extends HTMLElement {
+      constructor() {
+        super();
+        this.state = { currentTime: 0, volume: 1, muted: false, paused: true };
+      }
+      get controls() {
+        return this.hasAttribute('controls');
+      }
+      set controls(value) {
+        this.toggleAttribute('controls', Boolean(value));
+      }
+      get duration() {
+        return duration;
+      }
+      get readyState() {
+        return 1;
+      }
+      get paused() {
+        return this.state.paused;
+      }
+      get currentTime() {
+        return this.state.currentTime;
+      }
+      set currentTime(value) {
+        this.state.currentTime = value;
+      }
+      get volume() {
+        return this.state.volume;
+      }
+      set volume(value) {
+        this.state.volume = value;
+      }
+      get muted() {
+        return this.state.muted;
+      }
+      set muted(value) {
+        this.state.muted = value;
+      }
+      get buffered() {
+        return { length: 0 };
+      }
+      play() {
+        this.state.paused = false;
+      }
+      pause() {
+        this.state.paused = true;
+      }
+    }
+  );
+}
+
+function fakeElement(tag) {
+  const media = document.createElement(tag);
+  media.setAttribute('controls', '');
+  media.className = 'media-player-media';
+  return media;
+}
+
+describe('a custom element that speaks the media API', () => {
+  test('marked media-player-media, it is driven the way a <video> is: controls off, metadata read, events wired, controls back on the way out', () => {
+    defineFakeElement('fake-video');
+    const media = fakeElement('fake-video');
+    const player = mount(media);
+    expect(media.hasAttribute('controls')).toBe(false);
+    expect(player.hasAttribute('is-video')).toBe(true);
+    expect(player.duration).toBe(120);
+    media.dispatchEvent(new Event('play'));
+    expect(player.hasAttribute('is-playing')).toBe(true);
+    player.remove();
+    expect(media.hasAttribute('controls')).toBe(true);
+  });
+
+  test('one whose name ends in -audio is the audio half', () => {
+    defineFakeElement('fake-audio');
+    const player = mount(fakeElement('fake-audio'));
+    expect(player.isReady).toBe(true);
+    expect(player.hasAttribute('is-video')).toBe(false);
+  });
+
+  test('without the class it is not the media, and the player says so', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const media = document.createElement('fake-video');
+    media.setAttribute('controls', '');
+    mount(media);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('no <audio> or <video>'));
+    expect(media.hasAttribute('controls')).toBe(true);
+    warn.mockRestore();
+  });
+
+  test('one that upgrades after the player did is left untouched until then, and driven once it has', async () => {
+    const media = fakeElement('late-video');
+    const player = mount(media);
+    // Untouched means no own `controls` property either: written before the upgrade, one
+    // would shadow the accessor the upgrade brings, and the platform's own chrome would load.
+    expect(media.hasAttribute('controls')).toBe(true);
+    expect(Object.prototype.hasOwnProperty.call(media, 'controls')).toBe(false);
+    expect(player.isReady).toBeFalsy();
+
+    defineFakeElement('late-video');
+    await customElements.whenDefined('late-video');
+    await Promise.resolve();
+
+    expect(media.hasAttribute('controls')).toBe(false);
+    expect(player.isReady).toBe(true);
+    expect(player.duration).toBe(120);
+  });
+
+  test('a player removed while still waiting on the upgrade leaves the element alone when it comes', async () => {
+    const media = fakeElement('gone-video');
+    const player = mount(media);
+    player.remove();
+
+    defineFakeElement('gone-video');
+    await customElements.whenDefined('gone-video');
+    await Promise.resolve();
+
+    expect(media.hasAttribute('controls')).toBe(true);
+    expect(player.isReady).toBeFalsy();
   });
 });
 

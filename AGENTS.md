@@ -64,6 +64,11 @@ script/lint      # eslint + stylelint (the authority; CI runs it)
   `volume` and `muted` on the element instance and stub `play`/`pause`. Fullscreen and
   `cuechange` are not testable here and are documented as uncovered at the top of the test
   file.
+- **A custom media element upgrades on its own schedule.** `connected()` waits on
+  `customElements.whenDefined` for a `media-player-media` child whose tag is not defined yet:
+  `controls = false` written before the upgrade is an own property shadowing the accessor
+  the definition brings, and the platform's chrome loads under the author's controls with
+  nothing warning. The wires are already on it from the scan; only the reading waits.
 - **`localStorage` throws** in a Safari private window and under a blocking cookie policy.
   `store` and `read` swallow it — remembering a volume is a nicety, taking the page down
   over one is not.

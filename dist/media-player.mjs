@@ -1670,11 +1670,21 @@ function focusedElement() {
   while (node && node.shadowRoot && node.shadowRoot.activeElement) node = node.shadowRoot.activeElement;
   return node;
 }
+var MEDIA_SELECTOR = "audio, video, .media-player-media";
 var MediaPlayer = class extends HgElement {
   connected() {
-    const media = this.querySelector("audio, video");
+    const media = this.querySelector(MEDIA_SELECTOR);
     if (!media) {
-      console.warn("media-player: no <audio> or <video> inside \u2014 nothing to play");
+      console.warn("media-player: no <audio> or <video> inside, nothing marked media-player-media \u2014 nothing to play");
+      return;
+    }
+    if (media.localName.includes("-") && !customElements.get(media.localName)) {
+      if (!this.awaiting) {
+        this.awaiting = customElements.whenDefined(media.localName).then(() => {
+          this.awaiting = null;
+          if (this.isConnected) this.connected();
+        });
+      }
       return;
     }
     if (this.isReady && this.media !== media) {
@@ -1690,7 +1700,7 @@ var MediaPlayer = class extends HgElement {
       this.thumbs = null;
     }
     this.media = media;
-    this.isVideo = this.media.tagName === "VIDEO";
+    this.isVideo = !/(^|-)audio$/.test(this.media.localName);
     this.frame = 0;
     this.linger = null;
     this.scrubStep = null;
@@ -2586,7 +2596,7 @@ __publicField(MediaPlayer, "properties", [
  * keeps firing once.
  */
 __publicField(MediaPlayer, "wires", {
-  "audio, video": "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;error:onError",
+  [MEDIA_SELECTOR]: "loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;error:onError",
   // The picture is the same button the overlay is, once the overlay has stepped out of the
   // way: clicking a playing video pauses it, and the overlay comes back over the frame it
   // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
@@ -2618,6 +2628,7 @@ var media_player_default = MediaPlayer;
 export {
   CONTROLS_LINGER,
   LIVE_DURATION,
+  MEDIA_SELECTOR,
   MediaPlayer,
   VOLUME_SCALE,
   VOLUME_SETTLE,

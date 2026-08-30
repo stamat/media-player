@@ -12,11 +12,13 @@ probably for a different library.
 - **No generated controls.** There is no control bar to configure and no `controls` option
   taking names or an HTML string. The moment the element can draw a control row, every
   question about it becomes a config question, which is the thing this exists to avoid.
-- **No streaming formats and no third-party embeds.** HLS, DASH, YouTube and Vimeo are all
-  a third-party script driving an element the author did not write. Nothing degrades without
-  JavaScript there, so the central promise cannot be kept — and
-  [Plyr](https://github.com/sampotts/plyr) and [Vidstack](https://vidstack.io) already do it
-  well. Send people there.
+- **No streaming formats and no embeds of its own.** HLS, DASH, YouTube and Vimeo each need
+  a third-party script, and nothing here ships one or knows one by name. What the element
+  accepts is any child that speaks the media API — the author's `<video>` with hls.js on it,
+  or a `<youtube-video>` from [media-elements](https://github.com/muxinc/media-elements)
+  marked `media-player-media` — and what a blocked script leaves behind is then that child's
+  to decide. A provider, a `src` naming a platform, or a list of known tags is refused: the
+  seam is the media API, one selector wide.
 - **No shadow DOM.** The light DOM is the point: the page's CSS, the page's semantics, the
   page working before the script arrives.
 - **No re-implementing the platform.** The scrubber is an `<input type="range">` and the

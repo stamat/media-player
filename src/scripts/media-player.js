@@ -236,6 +236,14 @@ function focusedElement() {
 }
 
 /**
+ * What the element drives: the `<audio>` or `<video>` the author wrote, or a custom element
+ * that speaks the media API, marked with the class — no tag name can say what an element
+ * answers to, and the classes are already the markup contract. One selector for the wires
+ * and the lookup both, so the two cannot find different elements.
+ */
+export const MEDIA_SELECTOR = 'audio, video, .media-player-media';
+
+/**
  * `<media-player>` custom element.
  *
  * One element over the `<audio>` or `<video>` the author already wrote. Which of the two it
@@ -244,6 +252,13 @@ function focusedElement() {
  * attribute on the wrapper would mean no media element at all until the script arrives.
  * That is the whole bargain: the markup is the author's, `controls` on the media element is
  * the fallback, and a script that never loads leaves a working native player behind.
+ *
+ * The third thing it wraps is a custom element that speaks the media API — `<youtube-video>`,
+ * `<vimeo-video>`, `<hls-video>` from [media-elements](https://github.com/muxinc/media-elements)
+ * — marked `class="media-player-media"`. Same properties, same events, same bargain:
+ * `controls` off at upgrade and back on removal. What a blocked script leaves behind is then
+ * that element's promise, not this one's: a `<youtube-video>` is a blank box until its own
+ * module runs. A custom element counts as video unless its name ends in `-audio`.
  *
  * The controls are the author's too. There is no generated control bar and no `controls`
  * option taking an HTML string — the buttons, the sliders and the labels are written in the
@@ -310,7 +325,7 @@ function focusedElement() {
  * @attr {boolean} is-buffering - Waiting on data. CSS hook for a spinner; the element sets it.
  * @attr {boolean} is-error - The media gave up — a 404, a refused codec, a failed decode. CSS hook; the element sets it, hands the native controls back for the browser's own error state, and warns in the console.
  * @attr {boolean} is-live - The duration says this is an endless stream, so there is nothing to seek. CSS hook; the element sets it.
- * @attr {boolean} is-video - The wrapped element is a `<video>`. CSS hook; the element sets it.
+ * @attr {boolean} is-video - The wrapped element is a `<video>`, or a custom media element not named `-audio`. CSS hook; the element sets it.
  * @attr {boolean} is-fullscreen - CSS hook; the element sets it.
  * @attr {boolean} no-fullscreen - Fullscreen has no door to open here — an iframe without `allow="fullscreen"` is the common way. CSS hook for hiding the button that would do nothing; the element sets it.
  * @attr {boolean} controls-shown - The video controls are up. CSS hook; the element sets it.
@@ -394,7 +409,7 @@ export class MediaPlayer extends HgElement {
    * keeps firing once.
    */
   static wires = {
-    'audio, video':
+    [MEDIA_SELECTOR]:
       'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;error:onError',
     // The picture is the same button the overlay is, once the overlay has stepped out of the
     // way: clicking a playing video pauses it, and the overlay comes back over the frame it
@@ -425,9 +440,23 @@ export class MediaPlayer extends HgElement {
   };
 
   connected() {
-    const media = this.querySelector('audio, video');
+    const media = this.querySelector(MEDIA_SELECTOR);
     if (!media) {
-      console.warn('media-player: no <audio> or <video> inside — nothing to play');
+      console.warn('media-player: no <audio> or <video> inside, nothing marked media-player-media — nothing to play');
+      return;
+    }
+    // A custom media element that has not upgraded yet answers to nothing: `controls`
+    // written now lands as an own property that shadows the accessor the definition brings,
+    // and the platform's own chrome loads under the author's controls with nothing warning.
+    // The wires are already on it from the scan; the reading waits for the definition and
+    // starts over. One wait per player — a move in the meantime runs this again.
+    if (media.localName.includes('-') && !customElements.get(media.localName)) {
+      if (!this.awaiting) {
+        this.awaiting = customElements.whenDefined(media.localName).then(() => {
+          this.awaiting = null;
+          if (this.isConnected) this.connected();
+        });
+      }
       return;
     }
     // A reconnect resumes only for the element it went ready with: a morph or a framework
@@ -449,7 +478,7 @@ export class MediaPlayer extends HgElement {
     }
     this.media = media;
 
-    this.isVideo = this.media.tagName === 'VIDEO';
+    this.isVideo = !/(^|-)audio$/.test(this.media.localName);
     this.frame = 0;
     this.linger = null;
     this.scrubStep = null;

@@ -9,6 +9,25 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A custom element that speaks the media API is the third thing the player wraps.**
+  `<youtube-video>`, `<vimeo-video>`, `<hls-video>` — the
+  [media-elements](https://github.com/muxinc/media-elements) family, each an
+  `HTMLMediaElement`-shaped element over a third-party player — go inside the way a `<video>`
+  does, marked `class="media-player-media"` because no tag name can say what an element
+  answers to. Same wires, same properties, same bargain: `controls` off at upgrade and back on
+  removal, which on those elements reloads their iframe with the platform's own chrome. One
+  that upgrades after the player did is left alone until it has — `controls` written first
+  would be an own property shadowing the accessor the definition brings, and the platform's
+  chrome would load under yours with nothing warning.
+
+  **What stays out:** the elements themselves. Nothing here loads a platform script or knows
+  a platform by name, so the page with the script blocked is now that element's promise to
+  keep — a `<youtube-video>` is a blank box until its own module runs, the way a
+  `<video src="stream.m3u8">` is in Chrome until hls.js runs. Click-to-pause on the picture is
+  the other loss: the iframe inside their shadow root takes the click, and whether the
+  platform toggles on it is the platform's rule. `is-video` reads off the name now — a custom
+  element counts as video unless it ends in `-audio`.
+
 - **Two bundled stylesheets, so a page links two sheets instead of nine.**
   `media-player-element/bundle.css` is `style.css` with the four elemental structure sheets
   folded in, and `bundle-theme.css` is `theme.css` with theirs — the same CSS, compiled

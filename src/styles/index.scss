@@ -33,10 +33,18 @@ media-player:not(:defined) .media-player-overlay {
   display: none;
 }
 
-media-player video {
+media-player video,
+media-player .media-player-media {
   display: block;
   width: 100%;
   height: auto;
+}
+
+// A custom media element has no intrinsic ratio the way a `<video>` has: its iframe fills
+// whatever box the host gives it, and the host alone is the 300×150 its own style says.
+// Sixteen by nine is what the platforms cut for; a page with another cut overrides it by name.
+media-player .media-player-media {
+  aspect-ratio: 16 / 9;
 }
 
 // Two rows without a width breakpoint anywhere in here: the scrubber is written first in
@@ -154,7 +162,8 @@ media-player[is-video] {
 
 // Fullscreen hands the element the whole viewport; the video keeps its ratio inside it
 // rather than stretching to `fill`, which is what a bare `height: 100%` would do.
-media-player[is-fullscreen] video {
+media-player[is-fullscreen] video,
+media-player[is-fullscreen] .media-player-media {
   height: 100%;
   object-fit: contain;
 }

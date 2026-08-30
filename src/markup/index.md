@@ -385,7 +385,7 @@ until JavaScript says so.
 There is no separate audio player and video player. `<media-player>` reads which element you
 wrapped and turns on the video half — poster, click-to-play overlay, click-to-pause on the
 picture, captions, fullscreen, controls that fade out while playing — only when it wrapped a
-`<video>`.
+`<video>`, or a custom element standing in for one, which the end of this section gets to.
 
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it.
@@ -765,6 +765,40 @@ charge of what captions look like. Position included: the structure sheet clears
 control bar with `padding-bottom: 5.5rem` on `.media-player-captions`, and a taller bar —
 or one wrapped to a third row on a narrow phone — wants that number overridden in your own
 sheet.
+
+The third thing it wraps is not a native element at all. YouTube, Vimeo, HLS and the rest
+each need a third-party script driving something, and this element ships none and knows none
+by name — what it knows is the media API.
+[media-elements](https://github.com/muxinc/media-elements) publishes one element per platform
+with that API on it — `<youtube-video>`, `<vimeo-video>`, `<hls-video>` among them — and any
+of those goes where the `<video>` goes, marked `class="media-player-media"`, because no tag
+name can say what an element answers to. Same wires, same properties, same bargain:
+`controls` comes off at upgrade and goes back on removal, which on these elements reloads
+their iframe with the platform's own chrome, and the video half comes on unless the name ends
+in `-audio`.
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/youtube-video-element@1"></script>
+
+<media-player tabindex="0" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+  <youtube-video
+    class="media-player-media"
+    controls
+    src="https://www.youtube.com/watch?v=rubNgGj3pYo"
+  ></youtube-video>
+  <!-- the overlay and the control row from the sample above, copied whole -->
+</media-player>
+```
+
+Two things the swap costs, and both are the platform's rather than this element's. The
+promise at the top of this page — the page plays with the script blocked — is now
+`<youtube-video>`'s to keep, and it does not: until its own module runs it is a blank box,
+the way a `<video src="stream.m3u8">` is in Chrome until hls.js runs. And a click on the
+picture never reaches this element, because the iframe inside their shadow root takes it;
+whether the platform pauses on that click is the platform's rule. The order of the two
+scripts does not matter: a `<youtube-video>` that upgrades after the player did is left
+alone until it has, then read the same way. Not a live sample, because it would put a third
+party's module on this page, and the page loads nothing it does not build.
 
 ## Twelve minutes, from someone else's server
 
@@ -1465,7 +1499,7 @@ win.
 | **Your CSS reaches every part**    | yes                                                     | yes                                                  | through `::part()` and the variables it chose          | partly                               | yes                                    |
 | **Scrubber frame previews**        | yes — your box, the browser's VTT parser                | yes — its own VTT parser                             | yes, inside its time range                             | yes — VTT, sprites, storyboards      | a community plugin                     |
 | **Built from reusable primitives** | yes — the sliders ship separately                       | no                                                   | no                                                     | no                                   | no                                     |
-| **YouTube, Vimeo, HLS, DASH**      | **no**                                                  | YouTube, Vimeo                                       | via a provider                                         | all of them                          | via plugins                            |
+| **YouTube, Vimeo, HLS, DASH**      | via media-elements, or hls.js on your `<video>`         | YouTube, Vimeo                                       | via a provider                                         | all of them                          | via plugins                            |
 | **Ecosystem**                      | none                                                    | large                                                | Mux's                                                  | large                                | the largest                            |
 | **Pick it when**                   | the markup is yours and must survive without the script | you want one line and a good default                 | you want composable parts and accept a shadow root     | you are building an app around media | you need every format and every plugin |
 
@@ -1478,9 +1512,14 @@ elementals' four structure sheets 1.3 kB and their three themes 2.5 kB more, eac
 its own the way a browser fetches it. Every one of those numbers moves with a release;
 measure before quoting.
 
-Where this loses is the bottom of that table, and it loses there on purpose. **Plyr and
-Vidstack are the right answer for YouTube and Vimeo**, and Video.js for the long tail of
-formats and plugins. None of that is planned here.
+Where this loses is the bottom of that table, and it loses there on purpose. YouTube and
+Vimeo arrive the way they arrive in media-chrome — an element from
+[media-elements](https://github.com/muxinc/media-elements) that speaks the media API,
+dropped in where the `<video>` goes — and with the script blocked that element is a blank
+box, which is the promise at the top of this page handed to someone else.
+**[Plyr](https://github.com/sampotts/plyr) is the answer when the embed must play with no
+script at all**, since it enhances the `<iframe>` you already wrote, and Video.js for the
+long tail of formats and plugins. None of that is planned here.
 
 ## Live, and the streams it does not carry
 
@@ -1661,12 +1700,13 @@ Each of these is a decision, not a gap waiting for a pull request.
 - **Generate controls.** There is no control bar to configure, because configuring one is
   the problem this exists to avoid. The sample above is the starter — copy it and delete
   what you do not want.
-- **Streaming formats.** HLS, DASH and the YouTube and Vimeo iframe APIs are all a
-  third-party script driving an element you did not write, which is the opposite of the
-  bargain here. Live streams themselves are handled, and hls.js composes with this element
-  without it shipping a line about it —
-  [Live, and the streams it does not carry](#live-and-the-streams-it-does-not-carry) says how,
-  and what it costs.
+- **Streaming formats and embeds of its own.** HLS, DASH, YouTube and Vimeo each need a
+  third-party script, and nothing here ships one or knows one by name. What composes is
+  anything that speaks the media API: hls.js on the `<video>` you wrote, or a
+  `<youtube-video>` from media-elements marked `media-player-media`.
+  [One element, both media](#one-element-both-media) shows the second,
+  [Live, and the streams it does not carry](#live-and-the-streams-it-does-not-carry) the
+  first, and both say what a blocked script leaves behind.
 - **Ship a keyboard map of its own.** Nothing is bound until the author writes it: `key` on
   a control the page already shows, already names and already disables, and `keys` for the
   action no visible control carries — `volumeUp` behind a volume that is a slider. A `keys`
@@ -1798,11 +1838,15 @@ element's — see [Live, and the streams it does not carry](#live-and-the-stream
 
 </details>
 <details>
-<summary id="faq-streaming"><h3>Can I use it with HLS or DASH?</h3></summary>
+<summary id="faq-streaming"><h3>Can I use it with HLS, DASH, YouTube or Vimeo?</h3></summary>
 
-Nothing here ships either, and neither is coming. But both compose, and no seam was written
-to make them: attach hls.js or dash.js to the `<video>` you wrote, because this element only
-ever reads the media element and never touches its `src`.
+Nothing here ships any of them, and none is coming. But all four compose, and no seam was
+written to make them: attach hls.js or dash.js to the `<video>` you wrote, because this
+element only ever reads the media element and never touches its `src`. YouTube and Vimeo
+are one step over — media-elements ships `<youtube-video>` and `<vimeo-video>` with the
+media API on them, and this element wraps one marked `class="media-player-media"` the way it
+wraps a `<video>`. [One element, both media](#one-element-both-media) has the markup and
+the two things it costs.
 
 One half does not survive DASH. hls.js reports an endless duration for a live manifest and
 dash.js reports the rewind window's length, so `is-live` never comes on there. The worked

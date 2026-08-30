@@ -16,10 +16,15 @@ media-player:not(:defined) .media-player-overlay {
   display: none;
 }
 
-media-player video {
+media-player video,
+media-player .media-player-media {
   display: block;
   width: 100%;
   height: auto;
+}
+
+media-player .media-player-media {
+  aspect-ratio: 16/9;
 }
 
 .media-player-controls {
@@ -91,7 +96,8 @@ media-player[is-video] {
   overflow: hidden;
 }
 
-media-player[is-fullscreen] video {
+media-player[is-fullscreen] video,
+media-player[is-fullscreen] .media-player-media {
   height: 100%;
   object-fit: contain;
 }

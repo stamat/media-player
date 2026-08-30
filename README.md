@@ -53,7 +53,9 @@ keys only answer while focus is inside the player.
 
 One element for both — it reads which element you wrapped and turns on the video half
 (poster, click-to-play overlay, click-to-pause on the picture, captions, fullscreen, fading
-controls) only for a `<video>`. The scrubber and volume are [`<slider-elemental>`](https://github.com/stamat/book-of-elementals), the
+controls) only for a `<video>`. A custom element that speaks the media API — `<youtube-video>`
+or `<vimeo-video>` from [media-elements](https://github.com/muxinc/media-elements) — is the
+third thing it wraps, marked `class="media-player-media"`; the manual says what that costs. The scrubber and volume are [`<slider-elemental>`](https://github.com/stamat/book-of-elementals), the
 buffered bar is `<progress-elemental>`, the control row is `<toolbar-elemental>`, and the
 binding is [hydrargyri](https://github.com/stamat/hydrargyri).
 
