@@ -50,34 +50,32 @@
     <article class="prose">
       
 <h1 id="media-player">▶ media-player<a class="heading-anchor" href="#media-player" tabindex="-1" aria-hidden="true"></a></h1>
-<p>Every media player library starts by taking the player away from you. You hand over a
-<code>&lt;video&gt;</code> and a config object, and what comes back is someone else&#39;s control bar — their
-button order, their icons, their class names, their idea of where the time label goes.
-Wanting a different arrangement means learning a <code>controls</code> array, or passing an HTML string
-into a config option, which is templating in JavaScript wearing a smaller hat.</p>
-<p>This one goes the other way. <strong>You write the controls.</strong> They are buttons and range inputs
-in your page, styled by your stylesheet, in the order you put them. The element wires them
-by name and never touches their arrangement.</p>
+<p>Most media player libraries take the player away from you. You hand over a <code>&lt;video&gt;</code> and a
+config object, and get back someone else&#39;s control bar — their button order, their icons,
+their class names. Changing the arrangement means learning a <code>controls</code> array, or passing an
+HTML string into a config option.</p>
+<p>This one works the other way. <strong>You write the controls.</strong> Buttons and range inputs in your
+page, styled by your stylesheet, in the order you put them. The element wires them by name
+and never touches their arrangement.</p>
 <p>It is a rewrite of the media player I built at GitHub in 2022 as a passion project — the one still
 <a href="https://github.com/readme/podcast/powering-public-goods">playing on long forgotten github.com pages</a>,
 it was written in Catalyst and TypeScript, before the React era.
 Now it is given a new life as open source, dogfooding <a href="https://github.com/stamat/hydrargyri">hydrargyri</a> and
 <a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a>.</p>
-<p>The sample below is not a picture of one. It is the page&#39;s only copy of that markup, rendered
-in an isolated frame by <a href="https://github.com/stamat/code-preview-element"><code>&lt;code-preview&gt;</code></a> —
-press <strong>Edit</strong> and what you type is what plays. The <strong>Options</strong> tab beside it is the same
-<code>custom-elements.json</code> this package ships, turned into controls: the eight attributes an author
-writes and the seven custom properties the theme takes, each with what the manifest says its
-type is. An attribute knob rewrites the markup above it, so the code tab stays the truth; a
-custom property is not part of the sample, so it writes a rule into the frame and prints that
-rule for you to copy. The sixteen attributes the element writes for itself are left out — a
-knob spliced into the markup would not survive the next <code>play</code>.</p>
+<p>The sample below is the page&#39;s only copy of that markup, rendered in an isolated frame by
+<a href="https://github.com/stamat/code-preview-element"><code>&lt;code-preview&gt;</code></a>: press <strong>Edit</strong> and what
+you type is what plays. The <strong>Options</strong> tab is generated from the <code>custom-elements.json</code> this
+package ships — the eight attributes an author writes and the seven custom properties the
+theme takes, each with its declared type. An attribute knob rewrites the markup above it, so
+the code tab stays the truth; a custom property is not part of the sample, so it writes a
+rule into the frame and prints that rule for you to copy. The sixteen attributes the element
+writes for itself are left out: a knob spliced into the markup would not survive the next
+<code>play</code>.</p>
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it.
-     The frame's own padding drops to nothing on a narrow screen. That keeps the sample
-     honest rather than tidy: 1.5rem a side renders it 48px narrower than the page a reader
-     would paste this markup onto, which is enough to wrap the video row to a third line on
-     a phone and show a defect the markup does not have. -->
+     The frame's padding drops to nothing on a narrow screen: 1.5rem a side renders it 48px
+     narrower than the page a reader would paste this markup onto, enough to wrap the video
+     row to a third line on a phone and show a defect the markup does not have. -->
 <code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;region&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Audio player&quot;</span> <span class="hljs-attr">keys</span>=<span class="hljs-string">&quot;ArrowUp:volumeUp;ArrowDown:volumeDown&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;keydown:onKeyDown&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">audio</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/tone.wav&quot;</span> <span class="hljs-attr">preload</span>=<span class="hljs-string">&quot;metadata&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>
 
@@ -106,10 +104,10 @@ knob spliced into the markup would not survive the next <code>play</code>.</p>
         &gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">progress</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">progress-elemental</span>&gt;</span>
       <span class="hljs-comment">&lt;!-- `step=&quot;any&quot;` lets the clock&#x27;s fractional writes land unsnapped, so the thumb
-           glides with playback instead of jumping once a second. A hand is the exception:
-           `beginScrub` flips the step to whole seconds the moment a pointer or a seek key
-           lands, and `endScrub` puts `any` back — a drag and the arrows move per second,
-           the tooltip reads whole seconds regardless.
+           glides with playback instead of jumping once a second. `beginScrub` flips the
+           step to whole seconds the moment a pointer or a seek key lands, and `endScrub`
+           puts `any` back — a drag and the arrows move per second, the tooltip reads whole
+           seconds regardless.
            `pointerup@document` as well as `change`: a thumb picked up and put back where it
            started fires no `change`, and the clock would stay stopped over playing audio. --&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
@@ -342,14 +340,12 @@ knob spliced into the markup would not survive the next <code>play</code>.</p>
 <script src="js/code-preview-hljs.min.js" defer></script><!-- The options panel, a second bundle carrying no copy of the element. It is what turns the
      `manifest` on the previews above into controls; without it that attribute is inert and
      the samples render exactly as they did. -->
-<script src="js/code-preview-options.min.js" defer></script><p>Block the script and that markup is a plain <code>&lt;audio controls&gt;</code> — which is the point, and
-worth trying with JavaScript off before taking the claim on trust. Not on this page, though:
+<script src="js/code-preview-options.min.js" defer></script><p>Block the script and that markup is a plain <code>&lt;audio controls&gt;</code>. Not testable on this page:
 the preview above is itself a custom element, so with scripting off there is nothing here but
-the code block it was built from. Paste the sample into a file of your own and the claim is
-one browser setting from proof.</p>
+the code block it was built from. Paste the sample into a file of your own to check it.</p>
 <p>That is the whole wiring model. <code>on</code> says what fires, <code>bind</code> says
   where state lands, and both hold names — never code — so there is nothing to evaluate and
-  nothing for a Content Security Policy to object to. It sits on
+  nothing for a Content Security Policy to object to. It rests on
   <a href="https://github.com/stamat/hydrargyri">hydrargyri</a> for the binding and
   <a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a> for the
   sliders.</p>
@@ -358,80 +354,76 @@ one browser setting from proof.</p>
 
 <details class="toc-disclosure" open>
   <summary>On this page</summary>
-  <nav class="toc" aria-label="On this page"><ul><li class="toc-h2"><a href="#two-rows-and-what-a-phone-changes">Two rows, and what a phone changes</a></li><li class="toc-h2"><a href="#the-part-that-matters-most">The part that matters most</a></li><li class="toc-h2"><a href="#one-element-both-media">One element, both media</a></li><li class="toc-h3"><a href="#youtube-and-vimeo-from-one-tag">YouTube and Vimeo, from one tag</a></li><li class="toc-h3"><a href="#every-other-platform">Every other platform</a></li><li class="toc-h3"><a href="#what-the-embed-costs-either-way">What the embed costs, either way</a></li><li class="toc-h2"><a href="#twelve-minutes-from-someone-elses-server">Twelve minutes, from someone else&#39;s server</a></li><li class="toc-h2"><a href="#frames-on-the-scrubber">Frames on the scrubber</a></li><li class="toc-h2"><a href="#a-background-loop-and-the-one-button-it-owes-you">A background loop, and the one button it owes you</a></li><li class="toc-h2"><a href="#what-it-borrows">What it borrows</a></li><li class="toc-h2"><a href="#keys-the-buttons-carry">Keys the buttons carry</a></li><li class="toc-h3"><a href="#which-keydown-you-bind-is-the-whole-scope">Which keydown you bind is the whole scope</a></li><li class="toc-h3"><a href="#what-a-press-has-to-get-past-first">What a press has to get past first</a></li><li class="toc-h2"><a href="#tooltips-on-the-controls">Tooltips on the controls</a></li><li class="toc-h2"><a href="#attributes-it-writes">Attributes it writes</a></li><li class="toc-h2"><a href="#on-the-lock-screen">On the lock screen</a></li><li class="toc-h2"><a href="#what-the-theme-takes">What the theme takes</a></li><li class="toc-h2"><a href="#handlers-you-can-name">Handlers you can name</a></li><li class="toc-h2"><a href="#state-you-can-bind">State you can bind</a></li><li class="toc-h2"><a href="#labels-in-another-language">Labels in another language</a></li><li class="toc-h2"><a href="#events">Events</a></li><li class="toc-h2"><a href="#against-the-alternatives">Against the alternatives</a></li><li class="toc-h2"><a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a></li><li class="toc-h2"><a href="#what-it-does-not-do">What it does not do</a></li><li class="toc-h2"><a href="#install">Install</a></li><li class="toc-h2"><a href="#what-editors-read">What editors read</a></li><li class="toc-h2"><a href="#questions">Questions</a></li><li class="toc-h2"><a href="#license">License</a></li></ul></nav>
+  <nav class="toc" aria-label="On this page"><ul><li class="toc-h2"><a href="#two-rows-and-narrow-screens">Two rows, and narrow screens</a></li><li class="toc-h2"><a href="#playing-with-the-script-blocked">Playing with the script blocked</a></li><li class="toc-h2"><a href="#one-element-both-media">One element, both media</a></li><li class="toc-h3"><a href="#youtube-and-vimeo-from-one-tag">YouTube and Vimeo, from one tag</a></li><li class="toc-h3"><a href="#every-other-platform">Every other platform</a></li><li class="toc-h3"><a href="#what-the-embed-costs-either-way">What the embed costs, either way</a></li><li class="toc-h2"><a href="#a-twelve-minute-file-and-what-preload-costs">A twelve-minute file, and what preload costs</a></li><li class="toc-h2"><a href="#frames-on-the-scrubber">Frames on the scrubber</a></li><li class="toc-h2"><a href="#background-video-and-the-pause-button-it-needs">Background video, and the pause button it needs</a></li><li class="toc-h2"><a href="#what-it-borrows">What it borrows</a></li><li class="toc-h2"><a href="#keys-the-buttons-carry">Keys the buttons carry</a></li><li class="toc-h3"><a href="#which-keydown-you-bind-is-the-whole-scope">Which keydown you bind is the whole scope</a></li><li class="toc-h3"><a href="#what-a-press-has-to-get-past">What a press has to get past</a></li><li class="toc-h2"><a href="#tooltips-on-the-controls">Tooltips on the controls</a></li><li class="toc-h2"><a href="#attributes-it-writes">Attributes it writes</a></li><li class="toc-h2"><a href="#on-the-lock-screen">On the lock screen</a></li><li class="toc-h2"><a href="#what-the-theme-takes">What the theme takes</a></li><li class="toc-h2"><a href="#handlers-you-can-name">Handlers you can name</a></li><li class="toc-h2"><a href="#state-you-can-bind">State you can bind</a></li><li class="toc-h2"><a href="#labels-in-another-language">Labels in another language</a></li><li class="toc-h2"><a href="#events">Events</a></li><li class="toc-h2"><a href="#against-the-alternatives">Against the alternatives</a></li><li class="toc-h2"><a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a></li><li class="toc-h2"><a href="#what-it-does-not-do">What it does not do</a></li><li class="toc-h2"><a href="#install">Install</a></li><li class="toc-h2"><a href="#what-editors-read">What editors read</a></li><li class="toc-h2"><a href="#questions">Questions</a></li><li class="toc-h2"><a href="#license">License</a></li></ul></nav>
 </details>
-<h2 id="two-rows-and-what-a-phone-changes">Two rows, and what a phone changes<a class="heading-anchor" href="#two-rows-and-what-a-phone-changes" tabindex="-1" aria-hidden="true"></a></h2>
+<h2 id="two-rows-and-narrow-screens">Two rows, and narrow screens<a class="heading-anchor" href="#two-rows-and-narrow-screens" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The scrubber is first in that markup on purpose. <code>style.css</code> gives it a whole flex line, so
-the buttons and the clock wrap under it and the bar is two rows with no breakpoint to tune —
-a phone and a page-wide video get the same shape. Squeezed into one row instead, the
-fixed-width parts alone outgrow a 375px viewport and the scrubber is left with about twenty
-pixels of something meant to be dragged.</p>
-<p>Two is the floor rather than a promise. The line under the scrubber wraps again when what it
-carries outgrows it, and the theme&#39;s buttons are 32px: the video sample&#39;s six of them and
-the clock come to 306px, which is what a 360px phone leaves. Below that they wrap to a third
-row, and the fix is to drop a control from the row or fold part of it away.</p>
-<p>Which is what the fold is for. Measured on the video sample with the theme loaded and the
-volume slider already gone, the row still wraps to a third line at 425px of player width —
-and dropping one control does not clear a 375px phone: speed takes it to 387px,
-picture-in-picture to 385px. Two have to go, and the button costs a slot of its own —
-folding two buys back one — so three go together: speed, captions, picture-in-picture. The
-AirPlay button makes four for a different reason: it appears by network weather, and folded,
-a phone standing near a receiver is no longer the one phone whose row wraps. What is left is
-a 324px row that keeps its second line down to 340px of player width.</p>
+the buttons and the clock wrap under it: the bar is two rows with no breakpoint to tune, and
+a phone and a page-wide video get the same shape. In one row instead, the fixed-width parts
+alone outgrow a 375px viewport and the scrubber is left with about twenty pixels to drag.</p>
+<p>Two is the floor, not a promise. The line under the scrubber wraps again when what it carries
+outgrows it, and the theme&#39;s buttons are 32px: the video sample&#39;s six of them and the clock
+come to 306px, which is what a 360px phone leaves. Below that they wrap to a third row, and
+the fix is to drop a control or fold part of the row away.</p>
+<p>That is what the fold is for. Measured on the video sample with the theme loaded and the
+volume slider already gone, the row still wraps to a third line at 425px of player width, and
+dropping one control does not clear a 375px phone: speed takes it to 387px, picture-in-picture
+to 385px. Two have to go, and the button costs a slot of its own — folding two buys back one
+— so three go together: speed, captions, picture-in-picture. AirPlay makes four for a
+different reason: it appears only when there is a device on the network, and folded, a phone
+standing near a receiver is no longer the one phone whose row wraps. What is left is a 324px
+row that keeps its second line down to 340px of player width.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">disclosure-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-more&quot;</span> <span class="hljs-attr">open-when</span>=<span class="hljs-string">&quot;(min-width: 30rem)&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;disclosure-toggle:onMoreToggle&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;More controls&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;moreLabel:attr#aria-label&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-more-region&quot;</span>&gt;</span>
     <span class="hljs-comment">&lt;!-- speed, captions, picture-in-picture, play on a device --&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">disclosure-elemental</span>&gt;</span></code></pre>
-<p><code>open-when</code> is the whole of the arrangement, and the breakpoint is written once. Above it the
-region is held open and the element reflects <code>data-mode=&quot;pinned&quot;</code>, which <code>style.css</code> reads to
-take the button away and give the region <code>display: contents</code> — so a wide row is the row it
-always was, in the markup&#39;s own order, with no extra box in the middle of it.</p>
-<p>Below it the button owns the region, and opening it swaps the line rather than growing the
-bar: the transport, the clock and the mute step out, the four unfurl into their space the
-way a search field expands, and the caret slides along with them — turned around while it is
-open, and offering &quot;Fewer controls&quot; through the same <code>moreLabel</code> its tooltip reads. Whatever
-control ends the row — fullscreen here — keeps its corner in both states, and the scrubber
-never leaves: seeking is not the fold&#39;s to take away. A menu floating over the picture is
-the version that did not survive: inside the player&#39;s <code>overflow: hidden</code> it clips on any
-ratio shorter than 16:9, and the player at the top of this page is 2.4:1. The button comes
-first in the disclosure and the region after it, so the sequence reads the way the row does
-— the trigger, then what it revealed — and the tooltip, which cannot wrap this one button
-because the disclosure wants it as a direct child, names it with <code>for</code> instead.</p>
-<p>Width is not the only thing that can make a fold pointless. One control behind the button is
-a fold that saves nothing — the button takes the slot the control gave up, and charges a tap
-for what used to be one press — so the element counts the region on connect, and a fold
-holding one or none has its <code>open-when</code> rewritten to <code>all</code>. That pins it at every width,
-which is the wide arrangement above reached by counting rather than by measuring. The count
-is the markup&#39;s: a control the author hides at some width, or on <code>no-airplay</code>, is still one
-of the fold&#39;s, so a row that empties out at runtime keeps its button. The attribute goes back
-the way it was written if the player leaves the page.</p>
-<p>The clock turns around at almost the same width. Below 21.25rem of player — where a 324px
-row stops fitting with the duration in it — <code>current / duration</code> hands the line to a single
-countdown that ends on zero when the track does: <code>.media-player-elapsed</code> holds the pair,
+<p><code>open-when</code> is the whole arrangement, and the breakpoint is written once. Above it the region
+is held open and the element reflects <code>data-mode=&quot;pinned&quot;</code>, which <code>style.css</code> reads to take
+the button away and give the region <code>display: contents</code> — so a wide row is the row it always
+was, in the markup&#39;s own order, with no extra box in the middle.</p>
+<p>Below it the button owns the region. Opening it swaps the line rather than growing the bar:
+the transport, the clock and the mute step out, the four unfurl into their space, and the
+caret slides along with them — turned around while open, and offering &quot;Fewer controls&quot;
+through the same <code>moreLabel</code> its tooltip reads. Whatever control ends the row, fullscreen
+here, keeps its corner in both states, and the scrubber never leaves: seeking is not the
+fold&#39;s to take away. A menu floating over the picture was rejected: inside the player&#39;s
+<code>overflow: hidden</code> it clips on any ratio shorter than 16:9, and the player at the top of this
+page is 2.4:1. The button comes first in the disclosure and the region after it, so the
+sequence reads the way the row does. The tooltip cannot wrap this one button, because the
+disclosure wants it as a direct child, so it names it with <code>for</code> instead.</p>
+<p>Width is not the only thing that can make a fold pointless. One control behind the button
+saves nothing — the button takes the slot the control gave up and charges a tap for what used
+to be one press — so the element counts the region on connect, and a fold holding one or none
+has its <code>open-when</code> rewritten to <code>all</code>. That pins it at every width. The count is the
+markup&#39;s: a control the author hides at some width, or on <code>no-airplay</code>, is still one of the
+fold&#39;s, so a row that empties out at runtime keeps its button. The attribute goes back the way
+it was written if the player leaves the page.</p>
+<p>The clock turns around at almost the same width. Below 21.25rem of player — where a 324px row
+stops fitting with the duration in it — <code>current / duration</code> gives way to a single countdown
+that ends on zero when the track does. <code>.media-player-elapsed</code> holds the pair,
 <code>.media-player-remaining</code> the countdown, and the swap is two container-query rules in
 <code>style.css</code>. That keeps the second line down to 294px of player width, which a 320px phone
 clears.</p>
 <p>The arrows skip what is folded, so a closed region is not a stretch of dead arrow presses:
-<code>&lt;toolbar-elemental&gt;</code> walks only the controls that are on screen, which is
-book-of-elementals 3.1.1 and the floor this version asks for. <code>&lt;media-player&gt;</code> imports the
-disclosure for you; a page that blocks the script has no control row at all, and one whose
+<code>&lt;toolbar-elemental&gt;</code> walks only the controls that are on screen, which needs
+book-of-elementals 3.1.1, the floor this version asks for. <code>&lt;media-player&gt;</code> imports the
+disclosure for you. A page that blocks the script has no control row at all; one whose
 disclosure never defines gets the four controls sitting in the open, which is the row this
 section started with.</p>
-<p>Which is also why the scrubber is moved in the markup rather than with <code>order</code>. Reordering a
-flex line visually leaves the tab sequence in the old order, and a keyboard user would read
-the bar top-to-bottom while tabbing it bottom-to-top. Put it where you want it and both agree.</p>
-<p>The row under it falls into two clusters — the transport with its clock at the start,
-everything else at the end. What opens the gap is a single <code>margin-inline-end: auto</code> on the
-clock, so the arrangement stays yours: the clock and everything before it goes left,
-everything after it goes right, and moving the clock moves the divide. It sits on the clock
-rather than on the control after it because a button wrapped in <code>&lt;tooltip-elemental&gt;</code> is not
-the flex item any more — that element is <code>display: contents</code> — and a margin on the wrapper
-would land on a box that does not exist. A row written without a clock matches that rule
-nowhere and comes out as one cluster at the start — visibly wrong rather than quietly broken
-— and the fix is to put the same <code>auto</code> on whichever control should close the left-hand
-group.</p>
+<p>The scrubber is moved in the markup rather than with <code>order</code> for the same reason. Reordering
+a flex line visually leaves the tab sequence in the old order, and a keyboard user would read
+the bar top-to-bottom while tabbing it bottom-to-top.</p>
+<p>The row under it falls into two clusters: the transport with its clock at the start,
+everything else at the end. A single <code>margin-inline-end: auto</code> on the clock opens the gap, so
+the arrangement stays yours — the clock and everything before it goes left, everything after
+it goes right, and moving the clock moves the divide. It sits on the clock rather than on the
+control after it because a button wrapped in <code>&lt;tooltip-elemental&gt;</code> is not the flex item any
+more, that element being <code>display: contents</code>, and a margin on the wrapper would land on a box
+that does not exist. A row written without a clock matches that rule nowhere and comes out as
+one cluster at the start — visibly wrong rather than quietly broken — and the fix is to put
+the same <code>auto</code> on whichever control should close the left-hand group.</p>
 <p>One thing changes under a coarse pointer — a phone, a tablet — and it is opt-out by
 overriding the rule:</p>
 <table>
@@ -451,36 +443,34 @@ overriding the rule:</p>
 <p>The buttons do not grow for the finger, and that is a choice with a cost. <code>theme.css</code> draws
 a 32px button on every pointer: past <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html">WCAG 2.5.8</a>,
 the AA minimum of 24px, and short of <a href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html">2.5.5</a>,
-the AAA 44px — Apple asks the same 44pt, Google a step more at 48dp. 44px was tried and the row could
-not afford it — six targets and the clock come to 343px where a 393px phone gives the bar
-338px, so the fullscreen button wrapped to a third line and clawing it back cost the gap
-between every button. If your row is short enough to pay for it, the AAA size is two
-declarations:</p>
+the AAA 44px — Apple asks the same 44pt, Google 48dp. 44px was tried and the row could not
+afford it: six targets and the clock come to 343px where a 393px phone gives the bar 338px,
+so the fullscreen button wrapped to a third line and clawing it back cost the gap between
+every button. If your row is short enough to pay for it, the AAA size is two declarations:</p>
 <pre><code class="hljs language-css"><span class="hljs-keyword">@media</span> (<span class="hljs-attribute">pointer</span>: coarse) {
   media-player <span class="hljs-selector-class">.media-player-controls</span> <span class="hljs-selector-tag">button</span> {
     <span class="hljs-attribute">min-width</span>: <span class="hljs-number">2.75rem</span>;
     <span class="hljs-attribute">min-height</span>: <span class="hljs-number">2.75rem</span>;
   }
 }</code></pre>
-<h2 id="the-part-that-matters-most">The part that matters most<a class="heading-anchor" href="#the-part-that-matters-most" tabindex="-1" aria-hidden="true"></a></h2>
-<p><strong>Delete the <code>&lt;script&gt;</code> tag and the page still plays.</strong> The <code>controls</code> attribute you wrote
-is on the media element until the moment this element upgrades and takes over; a script that
-404s, a CDN that is down, a browser that stopped at the first parse error — all of them leave
-a working native player rather than a row of dead buttons.</p>
-<p>That is not a nice-to-have here, it is the reason the markup looks the way it does. A
+<h2 id="playing-with-the-script-blocked">Playing with the script blocked<a class="heading-anchor" href="#playing-with-the-script-blocked" tabindex="-1" aria-hidden="true"></a></h2>
+<p><strong>Delete the <code>&lt;script&gt;</code> tag and the page still plays.</strong> The <code>controls</code> attribute you wrote is
+on the media element until this element upgrades and takes over. A script that 404s, a CDN
+that is down, a browser that stopped at the first parse error — all of them leave a working
+native player rather than a row of dead buttons.</p>
+<p>That is not a nice-to-have, it is why the markup looks the way it does. A
 <code>&lt;media-player src=&quot;…&quot;&gt;</code> that built its own <code>&lt;audio&gt;</code> would be a player that does not exist
 until JavaScript says so.</p>
 <h2 id="one-element-both-media">One element, both media<a class="heading-anchor" href="#one-element-both-media" tabindex="-1" aria-hidden="true"></a></h2>
 <p>There is no separate audio player and video player. <code>&lt;media-player&gt;</code> reads which element you
 wrapped and turns on the video half — poster, click-to-play overlay, click-to-pause on the
 picture, captions, fullscreen, controls that fade out while playing — only when it wrapped a
-<code>&lt;video&gt;</code>, or a custom element standing in for one, which the end of this section gets to.</p>
+<code>&lt;video&gt;</code>, or a custom element standing in for one, covered at the end of this section.</p>
 <!-- One line, and it has to be: markdown treats an unknown tag as a block only when its
      whole opening tag sits on a line of its own. Broken over four, the page prints it.
-     The frame's own padding drops to nothing on a narrow screen. That keeps the sample
-     honest rather than tidy: 1.5rem a side renders it 48px narrower than the page a reader
-     would paste this markup onto, which is enough to wrap the video row to a third line on
-     a phone and show a defect the markup does not have. -->
+     The frame's padding drops to nothing on a narrow screen: 1.5rem a side renders it 48px
+     narrower than the page a reader would paste this markup onto, enough to wrap the video
+     row to a third line on a phone and show a defect the markup does not have. -->
 <code-preview manifest="custom-elements.json" css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>
   <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span>
   <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;region&quot;</span>
@@ -925,54 +915,51 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
 <p>Video and captions are NASA&#39;s, <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/">public domain</a>:
 the <a href="https://images.nasa.gov/details/KSC-20260117-MH-DNS01-0001-Artemis_II_Rollout_Timelapse_LC_39_Press_Site-M18870">Artemis II rollout</a>
 to Launch Complex 39B on 17 January 2026. The clip is silent — it carries an audio track, but
-every sample in it is zero — so the mute button and the volume slider on this row have
-nothing to act on here. They are in the sample anyway, because a video player&#39;s row is not
-complete without them and this page is where the row gets copied from; the player further
-down is where they do something. Its one caption cue reads
+every sample in it is zero — so the mute button and the volume slider have nothing to act on
+here. They are in the sample anyway, because this page is where a video player&#39;s row gets
+copied from; the player further down is where they do something. Its one caption cue reads
 <code>[Ambient sounds]</code>, which belongs to a longer cut of the same footage and is left as NASA
-wrote it: enough to prove the CC wiring, no more. The controls fade out while it plays and
-come back on the next mouse move, or the next touch — that is <code>mousemove:showControls</code> and
-<code>touchstart:showControls</code>, below.</p>
+wrote it: enough to prove the CC wiring, no more.</p>
 <p>The three handlers on the <code>&lt;media-player&gt;</code> itself are the video half&#39;s housekeeping.
-<code>mousemove:showControls</code> is what makes the control row behave the way a video player&#39;s does:
-up while the pointer moves, gone five seconds after it stops, and always up while the video
-is paused or a focus ring is inside the row. A ring, not focus: a mouse click leaves focus on
-the button it pressed, and a row pinned by that is a row that never fades once you have
-pressed play. <code>touchstart:showControls</code> is the same row for a
-pointer that cannot hover, and it is not optional there — a touch sends no <code>mousemove</code>, so
-without it the row goes five seconds into playback and the only thing that brings it back is
-a tap on the picture, which pauses the video to do it. With it, the first tap reveals and the
-second presses what it lands on: the element will not pause on a tap while the pointer cannot
-hover, for the same reason. <code>fullscreenchange@document:onFullscreenChange</code>
-keeps <code>is-fullscreen</code> honest when <kbd>Escape</kbd> leaves fullscreen without the button
-being pressed. A third would bind the keyboard — <a href="#keys-the-buttons-carry">Keys the buttons carry</a>,
-below — which no sample on this page switches on.</p>
-<p>A click on the picture itself needs no handler in the markup: the element wires it, the same
-way it wires the media element&#39;s events. Clicking a playing video pauses it and the overlay
-returns over the frame it stopped on, so the big play button is up whenever there is
-something to start — including while a paused video is being scrubbed.</p>
+<code>mousemove:showControls</code> makes the control row behave the way a video player&#39;s does: up while
+the pointer moves, gone five seconds after it stops, and always up while the video is paused
+or a focus ring is inside the row. A ring, not focus: a mouse click leaves focus on the button
+it pressed, and a row pinned by that never fades once you have pressed play.
+<code>touchstart:showControls</code> is the same for a pointer that cannot hover, and it is not optional
+there — a touch sends no <code>mousemove</code>, so without it the row goes five seconds into playback
+and only a tap on the picture brings it back, which pauses the video to do it. With it, the
+first tap reveals and the second presses what it lands on: the element will not pause on a tap
+while the pointer cannot hover, for the same reason.
+<code>fullscreenchange@document:onFullscreenChange</code> keeps <code>is-fullscreen</code> honest when
+<kbd>Escape</kbd> leaves fullscreen without the button being pressed. A fourth would bind the
+keyboard — <a href="#keys-the-buttons-carry">Keys the buttons carry</a> — which no sample on this page
+switches on.</p>
+<p>A click on the picture needs no handler in the markup: the element wires it, the same way it
+wires the media element&#39;s events. Clicking a playing video pauses it and the overlay returns
+over the frame it stopped on, so the big play button is up whenever there is something to
+start, including while a paused video is being scrubbed.</p>
 <p>Captions render into whatever binds <code>captionText</code>, with the track held <code>hidden</code> so the
-browser&#39;s own caption box stays out of the way — which is what leaves your stylesheet in
-charge of what captions look like. Position included: the structure sheet rests
-<code>.media-player-captions</code> 2rem off the bottom edge and lifts it <code>3.5rem</code> more — 5.5rem in all,
-which clears a two-row control bar — for as long as that bar is up, so a caption never sits
-held above a row that has faded out. A taller bar, or one wrapped to a third row on a narrow
-phone, wants the lift overridden in your own sheet.</p>
-<p>The third thing it wraps is not a native element at all. YouTube, Vimeo, HLS and the rest
-each need a third-party script driving something, and this element ships none and knows none
-by name — what it knows is the media API. Any element carrying that API goes where the
-<code>&lt;video&gt;</code> goes, marked <code>class=&quot;media-player-media&quot;</code>, because no tag name can say what an
-element answers to. Same wires, same properties, same bargain: <code>controls</code> comes off at upgrade
-and goes back on removal, which on these elements reloads their iframe with the platform&#39;s own
-chrome, and the video half comes on unless the name ends in <code>-audio</code>. The structure sheet
-sizes it like a <code>&lt;video&gt;</code> — full width, <code>16 / 9</code> until your sheet says otherwise; what the
-element does to itself is its own.</p>
+browser&#39;s own caption box stays out of the way — which leaves your stylesheet in charge of
+what captions look like. Position included: the structure sheet rests <code>.media-player-captions</code>
+2rem off the bottom edge and lifts it <code>3.5rem</code> more, 5.5rem in all, which clears a two-row
+control bar. The lift lasts as long as that bar is up, so a caption never sits held above a
+row that has faded out. A taller bar, or one wrapped to a third row on a narrow phone, wants
+the lift overridden in your own sheet.</p>
+<p>The third thing it wraps is not a native element. YouTube, Vimeo, HLS and the rest each need a
+third-party script, and this element ships none and knows none by name — what it knows is the
+media API. Any element carrying that API goes where the <code>&lt;video&gt;</code> goes, marked
+<code>class=&quot;media-player-media&quot;</code>, because no tag name can say what an element answers to. Same
+wires, same properties, same bargain: <code>controls</code> comes off at upgrade and goes back on
+removal, which on these elements reloads their iframe with the platform&#39;s own chrome, and the
+video half comes on unless the name ends in <code>-audio</code>. The structure sheet sizes it like a
+<code>&lt;video&gt;</code> — full width, <code>16 / 9</code> until your sheet says otherwise; what the element does to
+itself is its own.</p>
 <h3 id="youtube-and-vimeo-from-one-tag">YouTube and Vimeo, from one tag<a class="heading-anchor" href="#youtube-and-vimeo-from-one-tag" tabindex="-1" aria-hidden="true"></a></h3>
 <p><a href="https://github.com/stamat/video-background-element"><code>&lt;video-background&gt;</code></a> speaks that API and
-drops into that slot, and it answers for all three sources from a single tag: the <code>src</code>
-decides whether the thing behind it is YouTube, Vimeo or a plain video file. It is mine, so
-weigh the preference accordingly — everything claimed for it below was measured in a browser,
-and the two players under this paragraph are the measurement.</p>
+answers for all three sources from a single tag: the <code>src</code> decides whether the thing behind it
+is YouTube, Vimeo or a plain video file. It is mine, so weigh the preference accordingly —
+everything claimed for it below was measured in a browser, and the two players under this
+paragraph are the measurement.</p>
 <code-preview css="css/prose.min.css" theme-attribute="data-theme" head="&lt;style&gt;body{margin:0;padding:1.5rem}@media(max-width:30rem){body{padding:0}}&lt;/style&gt;&lt;script src='https://cdn.jsdelivr.net/npm/video-background-element@1.1.0'&gt;&lt;/script&gt;&lt;script type='module' src='dist/media-player.min.mjs'&gt;&lt;/script&gt;"><pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css">
   <span class="hljs-comment">/* `unstyled` drops the element&#x27;s own sheet, and `load-background` places the thumbnail
      through it. Two declarations buy that back; without them the picture tiles. */</span>
@@ -1056,44 +1043,40 @@ platform&#39;s link over the <code>src</code> to watch that happen:</p>
 published bundle carries its one dependency inside it, so no bare import is left for the
 browser to resolve.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/video-background-element@1.1.0&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
-<p>The eight attributes on the element are it being talked out of being a background, which is
-the one thing it was written to be. <code>unstyled</code> drops the absolute, full-bleed positioning it would
-otherwise take, and the <code>position: relative</code> it would write onto its parent, so it sits in the
-flow and the structure sheet&#39;s <code>16 / 9</code> is what sizes it. <code>fit-box</code> fills that box instead of
-overscanning past it — the overscan exists to push a platform&#39;s edge chrome out of a
-background&#39;s crop, and here the box <em>is</em> the picture, so cropping it is loss. A background
-autoplays, loops and starts muted; a player does none of the three until it is told to, which
-is what <code>autoplay=&quot;false&quot;</code>, <code>loop=&quot;false&quot;</code> and <code>muted=&quot;false&quot;</code> say. <code>load-background</code> is the
-poster: the element hides its own first frame until playback starts, so without it the box is
-blank until you press play. <code>lazyloading</code> puts <code>loading=&quot;lazy&quot;</code> on the iframe, which is what
-keeps two embeds off this page until they scroll into view. And <code>pause-offscreen=&quot;false&quot;</code>
-takes the scroll gate off: a background stops itself the moment it leaves the viewport, which
-is thrift when nobody asked for it and rudeness once somebody has pressed play — written off,
-the element builds no <code>IntersectionObserver</code> at all and playback is the listener&#39;s to stop.
-It cannot start anything on its own here either, because that path is gated on <code>autoplay</code> as
-well, and <code>autoplay</code> is off. This element has an attribute of the same name and the opposite
-default, <a href="#attributes-it-writes">below</a> — a background yields the moment it is out of sight,
-a player does not until you ask it to.</p>
-<p><strong>What those two frames cost, named rather than buried.</strong> Every other sample on this page runs
-on files this repository built, and the only thing the page itself fetches from anywhere else
-is the Tears of Steel video further down. These two do not: inside each frame the browser
-pulls <code>video-background-element</code> from jsdelivr, then an embed from <code>youtube-nocookie.com</code> or
-<code>player.vimeo.com</code> — the privacy-preserving domains, which is that element&#39;s <code>no-cookie</code>
-default, with <code>dnt=1</code> on the Vimeo one. The posters go further afield, and one of them to a
-party neither you nor the platform runs: YouTube&#39;s thumbnail comes from <code>img.youtube.com</code>,
-Vimeo&#39;s from <code>vumbnail.com</code>, a proxy the element falls back on because Vimeo publishes no
-thumbnail URL you can build from an id. The frames are not a sandbox and are not sold as one:
+<p>The eight attributes talk the element out of being a background, which is the one thing it was
+written to be. <code>unstyled</code> drops the absolute, full-bleed positioning it would otherwise take,
+and the <code>position: relative</code> it would write onto its parent, so it sits in the flow and the
+structure sheet&#39;s <code>16 / 9</code> sizes it. <code>fit-box</code> fills that box instead of overscanning past it:
+the overscan exists to push a platform&#39;s edge chrome out of a background&#39;s crop, and here the
+box <em>is</em> the picture. A background autoplays, loops and starts muted; a player does none of
+the three until told to, which is what <code>autoplay=&quot;false&quot;</code>, <code>loop=&quot;false&quot;</code> and <code>muted=&quot;false&quot;</code>
+say. <code>load-background</code> is the poster — the element hides its own first frame until playback
+starts, so without it the box is blank until you press play. <code>lazyloading</code> puts
+<code>loading=&quot;lazy&quot;</code> on the iframe, which keeps the two embeds off this page until they scroll
+into view. <code>pause-offscreen=&quot;false&quot;</code> takes the scroll gate off: a background stops itself the
+moment it leaves the viewport, which is unwanted once somebody has pressed play. Written off,
+the element builds no <code>IntersectionObserver</code> at all. It cannot start anything on its own
+either, because that path is gated on <code>autoplay</code>, which is off. This element has an attribute
+of the same name and the opposite default, <a href="#attributes-it-writes">below</a>.</p>
+<p><strong>What those two frames cost.</strong> Every other sample on this page runs on files this repository
+built, and the only thing the page itself fetches from elsewhere is the Tears of Steel video
+further down. These two do not: inside each frame the browser pulls
+<code>video-background-element</code> from jsdelivr, then an embed from <code>youtube-nocookie.com</code> or
+<code>player.vimeo.com</code> — the privacy-preserving domains, that element&#39;s <code>no-cookie</code> default, with
+<code>dnt=1</code> on the Vimeo one. The posters go further: YouTube&#39;s thumbnail comes from
+<code>img.youtube.com</code>, Vimeo&#39;s from <code>vumbnail.com</code>, a proxy the element falls back on because
+Vimeo publishes no thumbnail URL you can build from an id. The frames are not a sandbox:
 <code>&lt;code-preview&gt;</code> renders through <code>srcdoc</code> with no <code>sandbox</code> attribute, so the element&#39;s script
-runs on this origin the way every other script here does. What the nesting buys is narrower
-and real — the embed inside is cross-origin and can reach nothing out here, and neither
-iframe loads at all until you scroll to it. If that is not a trade you want on your own page,
-drop <code>load-background</code>, put an <code>&lt;img class=&quot;media-player-poster&quot;&gt;</code> you host in its place, and
-nothing else in the recipe moves.</p>
+runs on this origin like every other script here. What the nesting does buy is that the embed
+inside is cross-origin and can reach nothing out here, and that neither iframe loads until you
+scroll to it. If that is not a trade you want on your own page, drop <code>load-background</code>, put an
+<code>&lt;img class=&quot;media-player-poster&quot;&gt;</code> you host in its place, and nothing else in the recipe
+moves.</p>
 <h3 id="every-other-platform">Every other platform<a class="heading-anchor" href="#every-other-platform" tabindex="-1" aria-hidden="true"></a></h3>
-<p><code>&lt;video-background&gt;</code> stops at three sources. HLS, DASH, Wistia, Twitch and the long tail have
-no answer in it, and <a href="https://github.com/muxinc/media-elements">media-elements</a> is where they
-live — one element per platform, <code>&lt;youtube-video&gt;</code>, <code>&lt;vimeo-video&gt;</code>, <code>&lt;hls-video&gt;</code> and a dozen
-more, each with the media API on it, each dropped in the same slot and marked the same way.</p>
+<p><code>&lt;video-background&gt;</code> stops at three sources. HLS, DASH, Wistia, Twitch and the long tail live
+in <a href="https://github.com/muxinc/media-elements">media-elements</a> instead — one element per
+platform, <code>&lt;youtube-video&gt;</code>, <code>&lt;vimeo-video&gt;</code>, <code>&lt;hls-video&gt;</code> and a dozen more, each with the
+media API on it, each dropped in the same slot and marked the same way.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/youtube-video-element@1/+esm&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
 <span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
@@ -1105,8 +1088,8 @@ more, each with the media API on it, each dropped in the same slot and marked th
   <span class="hljs-comment">&lt;!-- the overlay and the control row from the samples above, copied whole --&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
 <p><code>/+esm</code> is not decoration: the package&#39;s plain build imports a helper by bare name, which a
-browser cannot resolve, and the element then never defines — with this one waiting on it
-politely and nothing in the console. The <code>+esm</code> build has the import rewritten.</p>
+browser cannot resolve, so the element never defines — this one waits on it and nothing
+appears in the console. The <code>+esm</code> build has the import rewritten.</p>
 <p>Which route to take, both measured under this player against the same 58-second YouTube clip:</p>
 <table>
 <thead>
@@ -1157,53 +1140,48 @@ politely and nothing in the console. The <code>+esm</code> build has the import 
 <td>Mux&#39;s</td>
 </tr>
 </tbody></table>
-<p>Take media-elements when the format decides it — HLS and DASH have no other answer here, and
+<p>Take media-elements when the format decides it: HLS and DASH have no other answer here, and
 one platform on a page is the smaller download either way.</p>
 <h3 id="what-the-embed-costs-either-way">What the embed costs, either way<a class="heading-anchor" href="#what-the-embed-costs-either-way" tabindex="-1" aria-hidden="true"></a></h3>
-<p>The promise at the top of this page is the first casualty, and it is now the embed&#39;s to keep
-rather than this element&#39;s. Until the third-party script runs, the box is blank the way a
-<code>&lt;video src=&quot;stream.m3u8&quot;&gt;</code> is in Chrome until hls.js runs — a poster is what stands there
-instead, and there is nothing under it to play.</p>
+<p><strong>Playing without the script goes first</strong>, and it is now the embed&#39;s to keep rather than this
+element&#39;s. Until the third-party script runs, the box is blank the way a
+<code>&lt;video src=&quot;stream.m3u8&quot;&gt;</code> is in Chrome until hls.js runs: a poster stands there, with
+nothing under it to play.</p>
 <p>The click on the picture changes hands too. The structure sheet gives a <code>.media-player-media</code>
 no pointer input, because a cross-origin iframe keeps every click it gets and passes nothing
-out, so the click lands on the player&#39;s own box and pauses, as on a <code>&lt;video&gt;</code> — whatever the
-platform would have done with it is not on offer. <code>is-live</code> never comes on for either route:
-that reads <code>seekable</code>, and an embed has none, so the live section below has nothing to say
-about a platform stream.</p>
+out, so the click lands on the player&#39;s own box and pauses, as on a <code>&lt;video&gt;</code>. <code>is-live</code> never
+comes on for either route: that reads <code>seekable</code>, and an embed has none.</p>
 <p>The buffered bar is <code>&lt;video-background&gt;</code>&#39;s alone, and it is silent rather than broken: the bar
 is painted from <code>progress</code>, which that element does not emit, so it never fills. YouTube&#39;s
-loaded fraction is sitting on the element the whole time with no event announcing it. A
+loaded fraction sits on the element the whole time with no event announcing it. A
 <code>&lt;youtube-video&gt;</code> does emit one, and its bar fills.</p>
-<p>Captions are neither route&#39;s, whatever the table above might suggest at a glance. A
-<code>&lt;video-background&gt;</code> has no <code>textTracks</code> at all, so the button toggles nothing. A
-<code>&lt;youtube-video&gt;</code> has the list and it came back empty on this clip; on another video it filled
-with five entries carrying no cues, which put exactly as much text on screen — none. Whatever
-the platform is drawing over its own picture, it is not arriving here as a track this element
-can read, so the captions button and the scrubber&#39;s frame previews have nothing behind them on
+<p>Captions are neither route&#39;s. A <code>&lt;video-background&gt;</code> has no <code>textTracks</code> at all, so the button
+toggles nothing. A <code>&lt;youtube-video&gt;</code> has the list and it came back empty on this clip; on
+another video it filled with five entries carrying no cues, which put none on screen. Whatever
+the platform is drawing over its own picture is not arriving here as a track this element can
+read, so the captions button and the scrubber&#39;s frame previews have nothing behind them on
 either route.</p>
-<p>Speed and picture-in-picture go the same way, and the element says so rather than leaving you
-to find out: an embed gets <code>no-rate</code>, because writing <code>playbackRate</code> on an element that does
-not implement it lands as an own property and reads the new number back — a control that lies
-is worse than one that is missing — and <code>no-pip</code>, because the floating window is the
-browser&#39;s to open over a <code>&lt;video&gt;</code> and there is no <code>&lt;video&gt;</code> here. That is why the rows in
-those two frames are three controls shorter than the starter above. Bind them anyway and they
-render, focus and announce themselves correctly while doing nothing at all.</p>
-<p>The order of the two scripts does not matter either way: an embed that upgrades after the
-player did is left alone until it has, then read the same way — which is a thing the two
-frames above prove rather than assert, since neither of them controls which script the
-browser finishes with first.</p>
-<p>Two of those costs are visible in the frames above rather than described: the buffered bar
-under the scrubber never fills, and the captions button is the one control missing from a row
-otherwise copied whole from the starter. It is missing on purpose. Put it back and it renders,
-focuses and announces itself correctly, and toggles nothing at all — which is worse than not
-shipping it.</p>
-<h2 id="twelve-minutes-from-someone-elses-server">Twelve minutes, from someone else&#39;s server<a class="heading-anchor" href="#twelve-minutes-from-someone-elses-server" tabindex="-1" aria-hidden="true"></a></h2>
-<p>Twelve seconds proves the wiring and proves nothing about the seeking. A local file that
-short never buffers, and a clock reading <code>00:00 / 00:12</code> never needs the minutes it can show.
-So here is the same row over twelve minutes of Tears of Steel, and this one is not in an editable
-frame — it is the page&#39;s own DOM, upgraded by the one module tag sitting under it. Block that
-tag and what is left is a plain <code>&lt;video controls&gt;</code>, which makes the claim this page opens with
-testable right here rather than in a file you have to build yourself.</p>
+<p>Speed and picture-in-picture go the same way, and the element says so. An embed gets
+<code>no-rate</code>, because writing <code>playbackRate</code> on an element that does not implement it lands as an
+own property and reads the new number back — a control that lies is worse than one that is
+missing — and <code>no-pip</code>, because the floating window is the browser&#39;s to open over a <code>&lt;video&gt;</code>
+and there is no <code>&lt;video&gt;</code> here. That is why the rows in those two frames are three controls
+shorter than the starter above. Bind them anyway and they render, focus and announce
+themselves correctly while doing nothing.</p>
+<p>Script order does not matter: an embed that upgrades after the player did is left alone until
+it has, then read the same way. Neither frame above controls which script the browser finishes
+with first, so both are the demonstration.</p>
+<p>Two of those costs are visible in the frames rather than described: the buffered bar never
+fills, and the captions button is the one control missing from a row otherwise copied whole
+from the starter. Put it back and it renders, focuses and announces itself correctly, and
+toggles nothing — which is worse than not shipping it.</p>
+<h2 id="a-twelve-minute-file-and-what-preload-costs">A twelve-minute file, and what preload costs<a class="heading-anchor" href="#a-twelve-minute-file-and-what-preload-costs" tabindex="-1" aria-hidden="true"></a></h2>
+<p>Twelve seconds proves the wiring and nothing about the seeking. A file that short never
+buffers, and a clock reading <code>00:00 / 00:12</code> never needs the minutes it can show. So here is
+the same row over twelve minutes of Tears of Steel, and this one is not in an editable frame:
+it is the page&#39;s own DOM, upgraded by the module tag sitting under it. Block that tag and what
+is left is a plain <code>&lt;video controls&gt;</code>, so
+<a href="#playing-with-the-script-blocked">playing with the script blocked</a> is testable right here.</p>
 <!-- One line, and it has to be: the whole opening tag of an unknown element must sit on a
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
@@ -1273,50 +1251,46 @@ testable right here rather than in a file you have to build yourself.</p>
 </media-player><!-- The page's own copy. The previews above each load this inside their frame; this player is
      in the document, so the document needs it too. One tag: the bundle carries the elementals
      it imports, and the stylesheets are already in `prose.css`. -->
-<script type="module" src="dist/media-player.min.mjs"></script><p>The captions are the Blender Foundation&#39;s own English subtitles, and they are served from
-this repository rather than from Blender&#39;s. A <code>&lt;track&gt;</code> cannot read the file that is up
-there: it is SRT, it comes back as <code>application/octet-stream</code> under <code>nosniff</code>, and it carries
-no <code>access-control-allow-origin</code> while a track fetch is CORS-mode whatever the media element
+<script type="module" src="dist/media-player.min.mjs"></script><p>The captions are the Blender Foundation&#39;s own English subtitles, served from this repository
+rather than from Blender&#39;s. A <code>&lt;track&gt;</code> cannot read the file up there: it is SRT, it comes
+back as <code>application/octet-stream</code> under <code>nosniff</code>, and it carries no
+<code>access-control-allow-origin</code> while a track fetch is CORS-mode whatever the media element
 says. So the cues were converted to WebVTT once and committed beside the poster, which is the
-trip a third-party caption track takes onto any page. The last one ends at <code>09:27</code> and the
+trip a third-party caption track takes onto any page. The last cue ends at <code>09:27</code> and the
 closing minutes carry none — that is what the file has, not something the element dropped.</p>
 <p>There is no language picker, though that server holds twenty-four translations. The element
-takes the first caption track and keeps it, because switching language needs a control to
-switch it with and there is no such control here to name. What it does remember is whether
-you had captions on, along with the volume, so this row comes back the way you left it. Mute
-and volume are here too, and unlike the Artemis clip this one has sound for them to move.</p>
-<p>What it costs is worth naming. The file is not mine — it is on
-<a href="https://download.blender.org/">Blender&#39;s download server</a>, so this page makes a third-party
-request for it, and <code>preload=&quot;metadata&quot;</code> means that request happens on load rather than on
-your first click.</p>
-<p>Which is a deliberate choice, and the reason is the flaw in the file. It is 355 MiB laid out
-<code>ftyp wide mdat moov</code> — the index is the <em>last</em> 585 KiB of it, at byte 371,579,659 — so it is
-not &quot;fast start&quot;, and nothing can know the duration until a range request for the tail comes
-back. <code>preload=&quot;none&quot;</code> would defer that to the first click, and the click would then look
-broken: the control row is bound <code>isReady:if</code>, readiness needs a duration, so there would be
-no row to press and nothing on screen would change for as long as the tail took to arrive.
-Fetching the index up front costs 585 KiB and buys a player that is a player before you touch
-it. The stripe march and the buffered bar then have something real to show, which a
-twelve-second local file never gives them.</p>
+takes the first caption track and keeps it: switching language needs a control to switch it
+with, and there is none here to name. It does remember whether you had captions on, along
+with the volume, so this row comes back the way you left it. Unlike the Artemis clip, this one
+has sound for the mute button and volume slider to move.</p>
+<p>The file is not mine — it is on <a href="https://download.blender.org/">Blender&#39;s download server</a>, so
+this page makes a third-party request for it, and <code>preload=&quot;metadata&quot;</code> means that request
+happens on load rather than on your first click.</p>
+<p>That is deliberate, and the reason is a flaw in the file. It is 355 MiB laid out
+<code>ftyp wide mdat moov</code>: the index is the <em>last</em> 585 KiB, at byte 371,579,659, so the file is
+not &quot;fast start&quot; and nothing can know the duration until a range request for the tail comes
+back. <code>preload=&quot;none&quot;</code> would defer that to the first click, and the click would look broken —
+the control row is bound <code>isReady:if</code>, readiness needs a duration, so there would be no row to
+press and nothing on screen would change until the tail arrived. Fetching the index up front
+costs 585 KiB and buys a player that is a player before you touch it. The buffered bar and
+the theme&#39;s buffering stripes then have something real to show, which a twelve-second local
+file never gives them.</p>
 <p>Attribution: <em>Tears of Steel</em> and its subtitles are © the Blender Foundation, released under
 <a href="https://mango.blender.org/sharing/">CC-BY 3.0</a>.</p>
 <h2 id="frames-on-the-scrubber">Frames on the scrubber<a class="heading-anchor" href="#frames-on-the-scrubber" tabindex="-1" aria-hidden="true"></a></h2>
-<p>A scrubber names a second; a frame says what is there. Every big player draws one on hover,
-and every one of them makes you pay for it the same way, because there is no way not to: <strong>the
-frames have to be cut from the video beforehand.</strong> No browser API hands out the picture at an
-arbitrary second without seeking there, so the preview is a build step and a markup choice,
-never a flag.</p>
-<p>The format is the one the field already settled on — a WebVTT file whose cues map a time
-range to a slice of a sprite sheet, <code>sprite.jpg#xywh=x,y,width,height</code> — which means
-thumbnails cut for <a href="https://github.com/sampotts/plyr">Plyr</a>,
-<a href="https://www.vidstack.io">Vidstack</a> or
+<p>A scrubber names a second; a frame says what is there. Every player that draws one charges the
+same price, because there is no way around it: <strong>the frames have to be cut from the video
+beforehand.</strong> No browser API hands out the picture at an arbitrary second without seeking
+there, so the preview is a build step and a markup choice, never a flag.</p>
+<p>The format is the one the field settled on — a WebVTT file whose cues map a time range to a
+slice of a sprite sheet, <code>sprite.jpg#xywh=x,y,width,height</code> — so thumbnails cut for
+<a href="https://github.com/sampotts/plyr">Plyr</a>, <a href="https://www.vidstack.io">Vidstack</a> or
 <a href="https://www.media-chrome.org/docs/en/components/media-preview-thumbnail">media-chrome</a> work
 here unchanged, and the other way round. Where those parse the file themselves, this element
-hands it to the browser: the author writes it as a <code>&lt;track kind=&quot;metadata&quot;&gt;</code> — the same
-element media-chrome asks for — the element flips the track <code>hidden</code> so the browser fetches
-and parses it, and the only syntax read here is the <code>#xywh</code> fragment. Both video players
-above carry the whole wiring — the twelve-minute one is the one worth hovering, since
-twelve seconds of frames barely change; the three lines that are it:</p>
+hands it to the browser: the author writes it as a <code>&lt;track kind=&quot;metadata&quot;&gt;</code>, the same element
+media-chrome asks for, and the element flips the track <code>hidden</code> so the browser fetches and
+parses it. The only syntax read here is the <code>#xywh</code> fragment. Both video players above carry
+the wiring — hover the twelve-minute one, since twelve seconds of frames barely change:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">preload</span>=<span class="hljs-string">&quot;metadata&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;movie.mp4&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">track</span> <span class="hljs-attr">kind</span>=<span class="hljs-string">&quot;metadata&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;movie-thumbs.vtt&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span></code></pre>
@@ -1329,28 +1303,27 @@ twelve seconds of frames barely change; the three lines that are it:</p>
   <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-preview&quot;</span> <span class="hljs-attr">hidden</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
   …
 <span class="hljs-tag">&lt;/<span class="hljs-name">slider-elemental</span>&gt;</span></code></pre>
-<p>The box is yours, like every control on this page — position and paint come from
-<code>style.css</code> and <code>theme.css</code>, and the element writes only what a stylesheet cannot know: the
-slice, the tile&#39;s size, and where along the track the pointer is. A relative image path in
-the VTT resolves against the VTT file, not against the page, so the pair travels as one
-directory. What the element never does is scale: <strong>a tile is shown at the size it was cut</strong>,
-because scaling needs the sprite&#39;s natural size, which is unknown until the image loads, and
-a box that resizes itself mid-hover is a bubble jumping under a still pointer. Cut the
-frames at the size the box should be.</p>
-<p>Cutting them is one command —
+<p>The box is yours, like every control on this page: position and paint come from <code>style.css</code>
+and <code>theme.css</code>, and the element writes only what a stylesheet cannot know — the slice, the
+tile&#39;s size, and where along the track the pointer is. A relative image path in the VTT
+resolves against the VTT file, not against the page, so the pair travels as one directory.
+The element never scales: <strong>a tile is shown at the size it was cut</strong>, because scaling needs
+the sprite&#39;s natural size, which is unknown until the image loads, and a box that resizes
+itself mid-hover is a bubble jumping under a still pointer. Cut the frames at the size the box
+should be.</p>
+<p>Cutting them is one command:
 <a href="https://github.com/stamat/media-player/blob/main/script/thumbs"><code>script/thumbs</code></a> in this
-repository, a bash script over <code>ffmpeg</code> and <code>ffprobe</code>, which is what wrote both sprites
-the players above hover — the twelve-minute film cuts to 147 frames in a 637 KiB sheet.
-Each frame is cut from the middle of its cue rather than the start, so a hover is never
-more than half an interval away from the second it names:</p>
+repository, a bash script over <code>ffmpeg</code> and <code>ffprobe</code>, which wrote both sprites the players
+above hover. The twelve-minute film cuts to 147 frames in a 637 KiB sheet. Each frame comes
+from the middle of its cue rather than the start, so a hover is never more than half an
+interval from the second it names:</p>
 <pre><code class="hljs language-bash">script/thumbs movie.mp4          <span class="hljs-comment"># movie-thumbs.jpg + movie-thumbs.vtt, a frame every 5 s</span>
 script/thumbs movie.mp4 2 160 5  <span class="hljs-comment"># every 2 s, 160px wide, 5 to a sprite row</span></code></pre>
-<p>The interval is the cost knob, and the trade is lopsided: the sheet grows linearly with
-the frame count while what a finer grid buys shrinks. Every frame is cut from the middle
-of its cue, so a hover is off by at most half the interval — and the click seeks
-frame-exact regardless, so the bubble only has to orient. One pixel of a page-wide
-scrubber already spans about a second of a feature-length film. Tears of Steel above, cut
-at every interval with 160px tiles:</p>
+<p>The interval is the cost knob, and the trade is lopsided: the sheet grows linearly with the
+frame count while what a finer grid buys shrinks. A hover is off by at most half the interval,
+and the click seeks frame-exact regardless, so the bubble only has to orient. One pixel of a
+page-wide scrubber already spans about a second of a feature-length film. Tears of Steel
+above, cut at every interval with 160px tiles:</p>
 <table>
 <thead>
 <tr>
@@ -1385,36 +1358,34 @@ at every interval with 160px tiles:</p>
 <td>0.5 s</td>
 </tr>
 </tbody></table>
-<p><code>script/thumbs movie.mp4 1</code> is the whole of getting the last row — nothing in the element
-cares which you pick. It is the sheet your visitors pay for on their first hover, which is
-why this page ships the middle of the table: below two seconds it outweighs the player&#39;s
-entire bundle several times over, spent on a bubble whose job is orientation.</p>
-<p>Copy it out of the repository — it is not in the npm package, because a bash script in a
-browser library&#39;s tarball is a file nobody runs from there. Anything else that emits the
-<code>#xywh</code> format works the same; hosted pipelines like Mux and Cloudflare Stream generate it
-for you.</p>
-<p>The degradation is the usual bargain. No <code>&lt;track kind=&quot;metadata&quot;&gt;</code>, no
-<code>.media-player-preview</code> box, cues not loaded yet, a live stream — each means no preview and
-no error, and the scrubber&#39;s own value bubble still reads the time. A captions <code>&lt;track&gt;</code> is
-untouched by any of this: a <code>kind=&quot;metadata&quot;</code> track is not one the captions button takes —
-<a href="#faq-captions">the FAQ names which are</a> — so the two tracks sit in one <code>&lt;video&gt;</code>
-without stepping on each other. Blocked script never enters
-into it — the preview box is <code>hidden</code> in the markup and the native player the fallback
-leaves behind never had hover previews to lose.</p>
-<h2 id="a-background-loop-and-the-one-button-it-owes-you">A background loop, and the one button it owes you<a class="heading-anchor" href="#a-background-loop-and-the-one-button-it-owes-you" tabindex="-1" aria-hidden="true"></a></h2>
-<p>A video behind a headline is not a player. Nothing on it is meant to be pressed — no
-scrubber, no clock, no volume on a track that is silent — and the markup for it is four
-attributes the platform answered on its own long before this element existed:</p>
+<p><code>script/thumbs movie.mp4 1</code> gets the last row; nothing in the element cares which you pick.
+Your visitors pay for the sheet on their first hover, which is why this page ships the middle
+of the table: below two seconds it outweighs the player&#39;s entire bundle several times over,
+spent on a bubble whose job is orientation.</p>
+<p>Copy the script out of the repository — it is not in the npm package, because a bash script in
+a browser library&#39;s tarball is a file nobody runs from there. Anything else that emits the
+<code>#xywh</code> format works the same; hosted pipelines like Mux and Cloudflare Stream generate it for
+you.</p>
+<p>Degradation: no <code>&lt;track kind=&quot;metadata&quot;&gt;</code>, no <code>.media-player-preview</code> box, cues not loaded
+yet, or a live stream — each means no preview and no error, and the scrubber&#39;s own value
+bubble still reads the time. A captions <code>&lt;track&gt;</code> is untouched by any of this, since a
+<code>kind=&quot;metadata&quot;</code> track is not one the captions button takes
+(<a href="#faq-captions">the FAQ names which are</a>), so the two sit in one <code>&lt;video&gt;</code> without stepping
+on each other. A blocked script does not enter into it: the preview box is <code>hidden</code> in the
+markup, and the native player the fallback leaves behind never had hover previews to lose.</p>
+<h2 id="background-video-and-the-pause-button-it-needs">Background video, and the pause button it needs<a class="heading-anchor" href="#background-video-and-the-pause-button-it-needs" tabindex="-1" aria-hidden="true"></a></h2>
+<p>A video behind a headline is not a player. Nothing on it is meant to be pressed — no scrubber,
+no clock, no volume on a silent track — and the markup for it is four attributes the platform
+answered long before this element existed:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">autoplay</span> <span class="hljs-attr">muted</span> <span class="hljs-attr">loop</span> <span class="hljs-attr">playsinline</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.mp4&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span></code></pre>
 <p><code>muted</code> is the condition every browser puts on autoplay rather than a stylistic choice:
 without it the loop never starts. <code>playsinline</code> is what keeps iOS from taking the whole
 screen the moment it does.</p>
-<p>So the honest first answer is that a background video does not need this element. What it
-needs is the one thing those four attributes cannot say: <strong>motion that runs longer than five
-seconds has to be stoppable</strong> —
-<a href="https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html">WCAG 2.2.2 Pause, Stop, Hide</a>
-— and a twelve-second loop crosses that line five seconds into its first play. That is one button,
-and wiring one button is the smallest thing <code>&lt;media-player&gt;</code> does.</p>
+<p>So a background video does not need this element. What it needs is the one thing those four
+attributes cannot say: <strong>motion that runs longer than five seconds has to be stoppable</strong>
+(<a href="https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html">WCAG 2.2.2 Pause, Stop, Hide</a>),
+and a twelve-second loop crosses that line five seconds into its first play. That is one
+button, and wiring one button is the smallest thing <code>&lt;media-player&gt;</code> does.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;video-background&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">autoplay</span> <span class="hljs-attr">muted</span> <span class="hljs-attr">loop</span> <span class="hljs-attr">playsinline</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample/rollout.mp4&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>
 
@@ -1428,12 +1399,12 @@ and wiring one button is the smallest thing <code>&lt;media-player&gt;</code> do
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-pause-icon&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
-<p>Nothing on the <code>&lt;video&gt;</code> but what the platform reads — the element listens to it by itself,
-here as everywhere. Metadata arriving is what takes <code>disabled</code> off the button once there is
-something to press; <code>play</code> and <code>pause</code> keep <code>playLabel</code> and the <code>is-playing</code> attribute
-honest, and those two are the accessible name and the icon swap. The two icon spans carry
-the same class names as the play button further up the page, because the rule that swaps
-them is in <code>style.css</code> and asks nothing of where the button sits.</p>
+<p>Nothing on the <code>&lt;video&gt;</code> but what the platform reads; the element listens to it by itself,
+here as everywhere. Metadata arriving takes <code>disabled</code> off the button once there is something
+to press. <code>play</code> and <code>pause</code> keep <code>playLabel</code> and the <code>is-playing</code> attribute honest, which are
+the accessible name and the icon swap. The two icon spans carry the same class names as the
+play button further up the page, because the rule that swaps them is in <code>style.css</code> and asks
+nothing of where the button sits.</p>
 <pre><code class="hljs language-css"><span class="hljs-selector-class">.hero</span> {
   <span class="hljs-attribute">position</span>: relative;
   <span class="hljs-attribute">isolation</span>: isolate;
@@ -1459,37 +1430,37 @@ them is in <code>style.css</code> and asks nothing of where the button sits.</p>
   <span class="hljs-attribute">bottom</span>: <span class="hljs-number">1rem</span>;
 }</code></pre>
 <p><code>media-player</code> is already <code>display: block; position: relative</code> and <code>media-player[is-video]</code>
-already clips, so what a background adds is the crop — <code>height: 100%</code> and <code>object-fit: cover</code>
-over the <code>width: 100%</code> the stylesheet sets. There is no <code>z-index: -1</code> anywhere in that, on
-purpose: the toggle is a child of the player, and a player pushed behind the page takes its
-own button with it. The content is written after the player and positioned, which is enough
-to paint it on top — and it is also what decides the collision, so keep the toggle in a
-corner your text does not reach.</p>
-<p>Two things it costs, both worth knowing before pasting it.</p>
+already clips, so what a background adds is the crop: <code>height: 100%</code> and <code>object-fit: cover</code>
+over the <code>width: 100%</code> the stylesheet sets. There is no <code>z-index: -1</code>, on purpose — the toggle
+is a child of the player, and a player pushed behind the page takes its own button with it.
+The content is written after the player and positioned, which is enough to paint it on top,
+and it is also what decides the collision, so keep the toggle in a corner your text does not
+reach.</p>
+<p>Two costs, both worth knowing before pasting it.</p>
 <p><strong>The lock screen.</strong> Playing claims the OS media panel — the element&#39;s own <code>play</code> listener,
-the same one behind every player on this page — and it does not know this video is wallpaper. Leave
-<code>media-title</code>, <code>artist</code>, <code>album</code> and <code>artwork</code> off and there is nothing to name it with, so
-the metadata is cleared rather than set. <code>poster</code> is the one to watch: a <code>&lt;video poster&gt;</code> is
-read as artwork, so a background video that carries one puts a picture on the panel with no
+the same one behind every player on this page — and it does not know this video is wallpaper.
+Leave <code>media-title</code>, <code>artist</code>, <code>album</code> and <code>artwork</code> off and there is nothing to name it with,
+so the metadata is cleared rather than set. <code>poster</code> is the one to watch: a <code>&lt;video poster&gt;</code>
+is read as artwork, so a background video carrying one puts a picture on the panel with no
 title beside it.</p>
 <p><strong>No <code>controls</code>, which is where this page&#39;s own rule bends.</strong> Every other sample writes
-<code>controls</code> on the media element so that a blocked script leaves a working native player
-behind. Here there is nothing for a control bar to be the fallback <em>for</em> — a scrubber across
-your hero is not what you meant — so the button carries <code>disabled</code> in the markup instead, and
-a page whose script never ran shows a control that is visibly unavailable rather than one
-that silently does nothing. The loop still plays; <code>autoplay</code> is the browser&#39;s and owes this
-element nothing. What that leaves is motion with no way to stop it on a page with no
-JavaScript, and if that matters for yours, the markup that survives is a <code>&lt;video controls&gt;</code>
-with no <code>autoplay</code> — a different design, not this one with a flag flipped.</p>
+<code>controls</code> on the media element so a blocked script leaves a working native player behind.
+Here there is nothing for a control bar to be the fallback <em>for</em> — a scrubber across your hero
+is not what you meant — so the button carries <code>disabled</code> in the markup instead, and a page
+whose script never ran shows a control that is visibly unavailable rather than one that
+silently does nothing. The loop still plays; <code>autoplay</code> is the browser&#39;s. What that leaves is
+motion with no way to stop it on a page with no JavaScript. If that matters for yours, the
+markup that survives is a <code>&lt;video controls&gt;</code> with no <code>autoplay</code> — a different design, not this
+one with a flag flipped.</p>
 <p><code>prefers-reduced-motion</code> cannot reach the playback: <code>autoplay</code> is an attribute and no media
-query undoes one. The theme does read the preference — its transitions and the overlay
-chip&#39;s hover go still under it — but the video plays regardless. The button is the mechanism
-WCAG asks for, and a page that wants the preference honoured on top of it starts the video
-from its own script rather than from the attribute.</p>
+query undoes one. The theme does read the preference — its transitions and the overlay chip&#39;s
+hover go still under it — but the video plays regardless. The button is the mechanism WCAG
+asks for; a page that wants the preference honoured on top of it starts the video from its own
+script rather than from the attribute.</p>
 <h2 id="what-it-borrows">What it borrows<a class="heading-anchor" href="#what-it-borrows" tabindex="-1" aria-hidden="true"></a></h2>
-<p>The player draws almost nothing itself. The parts that have an
+<p>The player draws almost nothing itself. The parts with an
 <a href="https://www.w3.org/WAI/ARIA/apg/patterns/">APG pattern</a> behind them are elementals, each
-usable on its own and documented in its own right:</p>
+usable on its own and documented separately:</p>
 <table>
 <thead>
 <tr>
@@ -1524,10 +1495,9 @@ already says both, and saying them again is how they end up disagreeing.</p>
 <h2 id="keys-the-buttons-carry">Keys the buttons carry<a class="heading-anchor" href="#keys-the-buttons-carry" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Every control here is a <code>&lt;button&gt;</code> or an <code>&lt;input type=&quot;range&quot;&gt;</code>, so whichever one has focus
 already answers <kbd>Space</kbd>, <kbd>Enter</kbd>, the arrows, <kbd>Home</kbd> and
-<kbd>End</kbd> with no help from this element. What that leaves missing is the key that works
-without tabbing to anything first — and the reason this player went without one for so long
-is that a <kbd>k</kbd> nobody can see is a binding nobody can find.</p>
-<p>So it is not a map. The key goes on the control it presses, and the player is told to listen:</p>
+<kbd>End</kbd> with no help from this element. What is missing is the key that works without
+tabbing to anything first.</p>
+<p>It is not a map. The key goes on the control it presses, and the player is told to listen:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;keydown@document:onKeyDown&quot;</span>&gt;</span>
   …
   <span class="hljs-tag">&lt;<span class="hljs-name">button</span>
@@ -1565,31 +1535,31 @@ is that a <kbd>k</kbd> nobody can see is a binding nobody can find.</p>
 <span class="hljs-tag">&lt;/<span class="hljs-name">media-player</span>&gt;</span></code></pre>
 <p><code>key</code> is what a press looks for: <kbd>k</kbd> clicks the button carrying <code>key=&quot;k&quot;</code>, and
 everything hanging off that button&#39;s <code>on=</code> fires as though it had been pressed. Case does not
-matter, <kbd>K</kbd> presses the same button.</p>
-<p>Two things follow from the key living on the button rather than in a list somewhere:</p>
+matter; <kbd>K</kbd> presses the same button.</p>
+<p>Two things follow from the key living on the button rather than in a list:</p>
 <ul>
 <li><strong>A key can only name an action a control already names.</strong> There is nothing to document
-apart from the buttons and nothing to drift from them. Showing a binding is then a matter
-of showing it on the button it belongs to — a <code>&lt;kbd&gt;k&lt;/kbd&gt;</code> in the button&#39;s tooltip, or
+apart from the buttons and nothing to drift from them. Show a binding on the button it
+belongs to — a <code>&lt;kbd&gt;k&lt;/kbd&gt;</code> in the button&#39;s tooltip, or
 <code>[key]::after { content: attr(key) }</code> in your own stylesheet, which needs no markup at all.</li>
 <li><strong>A disabled button ignores its key,</strong> because a disabled button ignores a click, and the
 press stays the page&#39;s — a claimed <kbd>Space</kbd> that did nothing would still have
 stopped the page scrolling. Nothing answers before <code>is-ready</code>.</li>
 </ul>
 <p>One binding has no button to live on: the samples&#39; volume is a slider, so <code>volumeUp</code> and
-<code>volumeDown</code> have nothing to carry a <code>key</code>. The <code>keys</code> attribute on the player covers exactly
-that gap — <code>keys=&quot;ArrowUp:volumeUp;ArrowDown:volumeDown&quot;</code> maps a key straight to a handler
-from the reference below, which is how a focused player answers all four arrows the way
-YouTube does. It is the fallback, never the override: a control&#39;s own <code>key</code> wins the same
-press, every guard in the table further down applies unchanged, and a pair naming no handler
-warns in the console rather than dying silent. Reach for it only when no control names the
-action — a <code>keys</code> entry duplicating a button is a binding nothing on screen can show.</p>
-<p>Letters carry a cost the arrows do not: the match reads <code>event.key</code> — the character the
-layout produced, not the physical key — so <code>key=&quot;k&quot;</code> answers on a Latin layout and silently
+<code>volumeDown</code> have nothing to carry a <code>key</code>. The <code>keys</code> attribute on the player covers that
+gap. <code>keys=&quot;ArrowUp:volumeUp;ArrowDown:volumeDown&quot;</code> maps a key straight to a handler from the
+reference below, so a focused player answers all four arrows the way YouTube does. It is a
+fallback, never an override: a control&#39;s own <code>key</code> wins the same press, every guard in the
+table further down applies unchanged, and a pair naming no handler warns in the console rather
+than failing silently. Reach for it only when no control names the action — a <code>keys</code> entry
+duplicating a button is a binding nothing on screen can show.</p>
+<p>Letters carry a cost the arrows do not. The match reads <code>event.key</code>, the character the layout
+produced rather than the physical key, so <code>key=&quot;k&quot;</code> answers on a Latin layout and silently
 does not exist on a Cyrillic, Greek, Hebrew or Arabic one, where the same finger produces a
-different letter. <kbd>Space</kbd> and the arrows are layout-free, which is why they are
-what the samples bind; a letter shortcut is a Latin-layout feature, worth saying wherever
-the page announces it.</p>
+different letter. <kbd>Space</kbd> and the arrows are layout-free, which is why the samples
+bind those; a letter shortcut is a Latin-layout feature, worth saying wherever the page
+announces it.</p>
 <h3 id="which-keydown-you-bind-is-the-whole-scope">Which keydown you bind is the whole scope<a class="heading-anchor" href="#which-keydown-you-bind-is-the-whole-scope" tabindex="-1" aria-hidden="true"></a></h3>
 <p><code>on=</code> says where the listener goes, so the reach of the keys is one attribute and not an
 option:</p>
@@ -1617,63 +1587,59 @@ option:</p>
 <td>the page gives up those keys — <kbd>Space</kbd> included, which is its scroll key — and two players both bound this way both answer one press</td>
 </tr>
 </tbody></table>
-<p>The last one is what a shortcut usually means, and it is the one to write on a page built
-around a single player — an episode page, a video page. hydrargyri puts the listener on
-<code>document</code> and takes it off when the element leaves the DOM, so nothing outlives the player
-it belongs to. What it cannot do is share: two players bound page-wide both hear the same
-<kbd>k</kbd> and both press their own play button. With more than one on a page, bind the
-focused form, or bind the page-wide form on exactly one of them.</p>
-<p>Focus is yours to place, and the focused form depends on where it lands: a click leaves focus
+<p>The last is what a shortcut usually means, and the one to write on a page built around a
+single player. hydrargyri puts the listener on <code>document</code> and takes it off when the element
+leaves the DOM, so nothing outlives the player it belongs to. What it cannot do is share: two
+players bound page-wide both hear the same <kbd>k</kbd> and both press their own play button.
+With more than one on a page, bind the focused form, or bind the page-wide form on exactly one
+of them.</p>
+<p>Focus is yours to place, and the focused form depends on where it lands. A click leaves focus
 on the nearest focusable thing, and <code>&lt;media-player&gt;</code> is not one until you say so. Write
-<code>tabindex=&quot;0&quot;</code> on it and the player is a Tab stop of its own as well as the place a click on
-the video — or anywhere in the row that is not itself a control — leaves focus, which is what
+<code>tabindex=&quot;0&quot;</code> on it and the player becomes a Tab stop as well as the place a click on the
+video — or anywhere in the row that is not itself a control — leaves focus, which is what
 makes <kbd>Space</kbd> answer afterwards. A focusable element with no role reads out its
 entire contents to a screen reader, so the samples pair it with <code>role=&quot;region&quot;</code> and an
-<code>aria-label</code> naming the player; <code>tabindex=&quot;-1&quot;</code> is the same click behaviour without the Tab
+<code>aria-label</code> naming the player. <code>tabindex=&quot;-1&quot;</code> is the same click behaviour without the Tab
 stop, for a page where one more stop before the controls is one too many. The element never
 moves focus itself: pulling it back after a button press would move a screen reader&#39;s cursor
-mid-sentence, and there is no quiet way to do that.</p>
-<p>It does move focus in one place, and it is the opposite case: the click-to-play overlay is a
-real button, so pressing it to play leaves focus on it — and starting playback is the moment
-the overlay is hidden, which drops that focus to <code>&lt;body&gt;</code> and takes every key on this player
-with it. The next <kbd>Space</kbd> would scroll the page rather than pause. So focus moves to
-the player instead, which is not taking focus but declining to lose it. It needs the
-<code>tabindex</code> to land on: without one there is nowhere to put it, and the element leaves it
-alone rather than pretend.</p>
+mid-sentence.</p>
+<p>There is one exception. The click-to-play overlay is a real button, so pressing it to play
+leaves focus on it — and starting playback hides the overlay, which drops that focus to
+<code>&lt;body&gt;</code> and takes every key on this player with it. The next <kbd>Space</kbd> would scroll
+the page rather than pause, so focus moves to the player instead. It needs the <code>tabindex</code> to
+land on; without one there is nowhere to put it, and the element leaves focus alone.</p>
 <p><code>theme.css</code> draws a ring on a player that keyboard focus reaches, so a reader who Tabbed in —
 and therefore holds the keys — can see that they do. On <code>:focus-visible</code>, the same heuristic
 as the buttons, the one that
-<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible">hides a ring you placed with a finger</a>
-on the grounds that you know where you clicked: a click on the picture or the bar focuses the
-player too, and an accent ring around the whole box on every click reads as a glitch rather
-than a ring. One case pays for that quiet — the focus the element catches when the overlay
-goes at playback start draws no ring after a mouse press, so a mouse reader gets no sign the
-keys went live; Tab in once and it shows. The ring sits
-outside the box because inside it is invisible: on a video the overlay button covers the whole
-player and the poster sits under that, and both paint over it. Style
-<code>media-player:focus-visible { outline: none }</code> if you would rather it stayed quiet.</p>
+<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible">hides a ring you placed with a finger</a>:
+a click on the picture or the bar focuses the player too, and an accent ring around the whole
+box on every click reads as a glitch. One case pays for that quiet — the focus the element
+catches when the overlay goes at playback start draws no ring after a mouse press, so a mouse
+reader gets no sign the keys went live; Tab in once and it shows. The ring sits outside the
+box because inside it is invisible: on a video the overlay button covers the whole player and
+the poster sits under that, and both paint over it. Style
+<code>media-player:focus-visible { outline: none }</code> to turn it off.</p>
 <p>With it on, a <code>key=&quot; &quot;</code> answers from every place a reader is likely to leave focus: the
-player, the media element, the scrubber, and the big overlay button on a video — none of
-which scroll on <kbd>Space</kbd> any more, which is the trade it is buying. The overlay
-is the one the player keeps its hands off — a focused button is activated by the press it
-already owns — and it lands on the same action regardless, since the overlay in these samples
-is the play button. That is only worth knowing for the button it is not: focus parked on mute
-or fullscreen spends <kbd>Space</kbd> there, which is the point of the rule and the thing
-YouTube gets asked about.</p>
+player, the media element, the scrubber, and the big overlay button on a video — none of which
+scroll on <kbd>Space</kbd> any more, which is the trade. The overlay is the one the player
+keeps its hands off, since a focused button is activated by the press it already owns, and it
+lands on the same action regardless: the overlay in these samples is the play button. That
+matters for the buttons it is not — focus parked on mute or fullscreen spends <kbd>Space</kbd>
+there.</p>
 <p>The audio and video samples above both bind the focused form, so this is one to press rather
-than read: <code>keydown:onKeyDown</code> on the player, <code>key=&quot; &quot;</code> on its play button,
-<code>key=&quot;ArrowLeft&quot;</code> and <code>key=&quot;ArrowRight&quot;</code> on its skip buttons,
-<code>keys=&quot;ArrowUp:volumeUp;ArrowDown:volumeDown&quot;</code> on the player for the pair with no button,
-and <code>tabindex=&quot;0&quot;</code> so the player is a stop on the Tab order and a click on the bar leaves
-focus inside. Tab to one, or put focus anywhere in it — the scrubber, the picture, the row —
-and <kbd>Space</kbd> plays and pauses, except on a button, where it presses the button; the
-sideways arrows skip and the vertical ones move the volume the same way, except on the
-scrubber and the volume slider, which keep their own arrows.</p>
-<p>No sample binds the page-wide form. Not because it would misbehave here: a preview runs in
-its own frame, so a <kbd>k</kbd> claimed inside one never reaches this page. It is that the
-markup a sample hands you is markup you paste, and page-wide is the decision worth making
-once, on your own page, with the scroll key in mind.</p>
-<h3 id="what-a-press-has-to-get-past-first">What a press has to get past first<a class="heading-anchor" href="#what-a-press-has-to-get-past-first" tabindex="-1" aria-hidden="true"></a></h3>
+than read: <code>keydown:onKeyDown</code> on the player, <code>key=&quot; &quot;</code> on its play button, <code>key=&quot;ArrowLeft&quot;</code>
+and <code>key=&quot;ArrowRight&quot;</code> on its skip buttons,
+<code>keys=&quot;ArrowUp:volumeUp;ArrowDown:volumeDown&quot;</code> on the player for the pair with no button, and
+<code>tabindex=&quot;0&quot;</code> so the player is a Tab stop and a click on the bar leaves focus inside. Tab to
+one, or put focus anywhere in it — the scrubber, the picture, the row — and <kbd>Space</kbd>
+plays and pauses, except on a button, where it presses the button. The sideways arrows skip
+and the vertical ones move the volume, except on the scrubber and the volume slider, which
+keep their own arrows.</p>
+<p>No sample binds the page-wide form. Not because it would misbehave here — a preview runs in
+its own frame, so a <kbd>k</kbd> claimed inside one never reaches this page — but because the
+markup a sample hands you is markup you paste, and page-wide is a decision to make once, on
+your own page, with the scroll key in mind.</p>
+<h3 id="what-a-press-has-to-get-past">What a press has to get past<a class="heading-anchor" href="#what-a-press-has-to-get-past" tabindex="-1" aria-hidden="true"></a></h3>
 <table>
 <thead>
 <tr>
@@ -1703,20 +1669,19 @@ once, on your own page, with the scroll key in mind.</p>
 </tr>
 </tbody></table>
 <p>A press that gets past all five and finds a <code>key</code> is taken off the page with
-<code>preventDefault</code>, which is the part to weigh before binding <code>@document</code>: a letter the player
-claims is a letter the page no longer sees. <kbd>Space</kbd> is the expensive one to claim
-that way, because unclaimed it scrolls — bound <code>@document</code> it stops scrolling the whole page,
-not only the player. That is the reason YouTube&#39;s always-works key is <kbd>k</kbd> and its
-<kbd>Space</kbd> reaches no further than the player: a page that has given up its scroll key
-has given up more than a shortcut is worth. One field it cannot see is one inside a <em>closed</em>
-shadow root — the platform reports the component and offers no way in, so its letters are
+<code>preventDefault</code>. That is the part to weigh before binding <code>@document</code>: a letter the player
+claims is a letter the page no longer sees. <kbd>Space</kbd> is the expensive one, because
+unclaimed it scrolls — bound <code>@document</code> it stops scrolling the whole page, not only the
+player. That is why YouTube&#39;s always-works key is <kbd>k</kbd> and its <kbd>Space</kbd>
+reaches no further than the player. One field the element cannot see is one inside a <em>closed</em>
+shadow root: the platform reports the component and offers no way in, so its letters are
 taken. A page with one of those wants the focused binding.</p>
 <h2 id="tooltips-on-the-controls">Tooltips on the controls<a class="heading-anchor" href="#tooltips-on-the-controls" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The bubbles in the samples are <code>&lt;tooltip-elemental&gt;</code> wrapped round each button and round the
 speed <code>&lt;select&gt;</code>, which is where hover, focus, <kbd>Escape</kbd> to dismiss and the decision
-to ignore touch outright already live. The <code>&lt;select&gt;</code> is the one that is not a button, and it
-needs the bubble most: closed, it reads <code>1×</code> and says nothing about what it changes.</p>
-<p>Three of the bubbles bind rather than say: the play, mute and fold ones carry <code>playLabel</code>,
+to ignore touch already live. The <code>&lt;select&gt;</code> is not a button and needs the bubble most:
+closed, it reads <code>1×</code> and says nothing about what it changes.</p>
+<p>Three of the bubbles bind rather than state: the play, mute and fold ones carry <code>playLabel</code>,
 <code>muteLabel</code> and <code>moreLabel</code>, the same state the buttons announce themselves by, so the words
 in the bubble and the words a screen reader hears cannot drift apart.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
@@ -1725,23 +1690,21 @@ in the bubble and the words a screen reader hears cannot drift apart.</p>
   <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel&quot;</span>&gt;</span>Play<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span></code></pre>
-<p>The button keeps its <code>aria-label</code>, so the bubble is a description rather than the name and
-the control is named with or without it. Importing <code>media-player</code> defines the tooltip along
-with the rest, so the part a page can miss is the stylesheet — and unlike the other
-elementals it is the <em>theme</em> that paints the bubble at all, which the install list says
-beside it. <code>theme.css</code> then takes the caret back off the bubbles inside a player: a row of
-buttons a few pixels apart is not ambiguous about which one a bubble belongs to, and the
-player this is a rewrite of drew a plain rounded box too.</p>
-<p>The bubble on the scrubber is not one of these. That one is <code>&lt;slider-elemental&gt;</code>&#39;s own,
-asked for by <code>tooltip=&quot;thumb track&quot;</code> and reading out the second under the pointer, and it is
-centred on the thumb — which at either end of the track puts half of it outside the slider&#39;s
-box, where a video player clips it, since a player clips its own box to get the corners
-right over the picture. <code>style.css</code> clamps it inside the track instead, off
-<code>--slider-elemental-at</code>, the ratio that slider publishes for the purpose. Nothing measures
-and no script runs: the bound is <code>clamp()</code> against the track&#39;s own length, so a number that
-grows from <code>9:59</code> to <code>10:00</code> is held on the width it actually has. In the middle of the
-track the bubble is left exactly where the slider put it, and a player too narrow to hold
-the bubble at all parks it at the start rather than sliding it about.</p>
+<p>The button keeps its <code>aria-label</code>, so the bubble is a description rather than the name and the
+control is named with or without it. Importing <code>media-player</code> defines the tooltip along with
+the rest, so the part a page can miss is the stylesheet — and unlike the other elementals, it
+is the <em>theme</em> that paints the bubble at all, as the install list says. <code>theme.css</code> then takes
+the caret back off the bubbles inside a player: a row of buttons a few pixels apart is not
+ambiguous about which one a bubble belongs to.</p>
+<p>The bubble on the scrubber is not one of these. It is <code>&lt;slider-elemental&gt;</code>&#39;s own, asked for by
+<code>tooltip=&quot;thumb track&quot;</code>, and it reads out the second under the pointer. Centred on the thumb,
+at either end of the track it puts half of itself outside the slider&#39;s box, where a video
+player clips it — a player clips its own box to get the corners right over the picture.
+<code>style.css</code> clamps it inside the track instead, off <code>--slider-elemental-at</code>, the ratio that
+slider publishes for the purpose. Nothing measures and no script runs: the bound is <code>clamp()</code>
+against the track&#39;s own length, so a number that grows from <code>9:59</code> to <code>10:00</code> is held on the
+width it actually has. In the middle of the track the bubble stays exactly where the slider
+put it, and a player too narrow to hold the bubble parks it at the start.</p>
 <h2 id="attributes-it-writes">Attributes it writes<a class="heading-anchor" href="#attributes-it-writes" tabindex="-1" aria-hidden="true"></a></h2>
 <p>These land on the <code>&lt;media-player&gt;</code> element as CSS hooks. You do not set them — you style
 against them.</p>
@@ -1819,39 +1782,35 @@ nothing to keep in step with the markup:</p>
 <pre><code class="hljs language-css">media-player<span class="hljs-selector-attr">[no-airplay]</span> <span class="hljs-selector-pseudo">:is</span>(<span class="hljs-selector-attr">[on*=<span class="hljs-string">&quot;showAirplayPicker&quot;</span>]</span>, <span class="hljs-selector-pseudo">:has</span>(&gt; <span class="hljs-selector-attr">[on*=<span class="hljs-string">&quot;showAirplayPicker&quot;</span>]</span>)) {
   <span class="hljs-attribute">display</span>: none;
 }</code></pre>
-<p>The <code>:has()</code> half is for the <code>&lt;tooltip-elemental&gt;</code> around the button — hiding the button
-alone would leave its bubble&#39;s gap in the row. Keep the <code>&gt;</code> in it: written bare, <code>:has()</code>
-matches every ancestor holding that button, so the control row and the player go with it. This page writes exactly that rule for its own
-samples, which is why the device button in the row above appears when there is an Apple TV or
-a Chromecast to reach and is absent otherwise. <code>no-airplay</code> is the only one of the four that
-is not about video: the route carries an <code>&lt;audio&gt;</code> to a speaker, so an audio row can offer it
-too.</p>
-<p>Four you do set: <code>skip</code> is how many seconds a skip button moves (default <code>10</code>);
-<code>storage-key</code> is the prefix for the remembered volume, mute and captions state — set it per
-player, or two players on one page will share one volume; <code>keys</code> maps a key to an action
-no visible control names, covered under the keys section above; and <code>pause-offscreen</code> stops
-playback once the player has scrolled out of view. Four more, for what the lock screen shows,
-are in the next section.</p>
-<p><code>pause-offscreen</code> is off unless you write it, and the default is the argument: the opposite
-one would have this element decide that a podcast stops when the page scrolls past the
-controls, which is the single thing an audio player is most often left running for. Write it
-on a video and a listener who scrolls away gets silence instead of a soundtrack over the next
-section. It pauses and nothing more — what scrolls back into view is a paused player with its
-controls up, because playing again on the way back would need the element to tell a
-scroll-pause from your own press, and that is state to keep in step for a behaviour nobody can
-ask for on its own. A browser without <code>IntersectionObserver</code> never pauses, which is the
-behaviour of leaving the attribute off.</p>
+<p>The <code>:has()</code> half is for the <code>&lt;tooltip-elemental&gt;</code> around the button: hiding the button alone
+would leave its bubble&#39;s gap in the row. Keep the <code>&gt;</code> in it — written bare, <code>:has()</code> matches
+every ancestor holding that button, so the control row and the player go with it. This page
+writes that rule for its own samples, which is why the device button in the row above appears
+only when there is an Apple TV or a Chromecast to reach. <code>no-airplay</code> is the only one of the
+four that is not about video: the route carries an <code>&lt;audio&gt;</code> to a speaker, so an audio row can
+offer it too.</p>
+<p>Four you do set: <code>skip</code> is how many seconds a skip button moves (default <code>10</code>); <code>storage-key</code>
+is the prefix for the remembered volume, mute and captions state — set it per player, or two
+players on one page share one volume; <code>keys</code> maps a key to an action no visible control names,
+covered in the keys section above; and <code>pause-offscreen</code> stops playback once the player has
+scrolled out of view. Four more, for what the lock screen shows, are in the next section.</p>
+<p><code>pause-offscreen</code> is off unless you write it. On by default, it would decide that a podcast
+stops when the page scrolls past the controls, which is what an audio player is most often
+left running for. Write it on a video and a listener who scrolls away gets silence instead of
+a soundtrack over the next section. It pauses and nothing more: what scrolls back into view is
+a paused player with its controls up, because playing again would need the element to tell a
+scroll-pause from your own press. A browser without <code>IntersectionObserver</code> never pauses, which
+is the behaviour of leaving the attribute off.</p>
 <h2 id="on-the-lock-screen">On the lock screen<a class="heading-anchor" href="#on-the-lock-screen" tabindex="-1" aria-hidden="true"></a></h2>
-<p>Start playing and the player claims the operating system&#39;s media panel — the lock screen,
-the hardware media keys, the button on a pair of headphones. Play and pause are there with
-or without this element; every browser draws them for any media that plays. What the player
-adds is the rest: skip buttons that move by the same <code>skip</code> seconds the buttons on your page
-use, a scrubber that goes where you drop it, and a name for what is playing.</p>
-<p>The name comes out of markup you have probably already written. A <code>title</code> on the <code>&lt;audio&gt;</code>
-or <code>&lt;video&gt;</code> is what the panel calls the track, and a <code>&lt;video poster&gt;</code> is the artwork.
-Nothing is invented — with neither, the panel keeps its own default rather than showing
-<code>tone.wav</code> on your lock screen. Four attributes on <code>&lt;media-player&gt;</code> cover what that markup
-cannot say:</p>
+<p>Start playing and the player claims the operating system&#39;s media panel — the lock screen, the
+hardware media keys, the button on a pair of headphones. Play and pause are there with or
+without this element; every browser draws them for any media that plays. The player adds the
+rest: skip buttons that move by the same <code>skip</code> seconds the buttons on your page use, a
+scrubber that goes where you drop it, and a name for what is playing.</p>
+<p>The name comes out of markup you have probably already written. A <code>title</code> on the <code>&lt;audio&gt;</code> or
+<code>&lt;video&gt;</code> is what the panel calls the track, and a <code>&lt;video poster&gt;</code> is the artwork. Nothing is
+invented: with neither, the panel keeps its own default rather than showing <code>tone.wav</code> on your
+lock screen. Four attributes on <code>&lt;media-player&gt;</code> cover what that markup cannot say:</p>
 <table>
 <thead>
 <tr>
@@ -1882,19 +1841,19 @@ cannot say:</p>
 <p>The panel is one per document, so on a page with two players it follows whichever started
 last. A live stream gets no seek buttons, because there is nowhere on it to seek to.</p>
 <h2 id="what-the-theme-takes">What the theme takes<a class="heading-anchor" href="#what-the-theme-takes" tabindex="-1" aria-hidden="true"></a></h2>
-<p><code>theme.css</code> speaks the register Plyr made the standard: a flat compact bar, controls that
-flood with the accent under the pointer, a slim rounded track whose accent thumb comes up
-under the pointer with it, video controls on a bottom gradient with a centred play chip.
-The speed <code>&lt;select&gt;</code> loses its native chrome to <code>appearance: none</code> and is drawn as one more
-button in that row —
-the rate and no arrow, because <code>currentColor</code> reaches neither a <code>background-image</code> nor a
-pseudo-element a <code>&lt;select&gt;</code> renders. Where Plyr hardcodes white
-and slate, this sheet uses <code>Canvas</code> and <code>CanvasText</code>, so the same look follows the page
-into dark mode and forced colours — dark mode as the page declares it, <code>color-scheme: dark</code>, which is what flips the system pair; a class-toggled theme that never sets it keeps
-a light bar on a dark page. It reaches one thing it does not own: the caret comes off
-a <code>&lt;tooltip-elemental&gt;</code> bubble inside a player, because a row of buttons a few pixels apart
-is not ambiguous about which one a bubble points at. What it takes from you are custom
-properties — the first five live in the theme, the last two in the structure sheet:</p>
+<p><code>theme.css</code> follows the register Plyr made standard: a flat compact bar, controls that flood
+with the accent under the pointer, a slim rounded track whose accent thumb comes up with it,
+video controls on a bottom gradient with a centred play chip. The speed <code>&lt;select&gt;</code> loses its
+native chrome to <code>appearance: none</code> and is drawn as one more button in that row — the rate and
+no arrow, because <code>currentColor</code> reaches neither a <code>background-image</code> nor a pseudo-element a
+<code>&lt;select&gt;</code> renders.</p>
+<p>Where Plyr hardcodes white and slate, this sheet uses <code>Canvas</code> and <code>CanvasText</code>, so the look
+follows the page into dark mode and forced colours. Dark mode as the page declares it:
+<code>color-scheme: dark</code> is what flips the system pair, and a class-toggled theme that never sets
+it keeps a light bar on a dark page. The sheet reaches one thing it does not own — the caret
+comes off a <code>&lt;tooltip-elemental&gt;</code> bubble inside a player, because a row of buttons a few
+pixels apart is not ambiguous about which one a bubble points at. What it takes from you are
+custom properties; the first five live in the theme, the last two in the structure sheet:</p>
 <table>
 <thead>
 <tr>
@@ -1939,33 +1898,33 @@ properties — the first five live in the theme, the last two in the structure s
 <td>how long the video controls take to fade out</td>
 </tr>
 </tbody></table>
-<p>Neither knob is drawn all the time: a bar nobody is aiming at is a position line, and the
-knob — the scrubber&#39;s and the volume&#39;s alike — appears when the pointer arrives over its
-slider. Nothing moves when it does; only its colour changes, so the track, the played fill
-and the buffered bar, all three inset by half a thumb, sit where they sat. Keyboard focus
-counts as aiming at it, and so does a drag still holding the button after the pointer has
-slid off the track. Two places keep the knobs out of that rule: a touch device, which has no
-hover to bring one back, and forced colours, where the mode&#39;s own thumb colour is what makes
-the control findable at all. To have them always, put the colour back:</p>
+<p>Neither knob is drawn all the time. A bar nobody is aiming at is a position line, so the knob
+— the scrubber&#39;s and the volume&#39;s alike — appears when the pointer arrives over its slider.
+Nothing moves when it does; only its colour changes, so the track, the played fill and the
+buffered bar, all three inset by half a thumb, stay where they sat. Keyboard focus counts as
+aiming at it, and so does a drag still holding the button after the pointer has slid off the
+track. Two cases are exempt: a touch device, which has no hover to bring a knob back, and
+forced colours, where the mode&#39;s own thumb colour is what makes the control findable. To have
+them always, put the colour back:</p>
 <pre><code class="hljs language-css">media-player slider-elemental {
   <span class="hljs-attr">--slider-elemental-thumb</span>: <span class="hljs-built_in">var</span>(--slider-elemental-fill);
 }</code></pre>
 <h2 id="handlers-you-can-name">Handlers you can name<a class="heading-anchor" href="#handlers-you-can-name" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The samples above are the working answer; this is the index — every name <code>on=</code> can call, for
-the moment you are building a control row no sample here draws. It is the list
-<code>custom-elements.json</code> publishes minus the handlers the element wires itself, which an
-editor still reads.</p>
+when you are building a control row no sample here draws. It is the list
+<code>custom-elements.json</code> publishes, minus the handlers the element wires itself, which an editor
+still reads.</p>
 <p>Which element you write the <code>on=</code> on matters as much as which name you write in it. There are
 two places to write one — your controls and the <code>&lt;media-player&gt;</code> itself — and a name from one
 list does nothing on the other.</p>
 <p>The <code>&lt;audio&gt;</code>, the <code>&lt;video&gt;</code> and a <code>&lt;track&gt;</code> inside them take no <code>on=</code> at all. The listeners
 that keep the element in step with playback — the five metadata events, <code>play</code> and <code>pause</code>,
 <code>waiting</code> and <code>playing</code>, <code>ended</code>, <code>progress</code>, <code>timeupdate</code> for a live stream&#39;s window,
-<code>volumechange</code>, and a track&#39;s <code>cuechange</code> into
-<code>captionText</code> — are the element&#39;s own plumbing, declared in its <code>static wires</code> and attached
-by <a href="https://github.com/stamat/hydrargyri">hydrargyri</a> when the element upgrades. Markup from
-an earlier version that still carries those pairs keeps firing once: a pair the attribute
-already wired is skipped, never doubled.</p>
+<code>volumechange</code>, and a track&#39;s <code>cuechange</code> into <code>captionText</code> — are the element&#39;s own
+plumbing, declared in its <code>static wires</code> and attached by
+<a href="https://github.com/stamat/hydrargyri">hydrargyri</a> when the element upgrades. Markup from an
+earlier version that still carries those pairs keeps firing once: a pair the attribute already
+wired is skipped, never doubled.</p>
 <p><strong>On your controls</strong> — a <code>&lt;button&gt;</code>, a range input, anything a person presses:</p>
 <table>
 <thead>
@@ -2125,17 +2084,16 @@ which is the pair of them behind one control.</p>
 <td>the <code>formatTime</code> function itself — hand it to the scrubber&#39;s <code>prop#format</code> and the value bubble reads <code>01:12</code> instead of <code>72</code></td>
 </tr>
 </tbody></table>
-<p>Three formatters pipe a bind: <code>|time</code> writes seconds as a clock, <code>|floor</code> a whole number,
-and <code>|pressed</code> a boolean as the literal <code>&quot;true&quot;</code>/<code>&quot;false&quot;</code> that a toggle&#39;s <code>aria-pressed</code>
-wants — the captions, picture-in-picture and fullscreen buttons in the video sample are
-wired with it. No
-sample pipes <code>|floor</code> any more — the scrubber&#39;s <code>step=&quot;any&quot;</code> wants the fraction — but it
-stays for markup written against an earlier version, which piped it on the scrubber&#39;s
-binds.</p>
+<p>Three formatters pipe a bind: <code>|time</code> writes seconds as a clock, <code>|floor</code> a whole number, and
+<code>|pressed</code> a boolean as the literal <code>&quot;true&quot;</code>/<code>&quot;false&quot;</code> that a toggle&#39;s <code>aria-pressed</code> wants —
+the captions, picture-in-picture and fullscreen buttons in the video sample use it. No sample
+pipes <code>|floor</code> any more, since the scrubber&#39;s <code>step=&quot;any&quot;</code> wants the fraction, but it stays
+for markup written against an earlier version.</p>
 <h2 id="labels-in-another-language">Labels in another language<a class="heading-anchor" href="#labels-in-another-language" tabindex="-1" aria-hidden="true"></a></h2>
-<p><code>playLabel</code>, <code>muteLabel</code>, <code>captionsLabel</code> and <code>moreLabel</code> speak English. To localize, skip the bind and
-let the button name itself from its content — the attribute hooks already swap which half is
-visible, and <code>display: none</code> takes the hidden half out of the accessible name with it:</p>
+<p><code>playLabel</code>, <code>muteLabel</code>, <code>captionsLabel</code> and <code>moreLabel</code> speak English. To localize, skip the
+bind and let the button name itself from its content: the attribute hooks already swap which
+half is visible, and <code>display: none</code> takes the hidden half out of the accessible name with
+it.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>&gt;</span>▶<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;</span>Pusti<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
@@ -2145,21 +2103,20 @@ visible, and <code>display: none</code> takes the hidden half out of the accessi
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;</span>Pauziraj<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></code></pre>
-<p><code>visually-hidden</code> is your utility class — every design system carries one. The same swap
-hangs on <code>volume-state</code> for the mute button, <code>captions-visible</code> for the captions one, and —
-for the fold&#39;s caret — on its own disclosure&#39;s <code>[open]</code>: two spans and one <code>display</code> rule
-of your own.</p>
+<p><code>visually-hidden</code> is your utility class; every design system carries one. The same swap hangs
+on <code>volume-state</code> for the mute button, <code>captions-visible</code> for the captions one, and, for the
+fold&#39;s caret, on its own disclosure&#39;s <code>[open]</code> — two spans and one <code>display</code> rule of your
+own.</p>
 <h2 id="events">Events<a class="heading-anchor" href="#events" tabindex="-1" aria-hidden="true"></a></h2>
-<p><code>media-player-ready</code> when the duration is known, and <code>media-player-interaction</code> for
-everything a person did — <code>{ type, value }</code> in <code>detail</code>, where <code>type</code> is one of <code>play</code>,
-<code>pause</code>, <code>stop</code>, <code>seek</code>, <code>skip-forward</code>, <code>skip-backward</code>, <code>volume</code>, <code>volume-up</code>,
-<code>volume-down</code>, <code>mute</code>, <code>unmute</code>, <code>fullscreen</code>, <code>pip</code>, <code>airplay</code>, <code>rate</code>, <code>go-live</code>,
-<code>captions-on</code>, <code>captions-off</code>. Both bubble
-from the element, not from <code>document</code>. A <code>fullscreen</code> or <code>pip</code> event says which way in
-<code>value</code> — <code>true</code> entering, <code>false</code> leaving — a <code>rate</code> event carries the new speed, and a
-volume drag settles into one <code>volume</code> event, not one per pixel. An <code>airplay</code> event carries no
-value: what it reports is that the picker was opened, and whether a receiver was picked in it
-is <code>is-airplay</code> afterwards.</p>
+<p><code>media-player-ready</code> when the duration is known, and <code>media-player-interaction</code> for everything
+a person did — <code>{ type, value }</code> in <code>detail</code>, where <code>type</code> is one of <code>play</code>, <code>pause</code>, <code>stop</code>,
+<code>seek</code>, <code>skip-forward</code>, <code>skip-backward</code>, <code>volume</code>, <code>volume-up</code>, <code>volume-down</code>, <code>mute</code>,
+<code>unmute</code>, <code>fullscreen</code>, <code>pip</code>, <code>airplay</code>, <code>rate</code>, <code>go-live</code>, <code>captions-on</code>, <code>captions-off</code>.
+Both bubble from the element, not from <code>document</code>. A <code>fullscreen</code> or <code>pip</code> event says which
+way in <code>value</code> — <code>true</code> entering, <code>false</code> leaving — a <code>rate</code> event carries the new speed, and
+a volume drag settles into one <code>volume</code> event, not one per pixel. An <code>airplay</code> event carries
+no value: it reports that the picker was opened, and whether a receiver was picked is
+<code>is-airplay</code> afterwards.</p>
 <h2 id="against-the-alternatives">Against the alternatives<a class="heading-anchor" href="#against-the-alternatives" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Drawn on this player&#39;s axes, which is the caveat to read it with: a row is here because this
 project has an opinion about it, and the rows it has no answer for are the ones the others
@@ -2259,47 +2216,43 @@ win.</p>
 <p>Sizes are each package&#39;s browser bundle, gzipped: Plyr and Video.js as published
 (<code>dist/plyr.min.js</code>, <code>dist/video.min.js</code>), media-chrome bundled from its package entry with
 esbuild, Vidstack from <code>cdn.vidstack.io/player</code>. This one is <code>dist/media-player.min.mjs</code>,
-which carries hydrargyri and the five elementals inside it — everything the player needs
-except the stylesheets: its own structure sheet is 1.1 kB and the theme 1.6 kB more, the
-elementals&#39; five structure sheets 1.8 kB and their three themes 2.6 kB more, each gzipped on
-its own the way a browser fetches it. Every one of those numbers moves with a release;
-measure before quoting.</p>
-<p>Where this loses is the bottom of that table, and it loses there on purpose. YouTube and
-Vimeo arrive the way they arrive in media-chrome — an element that speaks the media API,
-dropped in where the <code>&lt;video&gt;</code> goes, from
-<a href="https://github.com/stamat/video-background-element"><code>&lt;video-background&gt;</code></a> or from
-<a href="https://github.com/muxinc/media-elements">media-elements</a> — and with the script blocked that
-element is a blank box, which is the promise at the top of this page handed to someone else.
-<strong><a href="https://github.com/sampotts/plyr">Plyr</a> is the answer when the embed must play with no
-script at all</strong>, since it enhances the <code>&lt;iframe&gt;</code> you already wrote, and Video.js for the
-long tail of formats and plugins. None of that is planned here.</p>
+which carries hydrargyri and the five elementals inside it — everything except the
+stylesheets: its own structure sheet is 1.1 kB and the theme 1.6 kB more, the elementals&#39; five
+structure sheets 1.8 kB and their three themes 2.6 kB more, each gzipped on its own the way a
+browser fetches it. Every one of those numbers moves with a release; measure before quoting.</p>
+<p>Where this loses is the bottom of that table, on purpose. YouTube and Vimeo arrive the way
+they arrive in media-chrome — an element that speaks the media API, dropped in where the
+<code>&lt;video&gt;</code> goes, from <a href="https://github.com/stamat/video-background-element"><code>&lt;video-background&gt;</code></a>
+or from <a href="https://github.com/muxinc/media-elements">media-elements</a> — and with the script
+blocked that element is a blank box, so playing without the script becomes someone else&#39;s
+promise. <strong><a href="https://github.com/sampotts/plyr">Plyr</a> is the answer when the embed must play
+with no script at all</strong>, since it enhances the <code>&lt;iframe&gt;</code> you already wrote, and Video.js for
+the long tail of formats and plugins. Neither is planned here.</p>
 <h2 id="live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry<a class="heading-anchor" href="#live-and-the-streams-it-does-not-carry" tabindex="-1" aria-hidden="true"></a></h2>
-<p>A live stream has no end, and browsers disagree about how to say that: some report
-<code>Infinity</code> for the duration, some a number in the billions. Anything at or above 2³² is read
-as endless here. <code>is-live</code> goes on the element and <code>duration</code> reads <code>0</code> rather than a bogus
-number, so a clock bound to it stays honest. Bind <code>isLive:if</code> on a <strong>Live</strong> badge and the row
-says which kind of thing it is holding.</p>
+<p>A live stream has no end, and browsers disagree about how to say that: some report <code>Infinity</code>
+for the duration, some a number in the billions. Anything at or above 2³² is read as endless
+here. <code>is-live</code> goes on the element and <code>duration</code> reads <code>0</code> rather than a bogus number, so a
+clock bound to it stays honest. Bind <code>isLive:if</code> on a <strong>Live</strong> badge and the row says which
+kind of thing it is holding.</p>
 <p>What can be reached inside that stream is a separate question, and the browser answers it.
-<code>seekable</code> is the platform saying which seconds still exist — a stream with a rewind window
+<code>seekable</code> is the platform saying which seconds still exist: a stream with a rewind window
 reports one range that slides forward as segments expire, and a stream without one reports
-something too narrow to call a window, or nothing at all before the first segment lands. So
-the window is what decides, not the endlessness: <code>seekTo</code>, <code>skipForward</code>, <code>skipBackward</code> and
-a drag on the scrubber all work inside it and all decline without it. <code>goLive</code> is the way
-back to the edge. <code>stop</code> refuses either way — a window does not give a stream a beginning,
-only an oldest second that has not expired yet, and landing a listener there is not going
-home.</p>
-<p>That is the whole of what ships. HLS and DASH are not here and are not coming: a manifest
-needs a third-party script driving Media Source Extensions, and a script driving the media
-element is the opposite of the bargain this page opens with.</p>
-<p>It composes anyway, and nothing here was written to make it. The element never creates, moves
-or replaces the media element and never touches its <code>src</code>: it reads the one you wrote and
-wires your controls to it, and a third-party script writing that same <code>src</code> is invisible to
-it — which is why the recipe below needs no seam to hold hls.js, and why hls.js is the only
-part of it this project does not ship.</p>
-<p>The scale is the markup&#39;s, which is what keeps <code>duration</code> meaning one thing everywhere. The
-element publishes three absolute numbers — <code>seekableStart</code>, <code>seekableEnd</code> and <code>behindLive</code> —
-and a scrubber over a rewind window binds the first two where a file&#39;s scrubber binds
-<code>duration</code>. Here is a whole live player, that binding and hls.js included:</p>
+something too narrow to call a window, or nothing before the first segment lands. So the
+window decides, not the endlessness — <code>seekTo</code>, <code>skipForward</code>, <code>skipBackward</code> and a drag on
+the scrubber all work inside it and all decline without it. <code>goLive</code> is the way back to the
+edge. <code>stop</code> refuses either way: a window does not give a stream a beginning, only an oldest
+second that has not expired yet.</p>
+<p>HLS and DASH are not here and are not coming. A manifest needs a third-party script driving
+Media Source Extensions, and a script driving the media element is the opposite of this
+element&#39;s bargain.</p>
+<p>They compose anyway, and nothing here was written to make them. The element never creates,
+moves or replaces the media element and never touches its <code>src</code>: it reads the one you wrote
+and wires your controls to it, so a third-party script writing that same <code>src</code> is invisible to
+it. That is why the recipe below needs no seam to hold hls.js.</p>
+<p>The scale is the markup&#39;s, which keeps <code>duration</code> meaning one thing everywhere. The element
+publishes three absolute numbers — <code>seekableStart</code>, <code>seekableEnd</code> and <code>behindLive</code> — and a
+scrubber over a rewind window binds the first two where a file&#39;s scrubber binds <code>duration</code>.
+A whole live player, that binding and hls.js included:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span>
   <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span>
   <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;region&quot;</span>
@@ -2352,22 +2305,21 @@ and a scrubber over a rewind window binds the first two where a file&#39;s scrub
     <span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;pagehide&#x27;</span>, <span class="hljs-function">() =&gt;</span> hls.<span class="hljs-title function_">destroy</span>(), { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });
   }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
-<p>The <code>disabled</code> attributes are the author being honest: nothing on that row can do anything
-until a manifest resolves, and the element takes them off when it does. <code>hls.destroy()</code> on
-the way out is the one piece of housekeeping a stream needs that a file does not — a live
-loader keeps refetching the manifest otherwise.</p>
-<p>Those three refresh on <code>timeupdate</code> and on <code>progress</code> — about four times a second while
-playing, which is the rate a window that slides in whole segments actually changes at, rather
-than the sixty a second a file&#39;s clock is painted at. What is deliberately absent is a live
-edge tolerance: nothing here decides how many seconds behind still counts as <em>at</em> the edge,
-because that number is a design decision about a badge, and the badge is yours. Bind
-<code>behindLive</code> and pick it in your own stylesheet.</p>
+<p>The <code>disabled</code> attributes say that nothing on that row can do anything until a manifest
+resolves; the element takes them off when it does. <code>hls.destroy()</code> on the way out is the one
+piece of housekeeping a stream needs that a file does not — a live loader keeps refetching the
+manifest otherwise.</p>
+<p>Those three numbers refresh on <code>timeupdate</code> and <code>progress</code>, about four times a second while
+playing, which is the rate a window sliding in whole segments actually changes at. There is
+deliberately no live edge tolerance: nothing here decides how many seconds behind still counts
+as <em>at</em> the edge, because that is a design decision about a badge, and the badge is yours.
+Bind <code>behindLive</code> and pick the number in your own stylesheet.</p>
 <p>Two more things stay off on a stream, window or not: the OS lock screen gets no position, and
-the scrubber&#39;s frame previews do nothing — the spec wants a finite duration for the first,
-and a thumbnail sheet is cut from a file that has ended for the second.</p>
+the scrubber&#39;s frame previews do nothing. The spec wants a finite duration for the first, and
+a thumbnail sheet is cut from a file that has ended for the second.</p>
 <p><strong>DASH swaps the script and nothing else.</strong> The markup above, the <code>&lt;style&gt;</code> and every binding
-stay exactly as they are — only the loader changes, and the native branch goes, because no
-browser plays DASH without a library:</p>
+stay as they are — only the loader changes, and the native branch goes, because no browser
+plays DASH without a library:</p>
 <pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player-element&#x27;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">MediaPlayer</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;dashjs&#x27;</span>;
 
@@ -2378,20 +2330,19 @@ player.<span class="hljs-title function_">initialize</span>(video, <span class="
 <span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;pagehide&#x27;</span>, <span class="hljs-function">() =&gt;</span> player.<span class="hljs-title function_">destroy</span>(), { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });</code></pre>
 <p>What that swap does not carry is the live half. Where hls.js reports <code>Infinity</code> for a live
 manifest, dash.js reports the length of the rewind window instead: a manifest declaring
-<code>timeShiftBufferDepth=&quot;PT10M&quot;</code> arrived here as <code>634.566</code>, a number rather than an
-endlessness. <code>is-live</code> therefore never comes on, and a live DASH stream plays as a ten-minute
-file — the scrubber above works, but there is no <strong>Live</strong> badge, no <code>goLive</code>, no
-<code>behindLive</code>, and the duration slides as segments expire. Telling the two apart would mean
-asking a library what kind of stream it is, and this element knows about no libraries. So:
-either loader for playback, hls.js if the live half matters. And with the script blocked a
-DASH page shows an empty box in every browser, Safari included — there is no native path to
-degrade onto at all.</p>
-<p>Order does not matter, which is the part that usually costs a library an option. Metadata
-arriving is five different events and all of them route to the same idempotent handler, so
-the controls come up whenever the manifest resolves — before this element upgrades or long
-after. A live manifest reports <code>Infinity</code>, which lands on <code>is-live</code> with no extra wiring.</p>
-<p>What you give up is the promise at the top of this page, and it is HLS that takes it rather
-than this element:</p>
+<code>timeShiftBufferDepth=&quot;PT10M&quot;</code> arrived here as <code>634.566</code>. <code>is-live</code> therefore never comes on,
+and a live DASH stream plays as a ten-minute file — the scrubber above works, but there is no
+<strong>Live</strong> badge, no <code>goLive</code>, no <code>behindLive</code>, and the duration slides as segments expire.
+Telling the two apart would mean asking a library what kind of stream it is, and this element
+knows no libraries. So: either loader for playback, hls.js if the live half matters. With the
+script blocked a DASH page shows an empty box in every browser, Safari included; there is no
+native path to degrade onto.</p>
+<p>Script order does not matter. Metadata arriving is five different events and all of them route
+to the same idempotent handler, so the controls come up whenever the manifest resolves, before
+this element upgrades or long after. A live manifest reports <code>Infinity</code>, which lands on
+<code>is-live</code> with no extra wiring.</p>
+<p>What you give up is playing without the script, and it is HLS that takes it rather than this
+element:</p>
 <table>
 <thead>
 <tr>
@@ -2415,90 +2366,88 @@ setting <code>src</code> in the browsers that need it:</p>
   <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/episode.mp4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;video/mp4&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span></code></pre>
 <p>Captions come along. A streaming library adds its caption track to the media element rather
-than as a <code>&lt;track&gt;</code> you wrote, and it arrives after this element has upgraded — so the track
-list is what is read, and <code>addtrack</code> is what says to read it again. The captions button
-lights up when the track lands, on whatever the page remembered from last visit. What is not
-here is a language picker: the first caption track found is the one that stays, because
-switching between them would need a control to switch with, and naming that control is a
-decision for markup rather than for this element.</p>
-<p>The late track is covered by a test, against a stated <code>textTracks</code> list. Nothing else here
-can be, because jsdom implements no Media Source Extensions — so what stands in for the test
-is a check by hand, and this one was run: a live manifest with a ten-minute rewind window, in
-Safari, which plays HLS natively, and in Chrome, which reaches it through hls.js. In both the
-first duration the element saw was <code>Infinity</code>, so <code>is-live</code> came on rather than latching a
-bogus number; the window drove the scrubber; skipping backwards landed inside it and stayed.
-The DASH figure above came out of the same check, in Chrome, against two dynamic manifests.
+than as a <code>&lt;track&gt;</code> you wrote, and it arrives after this element has upgraded, so the track
+list is what is read and <code>addtrack</code> is what says to read it again. The captions button lights
+up when the track lands, on whatever the page remembered from last visit. There is no language
+picker: the first caption track found is the one that stays, because switching between them
+would need a control to switch with, and naming that control is a decision for markup.</p>
+<p>The late track is covered by a test, against a stated <code>textTracks</code> list. Nothing else here can
+be, because jsdom implements no Media Source Extensions, so a check by hand stands in for it.
+That check was run: a live manifest with a ten-minute rewind window, in Safari, which plays
+HLS natively, and in Chrome, which reaches it through hls.js. In both, the first duration the
+element saw was <code>Infinity</code>, so <code>is-live</code> came on rather than latching a bogus number; the
+window drove the scrubber; skipping backwards landed inside it and stayed. The DASH figure
+above came out of the same check, in Chrome, against two dynamic manifests.
 <a href="https://github.com/stamat/media-player/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> says how
-to run that check yourself. It is not run on every release, so if it breaks for you, that is
-an issue worth filing.</p>
+to run that check yourself. It is not run on every release, so if it breaks for you, file an
+issue.</p>
 <h2 id="what-it-does-not-do">What it does not do<a class="heading-anchor" href="#what-it-does-not-do" tabindex="-1" aria-hidden="true"></a></h2>
 <p>Each of these is a decision, not a gap waiting for a pull request.</p>
 <ul>
-<li><strong>Generate controls.</strong> There is no control bar to configure, because configuring one is
-the problem this exists to avoid. The sample above is the starter — copy it and delete
-what you do not want.</li>
+<li><strong>Generate controls.</strong> There is no control bar to configure, because configuring one is the
+problem this exists to avoid. The sample above is the starter: copy it and delete what you
+do not want.</li>
 <li><strong>Streaming formats and embeds of its own.</strong> HLS, DASH, YouTube and Vimeo each need a
 third-party script, and nothing here ships one or knows one by name. What composes is
 anything that speaks the media API: hls.js on the <code>&lt;video&gt;</code> you wrote, or a
-<code>&lt;video-background&gt;</code>, which answers for YouTube and Vimeo from one tag — or a
+<code>&lt;video-background&gt;</code>, which answers for YouTube and Vimeo from one tag, or a
 <code>&lt;youtube-video&gt;</code> from media-elements for the rest — marked <code>media-player-media</code>.
 <a href="#one-element-both-media">One element, both media</a> shows the second,
 <a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a> the
 first, and both say what a blocked script leaves behind.</li>
-<li><strong>Ship a keyboard map of its own.</strong> Nothing is bound until the author writes it: <code>key</code> on
-a control the page already shows, already names and already disables, and <code>keys</code> for the
-action no visible control carries — <code>volumeUp</code> behind a volume that is a slider. A <code>keys</code>
-entry is the expensive half: a binding nothing on the page announces, so what it maps is
-the author&#39;s to say. What stays refused is the ready-made set — a default <code>k</code>, <code>m</code>, <code>f</code>
-map would spend letters on every page that never asked for them.</li>
+<li><strong>Ship a keyboard map of its own.</strong> Nothing is bound until the author writes it: <code>key</code> on a
+control the page already shows, names and disables, and <code>keys</code> for the action no visible
+control carries — <code>volumeUp</code> behind a volume that is a slider. A <code>keys</code> entry is the
+expensive half, a binding nothing on the page announces, so what it maps is the author&#39;s to
+say. What stays refused is the ready-made set: a default <code>k</code>, <code>m</code>, <code>f</code> map would spend
+letters on every page that never asked for them.</li>
 <li><strong>Sanitize anything.</strong> It writes text and attributes, never HTML.</li>
 </ul>
 <h2 id="install">Install<a class="heading-anchor" href="#install" tabindex="-1" aria-hidden="true"></a></h2>
 <pre><code class="hljs language-bash">npm install media-player-element</code></pre>
 <pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player-element&#x27;</span>;</code></pre>
-<p>The elementals ride along — importing <code>media-player-element</code> defines the slider, the progress bar,
-the toolbar and the tooltip too. Their stylesheets do not: each elemental draws its own
-track, thumb, bar or bubble, so every one of those sheets would otherwise be a <code>&lt;link&gt;</code> of
-its own. Two bundles carry them instead: <code>bundle.css</code> is this element&#39;s <code>style.css</code> with the
-four elemental structure sheets folded in, and <code>bundle-theme.css</code> is its <code>theme.css</code> with
-theirs. The rest of this page names the two halves unbundled, which is the same CSS.</p>
+<p>The elementals ride along: importing <code>media-player-element</code> defines the slider, the progress
+bar, the toolbar and the tooltip too. Their stylesheets do not — each elemental draws its own
+track, thumb, bar or bubble, so every one of those sheets would otherwise be a <code>&lt;link&gt;</code> of its
+own. Two bundles carry them instead: <code>bundle.css</code> is this element&#39;s <code>style.css</code> with the four
+elemental structure sheets folded in, and <code>bundle-theme.css</code> is its <code>theme.css</code> with theirs.
+The rest of this page names the two halves unbundled, which is the same CSS.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/bundle.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
   <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/bundle-theme.css&quot;</span>
 /&gt;</span><span class="hljs-comment">&lt;!-- the look; optional --&gt;</span></code></pre>
-<p><code>bundle-theme.css</code> is optional the way <code>theme.css</code> alone is: a page that already has a
-design system takes the first and writes its own colours. With one catch, because the split
-is by kind rather than by what you can live without — the tooltip&#39;s colours are in the theme
-bundle, and the tooltip&#39;s structure sheet only places the bubble. Take the structure bundle
-alone and there is unpainted text floating over the control row rather than a bubble, so
-paint <code>--tooltip-elemental-surface</code> and <code>--tooltip-elemental-color</code> yourself if you skip
-the look. Nothing else in here needs you to.</p>
+<p><code>bundle-theme.css</code> is optional the way <code>theme.css</code> alone is: a page that already has a design
+system takes the first and writes its own colours. One catch, because the split is by kind
+rather than by what you can live without — the tooltip&#39;s colours are in the theme bundle, and
+the tooltip&#39;s structure sheet only places the bubble. Take the structure bundle alone and
+there is unpainted text floating over the control row rather than a bubble, so paint
+<code>--tooltip-elemental-surface</code> and <code>--tooltip-elemental-color</code> yourself if you skip the look.
+Nothing else in here needs you to.</p>
 <p><strong>If book-of-elementals or hydrargyri is already in your project, install from npm and take
 <code>style.scss</code> and <code>theme.scss</code> — not the CDN module, and not the bundles.</strong> Both bake a copy
 of those packages in, and a second copy of either is a problem the page will not report.</p>
 <p>In the stylesheets it is version skew. Three quarters of <code>bundle-theme.css</code> is elemental CSS,
-frozen at whatever version this element was built against — and nothing in the file says
-which, since the banner carries this package&#39;s version and not that one. Load it beside your
-own copy and two versions of the same selectors are on one page, link order deciding which
-wins.</p>
-<p>In the module it is worse, because it is not only bytes. Nothing throws — registration is
-guarded, so the second <code>slider-elemental</code> is dropped and whichever script ran first owns the
-tag, leaving you a mix. But two copies of hydrargyri keep two separate registers of which
-tags are hydrargyri&#39;s, and that register is how an element knows a node belongs to a nested
-element rather than to itself. Split it and the outer element writes into the inner one&#39;s
-<code>bind</code> nodes: a <code>&lt;media-player&gt;</code> nested inside an element of your own has its controls
-written over by that element, and the only sign is a warning in the console about a bind
-naming a property the wrong element does not have.</p>
+frozen at whatever version this element was built against, and nothing in the file says which
+— the banner carries this package&#39;s version, not that one. Load it beside your own copy and
+two versions of the same selectors are on one page, link order deciding which wins.</p>
+<p>In the module it is worse. Nothing throws: registration is guarded, so the second
+<code>slider-elemental</code> is dropped and whichever script ran first owns the tag, leaving you a mix.
+But two copies of hydrargyri keep two separate registers of which tags are hydrargyri&#39;s, and
+that register is how an element knows a node belongs to a nested element rather than to
+itself. Split it and the outer element writes into the inner one&#39;s <code>bind</code> nodes: a
+<code>&lt;media-player&gt;</code> nested inside an element of your own has its controls written over by that
+element, and the only sign is a console warning about a bind naming a property the wrong
+element does not have.</p>
 <p>Installing from npm fixes both. This package&#39;s main entry is unbundled source importing
 <code>hydrargyri</code> and <code>book-of-elementals/*</code> by bare specifier, so your bundler resolves them to
 your copy — one of each, at the version you picked. Both are <code>peerDependencies</code> here, so an
-installer that cannot reconcile your version with this one says so rather than quietly
-nesting a second. That does mean your book-of-elementals major has to match the one this
-package declares.</p>
+installer that cannot reconcile your version with this one says so rather than quietly nesting
+a second. That does mean your book-of-elementals major has to match the one this package
+declares.</p>
 <p>The <code>href</code>s above are bare specifiers for a bundler to resolve. From a CDN they are two full
-URLs, no install and no build step, and the module beside them is one file — the elementals
-are compiled into it:</p>
+URLs, no install and no build step, and the module beside them is one file with the elementals
+compiled in:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
   <span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs&#x27;</span>;
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
@@ -2515,25 +2464,23 @@ next major.</p>
 <p>Every sheet is published on its own either way — this package&#39;s <code>style.css</code> and <code>theme.css</code>,
 and <code>style.css</code>/<code>theme.css</code> under each elemental in
 <a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a> — so a page wanting only
-some of them links those. What the bundles buy a page wanting all of them is nine <code>&lt;link&gt;</code>s
-becoming two, and 6.0KB of gzip becoming 4.4KB, because nine files each compress alone and
-share no window with the next.</p>
+some of them links those. For a page wanting all of them, the bundles turn nine <code>&lt;link&gt;</code>s into
+two and 6.0KB of gzip into 4.4KB, because nine files each compress alone and share no window
+with the next.</p>
 <h2 id="what-editors-read">What editors read<a class="heading-anchor" href="#what-editors-read" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The package ships a
 <a href="https://github.com/webcomponents/custom-elements-manifest">custom elements manifest</a> as
 <code>custom-elements.json</code>, named by the <code>customElements</code> field in <code>package.json</code> and generated
-from the element&#39;s source on every build. It carries what this page carries — the
-attributes, the two events, the seven custom properties — and marks everything the samples
-do not name as private, so an editor offering completions offers <code>togglePlay</code> and not
-<code>endDrag</code>.</p>
-<p>The samples at the top of this page read it too. Their <strong>Options</strong> tab is generated from
-this file and nothing else, which is the reason to ship one rather than invent a format: the
-knobs cannot describe an element this page no longer has. What the panel leaves out is in
-the file as well, under an <code>x-code-preview</code> key the schema permits and every other tool
-ignores — the sixteen CSS hooks stay documented for a stylesheet and are marked hidden for
-the panel, because they are the element&#39;s to write and not an author&#39;s.</p>
-<p>What any given editor does with it is its own business, and none of it is required to use
-the element: the manifest is a description, not a runtime.</p>
+from the element&#39;s source on every build. It carries what this page carries — the attributes,
+the two events, the seven custom properties — and marks everything the samples do not name as
+private, so an editor offering completions offers <code>togglePlay</code> and not <code>endDrag</code>.</p>
+<p>The samples at the top of this page read it too. Their <strong>Options</strong> tab is generated from this
+file and nothing else, which is the reason to ship one rather than invent a format: the knobs
+cannot describe an element this page no longer has. What the panel leaves out is in the file
+as well, under an <code>x-code-preview</code> key the schema permits and every other tool ignores — the
+sixteen CSS hooks stay documented for a stylesheet and are marked hidden for the panel,
+because they are the element&#39;s to write and not an author&#39;s.</p>
+<p>The manifest is a description, not a runtime; nothing here requires an editor to read it.</p>
 <h2 id="questions">Questions<a class="heading-anchor" href="#questions" tabindex="-1" aria-hidden="true"></a></h2>
 <!-- The accordion, on its own rather than in the player's bundle: it is this page's furniture
      and no part of the element, so it is the prebuilt file from book-of-elementals copied into
@@ -2542,23 +2489,22 @@ the element: the manifest is a description, not a runtime.</p>
      instead of sliding. -->
 <script src="js/accordion.min.js" defer></script><accordion-elemental class="faq">
 <details>
-<summary id="faq-no-js"><h3>Does the page still play with the script blocked?</h3></summary><p>Yes, and that is the one claim everything else is arranged around. You write
-<code>&lt;audio controls&gt;</code> or <code>&lt;video controls&gt;</code>; this element takes <code>controls</code> off when it upgrades
-and puts it back if it is ever removed from the DOM. It never creates, moves or replaces the
-media element, so with no script there is still a working native player where you put one.</p>
-<p>The exception is a streaming manifest, and it is the format&#39;s doing rather than this
-element&#39;s — see <a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a>.</p>
+<summary id="faq-no-js"><h3>Does the page still play with the script blocked?</h3></summary><p>Yes, and that is the claim everything else is arranged around. You write <code>&lt;audio controls&gt;</code> or
+<code>&lt;video controls&gt;</code>; this element takes <code>controls</code> off when it upgrades and puts it back if it
+is ever removed from the DOM. It never creates, moves or replaces the media element, so with
+no script there is still a working native player where you put one.</p>
+<p>The exception is a streaming manifest, which is the format&#39;s doing rather than this element&#39;s
+— see <a href="#live-and-the-streams-it-does-not-carry">Live, and the streams it does not carry</a>.</p>
 </details>
 <details>
-<summary id="faq-streaming"><h3>Can I use it with HLS, DASH, YouTube or Vimeo?</h3></summary><p>Nothing here ships any of them, and none is coming. But all four compose, and no seam was
+<summary id="faq-streaming"><h3>Can I use it with HLS, DASH, YouTube or Vimeo?</h3></summary><p>Nothing here ships any of them, and none is coming. All four compose anyway, and no seam was
 written to make them: attach hls.js or dash.js to the <code>&lt;video&gt;</code> you wrote, because this
-element only ever reads the media element and never touches its <code>src</code>. YouTube and Vimeo
-are one step over —
+element only ever reads the media element and never touches its <code>src</code>. For YouTube and Vimeo,
 <a href="https://github.com/stamat/video-background-element"><code>&lt;video-background&gt;</code></a> answers for both
 from one tag, and media-elements ships <code>&lt;youtube-video&gt;</code>, <code>&lt;vimeo-video&gt;</code> and a dozen more
 with the media API on them; this element wraps either marked <code>class=&quot;media-player-media&quot;</code> the
 way it wraps a <code>&lt;video&gt;</code>. <a href="#one-element-both-media">One element, both media</a> has both recipes
-as live players, measured side by side, and what each costs.</p>
+as live players, measured side by side, with what each costs.</p>
 <p>One half does not survive DASH. hls.js reports an endless duration for a live manifest and
 dash.js reports the rewind window&#39;s length, so <code>is-live</code> never comes on there. The worked
 recipe and that limit are in
@@ -2566,10 +2512,9 @@ recipe and that limit are in
 </details>
 <details>
 <summary id="faq-controls"><h3>Where is the default control bar?</h3></summary><p>There is not one, and there will not be. A control bar this element could draw would need an
-option to reorder it, an option to drop a button, an option to pass an icon — which is
-templating in JavaScript wearing a smaller hat, and the thing this exists to avoid. The
-samples on this page are the starter: copy one, delete what you do not want, and it is
-already your markup in your stylesheet.</p>
+option to reorder it, an option to drop a button, an option to pass an icon — which is the
+templating in JavaScript this exists to avoid. The samples on this page are the starter: copy
+one, delete what you do not want, and it is already your markup in your stylesheet.</p>
 </details>
 <details>
 <summary id="faq-live-scrubber"><h3>My scrubber disappeared on a live stream</h3></summary><p>The optional theme hides it — <code>media-player[is-live] .media-player-scrubber</code> — because it was
@@ -2577,13 +2522,12 @@ written when a live stream had nothing to seek. A stream with a rewind window do
 line in your own sheet brings it back. It is in the live recipe, with the reason.</p>
 </details>
 <details>
-<summary id="faq-captions"><h3>The captions button never appears</h3></summary><p>There has to be a caption track for the button to have anything to toggle — <code>captions</code>,
-<code>subtitles</code>, or a bare <code>&lt;track&gt;</code>, which the platform reads as subtitles. A
-<code>&lt;track kind=&quot;metadata&quot;&gt;</code> for thumbnails is not one, and neither are chapters or
-descriptions. If several are written, the one marked <code>default</code> wins, and otherwise the
-first. A track a streaming library adds after the upgrade
-counts too — the element watches <code>addtrack</code> for exactly that — but the button only lights
-once the track lands, which on a stream can be a moment after playback starts.</p>
+<summary id="faq-captions"><h3>The captions button never appears</h3></summary><p>There has to be a caption track for the button to toggle: <code>captions</code>, <code>subtitles</code>, or a bare
+<code>&lt;track&gt;</code>, which the platform reads as subtitles. A <code>&lt;track kind=&quot;metadata&quot;&gt;</code> for thumbnails
+is not one, and neither are chapters or descriptions. If several are written, the one marked
+<code>default</code> wins, otherwise the first. A track a streaming library adds after the upgrade counts
+too — the element watches <code>addtrack</code> for exactly that — but the button only lights once the
+track lands, which on a stream can be a moment after playback starts.</p>
 </details>
 <details>
 <summary id="faq-two-players"><h3>Two players on one page share a volume</h3></summary><p>They share a <code>storage-key</code>, which defaults to <code>media-player</code>. Set it per player and each
@@ -2594,13 +2538,12 @@ nicety, and taking the page down over one is not.</p>
 <details>
 <summary id="faq-shadow"><h3>Why light DOM rather than a shadow root?</h3></summary><p>Because the page&#39;s CSS, the page&#39;s semantics and the page working before the script arrives
 are the whole point. A shadow root would take your stylesheet&#39;s reach away from controls you
-wrote yourself, which is a strange thing to do to markup that is already yours.</p>
+wrote yourself.</p>
 </details>
 <details>
 <summary id="faq-frameworks"><h3>Does it work inside React, Vue or Svelte?</h3></summary><p>It is a standard custom element in the light DOM, so any framework that renders plain HTML
-renders it. What this project does not ship is a wrapper component for any of them — the
-markup contract is <code>on</code> and <code>bind</code> attributes, and those are attributes wherever they are
-written.</p>
+renders it. What this project does not ship is a wrapper component for any of them; the markup
+contract is <code>on</code> and <code>bind</code> attributes, and those are attributes wherever they are written.</p>
 </details>
 </accordion-elemental><h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
 <p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> ©

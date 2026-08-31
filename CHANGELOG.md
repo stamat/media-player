@@ -188,6 +188,15 @@ for the person who wrote the code.
 
 ### Changed
 
+- **The prose in the manual, the README and CONTRIBUTING.md is shorter.** Every fact, table,
+  measurement and markup sample is unchanged; what went is the essayistic register around
+  them — metaphors, restated points and asides. Four headings are renamed to say what their
+  section covers: "The part that matters most" is now "Playing with the script blocked",
+  "Two rows, and what a phone changes" is "Two rows, and narrow screens", "Twelve minutes,
+  from someone else's server" is "A twelve-minute file, and what preload costs", and "A
+  background loop, and the one button it owes you" is "Background video, and the pause button
+  it needs". None of the four was linked to; every anchor on the page still resolves.
+
 - **The speed control carries a tooltip.** Closed, the `<select>` reads `1×` and nothing
   else — a value with no name on it, next to a row of buttons that each explain themselves on
   hover. **Markup:** the samples wrap it in `<tooltip-elemental>` with a `<span>Speed</span>`,

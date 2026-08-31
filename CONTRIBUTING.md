@@ -4,14 +4,14 @@ Issues and pull requests are welcome. Taking part means keeping to the
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
 media-player is one idea kept small: the control bar is the author's markup, and the element
-only wires it. A change that sharpens that is welcome; a change that grows the surface is
-probably for a different library.
+only wires it. A change that sharpens that is welcome; a change that grows the surface belongs
+in a different library.
 
 ## What media-player refuses to become
 
 - **No generated controls.** There is no control bar to configure and no `controls` option
   taking names or an HTML string. The moment the element can draw a control row, every
-  question about it becomes a config question, which is the thing this exists to avoid.
+  question about it becomes a config question — the thing this exists to avoid.
 - **No streaming formats and no embeds of its own.** HLS, DASH, YouTube and Vimeo each need
   a third-party script, and nothing here ships one or knows one by name. What the element
   accepts is any child that speaks the media API — the author's `<video>` with hls.js on it,
@@ -33,14 +33,13 @@ probably for a different library.
   control names — `volumeUp` behind a volume that is a slider. A control's `key` outranks a
   `keys` entry for the same press, and a `keys` entry duplicating what a button could carry
   is the undiscoverable version and gets refused in review.
-- **No floating panels the element positions.** The fold opens in the control row's own
-  line, in flow, because a panel anchored over the picture clips on any ratio the CSS did
-  not foresee — a box inside `overflow: hidden` cannot know how much picture stands above
-  the row — and escaping the clip means script-measured `position: fixed` with the scroll
-  and resize listeners, the outside-tap dismissal and the Escape handling a real menu owes.
-  That bundle is a menu framework; the elementals own that kind of machinery, and a change
-  wanting it goes there. This was tried, measured against the 2.4:1 player in the manual,
-  and taken back out.
+- **No floating panels the element positions.** The fold opens in the control row's own line,
+  in flow. A panel anchored over the picture clips on any ratio the CSS did not foresee — a
+  box inside `overflow: hidden` cannot know how much picture stands above the row — and
+  escaping the clip means script-measured `position: fixed` with scroll and resize listeners,
+  outside-tap dismissal and Escape handling. That is a menu framework; the elementals own that
+  machinery, so a change wanting it goes there. This was tried, measured against the 2.4:1
+  player in the manual, and taken back out.
 
 ## Getting set up
 
