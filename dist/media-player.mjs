@@ -3125,7 +3125,20 @@ var MediaPlayer = class extends HgElement {
     if (!this.media || this.media.paused) return;
     this.linger = setTimeout(() => {
       this.controlsShown = false;
+      this.foldMore();
     }, CONTROLS_LINGER);
+  }
+  /**
+   * The row hiding takes the open fold with it, so the next reveal is the compact row the
+   * width asked for rather than four unfolded controls over a transport that stepped out
+   * for them. Free mode only — pinned means the query holds it open, and the stylesheet's
+   * swap only ever ran in free. Never over focus: closing hides the region, which drops a
+   * focus inside it on `<body>` — and the timer fires even while a `:focus-visible` in the
+   * row is holding the row up, because nothing restarts it for a keyboard reader.
+   */
+  foldMore() {
+    const more = this.querySelector('.media-player-more[open][data-mode="free"]');
+    if (more && !more.contains(focusedElement())) more.open = false;
   }
   // PERSISTENCE
   /** The prefix for remembered values — `storage-key`, or one shared by every player. */

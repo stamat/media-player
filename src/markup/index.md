@@ -407,6 +407,9 @@ The arrows skip what is folded, so a closed region is not a stretch of dead arro
 `<toolbar-elemental>` walks only the controls that are on screen, which needs
 book-of-elementals 3.2.1, the floor this version asks for — 3.2.0 gave `open-when` its
 `container:` ruler, and 3.2.1 the tarball that actually ships it to a source importer.
+They also skip the speed `<select>` wherever it stands, folded or not: a `<select>` spends
+the arrows on its own list, so the toolbar leaves it a tab stop of its own — one
+<kbd>Tab</kbd> past the row — rather than guess which press was meant for whom.
 `<media-player>` imports the
 disclosure for you. A page that blocks the script has no control row at all; one whose
 disclosure never defines gets the four controls sitting in the open — plus the caret, a
@@ -936,7 +939,9 @@ The three handlers on the `<media-player>` itself are the video half's housekeep
 `mousemove:showControls` makes the control row behave the way a video player's does: up while
 the pointer moves, gone five seconds after it stops, and always up while the video is paused
 or a focus ring is inside the row. A ring, not focus: a mouse click leaves focus on the button
-it pressed, and a row pinned by that never fades once you have pressed play.
+it pressed, and a row pinned by that never fades once you have pressed play. The fade takes an
+open fold with it, so the row that comes back is the compact one — unless focus is inside the
+fold, which closing would drop on nothing.
 `pointerdown:showControls` is the same for a pointer that cannot hover — a touch sends no
 `mousemove` — and it reveals on the finger landing rather than lifting: the first tap
 reveals and the second presses what it lands on, because the element will not pause on a tap
@@ -1516,9 +1521,9 @@ already says both, and saying them again is how they end up disagreeing.
 
 ## Keys the buttons carry
 
-Every control here is a `<button>` or an `<input type="range">`, so whichever one has focus
-already answers <kbd>Space</kbd>, <kbd>Enter</kbd>, the arrows, <kbd>Home</kbd> and
-<kbd>End</kbd> with no help from this element. What is missing is the key that works without
+Every control here is a `<button>`, an `<input type="range">` or a `<select>`, so whichever
+one has focus already answers <kbd>Space</kbd>, <kbd>Enter</kbd>, the arrows, <kbd>Home</kbd>
+and <kbd>End</kbd> with no help from this element. What is missing is the key that works without
 tabbing to anything first.
 
 It is not a map. The key goes on the control it presses, and the player is told to listen:

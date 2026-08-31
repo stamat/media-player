@@ -676,6 +676,12 @@
               "description": "Show the controls, and start the clock that takes them away again.\n\nA paused video keeps them: the timer is only started while something is playing, so a\nplayer sitting paused never hides the button that would start it."
             },
             {
+              "kind": "method",
+              "name": "foldMore",
+              "description": "The row hiding takes the open fold with it, so the next reveal is the compact row the\nwidth asked for rather than four unfolded controls over a transport that stepped out\nfor them. Free mode only — pinned means the query holds it open, and the stylesheet's\nswap only ever ran in free. Never over focus: closing hides the region, which drops a\nfocus inside it on `<body>` — and the timer fires even while a `:focus-visible` in the\nrow is holding the row up, because nothing restarts it for a keyboard reader.",
+              "privacy": "private"
+            },
+            {
               "kind": "field",
               "name": "storageKey",
               "description": "The prefix for remembered values — `storage-key`, or one shared by every player.",

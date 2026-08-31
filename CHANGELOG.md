@@ -27,7 +27,13 @@ for the person who wrote the code.
   named to its tooltip by `for` because the disclosure wants its button as a direct child
   and a wrapper would take that from it. Whatever control the row ends
   with — fullscreen in the samples — keeps its corner in both states, and the scrubber
-  never leaves. The samples write the breakpoint as
+  never leaves. On a video, the fade that takes the row folds an open fold with it — unless
+  focus is inside it, which closing would drop on nothing — so the reveal after is the
+  compact row, not four unfolded controls over a transport that stepped out for them. The
+  region also carries 4px of ring room, padding handed back as negative margin: its
+  `overflow: hidden` bounds the unfurl, and without the allowance it cut the focus rings
+  inside the fold on all four sides — a keyboard could land on the speed `<select>` with
+  nothing on screen saying so. The samples write the breakpoint as
   `open-when="container:(min-width: 30rem)"` — the disclosure's `container:` notation, so
   the fold arranges by the player's width the way the volume drop and the clock swap do,
   and a 400px player embedded in a desktop page folds like the phone it is as wide as; it

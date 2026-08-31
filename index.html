@@ -420,6 +420,9 @@ clears.</p>
 <code>&lt;toolbar-elemental&gt;</code> walks only the controls that are on screen, which needs
 book-of-elementals 3.2.1, the floor this version asks for — 3.2.0 gave <code>open-when</code> its
 <code>container:</code> ruler, and 3.2.1 the tarball that actually ships it to a source importer.
+They also skip the speed <code>&lt;select&gt;</code> wherever it stands, folded or not: a <code>&lt;select&gt;</code> spends
+the arrows on its own list, so the toolbar leaves it a tab stop of its own — one
+<kbd>Tab</kbd> past the row — rather than guess which press was meant for whom.
 <code>&lt;media-player&gt;</code> imports the
 disclosure for you. A page that blocks the script has no control row at all; one whose
 disclosure never defines gets the four controls sitting in the open — plus the caret, a
@@ -937,7 +940,9 @@ wrote it: enough to prove the CC wiring, no more.</p>
 <code>mousemove:showControls</code> makes the control row behave the way a video player&#39;s does: up while
 the pointer moves, gone five seconds after it stops, and always up while the video is paused
 or a focus ring is inside the row. A ring, not focus: a mouse click leaves focus on the button
-it pressed, and a row pinned by that never fades once you have pressed play.
+it pressed, and a row pinned by that never fades once you have pressed play. The fade takes an
+open fold with it, so the row that comes back is the compact one — unless focus is inside the
+fold, which closing would drop on nothing.
 <code>pointerdown:showControls</code> is the same for a pointer that cannot hover — a touch sends no
 <code>mousemove</code> — and it reveals on the finger landing rather than lifting: the first tap
 reveals and the second presses what it lands on, because the element will not pause on a tap
@@ -1509,9 +1514,9 @@ usable on its own and documented separately:</p>
 <p>So there is no <code>role=&quot;slider&quot;</code> and no <code>aria-valuenow</code> anywhere in this element. The platform
 already says both, and saying them again is how they end up disagreeing.</p>
 <h2 id="keys-the-buttons-carry">Keys the buttons carry<a class="heading-anchor" href="#keys-the-buttons-carry" tabindex="-1" aria-hidden="true"></a></h2>
-<p>Every control here is a <code>&lt;button&gt;</code> or an <code>&lt;input type=&quot;range&quot;&gt;</code>, so whichever one has focus
-already answers <kbd>Space</kbd>, <kbd>Enter</kbd>, the arrows, <kbd>Home</kbd> and
-<kbd>End</kbd> with no help from this element. What is missing is the key that works without
+<p>Every control here is a <code>&lt;button&gt;</code>, an <code>&lt;input type=&quot;range&quot;&gt;</code> or a <code>&lt;select&gt;</code>, so whichever
+one has focus already answers <kbd>Space</kbd>, <kbd>Enter</kbd>, the arrows, <kbd>Home</kbd>
+and <kbd>End</kbd> with no help from this element. What is missing is the key that works without
 tabbing to anything first.</p>
 <p>It is not a map. The key goes on the control it presses, and the player is told to listen:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;keydown@document:onKeyDown&quot;</span>&gt;</span>

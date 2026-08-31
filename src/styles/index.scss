@@ -311,6 +311,14 @@ media-player:dir(rtl) .media-player-more > button svg {
   max-width: 26rem;
   transition: max-width 0.2s ease;
 
+  // Room for the focus rings, or the clip above runs through them: the theme's ring
+  // stands 4px off a control — 2px of outline, 2px out — and a ring cut on all four
+  // sides is a focus indicator the keyboard cannot see land. The padding houses it,
+  // the margin hands the room back to the row, so nothing else moves. A page drawing
+  // a wider ring raises both together.
+  padding: 0.25rem;
+  margin: -0.25rem;
+
   &[hidden] {
     max-width: 0;
   }

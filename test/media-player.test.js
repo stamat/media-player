@@ -1295,13 +1295,22 @@ describe('the step under the hand', () => {
  * attribute the player writes on the disclosure — which side of the query it lands on is the
  * disclosure's own, and a browser's to show.
  */
-function mountFold(count, { openWhen = 'container:(min-width: 30rem)' } = {}) {
+function mountFold(count, { openWhen = 'container:(min-width: 30rem)', media = fakeMedia() } = {}) {
   const more = document.createElement('disclosure-elemental');
   more.className = 'media-player-more';
   if (openWhen) more.setAttribute('open-when', openWhen);
   more.innerHTML = `<button type="button"></button><div class="media-player-more-region">${'<tooltip-elemental><button></button></tooltip-elemental>'.repeat(count)}</div>`;
-  const player = mount(fakeMedia(), more);
+  const player = mount(media, more);
   return { player, more };
+}
+
+/** A fold on the free side of its query, open. jsdom resolves no query, so the
+ * `data-mode` the disclosure would reflect is written by hand. */
+function openFold(count, media) {
+  const mounted = mountFold(count, { media });
+  mounted.more.dataset.mode = 'free';
+  mounted.more.setAttribute('open', '');
+  return mounted;
 }
 
 describe('a fold only pays for itself past one control', () => {
@@ -1328,6 +1337,38 @@ describe('a fold only pays for itself past one control', () => {
     const bare = mountFold(1, { openWhen: null });
     bare.player.remove();
     expect(bare.more.hasAttribute('open-when')).toBe(false);
+  });
+});
+
+describe('hiding the controls folds the fold', () => {
+  test('the linger that hides the row closes an open fold with it, so the next reveal is the compact row', () => {
+    jest.useFakeTimers();
+    const { player, more } = openFold(2, fakeMedia('video', { paused: false }));
+    player.showControls();
+    jest.advanceTimersByTime(CONTROLS_LINGER + 1);
+    expect(player.hasAttribute('controls-shown')).toBe(false);
+    expect(more.hasAttribute('open')).toBe(false);
+    jest.useRealTimers();
+  });
+
+  test('a fold holding focus stays open when the row hides, because closing it would drop that focus on nothing', () => {
+    jest.useFakeTimers();
+    const { player, more } = openFold(2, fakeMedia('video', { paused: false }));
+    more.querySelector('.media-player-more-region button').focus();
+    player.showControls();
+    jest.advanceTimersByTime(CONTROLS_LINGER + 1);
+    expect(more.hasAttribute('open')).toBe(true);
+    jest.useRealTimers();
+  });
+
+  test('a pinned fold is not the timer\'s to close, because the query is what holds it open', () => {
+    jest.useFakeTimers();
+    const { player, more } = openFold(2, fakeMedia('video', { paused: false }));
+    more.dataset.mode = 'pinned';
+    player.showControls();
+    jest.advanceTimersByTime(CONTROLS_LINGER + 1);
+    expect(more.hasAttribute('open')).toBe(true);
+    jest.useRealTimers();
   });
 });
 
