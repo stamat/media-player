@@ -5,9 +5,47 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project
 follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-**How to use it:** land changes under `## [Unreleased]
+**How to use it:** land changes under `## [Unreleased]`, grouped under _Added_, _Changed_,
+_Deprecated_, _Removed_, _Fixed_ or _Security_. Write entries for the person upgrading, not
+for the person who wrote the code.
+
+## [Unreleased]
 
 ### Added
+
+- **The control row folds its last four controls behind one button where it runs out of
+  width — and unfolding them takes the line rather than adding one.** Speed, captions,
+  picture-in-picture and the device button sit in a `<disclosure-elemental
+  open-when="(min-width: 30rem)">` in the samples: above the query the region is held open
+  and `style.css` reads the `data-mode="pinned"` it reflects to take the button away and
+  give the region `display: contents`, so a wide row is exactly the row it was, in the
+  markup's order. Below it the button owns the region, and opening it swaps the line under
+  the scrubber instead of growing the bar: the transport, the clock and the mute step out,
+  the four unfurl into their space the way a search field expands, and the caret slides
+  along with them — turned around while open, offering "Fewer controls" through the new
+  `moreLabel` bind, named to its tooltip by `for` because the disclosure wants its button
+  as a direct child and a wrapper would take that from it. Whatever control the row ends
+  with — fullscreen in the samples — keeps its corner in both states, and the scrubber
+  never leaves. A menu floating over the picture was the version that did not survive:
+  inside the player's own `overflow: hidden` it clips on any ratio shorter than 16:9,
+  which the manual's own 2.4:1 player is.
+
+  **Markup:** new, and yours to copy — nothing folds unless you write it; the disclosure
+  wires `disclosure-toggle:onMoreToggle`, both new public names. **CSS:**
+  `.media-player-more` and `.media-player-more-region` are the hooks, `data-mode` and
+  `[open]` the states. **DOM:** the module imports book-of-elementals' disclosure and the
+  structure bundle carries its sheet, about 1.5 kB gzipped measured on its own; the arrows
+  skip a folded control, which is book-of-elementals **3.1.1**, now the floor. Folding the
+  AirPlay button is what pins the row's width: a control that appears by network weather no
+  longer decides whether the row wraps.
+
+- **The clock counts down where there is room for only one number.** Below 21.25rem of
+  player width the `current / duration` pair hands the line to a single remaining-time
+  figure, ending on zero when the track does — `remaining` was always there to bind; new is
+  the pair of spans the swap needs. **Markup:** the clock in the samples is two spans now,
+  `.media-player-elapsed` around the pair and `.media-player-remaining` for the countdown;
+  copy the new clock if you took the old one. **CSS:** the swap lives in `style.css`, keyed
+  on the same container the volume drop reads.
 
 - **A custom element that speaks the media API is the third thing the player wraps.**
   [`<video-background>`](https://github.com/stamat/video-background-element), or one of the
@@ -40,26 +78,6 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   every click — so a click on the picture lands on the player's box and pauses, as on a
   `<video>`. `is-video` reads off the name now — a custom
   element counts as video unless it ends in `-audio`.
-
-- **Two bundled stylesheets, so a page links two sheets instead of nine.**
-  `media-player-element/bundle.css` is `style.css` with the four elemental structure sheets
-  folded in, and `bundle-theme.css` is `theme.css` with theirs — the same CSS, compiled
-  together, declaration for declaration. Nine files gzip to 6.0KB because each compresses
-  alone; the two bundles gzip to 4.4KB, so the shorter block is the smaller download as
-  well. Nothing is removed: every sheet is still published on its own, and the script was
-  already one file with the elementals compiled into it.
-
-  **Not for a project that already uses book-of-elementals.** The elemental CSS inside a
-  bundle is frozen at the version this package was built against, and the file cannot tell
-  you which — so linking one beside your own copy puts two versions of the same selectors on
-  the page, with link order deciding and nothing reporting it. Take `style.scss` and
-  `theme.scss` there and `@use` them next to the sheets you already have. Both bundles say so
-  in a comment at the top for whoever meets the duplicate rules in devtools first.
-
-  One more catch if you take `bundle.css` without the look: the split is by kind, not by what
-  you can live without, so the tooltip's colours are in the theme bundle while its structure
-  sheet only places the bubble. Set `--tooltip-elemental-surface` and
-  `--tooltip-elemental-color` yourself, or there is unpainted text over the control row.
 
 - **Picture-in-picture, on a button you write.** `click:togglePictureInPicture` opens the
   floating window the browser keeps above everything else, and `is-pip` is the hook a
@@ -165,6 +183,17 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- **The speed control carries a tooltip.** Closed, the `<select>` reads `1×` and nothing
+  else — a value with no name on it, next to a row of buttons that each explain themselves on
+  hover. **Markup:** the samples wrap it in `<tooltip-elemental>` with a `<span>Speed</span>`,
+  the same shape the buttons use; copy it if you want it, nothing here writes it for you.
+  **Layout:** unchanged — `<tooltip-elemental>` is `display: contents`, so the chip is still
+  the flex item it was and the row's measured widths hold. The
+  `aria-label` stays on the `<select>`, so the bubble is a description rather than the name.
+
+- **The speed control's value is semibold**, to carry its label's weight beside a row of
+  icons.
+
 - **The volume slider also goes when the row is too narrow for it, not only where the pointer
   is coarse.** A container query on the control row rather than a breakpoint, because the width
   that decides is the player's own: a 400px player in a wide page crowds exactly the way a phone
@@ -188,19 +217,6 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   control findable. `--slider-elemental-thumb: var(--slider-elemental-fill)` on
   `media-player slider-elemental` puts the old behaviour back in one declaration.
 
-- **book-of-elementals and hydrargyri are `peerDependencies` now, not `dependencies`.**
-  Both register into globals a page has only one of — `customElements` for the elemental
-  tags, and hydrargyri's own register of which tags are hydrargyri's — so a second copy is
-  never harmless. The elemental case is quiet: registration is guarded, the second
-  `slider-elemental` is dropped, and whichever script ran first owns the tag. The hydrargyri
-  case is not quiet at all, because that register is how an element tells a node of its own
-  from one belonging to a nested element; split across two copies, an outer element writes
-  into a nested `<media-player>`'s `bind` nodes and overwrites its controls, with nothing but
-  a confusing console warning to go on. As peers, an installer that cannot reconcile your
-  version with this one says so at install time instead. **If you install with something that
-  does not add peers for you, add both yourself** — and if you were on book-of-elementals 1.x,
-  you now have to move to 2.x rather than silently getting a nested second copy.
-
 - **book-of-elementals moved to 3.x.** It left 0.x, then 1.x, then 2.x while this element sat
   on `^1.0.0`, so the install block's `@0.11` patch pin — right while a 0.x minor could break
   — was withholding fixes rather than refusing breakage. Neither major since touches the four
@@ -213,12 +229,37 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- **The video controls no longer stay invisible where nothing hovers.** The row fades in on
-  `mousemove` and a touch device sends none, so five seconds into playback on a phone it went
-  away and the only way back was a tap on the picture — which pauses the video to do it, since
-  that is the same tap. **CSS:** under `@media (hover: none)` the row does not fade at all, the
-  way a phone player's chrome does not. Keyed on hover rather than on the pointer, so a laptop
-  with a touchscreen keeps the fade it can still drive.
+- **The documented rule for hiding an unavailable control no longer hides the whole control
+  row.** `:has([on*="showAirplayPicker"])` matches every ancestor holding that button, not just
+  the `<tooltip-elemental>` around it — so wherever `no-airplay` is set, which is every reader
+  with no receiver on the network, the row and the player went with it. The rule is
+  `:has(> [on*="showAirplayPicker"])` now, in the manual and in this page's own stylesheet;
+  copy it again if you took the old one.
+
+- **The video controls come back on a touch, and reaching them no longer costs you the
+  playback.** The row fades in on `mousemove`, which a touch device never sends, so five
+  seconds into playback it was gone and the only way back was a tap on the picture — which
+  paused the video to do it, that tap being the play toggle. **Markup:** the video samples wire
+  `touchstart:showControls` beside the mouse one; copy the new `on=` if you took the old one.
+  **DOM:** where the pointer cannot hover, a click on the picture starts a stopped video and
+  otherwise leaves playback alone, so the first tap reveals and the second presses what it
+  revealed. Asked of `(hover: none)` at the click rather than of the user agent at upgrade, so
+  a touchscreen laptop keeps the toggle it can drive.
+
+- **The captions badge is the size of the buttons beside it.** Both states carried a viewBox
+  cropped to the glyph, `1 3 22 18`, on the theory that a wide short icon in a square box is
+  scaled by its height — `meet` scales by whichever axis fits worse, which in a 22-wide box is
+  the width, so the crop shrank the badge by 8% rather than enlarging it. The two states did
+  not match each other either: the outline was drawn 20 by 16 units and the solid one 18 by
+  14, against 22 by 20 for the AirPlay icon and 22 by 18 for picture-in-picture. **Markup:**
+  both badges are `0 0 24 24` now and both fill `0..24` by `3..21` — the full width of the
+  viewBox at picture-in-picture's height — the outline stroking to that edge and the solid
+  filling to it; the letters grew with the badge, a fifth larger, and stay centred in it. Copy
+  the new `<svg>` pair if you took the old one. Matching AirPlay's screen rectangle instead,
+  which is the obvious reading of "the same size", is the version that looks wrong: AirPlay
+  hangs a triangle below its screen and picture-in-picture an inset one, the badge hangs
+  nothing, so at the screen's own size it reads as the smaller button. The volume icon keeps its cropped viewBox — a different glyph,
+  and its own call to make.
 
 - **The arrow keys reach the controls sitting past a hidden one.** `<toolbar-elemental>`
   walked every control in the row whether it was on screen or not, and `focus()` on a hidden
@@ -250,6 +291,53 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   on a Vimeo link is where this was found. `playing`, which means playback actually began, is
   a second way into the loop now; it cancels before it schedules, so the two entry points
   cannot leave two loops running.
+
+## [2.0.0] - 2026-08-24
+
+### Added
+
+- **Two bundled stylesheets, so a page links two sheets instead of nine.**
+  `media-player-element/bundle.css` is `style.css` with the four elemental structure sheets
+  folded in, and `bundle-theme.css` is `theme.css` with theirs — the same CSS, compiled
+  together, declaration for declaration. Nine files gzip to 6.0KB because each compresses
+  alone; the two bundles gzip to 4.4KB, so the shorter block is the smaller download as
+  well. Nothing is removed: every sheet is still published on its own, and the script was
+  already one file with the elementals compiled into it.
+
+  **Not for a project that already uses book-of-elementals.** The elemental CSS inside a
+  bundle is frozen at the version this package was built against, and the file cannot tell
+  you which — so linking one beside your own copy puts two versions of the same selectors on
+  the page, with link order deciding and nothing reporting it. Take `style.scss` and
+  `theme.scss` there and `@use` them next to the sheets you already have. Both bundles say so
+  in a comment at the top for whoever meets the duplicate rules in devtools first.
+
+  One more catch if you take `bundle.css` without the look: the split is by kind, not by what
+  you can live without, so the tooltip's colours are in the theme bundle while its structure
+  sheet only places the bubble. Set `--tooltip-elemental-surface` and
+  `--tooltip-elemental-color` yourself, or there is unpainted text over the control row.
+
+### Changed
+
+- **book-of-elementals and hydrargyri are `peerDependencies` now, not `dependencies`.**
+  Both register into globals a page has only one of — `customElements` for the elemental
+  tags, and hydrargyri's own register of which tags are hydrargyri's — so a second copy is
+  never harmless. The elemental case is quiet: registration is guarded, the second
+  `slider-elemental` is dropped, and whichever script ran first owns the tag. The hydrargyri
+  case is not quiet at all, because that register is how an element tells a node of its own
+  from one belonging to a nested element; split across two copies, an outer element writes
+  into a nested `<media-player>`'s `bind` nodes and overwrites its controls, with nothing but
+  a confusing console warning to go on. As peers, an installer that cannot reconcile your
+  version with this one says so at install time instead. **If you install with something that
+  does not add peers for you, add both yourself** — and if you were on book-of-elementals 1.x,
+  you now have to move to 2.x rather than silently getting a nested second copy.
+
+- **book-of-elementals moved to 2.x.** It left 0.x and then 1.x while this element sat
+  on `^1.0.0`, so the install block's `@0.11` patch pin — right while a 0.x minor could break
+  — was withholding fixes rather than refusing breakage. The 2.0 break is a slider that turns
+  down the page with `writing-mode`, which renamed arguments on functions this element does
+  not call and added attributes to a bubble it does not style; the custom properties, the
+  element names and the SCSS entry points are the same ones, so nothing on the page changes
+  shape.
 
 ## [1.2.0] - 2026-08-21
 

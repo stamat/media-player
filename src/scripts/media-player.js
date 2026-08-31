@@ -3,6 +3,7 @@ import 'book-of-elementals/slider';
 import 'book-of-elementals/progress';
 import 'book-of-elementals/toolbar';
 import 'book-of-elementals/tooltip';
+import 'book-of-elementals/disclosure';
 
 /**
  * A duration this long is a live stream rather than a file.
@@ -408,6 +409,7 @@ export class MediaPlayer extends HgElement {
     'volumePercent',
     'playLabel',
     'muteLabel',
+    'moreLabel',
     'captionsLabel',
     'captionText',
     'playbackRate',
@@ -426,9 +428,10 @@ export class MediaPlayer extends HgElement {
       'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;error:onError',
     // The picture is the same button the overlay is, once the overlay has stepped out of the
     // way: clicking a playing video pauses it, and the overlay comes back over the frame it
-    // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so
-    // the pair would be a listener on nothing.
-    video: 'click:togglePlay',
+    // stopped on — except where nothing hovers, which `pictureToggle` explains. Video only —
+    // an `<audio>` with its controls off draws no box to click, so the pair would be a
+    // listener on nothing.
+    video: 'click:pictureToggle',
     // The same click for a custom media element, which never sees it: the structure sheet
     // gives it no pointer input, because its cross-origin iframe would keep the click, so
     // the click lands on this element's own box.
@@ -569,6 +572,9 @@ export class MediaPlayer extends HgElement {
     this.isBuffering = true;
     this.playLabel = 'Play';
     this.muteLabel = 'Mute';
+    // Not left for the first toggle to set: the button's `attr#aria-label` bind renders
+    // null by removing the attribute, and that is a nameless button, not a default.
+    this.moreLabel = 'More controls';
     this.captionsLabel = 'Enable captions';
     // Handed to the scrubber's `<slider-elemental>` through a `prop#format` bind, so the
     // value bubble reads `01:12` rather than `72`. A property rather than a `querySelector`
@@ -692,6 +698,25 @@ export class MediaPlayer extends HgElement {
    */
   onPictureClick(event) {
     if (event.target !== this || !this.isVideo) return;
+    this.pictureToggle();
+  }
+
+  /**
+   * What a click on the picture does, from either shape of it.
+   *
+   * Where nothing hovers, a tap is the only thing that brings a hidden control row back — so
+   * it cannot also be what pauses. One gesture cannot mean both, and a row that comes back
+   * only by stopping the video is a row you have to break playback to reach. A tap starts a
+   * stopped video and otherwise leaves playback alone, the reveal having already happened on
+   * the `touchstart` the markup wires to `showControls`.
+   *
+   * Asked of the pointer rather than of the user agent, and asked at the click rather than
+   * once at upgrade: a laptop with a touchscreen hovers, and a window dragged to a second
+   * screen can stop hovering. Where there is no `matchMedia` to ask, the pointer is taken to
+   * hover, which is what every version before this one did.
+   */
+  pictureToggle() {
+    if (!this.media?.paused && window.matchMedia?.('(hover: none)')?.matches) return;
     this.togglePlay();
   }
 
@@ -1033,6 +1058,17 @@ export class MediaPlayer extends HgElement {
       if (this.linger) clearTimeout(this.linger);
       this.controlsShown = true;
     }
+  }
+
+  /**
+   * The fold's button names its action, the way the mute button does: "More controls"
+   * closed, "Fewer controls" open. Wired in the markup — `on="disclosure-toggle:onMoreToggle"`
+   * on the disclosure — so a row without a fold never runs it. `aria-expanded` is the
+   * disclosure's own and already carries the state for a screen reader; this is for the
+   * tooltip and the label, which read words rather than state.
+   */
+  onMoreToggle(event) {
+    this.moreLabel = event?.detail?.open ? 'Fewer controls' : 'More controls';
   }
 
   /**

@@ -68,6 +68,23 @@ function fakeMedia(tag = 'audio', { duration = 120, paused = true } = {}) {
   return media;
 }
 
+/**
+ * A pointer that cannot hover, for the length of one call.
+ *
+ * jsdom implements no `matchMedia` at all, which is why the element asks for it optionally and
+ * why the rest of this file exercises the hovering half without stubbing anything.
+ */
+function withoutHover(run) {
+  const had = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+  window.matchMedia = (query) => ({ matches: query === '(hover: none)' });
+  try {
+    run();
+  } finally {
+    if (had) Object.defineProperty(window, 'matchMedia', had);
+    else delete window.matchMedia;
+  }
+}
+
 function mount(media) {
   const player = document.createElement('media-player');
   if (media) player.appendChild(media);
@@ -316,6 +333,28 @@ describe('the wiring the element carries itself', () => {
     expect(media.paused).toBe(false);
     media.dispatchEvent(new Event('click'));
     expect(media.paused).toBe(true);
+  });
+
+  test('a tap on the picture will not pause it, because that same tap is what brings the controls back', () => {
+    // Where nothing hovers there is no `mousemove` to reveal the row, so the touch does it —
+    // and a touch that also pauses makes the row reachable only by stopping the video, which
+    // is the whole defect. The first tap reveals; what pauses is the button it reveals.
+    const media = fakeMedia('video');
+    mount(media);
+    media.dispatchEvent(new Event('click'));
+    expect(media.paused).toBe(false);
+    withoutHover(() => media.dispatchEvent(new Event('click')));
+    expect(media.paused).toBe(false);
+  });
+
+  test('a tap on the picture still starts a stopped video, which is the half with nowhere else to go', () => {
+    // Stopped, the overlay is over the picture and its button is the one being pressed — but
+    // the picture answers the same way, because a guard that refused both directions would be
+    // a player a tap cannot start.
+    const media = fakeMedia('video');
+    mount(media);
+    withoutHover(() => media.dispatchEvent(new Event('click')));
+    expect(media.paused).toBe(false);
   });
 
   test('a click on an audio element is a click on the page, not on a control', () => {
@@ -1234,6 +1273,18 @@ describe('the labels a button announces itself by', () => {
     player.onPause();
     expect(player.playLabel).toBe('Play');
     expect(player.hasAttribute('is-playing')).toBe(false);
+  });
+
+  test('the fold button offers fewer controls once they are out, and more again after', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    // Initialised, not left for the first toggle: the aria-label bind renders null by
+    // removing the attribute, and that is a nameless button.
+    expect(player.moreLabel).toBe('More controls');
+    player.onMoreToggle({ detail: { open: true } });
+    expect(player.moreLabel).toBe('Fewer controls');
+    player.onMoreToggle({ detail: { open: false } });
+    expect(player.moreLabel).toBe('More controls');
   });
 
   test('the mute button says which way it goes, and follows a volume change it did not make', () => {

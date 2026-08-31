@@ -71,7 +71,8 @@
   "copy": {
     "in": [
       "node_modules/code-preview-element/dist/code-preview-hljs.min.js",
-      "node_modules/code-preview-element/dist/code-preview-options.min.js"
+      "node_modules/code-preview-element/dist/code-preview-options.min.js",
+      "node_modules/book-of-elementals/dist/elementals/accordion.min.js"
     ],
     "out": "js"
   },

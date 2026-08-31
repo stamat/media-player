@@ -177,6 +177,122 @@ media-player .media-player-media {
   }
 }
 
+// The duration goes the same way, further down — and the clock turns around with it.
+// Measured on the video sample with the theme loaded, AirPlay folded and the volume gone:
+// the folded row is 324px, 340px of player with its padding, and ` / 00:00` is 46px of it.
+// Below that the clock is the countdown alone: where one number is all the room there is,
+// the number worth keeping is how much is left, and it ends on the zero the track ends on.
+// The scrubber still says where the thumb sits in the whole.
+.media-player-remaining {
+  display: none;
+}
+
+@container (max-width: 21.25rem) {
+  .media-player-elapsed {
+    display: none;
+  }
+
+  .media-player-remaining {
+    display: inline;
+  }
+}
+
+// The end of the row, folded away where the row cannot carry it. Measured on the video sample
+// with the theme loaded: with the volume already gone the buttons still wrap to a third line
+// at 425px of player width, and one more control is not enough — the row needs two fewer to
+// clear a 375px phone. Four go behind the button — speed, captions, picture-in-picture and
+// the AirPlay button, whose habit of appearing by network weather would otherwise wrap the
+// one phone standing near a receiver — leaving a 324px row that the duration drop above
+// carries down to 294px. `open-when` holds the region open above the breakpoint and hands it back to the button
+// below, and reflects which side it is on as `data-mode`, so the number lives in one place
+// rather than once here and once in a media query. Pinned, the button is dead weight and the
+// region is `display: contents`, which puts the four controls back in the row's own flex line
+// in the order the markup already had them — so a wide player is exactly the row it was before
+// any of this, with no nested box in the middle of it.
+.media-player-more-region {
+  display: flex;
+  align-items: center;
+  gap: var(--media-player-gap);
+}
+
+.media-player-more[data-mode="pinned"] > button {
+  display: none;
+}
+
+.media-player-more-region[data-mode="pinned"] {
+  display: contents;
+}
+
+// Free and open, the region takes the line rather than adding one: the other controls step
+// out and the fold's four unfurl into the space they left, the way a search field expands.
+// The bar keeps its height whatever the picture — a column floating over it was tried and
+// clipped on every ratio shorter than 16:9, because a box inside `overflow: hidden` cannot
+// know how much picture stands above the row, and a scripted flyout is a menu framework
+// this element refuses. The scrubber keeps its line: seeking is not the fold's to take
+// away. `:last-child` spares whatever control the author put at the row's end — fullscreen
+// in the samples — so the corner it holds is the same corner open and closed. Hiding the
+// wrappers beats `display: contents` on specificity, and the toolbar's walk skips what is
+// off screen, so the hidden controls are no arrow stops. A disclosure that never reflects
+// `data-mode` matches nowhere and unfolds inline on a line of its own — the honest fallback.
+.media-player-controls:has(.media-player-more[open][data-mode="free"]) > :not(.media-player-scrubber, .media-player-more, :last-child) {
+  display: none;
+}
+
+// The open group packs against the row's end, so the last control keeps its corner and
+// the caret slides start-ward exactly as far as the region unfurling after it needs — the
+// search field's own motion, with the tab order intact: the button stays ahead of what it
+// revealed. On the button rather than the region because the disclosure is
+// `display: contents` — the button is the first box the group has.
+.media-player-more[open][data-mode="free"] > button {
+  margin-inline-start: auto;
+}
+
+// The caret points at the fold and turns around while it is open — the state the
+// play/pause button carries by swapping icons, carried here by one glyph turning, so the
+// markup holds a single arrow. Mirrored with the writing direction, because the fold
+// unfurls the other way there and a caret pointing off the row's end promises nothing.
+.media-player-more > button svg {
+  transition: rotate 0.2s ease;
+}
+
+.media-player-more[open] > button svg {
+  rotate: 180deg;
+}
+
+media-player:dir(rtl) .media-player-more > button svg {
+  scale: -1 1;
+}
+
+// No slide for this region in either mode: pinned it is `display: contents` with no box to
+// slide, and the swap is horizontal — the height animation on close was one frame of the
+// returned controls wrapping under a region still on its way out. `0s` is the element's own
+// documented instant switch, read off the region.
+.media-player-more-region {
+  --disclosure-elemental-duration: 0s;
+}
+
+// The unfurl: width from nothing to past its widest, clipped while it grows, the right
+// edge pinned by the margin above so growth runs leftward. The cap bounds the animation
+// and the region both — a region packed past 26rem is clipped, and the cap is where to
+// look. `@starting-style` is what lets a box just undisplayed transition at all; Firefox
+// ESR 128 lacks it and opens instantly, which is also the reduced-motion behaviour.
+.media-player-more-region[data-mode="free"] {
+  overflow: hidden;
+  max-width: 26rem;
+  transition: max-width 0.2s ease;
+
+  @starting-style {
+    max-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-player-more-region[data-mode="free"],
+  .media-player-more > button svg {
+    transition: none;
+  }
+}
+
 // Two clusters on the row under the scrubber: the transport and its clock at the start,
 // everything else at the end. One auto margin opens the gap — `justify-content:
 // space-between` would spread all six controls evenly instead of splitting them in two. The
@@ -259,18 +375,6 @@ media-player[is-video] .media-player-controls {
 media-player[is-video][controls-shown] .media-player-controls,
 media-player[is-video] .media-player-controls:focus-within {
   opacity: 1;
-}
-
-// Where nothing hovers, nothing drives the fade. `mousemove` is the only thing that brings
-// the row back mid-playback, and a touch device sends none — so once the linger timer takes
-// it away the only way back is a tap on the picture, which pauses the video to do it. The
-// row stays up instead, the way a phone player's does. `hover: none` rather than
-// `pointer: coarse`: a laptop with a touchscreen has a pointer that hovers, and keeps the
-// fade.
-@media (hover: none) {
-  media-player[is-video] .media-player-controls {
-    opacity: 1;
-  }
 }
 
 .media-player-poster {

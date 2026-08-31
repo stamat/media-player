@@ -179,6 +179,10 @@ media-player .media-player-rate {
   font: inherit;
   font-size: 0.8125rem;
 
+  // `font: inherit` above resets the weight along with everything else; the rate is a number
+  // read at a glance beside glyphs, and it needs the extra weight to hold its own against them.
+  font-weight: 600;
+
   // 1.125rem of line and this padding is the 2rem box a 1.125rem glyph makes, so the chip
   // stands exactly as tall as the buttons beside it whatever `normal` works out to for the
   // page's font.

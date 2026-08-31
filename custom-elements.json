@@ -201,7 +201,7 @@
                 "text": "array"
               },
               "static": true,
-              "default": "[ 'currentTime', 'remaining', 'duration', 'seekableStart', 'seekableEnd', 'behindLive', 'buffered', 'volumePercent', 'playLabel', 'muteLabel', 'captionsLabel', 'captionText', 'playbackRate', 'timeFormatter' ]",
+              "default": "[ 'currentTime', 'remaining', 'duration', 'seekableStart', 'seekableEnd', 'behindLive', 'buffered', 'volumePercent', 'playLabel', 'muteLabel', 'moreLabel', 'captionsLabel', 'captionText', 'playbackRate', 'timeFormatter' ]",
               "description": "State that never reaches the DOM.\n\n`currentTime` moves sixty times a second while playing. Reflected to an attribute that\nwould be sixty `setAttribute` calls a second, every one of them waking anything watching\nthe subtree — so the values that move fast live here, and only the flags CSS needs are\nattributes.",
               "privacy": "private"
             },
@@ -212,7 +212,7 @@
                 "text": "object"
               },
               "static": true,
-              "default": "{ [MEDIA_SELECTOR]: 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;error:onError', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on. Video only — an `<audio>` with its controls off draws no box to click, so // the pair would be a listener on nothing. video: 'click:togglePlay', // The same click for a custom media element, which never sees it: the structure sheet // gives it no pointer input, because its cross-origin iframe would keep the click, so // the click lands on this element's own box. ':scope': 'click:onPictureClick' }",
+              "default": "{ [MEDIA_SELECTOR]: 'loadedmetadata:onLoaded;durationchange:onLoaded;loadeddata:onLoaded;canplay:onLoaded;canplaythrough:onLoaded;play:onPlay;pause:onPause;waiting:onWaiting;playing:onPlaying;ended:onEnded;progress:onProgress;timeupdate:onTimeUpdate;volumechange:onVolumeChange;ratechange:onRateChange;enterpictureinpicture:onPipChange;leavepictureinpicture:onPipChange;error:onError', // The picture is the same button the overlay is, once the overlay has stepped out of the // way: clicking a playing video pauses it, and the overlay comes back over the frame it // stopped on — except where nothing hovers, which `pictureToggle` explains. Video only — // an `<audio>` with its controls off draws no box to click, so the pair would be a // listener on nothing. video: 'click:pictureToggle', // The same click for a custom media element, which never sees it: the structure sheet // gives it no pointer input, because its cross-origin iframe would keep the click, so // the click lands on this element's own box. ':scope': 'click:onPictureClick' }",
               "description": "The media element's wiring, attached by hydrargyri at upgrade rather than written in\nevery sample — plumbing with nothing in it for an author to choose, and one pair\nforgotten in an `on=` was a player that half-worked with nothing saying why. A pair the\nmedia element's own `on` attribute still carries is skipped, so markup predating this\nkeeps firing once.",
               "privacy": "private"
             },
@@ -273,6 +273,12 @@
                 }
               ],
               "description": "A click on the box itself, which is the picture of a custom media element — the media\nchild takes no pointer input, so the click falls through to here. Only the box: a\ncontrol inside is its own target, and an audio player has no picture to click.",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "pictureToggle",
+              "description": "What a click on the picture does, from either shape of it.\n\nWhere nothing hovers, a tap is the only thing that brings a hidden control row back — so\nit cannot also be what pauses. One gesture cannot mean both, and a row that comes back\nonly by stopping the video is a row you have to break playback to reach. A tap starts a\nstopped video and otherwise leaves playback alone, the reveal having already happened on\nthe `touchstart` the markup wires to `showControls`.\n\nAsked of the pointer rather than of the user agent, and asked at the click rather than\nonce at upgrade: a laptop with a touchscreen hovers, and a window dragged to a second\nscreen can stop hovering. Where there is no `matchMedia` to ask, the pointer is taken to\nhover, which is what every version before this one did.",
               "privacy": "private"
             },
             {
@@ -413,6 +419,16 @@
             {
               "kind": "method",
               "name": "onPause"
+            },
+            {
+              "kind": "method",
+              "name": "onMoreToggle",
+              "parameters": [
+                {
+                  "name": "event"
+                }
+              ],
+              "description": "The fold's button names its action, the way the mute button does: \"More controls\"\nclosed, \"Fewer controls\" open. Wired in the markup — `on=\"disclosure-toggle:onMoreToggle\"`\non the disclosure — so a row without a fold never runs it. `aria-expanded` is the\ndisclosure's own and already carries the state for a screen reader; this is for the\ntooltip and the label, which read words rather than state."
             },
             {
               "kind": "method",

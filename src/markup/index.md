@@ -195,8 +195,8 @@ knob spliced into the markup would not survive the next `play`.
     </tooltip-elemental>
 
     <span class="media-player-time">
-      <span bind="currentTime|time">00:00</span> /
-      <span bind="duration|time">00:00</span>
+      <span class="media-player-elapsed"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+      <span class="media-player-remaining" bind="remaining|time">00:00</span>
     </span>
 
     <tooltip-elemental>
@@ -280,19 +280,22 @@ knob spliced into the markup would not survive the next `play`.
     <!-- Speed, and an audio player is where it earns its place. A native `<select>`: the
          dropdown, its keyboard handling and the picker a phone puts up are the platform's,
          and the rates are `<option>`s you edit rather than a list this element holds. -->
-    <select
-      class="media-player-rate"
-      aria-label="Speed"
-      disabled
-      bind="playbackRate:prop#value"
-      on="change:setRate"
-    >
-      <option value="0.5">0.5&times;</option>
-      <option value="1" selected>1&times;</option>
-      <option value="1.25">1.25&times;</option>
-      <option value="1.5">1.5&times;</option>
-      <option value="2">2&times;</option>
-    </select>
+    <tooltip-elemental>
+      <select
+        class="media-player-rate"
+        aria-label="Speed"
+        disabled
+        bind="playbackRate:prop#value"
+        on="change:setRate"
+      >
+        <option value="0.5">0.5&times;</option>
+        <option value="1" selected>1&times;</option>
+        <option value="1.25">1.25&times;</option>
+        <option value="1.5">1.5&times;</option>
+        <option value="2">2&times;</option>
+      </select>
+      <span>Speed</span>
+    </tooltip-elemental>
   </toolbar-elemental>
 </media-player>
 ```
@@ -344,11 +347,56 @@ pixels of something meant to be dragged.
 Two is the floor rather than a promise. The line under the scrubber wraps again when what it
 carries outgrows it, and the theme's buttons are 32px: the video sample's six of them and
 the clock come to 306px, which is what a 360px phone leaves. Below that they wrap to a third
-row, and the fix is to drop a control from the row or move the clock out of it. The AirPlay
-button is a seventh wherever it shows at all — 40px more by the same arithmetic, button plus
-gap — so a 360px phone with an Apple TV or a Chromecast to reach is over the line and wraps.
-Which is the row paying for a control the same phone would otherwise have no way to reach,
-and the reason the button is hidden the rest of the time rather than merely disabled.
+row, and the fix is to drop a control from the row or fold part of it away.
+
+Which is what the fold is for. Measured on the video sample with the theme loaded and the
+volume slider already gone, the row still wraps to a third line at 425px of player width —
+and dropping one control does not clear a 375px phone: speed takes it to 387px,
+picture-in-picture to 385px. Two have to go, and the button costs a slot of its own —
+folding two buys back one — so three go together: speed, captions, picture-in-picture. The
+AirPlay button makes four for a different reason: it appears by network weather, and folded,
+a phone standing near a receiver is no longer the one phone whose row wraps. What is left is
+a 324px row that keeps its second line down to 340px of player width.
+
+```html
+<disclosure-elemental class="media-player-more" open-when="(min-width: 30rem)" on="disclosure-toggle:onMoreToggle">
+  <button type="button" aria-label="More controls" bind="moreLabel:attr#aria-label">…</button>
+  <div class="media-player-more-region">
+    <!-- speed, captions, picture-in-picture, play on a device -->
+  </div>
+</disclosure-elemental>
+```
+
+`open-when` is the whole of the arrangement, and the breakpoint is written once. Above it the
+region is held open and the element reflects `data-mode="pinned"`, which `style.css` reads to
+take the button away and give the region `display: contents` — so a wide row is the row it
+always was, in the markup's own order, with no extra box in the middle of it.
+
+Below it the button owns the region, and opening it swaps the line rather than growing the
+bar: the transport, the clock and the mute step out, the four unfurl into their space the
+way a search field expands, and the caret slides along with them — turned around while it is
+open, and offering "Fewer controls" through the same `moreLabel` its tooltip reads. Whatever
+control ends the row — fullscreen here — keeps its corner in both states, and the scrubber
+never leaves: seeking is not the fold's to take away. A menu floating over the picture is
+the version that did not survive: inside the player's `overflow: hidden` it clips on any
+ratio shorter than 16:9, and the player at the top of this page is 2.4:1. The button comes
+first in the disclosure and the region after it, so the sequence reads the way the row does
+— the trigger, then what it revealed — and the tooltip, which cannot wrap this one button
+because the disclosure wants it as a direct child, names it with `for` instead.
+
+The clock turns around at almost the same width. Below 21.25rem of player — where a 324px
+row stops fitting with the duration in it — `current / duration` hands the line to a single
+countdown that ends on zero when the track does: `.media-player-elapsed` holds the pair,
+`.media-player-remaining` the countdown, and the swap is two container-query rules in
+`style.css`. That keeps the second line down to 294px of player width, which a 320px phone
+clears.
+
+The arrows skip what is folded, so a closed region is not a stretch of dead arrow presses:
+`<toolbar-elemental>` walks only the controls that are on screen, which is
+book-of-elementals 3.1.1 and the floor this version asks for. `<media-player>` imports the
+disclosure for you; a page that blocks the script has no control row at all, and one whose
+disclosure never defines gets the four controls sitting in the open, which is the row this
+section started with.
 
 Which is also why the scrubber is moved in the markup rather than with `order`. Reordering a
 flex line visually leaves the tab sequence in the old order, and a keyboard user would read
@@ -378,8 +426,7 @@ the AA minimum of 24px, and short of [2.5.5](https://www.w3.org/WAI/WCAG22/Under
 the AAA 44px — Apple asks the same 44pt, Google a step more at 48dp. 44px was tried and the row could
 not afford it — six targets and the clock come to 343px where a 393px phone gives the bar
 338px, so the fullscreen button wrapped to a third line and clawing it back cost the gap
-between every button. A seventh at that size is 52px more again, which no phone in this
-measurement has. If your row is short enough to pay for it, the AAA size is two
+between every button. If your row is short enough to pay for it, the AAA size is two
 declarations:
 
 ```css
@@ -423,7 +470,7 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
   role="region"
   aria-label="Video player"
   keys="ArrowUp:volumeUp;ArrowDown:volumeDown"
-  on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown"
+  on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown"
 >
   <video
     controls
@@ -612,8 +659,8 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
     </tooltip-elemental>
 
     <span class="media-player-time">
-      <span bind="currentTime|time">00:00</span> /
-      <span bind="duration|time">00:00</span>
+      <span class="media-player-elapsed"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+      <span class="media-player-remaining" bind="remaining|time">00:00</span>
     </span>
 
     <tooltip-elemental>
@@ -694,95 +741,141 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
       />
     </slider-elemental>
 
-    <!-- Speed is a native `<select>`: the dropdown, its keyboard handling and the picker a
-         phone puts up are the platform's, and the rates are `<option>`s you edit rather
-         than a list this element holds. `no-rate` is the hook for hiding it where the
-         media element has no `playbackRate` to set. -->
-    <select
-      class="media-player-rate"
-      aria-label="Speed"
-      disabled
-      bind="playbackRate:prop#value"
-      on="change:setRate"
-    >
-      <option value="0.5">0.5&times;</option>
-      <option value="1" selected>1&times;</option>
-      <option value="1.25">1.25&times;</option>
-      <option value="1.5">1.5&times;</option>
-      <option value="2">2&times;</option>
-    </select>
+    <!-- The four the row sheds first when it runs out of width for them. `open-when` holds
+         them in the open on anything wider than a phone and hands them to the button below
+         that, which the stylesheet takes away while the query holds — so a wide row is the row
+         it always was, in the order written here. Needs book-of-elementals' disclosure, which
+         this element imports for you. -->
+    <!-- The button comes first so the tab order is the reading order: opening it puts the
+         four controls right after it in the sequence. Unfolding still reads like a search
+         field expanding — the caret slides left and the controls follow out of it — and
+         the caret points at the fold, turning around while it is open. -->
+    <disclosure-elemental class="media-player-more" open-when="(min-width: 30rem)" on="disclosure-toggle:onMoreToggle">
+      <!-- The one control whose tooltip cannot wrap it: the disclosure wants its button as
+           a direct child and its region as the button's next sibling, so the tooltip sits
+           after the region and names the button by `for` instead. -->
+      <button type="button" id="more-controls" aria-label="More controls" bind="moreLabel:attr#aria-label">
+        <svg
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </button>
 
-    <!-- The four a video adds, though the last of them is not video-only. The label stays
-         put and `aria-pressed` carries the state — which is also the hook the theme keeps
-         the hover flood on. `|pressed` turns the bind's boolean into ARIA's "true"/"false". -->
-    <tooltip-elemental>
-      <button
-        on="click:toggleCaptions"
-        aria-label="Captions"
-        bind="captionsVisible:attr#aria-pressed|pressed"
-        disabled
-      >
-        <!-- Two badges, one shown at a time off `captions-visible` — the same trick the
-             play/pause button uses. Outlined while captions are off, solid while they are
-             on, so the state survives a stylesheet with no accent in it. The viewBox is
-             cropped to the badge rather than left at `0 0 24 24`: a wide short glyph inside
-             a square box is scaled by its height, so a full-square viewBox draws it two
-             thirds the size of the square icons beside it and the button reads as smaller
-             than its neighbours. -->
-        <span class="media-player-captions-icon-off">
-          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2" />
-            <path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            <path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
-        </span>
-        <!-- The letters are knocked out of the badge with `fill-rule="evenodd"` rather than
-             painted in a second colour, so whatever is behind the button shows through them
-             — the accent flood when it is pressed, the page when it is not. -->
-        <span class="media-player-captions-icon-on">
-          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18">
-            <path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z" />
-          </svg>
-        </span>
-      </button>
-      <span><span bind="captionsLabel">Enable captions</span></span>
-    </tooltip-elemental>
-    <tooltip-elemental>
-      <button
-        on="click:togglePictureInPicture"
-        aria-label="Picture in picture"
-        bind="isPip:attr#aria-pressed|pressed"
-        disabled
-      >
-        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4" />
-          <rect width="10" height="7" x="12" y="13" rx="2" />
-        </svg>
-      </button>
-      <span>Picture in picture</span>
-    </tooltip-elemental>
-    <!-- The one control here that is not the video's: the route carries an `<audio>` to a
-         speaker the same way it carries a `<video>` to a screen. It is also the one with no
-         second direction to press — the system picker is the way back as well as the way out
-         — so it is `aria-haspopup` beside its `aria-pressed`, and the label never changes.
-         The label says device rather than AirPlay because the same button lists Chromecasts
-         in Chrome; the handler keeps the shorter name. Hidden where there is nothing to send
-         to: the rule for that is under Attributes it writes. -->
-    <tooltip-elemental>
-      <button
-        on="click:showAirplayPicker"
-        aria-label="Play on a device"
-        aria-haspopup="true"
-        bind="isAirplay:attr#aria-pressed|pressed"
-        disabled
-      >
-        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1" />
-          <path d="m12 15 5 6H7z" />
-        </svg>
-      </button>
-      <span>Play on a device</span>
-    </tooltip-elemental>
+      <div class="media-player-more-region">
+        <!-- Speed is a native `<select>`: the dropdown, its keyboard handling and the picker a
+             phone puts up are the platform's, and the rates are `<option>`s you edit rather
+             than a list this element holds. `no-rate` is the hook for hiding it where the
+             media element has no `playbackRate` to set. -->
+        <tooltip-elemental>
+          <select
+            class="media-player-rate"
+            aria-label="Speed"
+            disabled
+            bind="playbackRate:prop#value"
+            on="change:setRate"
+          >
+            <option value="0.5">0.5&times;</option>
+            <option value="1" selected>1&times;</option>
+            <option value="1.25">1.25&times;</option>
+            <option value="1.5">1.5&times;</option>
+            <option value="2">2&times;</option>
+          </select>
+          <span>Speed</span>
+        </tooltip-elemental>
+
+        <!-- The four a video adds, though the last of them is not video-only. The label stays
+             put and `aria-pressed` carries the state — which is also the hook the theme keeps
+             the hover flood on. `|pressed` turns the bind's boolean into ARIA's "true"/"false". -->
+        <tooltip-elemental>
+          <button
+            on="click:toggleCaptions"
+            aria-label="Captions"
+            bind="captionsVisible:attr#aria-pressed|pressed"
+            disabled
+          >
+            <!-- Two badges, one shown at a time off `captions-visible` — the same trick the
+                 play/pause button uses. Outlined while captions are off, solid while they are
+                 on, so the state survives a stylesheet with no accent in it. Both badges fill
+                 the width of the `0 0 24 24` and the height of the picture-in-picture glyph —
+                 `0..24` by `3..21`, the outline stroking to that edge and the solid filling to
+                 it. Matching AirPlay's screen rather than its silhouette is the version that
+                 looks wrong: the badge hangs nothing below itself, so at the screen's own size
+                 it reads as the smaller button. Cropping the viewBox to the glyph does the
+                 opposite of what it looks like — `meet` scales by whichever axis fits worse, so
+                 a 22-wide crop comes out smaller than the square icons, not larger. -->
+            <span class="media-player-captions-icon-off">
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <rect x="1" y="4" width="22" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2" />
+                <path d="M10.32 9.72A3 3 0 1 0 10.32 14.28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <path d="M17.52 9.72A3 3 0 1 0 17.52 14.28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            </span>
+            <!-- The letters are knocked out of the badge with `fill-rule="evenodd"` rather than
+                 painted in a second colour, so whatever is behind the button shows through them
+                 — the accent flood when it is pressed, the page when it is not. -->
+            <span class="media-player-captions-icon-on">
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path fill="currentColor" fill-rule="evenodd" d="M3 3h18a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Zm7.72 6.24A3.6 3.6 0 1 0 10.72 14.76L9.64 13.48A1.92 1.92 0 1 1 9.64 10.52Zm7.2 0A3.6 3.6 0 1 0 17.92 14.76L16.84 13.48A1.92 1.92 0 1 1 16.84 10.52Z" />
+              </svg>
+            </span>
+          </button>
+          <span><span bind="captionsLabel">Enable captions</span></span>
+        </tooltip-elemental>
+        <tooltip-elemental>
+          <button
+            on="click:togglePictureInPicture"
+            aria-label="Picture in picture"
+            bind="isPip:attr#aria-pressed|pressed"
+            disabled
+          >
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4" />
+              <rect width="10" height="7" x="12" y="13" rx="2" />
+            </svg>
+          </button>
+          <span>Picture in picture</span>
+        </tooltip-elemental>
+
+        <!-- The one control here that is not the video's: the route carries an `<audio>` to
+             a speaker the same way it carries a `<video>` to a screen. It is also the one
+             with no second direction to press — the system picker is the way back as well as
+             the way out — so it is `aria-haspopup` beside its `aria-pressed`, and the label
+             never changes. The label says device rather than AirPlay because the same button
+             lists Chromecasts in Chrome; the handler keeps the shorter name. Hidden where
+             there is nothing to send to: the rule for that is under Attributes it writes.
+             In the fold because it appears by network weather: out in the row, the one phone
+             whose row wrapped was the one standing near a receiver. -->
+        <tooltip-elemental>
+          <button
+            on="click:showAirplayPicker"
+            aria-label="Play on a device"
+            aria-haspopup="true"
+            bind="isAirplay:attr#aria-pressed|pressed"
+            disabled
+          >
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1" />
+              <path d="m12 15 5 6H7z" />
+            </svg>
+          </button>
+          <span>Play on a device</span>
+        </tooltip-elemental>
+      </div>
+
+      <tooltip-elemental for="more-controls">
+        <span bind="moreLabel">More controls</span>
+      </tooltip-elemental>
+    </disclosure-elemental>
     <tooltip-elemental>
       <button
         on="click:toggleFullscreen"
@@ -827,12 +920,18 @@ complete without them and this page is where the row gets copied from; the playe
 down is where they do something. Its one caption cue reads
 `[Ambient sounds]`, which belongs to a longer cut of the same footage and is left as NASA
 wrote it: enough to prove the CC wiring, no more. The controls fade out while it plays and
-come back on the next mouse move — that is `mousemove:showControls`, below.
+come back on the next mouse move, or the next touch — that is `mousemove:showControls` and
+`touchstart:showControls`, below.
 
-The two handlers on the `<media-player>` itself are the video half's housekeeping.
+The three handlers on the `<media-player>` itself are the video half's housekeeping.
 `mousemove:showControls` is what makes the control row behave the way a video player's does:
 up while the pointer moves, gone five seconds after it stops, and always up while the video
-is paused or something inside has focus. `fullscreenchange@document:onFullscreenChange`
+is paused or something inside has focus. `touchstart:showControls` is the same row for a
+pointer that cannot hover, and it is not optional there — a touch sends no `mousemove`, so
+without it the row goes five seconds into playback and the only thing that brings it back is
+a tap on the picture, which pauses the video to do it. With it, the first tap reveals and the
+second presses what it lands on: the element will not pause on a tap while the pointer cannot
+hover, for the same reason. `fullscreenchange@document:onFullscreenChange`
 keeps `is-fullscreen` honest when <kbd>Escape</kbd> leaves fullscreen without the button
 being pressed. A third would bind the keyboard — [Keys the buttons carry](#keys-the-buttons-carry),
 below — which no sample on this page switches on.
@@ -876,7 +975,7 @@ and the two players under this paragraph are the measurement.
   media-player video-background { background-size: cover; background-position: center; }
 </style>
 
-<media-player tabindex="0" role="region" aria-label="YouTube player" media-title="Family Guy: McStroke (Clip)" artist="TBS" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+<media-player tabindex="0" role="region" aria-label="YouTube player" media-title="Family Guy: McStroke (Clip)" artist="TBS" on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange">
   <video-background class="media-player-media" unstyled fit-box load-background lazyloading pause-offscreen="false" autoplay="false" loop="false" muted="false" src="https://www.youtube.com/watch?v=UIyoNvInzCI"></video-background>
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
@@ -896,7 +995,7 @@ and the two players under this paragraph are the measurement.
       <button on="click:skipForward" key="ArrowRight" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
       <span>Skip forward</span>
     </tooltip-elemental>
-    <span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+    <span class="media-player-time"><span class="media-player-elapsed"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span> <span class="media-player-remaining" bind="remaining|time">00:00</span></span>
     <tooltip-elemental>
       <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
       <span bind="muteLabel">Mute</span>
@@ -925,7 +1024,7 @@ platform's link over the `src` to watch that happen:
   media-player video-background { background-size: cover; background-position: center; }
 </style>
 
-<media-player tabindex="0" role="region" aria-label="Vimeo player" media-title="Minions: Paint" artist="Vimeo Staff Picks" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+<media-player tabindex="0" role="region" aria-label="Vimeo player" media-title="Minions: Paint" artist="Vimeo Staff Picks" on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange">
   <video-background class="media-player-media" unstyled fit-box load-background lazyloading pause-offscreen="false" autoplay="false" loop="false" muted="false" src="https://vimeo.com/137250145"></video-background>
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
@@ -945,7 +1044,7 @@ platform's link over the `src` to watch that happen:
       <button on="click:skipForward" key="ArrowRight" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
       <span>Skip forward</span>
     </tooltip-elemental>
-    <span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+    <span class="media-player-time"><span class="media-player-elapsed"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span> <span class="media-player-remaining" bind="remaining|time">00:00</span></span>
     <tooltip-elemental>
       <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
       <span bind="muteLabel">Mute</span>
@@ -1014,7 +1113,7 @@ more, each with the media API on it, each dropped in the same slot and marked th
 ```html
 <script type="module" src="https://cdn.jsdelivr.net/npm/youtube-video-element@1/+esm"></script>
 
-<media-player tabindex="0" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange">
+<media-player tabindex="0" on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange">
   <youtube-video
     class="media-player-media"
     controls
@@ -1102,7 +1201,7 @@ testable right here rather than in a file you have to build yourself.
 <!-- One line, and it has to be: the whole opening tag of an unknown element must sit on a
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
-<media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
+<media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
   <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg">
     <track kind="captions" src="sample/tears-of-steel.en.vtt" srclang="en" label="English" />
     <track kind="metadata" src="sample/tears-of-steel-thumbs.vtt" />
@@ -1128,25 +1227,38 @@ testable right here rather than in a file you have to build yourself.
       <button on="click:skipForward" key="ArrowRight" aria-label="Skip forward 10 seconds" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
       <span>Skip forward</span>
     </tooltip-elemental>
-    <span class="media-player-time"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span>
+    <span class="media-player-time"><span class="media-player-elapsed"><span bind="currentTime|time">00:00</span> / <span bind="duration|time">00:00</span></span> <span class="media-player-remaining" bind="remaining|time">00:00</span></span>
     <tooltip-elemental>
       <button on="click:toggleMute" bind="muteLabel:attr#aria-label" disabled><span class="media-player-volume-icon media-player-volume-icon-mute"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-mid"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/></svg></span><span class="media-player-volume-icon media-player-volume-icon-full"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></span></button>
       <span bind="muteLabel">Mute</span>
     </tooltip-elemental>
     <slider-elemental class="media-player-volume" tooltip="thumb"><input type="range" min="0" max="100" step="5" aria-label="Volume" disabled bind="volumePercent:prop#value" on="input:setVolume" /></slider-elemental>
-    <select class="media-player-rate" aria-label="Speed" disabled bind="playbackRate:prop#value" on="change:setRate"><option value="0.5">0.5&times;</option><option value="1" selected>1&times;</option><option value="1.25">1.25&times;</option><option value="1.5">1.5&times;</option><option value="2">2&times;</option></select>
-    <tooltip-elemental>
-      <button on="click:togglePictureInPicture" aria-label="Picture in picture" bind="isPip:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4"/><rect width="10" height="7" x="12" y="13" rx="2"/></svg></button>
-      <span>Picture in picture</span>
-    </tooltip-elemental>
-    <tooltip-elemental>
-      <button on="click:showAirplayPicker" aria-label="Play on a device" aria-haspopup="true" bind="isAirplay:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="m12 15 5 6H7z"/></svg></button>
-      <span>Play on a device</span>
-    </tooltip-elemental>
-    <tooltip-elemental>
-      <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><span class="media-player-captions-icon-off"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.6 10.1A2.5 2.5 0 1 0 10.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.6 10.1A2.5 2.5 0 1 0 16.6 13.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="media-player-captions-icon-on"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 3 22 18"><path fill="currentColor" fill-rule="evenodd" d="M6 5h12a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm4.93 4.7A3 3 0 1 0 10.93 14.3L10.03 13.23A1.6 1.6 0 1 1 10.03 10.77Zm6 0A3 3 0 1 0 16.93 14.3L16.03 13.23A1.6 1.6 0 1 1 16.03 10.77Z"/></svg></span></button>
-      <span bind="captionsLabel">Enable captions</span>
-    </tooltip-elemental>
+    <!-- Speed, picture-in-picture, captions and the device button fold away under one button
+         where the row runs out of width; `open-when` puts them back in the row above 30rem.
+         Captions moved up beside them, so the four the button carries are the four written
+         together. -->
+    <disclosure-elemental class="media-player-more" open-when="(min-width: 30rem)" on="disclosure-toggle:onMoreToggle">
+      <button type="button" id="more-controls" aria-label="More controls" bind="moreLabel:attr#aria-label"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="media-player-more-region">
+        <tooltip-elemental>
+          <select class="media-player-rate" aria-label="Speed" disabled bind="playbackRate:prop#value" on="change:setRate"><option value="0.5">0.5&times;</option><option value="1" selected>1&times;</option><option value="1.25">1.25&times;</option><option value="1.5">1.5&times;</option><option value="2">2&times;</option></select>
+          <span>Speed</span>
+        </tooltip-elemental>
+        <tooltip-elemental>
+          <button on="click:togglePictureInPicture" aria-label="Picture in picture" bind="isPip:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4"/><rect width="10" height="7" x="12" y="13" rx="2"/></svg></button>
+          <span>Picture in picture</span>
+        </tooltip-elemental>
+        <tooltip-elemental>
+          <button on="click:toggleCaptions" aria-label="Captions" bind="captionsVisible:attr#aria-pressed|pressed" disabled><span class="media-player-captions-icon-off"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.32 9.72A3 3 0 1 0 10.32 14.28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17.52 9.72A3 3 0 1 0 17.52 14.28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="media-player-captions-icon-on"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3 3h18a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Zm7.72 6.24A3.6 3.6 0 1 0 10.72 14.76L9.64 13.48A1.92 1.92 0 1 1 9.64 10.52Zm7.2 0A3.6 3.6 0 1 0 17.92 14.76L16.84 13.48A1.92 1.92 0 1 1 16.84 10.52Z"/></svg></span></button>
+          <span bind="captionsLabel">Enable captions</span>
+        </tooltip-elemental>
+        <tooltip-elemental>
+          <button on="click:showAirplayPicker" aria-label="Play on a device" aria-haspopup="true" bind="isAirplay:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="m12 15 5 6H7z"/></svg></button>
+          <span>Play on a device</span>
+        </tooltip-elemental>
+      </div>
+      <tooltip-elemental for="more-controls"><span bind="moreLabel">More controls</span></tooltip-elemental>
+    </disclosure-elemental>
     <tooltip-elemental>
       <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       <span>Fullscreen</span>
@@ -1398,7 +1510,7 @@ usable on its own and documented in its own right:
 | Scrubber, volume   | [`<slider-elemental>`](https://stamat.github.io/book-of-elementals/elementals/slider.html)            | a native `<input type="range">` and the whole APG Slider pattern — arrows, <kbd>Home</kbd>, <kbd>End</kbd>, touch, the value bubble                                         |
 | Buffered-ahead bar | [`<progress-elemental>`](https://stamat.github.io/book-of-elementals/elementals/progress.html)        | a native `<progress>` whose fill CSS can place — here it carries the buffered edge, on the duration's own scale                                                             |
 | Control row        | [`<toolbar-elemental>`](https://stamat.github.io/book-of-elementals/elementals/toolbar.html)          | one tab stop, arrow keys between the buttons                                                                                                                                |
-| Button tooltips    | [`<tooltip-elemental>`](https://stamat.github.io/book-of-elementals/elementals/tooltip.html)          | hover and focus both, <kbd>Escape</kbd> to dismiss per [WCAG 1.4.13](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html), and no half-handled touch |
+| Control tooltips   | [`<tooltip-elemental>`](https://stamat.github.io/book-of-elementals/elementals/tooltip.html)          | hover and focus both, <kbd>Escape</kbd> to dismiss per [WCAG 1.4.13](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html), and no half-handled touch |
 
 So there is no `role="slider"` and no `aria-valuenow` anywhere in this element. The platform
 already says both, and saying them again is how they end up disagreeing.
@@ -1577,11 +1689,14 @@ taken. A page with one of those wants the focused binding.
 
 ## Tooltips on the controls
 
-The bubbles in the samples are `<tooltip-elemental>` wrapped round each button, which is
-where hover, focus, <kbd>Escape</kbd> to dismiss and the decision to ignore touch outright
-already live. Two of them bind rather than say: the play and mute bubbles carry `playLabel`
-and `muteLabel`, the same state the buttons announce themselves by, so the words in the
-bubble and the words a screen reader hears cannot drift apart.
+The bubbles in the samples are `<tooltip-elemental>` wrapped round each button and round the
+speed `<select>`, which is where hover, focus, <kbd>Escape</kbd> to dismiss and the decision
+to ignore touch outright already live. The `<select>` is the one that is not a button, and it
+needs the bubble most: closed, it reads `1×` and says nothing about what it changes.
+
+Three of the bubbles bind rather than say: the play, mute and fold ones carry `playLabel`,
+`muteLabel` and `moreLabel`, the same state the buttons announce themselves by, so the words
+in the bubble and the words a screen reader hears cannot drift apart.
 
 ```html
 <tooltip-elemental>
@@ -1639,13 +1754,14 @@ wrapped — the handler you already wrote is the selector, so there is no class 
 nothing to keep in step with the markup:
 
 ```css
-media-player[no-airplay] :is([on*="showAirplayPicker"], :has([on*="showAirplayPicker"])) {
+media-player[no-airplay] :is([on*="showAirplayPicker"], :has(> [on*="showAirplayPicker"])) {
   display: none;
 }
 ```
 
 The `:has()` half is for the `<tooltip-elemental>` around the button — hiding the button
-alone would leave its bubble's gap in the row. This page writes exactly that rule for its own
+alone would leave its bubble's gap in the row. Keep the `>` in it: written bare, `:has()`
+matches every ancestor holding that button, so the control row and the player go with it. This page writes exactly that rule for its own
 samples, which is why the device button in the row above appears when there is an Apple TV or
 a Chromecast to reach and is absent otherwise. `no-airplay` is the only one of the four that
 is not about video: the route carries an `<audio>` to a speaker, so an audio row can offer it
@@ -1782,6 +1898,7 @@ already wired is skipped, never doubled.
 | `click:togglePictureInPicture`                  | the floating window the browser keeps above everything else; video only, and it warns rather than going quiet when the browser refuses — a request with no user gesture behind it is the usual reason |
 | `click:showAirplayPicker`                       | the system device picker, off the standard [Remote Playback API](https://w3c.github.io/remote-playback/) — AirPlay in Safari, Chromecast in Chrome. Audio as well as video, and not a toggle: the picker is the way back to the device as well as the way out, so the platform owns that half. It needs a gesture behind it, does nothing at all while `no-airplay` is set, and warns on a refusal that is not simply someone closing the picker |
 | `change:setRate`                                | playback speed, off the control's own `value` — a `<select>`'s in the samples; anything that is not a positive, finite number is dropped |
+| `disclosure-toggle:onMoreToggle`                | on the fold's `<disclosure-elemental>`: flips `moreLabel` between "More controls" and "Fewer controls", so the caret's name and its tooltip say what pressing it does next — `aria-expanded` is the disclosure's own and carries the state either way |
 
 **On `<media-player>` itself:**
 
@@ -1789,6 +1906,7 @@ already wired is skipped, never doubled.
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `keydown:onKeyDown`, `keydown@document:onKeyDown` | a press clicks the control whose `key` claims it — the two scopes are [Keys the buttons carry](#keys-the-buttons-carry)        |
 | `mousemove:showControls`                          | video only: bring the faded control row back, and start the timer that takes it away again                                     |
+| `touchstart:showControls`                         | the same for a pointer that cannot hover, which sends no `mousemove` — without it the row goes mid-playback and only a pause brings it back |
 | `fullscreenchange@document:onFullscreenChange`    | keeps `is-fullscreen` honest when the browser leaves fullscreen without going through your button — <kbd>Escape</kbd>, usually |
 
 Two names never appear in an `on=`: `seekTo(seconds)` and `seekBy(seconds)` take a number,
@@ -1805,7 +1923,7 @@ which is the pair of them behind one control.
 | `seekableStart`, `seekableEnd`            | the reachable window of a live stream, in absolute seconds — a scrubber's `min` and `max` on a stream with a rewind window          |
 | `behindLive`                              | seconds between playback and the live edge; `0` at the edge                                                                         |
 | `volumePercent`                           | `0`–`100`, for a volume slider's `value`                                                                                            |
-| `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next                                                                                             |
+| `playLabel`, `muteLabel`, `captionsLabel`, `moreLabel` | what the button should say it does next                                                                                |
 | `captionText`                             | the active cue                                                                                                                      |
 | `playbackRate`                            | the speed the media is playing at, `1` being normal — bound to a `<select>`'s `value` in the samples, and it follows the media element rather than the control, so a rate changed anywhere else lands on it |
 | `timeFormatter`                           | the `formatTime` function itself — hand it to the scrubber's `prop#format` and the value bubble reads `01:12` instead of `72`       |
@@ -1820,7 +1938,7 @@ binds.
 
 ## Labels in another language
 
-`playLabel`, `muteLabel` and `captionsLabel` speak English. To localize, skip the bind and
+`playLabel`, `muteLabel`, `captionsLabel` and `moreLabel` speak English. To localize, skip the bind and
 let the button name itself from its content — the attribute hooks already swap which half is
 visible, and `display: none` takes the hidden half out of the accessible name with it:
 
@@ -1837,8 +1955,9 @@ visible, and `display: none` takes the hidden half out of the accessible name wi
 ```
 
 `visually-hidden` is your utility class — every design system carries one. The same swap
-hangs on `volume-state` for the mute button and `captions-visible` for the captions one:
-two spans and one `display` rule of your own.
+hangs on `volume-state` for the mute button, `captions-visible` for the captions one, and —
+for the fold's caret — on its own disclosure's `[open]`: two spans and one `display` rule
+of your own.
 
 ## Events
 
@@ -1861,7 +1980,7 @@ win.
 
 |                                    | media-player                                            | [Plyr](https://github.com/sampotts/plyr)             | [media-chrome](https://github.com/muxinc/media-chrome) | [Vidstack](https://vidstack.io)      | [Video.js](https://videojs.com)        |
 | ---------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ | ------------------------------------ | -------------------------------------- |
-| **Size, gzipped**                  | **14.4 kB**                                             | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
+| **Size, gzipped**                  | **16.4 kB**                                             | 32 kB                                                | 42 kB                                                  | 40 kB                                | 196 kB                                 |
 | **You write the controls**         | yes, as the only way                                    | no — a `controls` array, or an HTML string in config | yes, from its components                               | no — layouts                         | no                                     |
 | **Shadow DOM**                     | never                                                   | never                                                | yes                                                    | yes                                  | no                                     |
 | **Page plays with no script**      | yes                                                     | yes, if you keep `controls`                          | no — its starter `<video>` has none                    | no                                   | yes                                    |
@@ -1875,9 +1994,9 @@ win.
 Sizes are each package's browser bundle, gzipped: Plyr and Video.js as published
 (`dist/plyr.min.js`, `dist/video.min.js`), media-chrome bundled from its package entry with
 esbuild, Vidstack from `cdn.vidstack.io/player`. This one is `dist/media-player.min.mjs`,
-which carries hydrargyri and the four elementals inside it — everything the player needs
-except the stylesheets: its own structure sheet is 0.8 kB and the theme 1.4 kB more, the
-elementals' four structure sheets 1.3 kB and their three themes 2.5 kB more, each gzipped on
+which carries hydrargyri and the five elementals inside it — everything the player needs
+except the stylesheets: its own structure sheet is 1.1 kB and the theme 1.6 kB more, the
+elementals' five structure sheets 1.8 kB and their three themes 2.6 kB more, each gzipped on
 its own the way a browser fetches it. Every one of those numbers moves with a release;
 measure before quoting.
 
@@ -2195,7 +2314,14 @@ the element: the manifest is a description, not a runtime.
 
 ## Questions
 
-<div class="faq">
+<!-- The accordion, on its own rather than in the player's bundle: it is this page's furniture
+     and no part of the element, so it is the prebuilt file from book-of-elementals copied into
+     `js/` rather than an import that would ride along in everyone's `dist/media-player.mjs`.
+     Block it and the questions below are still native `<details>` — they just open at once
+     instead of sliding. -->
+<script src="js/accordion.min.js" defer></script>
+
+<accordion-elemental class="faq">
 <details>
 <summary id="faq-no-js"><h3>Does the page still play with the script blocked?</h3></summary>
 
@@ -2283,7 +2409,7 @@ markup contract is `on` and `bind` attributes, and those are attributes wherever
 written.
 
 </details>
-</div>
+</accordion-elemental>
 
 ## License
 

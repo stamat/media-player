@@ -91,6 +91,7 @@ media-player .media-player-rate {
   color: inherit;
   font: inherit;
   font-size: 0.8125rem;
+  font-weight: 600;
   line-height: 1.125rem;
   text-align: center;
   text-align-last: center;

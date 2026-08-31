@@ -19,6 +19,18 @@
 // that sheet already solves with `Canvas` and `CanvasText`.
 @use "book-of-elementals/src/elementals/tooltip/index" as tooltip;
 @use "book-of-elementals/src/elementals/tooltip/theme" as tooltip-theme;
+
+// Structure only for the disclosure, and not optional: `display: contents` lives in it.
+// Without that the element is a block-level flex item — the folded four stack under the
+// trigger when open, and pinned they fall out of the row's flex line and baseline-align.
+// The theme stays out for the toolbar's reason: it draws a caret on the trigger, and the
+// fold's trigger is an icon button in a row of icon buttons.
+@use "book-of-elementals/src/elementals/disclosure/index" as disclosure;
+
+// Structure only for the accordion, and only the questions at the end use it. Its theme
+// draws the grouped look — a border, a radius, a rule between the panels — which the `.faq`
+// rules below already draw, and two of them on one box is a border inside a border.
+@use "book-of-elementals/src/elementals/accordion/index" as accordion;
 @use "./index";
 @use "./theme";
 
@@ -50,10 +62,12 @@
 // of Firefox. The handler name is the selector rather than a class, so the
 // rule holds for markup copied out of this page unchanged; the `:has()` half takes the
 // `<tooltip-elemental>` wrapper with it, since hiding the button alone leaves its gap in the
-// row. Here rather than in the structure sheet: which controls a row keeps is the author's
+// row. The child combinator in that half is load-bearing: written bare, `:has()` matches
+// every ancestor holding the button, so the whole control row went `display: none` wherever
+// `no-airplay` is set — which is every reader with no receiver on the network. Here rather than in the structure sheet: which controls a row keeps is the author's
 // call, and the same is true of `no-pip`, `no-rate` and `no-fullscreen`, which this page has
 // nothing to hide for.
-media-player[no-airplay] :is([on*="showAirplayPicker"], :has([on*="showAirplayPicker"])) {
+media-player[no-airplay] :is([on*="showAirplayPicker"], :has(> [on*="showAirplayPicker"])) {
   display: none;
 }
 
@@ -132,6 +146,14 @@ media-player[no-airplay] :is([on*="showAirplayPicker"], :has([on*="showAirplayPi
   rotate: 180deg;
 }
 
+// A closing panel keeps `open` for the length of its slide, so the rule above would hold the
+// caret turned for the whole close and snap it back a quarter second late. The element marks
+// the panel it is closing for exactly this, and the caret turns back with the body. Same
+// specificity as the rule above, so it has to sit after it.
+.faq > details.accordion-elemental-closing > summary::after {
+  rotate: 0deg;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .toc-disclosure > summary::before,
   .faq > details > summary::after {
@@ -184,10 +206,12 @@ media-player[no-airplay] :is([on*="showAirplayPicker"], :has([on*="showAirplayPi
 }
 
 // The questions at the end: the same disclosure worn as a run of rows rather than one box —
-// rows sharing a border, the radius only on the outer corners. Plain `<details>` rather than
-// an accordion element, because the browser already announces the expanded state, handles
-// Enter and Space, and opens a closed one for find-in-page or a `#faq-…` link. What is lost
-// is the slide, which is the one part of an accordion nothing native does yet.
+// rows sharing a border, the radius only on the outer corners. Still native `<details>`
+// underneath, because the browser already announces the expanded state, handles Enter and
+// Space, and opens a closed one for find-in-page or a `#faq-…` link. `<accordion-elemental>`
+// is wrapped around them for the slide, which is the one part nothing native does yet, and
+// for the arrow-key walk between headers the APG asks for; with the script blocked it never
+// upgrades and the rows toggle instantly, which is correct, just unanimated.
 .faq {
   margin-block: 1.75rem;
   border: 1px solid var(--border);
@@ -217,11 +241,16 @@ media-player[no-airplay] :is([on*="showAirplayPicker"], :has([on*="showAirplayPi
   margin-inline-start: auto;
 }
 
-.faq > details > div,
-.faq > details > p:last-child {
-  margin-bottom: 1rem;
+// The panel body sits in one of two places, so both are named. With the script blocked it is
+// a bare run of siblings under the `<details>`; upgraded, `<accordion-elemental>` moves that
+// run into a content box of its own, inside the box the slide measures and clips. That outer
+// box is what the exclusion keeps clear of: `box-sizing: border-box` renders `height: 0` as
+// its padding, so a padded one slides shut down to that and cuts, and a margin on it is not
+// animated at all — it would stand at full size for the whole close and drop in a frame.
+.faq :is(details, .accordion-elemental-content) > :not(summary, .accordion-elemental-content-wrapper) {
+  padding-inline: 1rem;
 }
 
-.faq > details > :not(summary) {
-  padding-inline: 1rem;
+.faq :is(details, .accordion-elemental-content) > :is(div, p:last-child):not(.accordion-elemental-content-wrapper) {
+  margin-bottom: 1rem;
 }

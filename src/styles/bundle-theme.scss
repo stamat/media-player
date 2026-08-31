@@ -18,4 +18,8 @@
 // legible over whatever it covers, which that sheet already solves with `Canvas` and
 // `CanvasText`.
 @use "book-of-elementals/src/elementals/tooltip/theme" as tooltip-theme;
+
+// The disclosure's theme is left out for the toolbar's reason: it draws a caret on the
+// trigger, and the fold's trigger is an icon button in a row of icon buttons, which the
+// player's own theme already draws.
 @use "./theme";
