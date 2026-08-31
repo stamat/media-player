@@ -11,6 +11,8 @@ for the person who wrote the code.
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-08-31
+
 ### Added
 
 - **The control row folds its last four controls behind one button where it runs out of
