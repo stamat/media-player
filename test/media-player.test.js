@@ -9,7 +9,8 @@
  * can be reached, the volume
  * arithmetic and its persistence, captions toggling and its persistence around a stubbed
  * track — the one the author marked `default`, and the one a streaming library adds after
- * the upgrade with no `<track>` behind it — the video controls' hide timer, the labels the buttons announce themselves by, the
+ * the upgrade with no `<track>` behind it — the video controls' hide timer, the fold pinning itself open over a
+ * single control rather than charging a tap for the slot its button takes, the labels the buttons announce themselves by, the
  * keys a control claims and the presses that are somebody else's, the remote-playback route
  * against a stubbed `RemotePlayback` — the picker itself is the platform's and opens nowhere
  * here, so what is proved is the wiring around it: nothing offered until availability says
@@ -85,9 +86,10 @@ function withoutHover(run) {
   }
 }
 
-function mount(media) {
+function mount(media, ...children) {
   const player = document.createElement('media-player');
   if (media) player.appendChild(media);
+  for (const child of children) player.appendChild(child);
   document.body.appendChild(player);
   return player;
 }
@@ -1259,6 +1261,48 @@ describe('the step under the hand', () => {
     player.beginScrub({ type: 'keydown', key: 'ArrowRight', target: input });
     player.endScrub();
     expect(input.step).toBe('any');
+  });
+});
+
+/**
+ * A fold, drawn the way the samples draw one: the disclosure, its button, and a region
+ * holding `count` controls. jsdom resolves no media query, so what is provable here is the
+ * attribute the player writes on the disclosure — which side of the query it lands on is the
+ * disclosure's own, and a browser's to show.
+ */
+function mountFold(count, { openWhen = '(min-width: 30rem)' } = {}) {
+  const more = document.createElement('disclosure-elemental');
+  more.className = 'media-player-more';
+  if (openWhen) more.setAttribute('open-when', openWhen);
+  more.innerHTML = `<button type="button"></button><div class="media-player-more-region">${'<tooltip-elemental><button></button></tooltip-elemental>'.repeat(count)}</div>`;
+  const player = mount(fakeMedia(), more);
+  return { player, more };
+}
+
+describe('a fold only pays for itself past one control', () => {
+  test('a fold holding one control is pinned open at every width, because the button costs the slot the control gave up', () => {
+    const { more } = mountFold(1);
+    expect(more.getAttribute('open-when')).toBe('all');
+  });
+
+  test('two controls behind the button buy a slot back, so the breakpoint the markup wrote stands', () => {
+    const { more } = mountFold(2);
+    expect(more.getAttribute('open-when')).toBe('(min-width: 30rem)');
+  });
+
+  test('a fold written with no breakpoint at all is still pinned open over its one control', () => {
+    const { more } = mountFold(1, { openWhen: null });
+    expect(more.getAttribute('open-when')).toBe('all');
+  });
+
+  test('the markup is handed back as it was written when the player leaves the page', () => {
+    const { player, more } = mountFold(1);
+    player.remove();
+    expect(more.getAttribute('open-when')).toBe('(min-width: 30rem)');
+
+    const bare = mountFold(1, { openWhen: null });
+    bare.player.remove();
+    expect(bare.more.hasAttribute('open-when')).toBe(false);
   });
 });
 

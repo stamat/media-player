@@ -28,7 +28,12 @@ for the person who wrote the code.
   with — fullscreen in the samples — keeps its corner in both states, and the scrubber
   never leaves. A menu floating over the picture was the version that did not survive:
   inside the player's own `overflow: hidden` it clips on any ratio shorter than 16:9,
-  which the manual's own 2.4:1 player is.
+  which the manual's own 2.4:1 player is. A fold worth one control is not folded at all:
+  the button would take the slot that control gave up and charge a tap for it, so the
+  element counts the region on connect and rewrites `open-when` to `all` where it holds one
+  or none, which pins it at every width. The count is the markup's — a control you hide at
+  some width, or on `no-airplay`, is still one of the fold's — and the attribute goes back
+  as you wrote it if the player leaves the page.
 
   **Markup:** new, and yours to copy — nothing folds unless you write it; the disclosure
   wires `disclosure-toggle:onMoreToggle`, both new public names. **CSS:**
@@ -228,6 +233,25 @@ for the person who wrote the code.
   same ones, so nothing on the page changes shape.
 
 ### Fixed
+
+- **The video controls fade out on a desktop too: one press of play no longer pins them up
+  for the rest of the film.** The row was held by `.media-player-controls:focus-within`,
+  which is there so a keyboard user tabbing to the mute button does not lose it from under
+  the focus ring — but every browser except Safari focuses a button on a mouse click as
+  well, so the click that started the video left focus in the row and the hide timer had
+  nothing to hide. It reads `:has(:focus-visible, :active)` now, which is the platform's own
+  line between a keyboard's focus and a mouse's: the ring still pins the row, a held thumb
+  mid-drag still pins it, a click does not. **CSS output:** that one selector in
+  `media-player.css`.
+
+- **The caption drops to the picture's edge when the control row goes.** It sat 5.5rem up
+  whether or not there was a bar beneath it to clear, so on a playing video — where the row
+  fades out after five seconds — the subtitle floated in open frame. It rests 2rem off the
+  bottom now and lifts the remaining 3.5rem for as long as the row is up, on the row's own
+  fade duration so the two move as one. **CSS output / upgrading:**
+  `.media-player-captions` carries `padding-bottom: 2rem` rather than `5.5rem`, and the
+  clearance is a `translate` on `media-player[is-video][controls-shown]`; a sheet of yours
+  that overrode the padding to clear a taller bar wants to override the lift instead.
 
 - **The documented rule for hiding an unavailable control no longer hides the whole control
   row.** `:has([on*="showAirplayPicker"])` matches every ancestor holding that button, not just

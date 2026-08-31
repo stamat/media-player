@@ -510,6 +510,20 @@ export class MediaPlayer extends HgElement {
     this.volumeSlider = this.querySelector('.media-player-volume');
     this.previewBox = this.querySelector('.media-player-preview');
 
+    // A fold over a single control costs more than it saves: the button takes the slot the
+    // control gave up, and charges a tap for what used to be one press. `all` matches at
+    // every width, so the disclosure pins itself everywhere and the control stays in the row
+    // exactly as a wide player already leaves it — the arrangement is the stylesheet's,
+    // reached by counting rather than by width. Counted in the markup: a control the author
+    // hides at some width, or on `no-airplay`, is still one of the fold's.
+    const more = this.querySelector('.media-player-more');
+    const region = more?.querySelector('.media-player-more-region');
+    if (region && region.children.length < 2) {
+      this.more = more;
+      this.hadOpenWhen = more.getAttribute('open-when');
+      more.setAttribute('open-when', 'all');
+    }
+
     // Present only when no fullscreen door will open — an iframe without
     // `allow="fullscreen"` is the common way to get here — so a stylesheet can hide the
     // button that would silently do nothing.
@@ -610,6 +624,12 @@ export class MediaPlayer extends HgElement {
     // Put the page back the way it was found: an element removed from the DOM should leave
     // a media element that still plays, not a controlless one.
     if (this.media && this.hadControls) this.media.controls = true;
+    // And the fold pinned open above, back to the query the markup wrote — or to none.
+    if (this.more) {
+      if (this.hadOpenWhen === null) this.more.removeAttribute('open-when');
+      else this.more.setAttribute('open-when', this.hadOpenWhen);
+      this.more = null;
+    }
   }
 
   attributeChanged(name) {

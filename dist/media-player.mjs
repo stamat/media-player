@@ -2034,6 +2034,13 @@ var MediaPlayer = class extends HgElement {
     this.scrubber = this.querySelector(".media-player-scrubber");
     this.volumeSlider = this.querySelector(".media-player-volume");
     this.previewBox = this.querySelector(".media-player-preview");
+    const more = this.querySelector(".media-player-more");
+    const region = more?.querySelector(".media-player-more-region");
+    if (region && region.children.length < 2) {
+      this.more = more;
+      this.hadOpenWhen = more.getAttribute("open-when");
+      more.setAttribute("open-when", "all");
+    }
     if (this.isVideo) {
       this.noFullscreen = !(document.fullscreenEnabled || this.media.webkitEnterFullscreen);
       this.noPip = !(document.pictureInPictureEnabled && this.media.requestPictureInPicture && !this.media.disablePictureInPicture);
@@ -2079,6 +2086,11 @@ var MediaPlayer = class extends HgElement {
     this.viewport?.disconnect();
     this.unwatchRemote();
     if (this.media && this.hadControls) this.media.controls = true;
+    if (this.more) {
+      if (this.hadOpenWhen === null) this.more.removeAttribute("open-when");
+      else this.more.setAttribute("open-when", this.hadOpenWhen);
+      this.more = null;
+    }
   }
   attributeChanged(name) {
     if (name === "pause-offscreen") this.watchViewport();

@@ -384,6 +384,15 @@ first in the disclosure and the region after it, so the sequence reads the way t
 — the trigger, then what it revealed — and the tooltip, which cannot wrap this one button
 because the disclosure wants it as a direct child, names it with `for` instead.
 
+Width is not the only thing that can make a fold pointless. One control behind the button is
+a fold that saves nothing — the button takes the slot the control gave up, and charges a tap
+for what used to be one press — so the element counts the region on connect, and a fold
+holding one or none has its `open-when` rewritten to `all`. That pins it at every width,
+which is the wide arrangement above reached by counting rather than by measuring. The count
+is the markup's: a control the author hides at some width, or on `no-airplay`, is still one
+of the fold's, so a row that empties out at runtime keeps its button. The attribute goes back
+the way it was written if the player leaves the page.
+
 The clock turns around at almost the same width. Below 21.25rem of player — where a 324px
 row stops fitting with the duration in it — `current / duration` hands the line to a single
 countdown that ends on zero when the track does: `.media-player-elapsed` holds the pair,
@@ -926,7 +935,9 @@ come back on the next mouse move, or the next touch — that is `mousemove:showC
 The three handlers on the `<media-player>` itself are the video half's housekeeping.
 `mousemove:showControls` is what makes the control row behave the way a video player's does:
 up while the pointer moves, gone five seconds after it stops, and always up while the video
-is paused or something inside has focus. `touchstart:showControls` is the same row for a
+is paused or a focus ring is inside the row. A ring, not focus: a mouse click leaves focus on
+the button it pressed, and a row pinned by that is a row that never fades once you have
+pressed play. `touchstart:showControls` is the same row for a
 pointer that cannot hover, and it is not optional there — a touch sends no `mousemove`, so
 without it the row goes five seconds into playback and the only thing that brings it back is
 a tap on the picture, which pauses the video to do it. With it, the first tap reveals and the
@@ -943,10 +954,11 @@ something to start — including while a paused video is being scrubbed.
 
 Captions render into whatever binds `captionText`, with the track held `hidden` so the
 browser's own caption box stays out of the way — which is what leaves your stylesheet in
-charge of what captions look like. Position included: the structure sheet clears a two-row
-control bar with `padding-bottom: 5.5rem` on `.media-player-captions`, and a taller bar —
-or one wrapped to a third row on a narrow phone — wants that number overridden in your own
-sheet.
+charge of what captions look like. Position included: the structure sheet rests
+`.media-player-captions` 2rem off the bottom edge and lifts it `3.5rem` more — 5.5rem in all,
+which clears a two-row control bar — for as long as that bar is up, so a caption never sits
+held above a row that has faded out. A taller bar, or one wrapped to a third row on a narrow
+phone, wants the lift overridden in your own sheet.
 
 The third thing it wraps is not a native element at all. YouTube, Vimeo, HLS and the rest
 each need a third-party script driving something, and this element ships none and knows none
