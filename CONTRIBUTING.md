@@ -44,8 +44,8 @@ in a different library.
 ## Getting set up
 
 ```bash
-git clone https://github.com/stamat/media-player.git
-cd media-player
+git clone https://github.com/stamat/media-player-element.git
+cd media-player-element
 script/bootstrap
 ```
 

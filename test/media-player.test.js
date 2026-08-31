@@ -2364,6 +2364,31 @@ describe('keys the markup claims', () => {
     expect(presses).toEqual([]);
   });
 
+  test('an arrow off the toolbar\'s end is the walk\'s dead stop, not a seek', () => {
+    // The walk does not wrap, and it refuses that press without `preventDefault` — the
+    // leak that used to reach a skip button's `key` and move the scrubber under a reader
+    // who was only walking the bar.
+    const { player, presses } = keyed(fakeMedia(), 'ArrowRight');
+    const bar = document.createElement('toolbar-elemental');
+    bar.appendChild(document.createElement('button'));
+    player.appendChild(bar);
+    expect(press(bar.querySelector('button'), 'ArrowRight').defaultPrevented).toBe(false);
+    expect(presses).toEqual([]);
+  });
+
+  test('the toolbar\'s cross axis stays the page\'s scroll, not the volume\'s', () => {
+    const media = fakeMedia();
+    const player = mount(media);
+    player.setAttribute('keys', 'ArrowUp:volumeUp');
+    player.addEventListener('keydown', (event) => player.onKeyDown(event));
+    const bar = document.createElement('toolbar-elemental');
+    bar.appendChild(document.createElement('button'));
+    player.appendChild(bar);
+    media.volume = 0.5;
+    expect(press(bar.querySelector('button'), 'ArrowUp').defaultPrevented).toBe(false);
+    expect(media.volume).toBe(0.5);
+  });
+
   test('the keys attribute reaches the action no control names — the volume arrows', () => {
     const media = fakeMedia();
     const player = mount(media);

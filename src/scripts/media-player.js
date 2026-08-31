@@ -182,19 +182,27 @@ function isActivated(node) {
  * The keys a focused control spends on its own value or its own group, so a `key` can
  * never claim one off it. Every `<input type="range">` answers the arrows, Home, End and
  * the Page keys — the APG Slider pattern the elementals lean on — and a radio group walks
- * itself with the arrows. The toolbar needs no entry here: it calls `preventDefault` on
- * the arrows it spends walking the row, and an already-handled press is declined anyway.
+ * itself with the arrows. A toolbar spends them walking the row, and its refusals are part
+ * of the walk: `preventDefault` covers only the steps it takes, but the walk not wrapping
+ * makes an arrow off either end the pattern's dead stop, and the cross axis is the page's
+ * scroll — neither is a press left over for a binding. Read off `role`, not the tag, so
+ * any toolbar that says what it is keeps its arrows, and one that never upgraded — no
+ * role, no walk — leaves the keys answering. Rebound, walking off the row's end seeked,
+ * and ArrowUp over any button moved the volume: sliders moving under a reader who was
+ * only walking the bar.
  *
  * This is what makes an arrow honest to write in a `key` at all. Bound to a skip button it
- * answers on the player itself, the overlay and any plain button — and a slider under
- * focus still moves by its own step, rather than stepping and skipping off one press.
+ * answers on the player itself, the overlay and a button outside the toolbar — and a
+ * slider under focus still moves by its own step, rather than stepping and skipping off
+ * one press.
  */
 const ARROW_KEYS = new Set(['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'home', 'end', 'pageup', 'pagedown']);
 const ARROWED_CONTROLS = 'input[type=range],input[type=radio]';
 
-/** Does the focused control spend this key on itself already? */
+/** Does the focused control — or the toolbar it stands in — spend this key already? */
 function isArrowed(node) {
-  return !!node && node.nodeType === 1 && node.matches(ARROWED_CONTROLS);
+  if (!node || node.nodeType !== 1) return false;
+  return node.matches(ARROWED_CONTROLS) || !!node.closest('[role=toolbar]');
 }
 
 /**
@@ -1272,10 +1280,11 @@ export class MediaPlayer extends HgElement {
    * reach an action no control on this player names.
    *
    * Letters mostly, and the arrows where nothing spends them. `toolbar-elemental` walks the
-   * control row with the arrows and Home/End and calls `preventDefault` as it goes, and
-   * every `<input type="range">` answers them too — so an arrow in a `key` yields to both
-   * and answers from the player itself, the overlay or a plain button: ArrowRight on a
-   * focused player skips, and on a focused scrubber still nudges by one step. Space and Enter go
+   * control row with the arrows and Home/End, and every `<input type="range">` answers them
+   * too — so an arrow in a `key` yields to the toolbar whole, dead ends and cross axis
+   * included, and to every slider, answering from the player itself, the overlay or a
+   * button outside the row: ArrowRight on a focused player skips, and on a focused
+   * scrubber still nudges by one step. Space and Enter go
    * the same way whenever a button, a checkbox, a link or a `summary` holds focus: the press
    * is spent there already, activating the control or — Space over a link — scrolling the
    * page. Modified presses are left alone because they belong to the browser, and an

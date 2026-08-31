@@ -404,12 +404,12 @@ that ends on zero when the track does. `.media-player-elapsed` holds the pair,
 clears.
 
 The arrows skip what is folded, so a closed region is not a stretch of dead arrow presses:
-`<toolbar-elemental>` walks only the controls that are on screen, which needs
-book-of-elementals 3.2.1, the floor this version asks for — 3.2.0 gave `open-when` its
-`container:` ruler, and 3.2.1 the tarball that actually ships it to a source importer.
-They also skip the speed `<select>` wherever it stands, folded or not: a `<select>` spends
-the arrows on its own list, so the toolbar leaves it a tab stop of its own — one
-<kbd>Tab</kbd> past the row — rather than guess which press was meant for whom.
+`<toolbar-elemental>` walks only the controls that are on screen, and it walks onto the
+speed `<select>` — part of the row's single tab stop, ←/→ stepping onto and off it while
+↑/↓ stay the select's own, opening and stepping its list. Both need book-of-elementals
+3.3.0, the floor this version asks for: 3.2.0 gave `open-when` its `container:` ruler,
+3.2.1 shipped the file it lives in to source importers, and 3.3.0 taught the walk the
+select — against an older one the select stands as a second tab stop the arrows step past.
 `<media-player>` imports the
 disclosure for you. A page that blocks the script has no control row at all; one whose
 disclosure never defines gets the four controls sitting in the open — plus the caret, a
@@ -1358,7 +1358,7 @@ itself mid-hover is a bubble jumping under a still pointer. Cut the frames at th
 should be.
 
 Cutting them is one command:
-[`script/thumbs`](https://github.com/stamat/media-player/blob/main/script/thumbs) in this
+[`script/thumbs`](https://github.com/stamat/media-player-element/blob/main/script/thumbs) in this
 repository, a bash script over `ffmpeg` and `ffprobe`, which wrote both sprites the players
 above hover. The twelve-minute film cuts to 147 frames in a 637 KiB sheet. Each frame comes
 from the middle of its cue rather than the start, so a hover is never more than half an
@@ -1513,7 +1513,7 @@ usable on its own and documented separately:
 | ------------------ | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Scrubber, volume   | [`<slider-elemental>`](https://stamat.github.io/book-of-elementals/elementals/slider.html)            | a native `<input type="range">` and the whole APG Slider pattern — arrows, <kbd>Home</kbd>, <kbd>End</kbd>, touch, the value bubble                                         |
 | Buffered-ahead bar | [`<progress-elemental>`](https://stamat.github.io/book-of-elementals/elementals/progress.html)        | a native `<progress>` whose fill CSS can place — here it carries the buffered edge, on the duration's own scale                                                             |
-| Control row        | [`<toolbar-elemental>`](https://stamat.github.io/book-of-elementals/elementals/toolbar.html)          | one tab stop, arrow keys between the buttons                                                                                                                                |
+| Control row        | [`<toolbar-elemental>`](https://stamat.github.io/book-of-elementals/elementals/toolbar.html)          | one tab stop, arrow keys between the controls — the speed `<select>` included, which keeps ↑/↓ for its own list                                                             |
 | Control tooltips   | [`<tooltip-elemental>`](https://stamat.github.io/book-of-elementals/elementals/tooltip.html)          | hover and focus both, <kbd>Escape</kbd> to dismiss per [WCAG 1.4.13](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html), and no half-handled touch |
 
 So there is no `role="slider"` and no `aria-valuenow` anywhere in this element. The platform
@@ -1658,8 +1658,12 @@ and `key="ArrowRight"` on its skip buttons,
 `tabindex="0"` so the player is a Tab stop and a click on the bar leaves focus inside. Tab to
 one, or put focus anywhere in it — the scrubber, the picture, the row — and <kbd>Space</kbd>
 plays and pauses, except on a button, where it presses the button. The sideways arrows skip
-and the vertical ones move the volume, except on the scrubber and the volume slider, which
-keep their own arrows.
+and the vertical ones move the volume — from the picture, the overlay or the player itself.
+Inside the control row every arrow is the row's: the walk between the buttons, the ends it
+refuses to wrap past, the cross axis it leaves to the page's scroll, and the sliders' own
+steps — none of them a press a `key` may take, or the row's ends would seek and
+<kbd>↑</kbd> over any button would move the volume under a reader who was only walking
+the bar.
 
 No sample binds the page-wide form. Not because it would misbehave here — a preview runs in
 its own frame, so a <kbd>k</kbd> claimed inside one never reaches this page — but because the
@@ -1670,7 +1674,7 @@ your own page, with the scroll key in mind.
 
 | Press                                                                                           | Who it belongs to                                                                                                                                                                                                                                                                                                                                                      |
 | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The arrows, <kbd>Home</kbd>, <kbd>End</kbd> or a Page key with a slider or a radio group focused | the focused control — a slider spends them on its own value, a radio group on its own walk. Everywhere else an arrow is free to claim: `key="ArrowRight"` on the skip button skips while the player holds focus, and still nudges the scrubber by one second when focus is on it. The control row's arrows land in the already-handled line below                       |
+| The arrows, <kbd>Home</kbd>, <kbd>End</kbd> or a Page key with a slider or a radio group focused, or pressed anywhere inside a `role="toolbar"` | the focused control or the row around it — a slider spends them on its own value, a radio group on its own walk, and the toolbar owns its arrows whole: the steps its walk takes, the ends it refuses to wrap past, and the cross axis it leaves to the page's scroll. Everywhere else an arrow is free to claim: `key="ArrowRight"` on the skip button skips while the player holds focus                       |
 | <kbd>Space</kbd> or <kbd>Enter</kbd> with a button, a checkbox, a link or a `<summary>` focused | whatever the press does there already — it activates a button, a checkbox or a `<summary>`, it follows a link on <kbd>Enter</kbd>, and on <kbd>Space</kbd> over a link it scrolls the page. It is the split [YouTube documents](https://support.google.com/youtube/answer/7631406): Space pauses when the player holds focus and presses the button when a button does |
 | Anything with <kbd>Ctrl</kbd>, <kbd>⌘</kbd> or <kbd>Alt</kbd> held                              | the browser                                                                                                                                                                                                                                                                                                                                                            |
 | A key typed into a text field, a `<select>` or anything `contenteditable`                       | whatever is being typed into — a comment box under a player is the ordinary case, not the odd one. Found through an open shadow root too, since a `keydown` reports the component rather than the field inside it                                                                                                                                                      |
@@ -2161,7 +2165,7 @@ HLS natively, and in Chrome, which reaches it through hls.js. In both, the first
 element saw was `Infinity`, so `is-live` came on rather than latching a bogus number; the
 window drove the scrubber; skipping backwards landed inside it and stayed. The DASH figure
 above came out of the same check, in Chrome, against two dynamic manifests.
-[CONTRIBUTING.md](https://github.com/stamat/media-player/blob/main/CONTRIBUTING.md) says how
+[CONTRIBUTING.md](https://github.com/stamat/media-player-element/blob/main/CONTRIBUTING.md) says how
 to run that check yourself. It is not run on every release, so if it breaks for you, file an
 issue.
 
@@ -2390,7 +2394,7 @@ contract is `on` and `bind` attributes, and those are attributes wherever they a
 
 ## License
 
-<p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> ©
+<p><a href="https://github.com/stamat/media-player-element/blob/main/LICENSE">MIT</a> ©
   <a href="https://github.com/stamat">Stamat</a>. The icons in the samples are
   <a href="https://lucide.dev">Lucide</a>, ISC — except the CC badge on the captions button,
   which is drawn here because Lucide has no lettered one.</p>

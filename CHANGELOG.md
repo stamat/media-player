@@ -52,9 +52,10 @@ for the person who wrote the code.
   `.media-player-more` and `.media-player-more-region` are the hooks, `data-mode` and
   `[open]` the states. **DOM:** the module imports book-of-elementals' disclosure and the
   structure bundle carries its sheet, 0.4 kB gzipped measured on its own; the arrows
-  skip a folded control, and `container:` is the disclosure's own ruler — both
-  book-of-elementals **3.2.1**, now the floor: 3.2.0 introduced the ruler, 3.2.1 ships the
-  file it lives in to source importers. Folding the
+  skip a folded control, and `container:` is the disclosure's own ruler — both inside
+  book-of-elementals **3.3.0**, now the floor: 3.2.0 introduced the ruler, 3.2.1 ships the
+  file it lives in to source importers, and what 3.3.0 raised it for is the select entry
+  under _Changed_. Folding the
   AirPlay button is what pins the row's width: a control that appears by network weather no
   longer decides whether the row wraps.
 
@@ -204,6 +205,23 @@ for the person who wrote the code.
 
 ### Changed
 
+- **The repository moved to
+  [`stamat/media-player-element`](https://github.com/stamat/media-player-element), and the
+  documentation site with it — <https://stamat.github.io/media-player-element/>.** The
+  package name has been `media-player-element` since 2.0.0; the repository now matches it.
+  GitHub redirects the old repository URL and `git remote` keeps working, but the old Pages
+  address stops serving: a bookmark or a link to `stamat.github.io/media-player` needs the
+  new one. `homepage`, `repository` and `bugs` in `package.json` point at the new path.
+
+- **The arrow keys walk onto the speed `<select>`, and it joins the row's single tab
+  stop.** It stood as a second tab stop the arrows stepped past, which read as a control
+  the row pretends is not there — a reader walking the bar could not reach speed at all
+  without <kbd>Tab</kbd>. book-of-elementals 3.3.0's toolbar walks it on the APG toolbar's
+  own axis split: ←/→ step onto and off the chip, ↑/↓ stay the select's, opening and
+  stepping its list. That release is the floor now — `^3.3.0` — and against an older one
+  the select is the separate tab stop it used to be; nothing in this repository's own code
+  changed for it.
+
 - **The prose in the manual, the README and CONTRIBUTING.md is shorter.** Every fact, table,
   measurement and markup sample is unchanged; what went is the essayistic register around
   them — metaphors, restated points and asides. Four headings are renamed to say what their
@@ -253,6 +271,15 @@ for the person who wrote the code.
   entry points are the same ones, so nothing on the page changes shape.
 
 ### Fixed
+
+- **An arrow pressed inside the control row can no longer move a slider the reader never
+  touched.** The toolbar `preventDefault`s only the steps its walk takes: walking off
+  either end of the row — the pattern's own dead stop — leaked the press to a skip
+  button's `key` and seeked, and the cross axis, which the toolbar leaves to the page's
+  scroll, leaked <kbd>↑</kbd>/<kbd>↓</kbd> to a `keys` volume binding. An arrow-family
+  press from inside anything `role="toolbar"` now never reaches `key` or `keys` —
+  letters are untouched, and an arrow in a `key` still answers on the player itself, the
+  overlay and controls outside the row.
 
 - **The fold's unfurl actually plays.** The 0.2s width animation rode `@starting-style`,
   which only applies to a box returning from unrendered — and in every current stable
@@ -340,7 +367,7 @@ for the person who wrote the code.
   button does nothing — so on every browser but Safari, where `no-airplay` takes the AirPlay
   button out of the row, a right arrow from picture-in-picture moved nothing and fullscreen
   was off the keyboard altogether, the bar's roving `tabindex` having already taken it out of
-  Tab's reach. Fixed in book-of-elementals 3.1.1, inside the 3.2.1 floor this release asks
+  Tab's reach. Fixed in book-of-elementals 3.1.1, inside the 3.3.0 floor this release asks
   for; nothing in this repository changed.
 
 - **The scrubber's value bubble no longer gets a slice cut off it at either end of the

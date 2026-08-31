@@ -1,4 +1,4 @@
-/* media-player-element v2.0.0 | https://stamat.github.io/media-player/ | MIT License */
+/* media-player-element v2.0.0 | https://stamat.github.io/media-player-element/ | MIT License */
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
@@ -1268,7 +1268,7 @@ function toolbarKey(key, vertical) {
   if (key === (vertical ? "ArrowUp" : "ArrowLeft")) return key;
   return null;
 }
-var CONTROLS = "button, a[href]";
+var CONTROLS = "button, a[href], select";
 function reachable(control) {
   if (control.closest("[hidden]")) return false;
   return control.checkVisibility ? control.checkVisibility({ visibilityProperty: true }) : true;
@@ -2072,7 +2072,8 @@ function isActivated(node) {
 var ARROW_KEYS = /* @__PURE__ */ new Set(["arrowleft", "arrowright", "arrowup", "arrowdown", "home", "end", "pageup", "pagedown"]);
 var ARROWED_CONTROLS = "input[type=range],input[type=radio]";
 function isArrowed(node) {
-  return !!node && node.nodeType === 1 && node.matches(ARROWED_CONTROLS);
+  if (!node || node.nodeType !== 1) return false;
+  return node.matches(ARROWED_CONTROLS) || !!node.closest("[role=toolbar]");
 }
 function keyedMethod(value, pressed) {
   if (!value) return null;
@@ -2743,10 +2744,11 @@ var MediaPlayer = class extends HgElement {
    * reach an action no control on this player names.
    *
    * Letters mostly, and the arrows where nothing spends them. `toolbar-elemental` walks the
-   * control row with the arrows and Home/End and calls `preventDefault` as it goes, and
-   * every `<input type="range">` answers them too — so an arrow in a `key` yields to both
-   * and answers from the player itself, the overlay or a plain button: ArrowRight on a
-   * focused player skips, and on a focused scrubber still nudges by one step. Space and Enter go
+   * control row with the arrows and Home/End, and every `<input type="range">` answers them
+   * too — so an arrow in a `key` yields to the toolbar whole, dead ends and cross axis
+   * included, and to every slider, answering from the player itself, the overlay or a
+   * button outside the row: ArrowRight on a focused player skips, and on a focused
+   * scrubber still nudges by one step. Space and Enter go
    * the same way whenever a button, a checkbox, a link or a `summary` holds focus: the press
    * is spent there already, activating the control or — Space over a link — scrolling the
    * page. Modified presses are left alone because they belong to the browser, and an

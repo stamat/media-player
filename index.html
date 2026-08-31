@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="A media player you write in HTML — one custom element over the &lt;audio&gt; or &lt;video&gt; you already wrote.">
   
-  <link rel="canonical" href="https://stamat.github.io/media-player">
+  <link rel="canonical" href="https://stamat.github.io/media-player-element">
   <meta property="og:title" content="Media Player">
 <meta property="og:description" content="A media player you write in HTML — one custom element over the &lt;audio&gt; or &lt;video&gt; you already wrote.">
 <meta property="og:type" content="website">
@@ -16,7 +16,7 @@
 <meta property="og:locale" content="en">
 <meta name="twitter:card" content="summary">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Media Player","description":"A media player you write in HTML — one custom element over the \u003caudio\u003e or \u003cvideo\u003e you already wrote.","inLanguage":"en","publisher":{"@type":"Organization","name":"Media Player"}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Media Player","url":"https://stamat.github.io/media-player","inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Media Player","url":"https://stamat.github.io/media-player-element","inLanguage":"en"}</script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%96%B6</text></svg>">
   <link rel="stylesheet" href="./css/prose.min.css">
   
@@ -31,7 +31,7 @@
     </a>
   </div>
   <div class="topbar-actions"><tooltip-elemental><a class="icon-btn" href="https://www.npmjs.com/package/media-player-element" title="npm" target="_blank" rel="noopener"><span aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z"></path></svg></span></a><span>npm</span></tooltip-elemental>
-    <tooltip-elemental><a class="icon-btn" href="https://github.com/stamat/media-player" title="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg></a><span>GitHub</span></tooltip-elemental>
+    <tooltip-elemental><a class="icon-btn" href="https://github.com/stamat/media-player-element" title="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg></a><span>GitHub</span></tooltip-elemental>
     
     <switch-elemental class="switch-elemental-small switch-elemental-thin" checked-if="[data-theme=dark]">
       <button data-theme-toggle aria-label="Dark mode">
@@ -417,12 +417,12 @@ that ends on zero when the track does. <code>.media-player-elapsed</code> holds 
 <code>style.css</code>. That keeps the second line down to 294px of player width, which a 320px phone
 clears.</p>
 <p>The arrows skip what is folded, so a closed region is not a stretch of dead arrow presses:
-<code>&lt;toolbar-elemental&gt;</code> walks only the controls that are on screen, which needs
-book-of-elementals 3.2.1, the floor this version asks for — 3.2.0 gave <code>open-when</code> its
-<code>container:</code> ruler, and 3.2.1 the tarball that actually ships it to a source importer.
-They also skip the speed <code>&lt;select&gt;</code> wherever it stands, folded or not: a <code>&lt;select&gt;</code> spends
-the arrows on its own list, so the toolbar leaves it a tab stop of its own — one
-<kbd>Tab</kbd> past the row — rather than guess which press was meant for whom.
+<code>&lt;toolbar-elemental&gt;</code> walks only the controls that are on screen, and it walks onto the
+speed <code>&lt;select&gt;</code> — part of the row&#39;s single tab stop, ←/→ stepping onto and off it while
+↑/↓ stay the select&#39;s own, opening and stepping its list. Both need book-of-elementals
+3.3.0, the floor this version asks for: 3.2.0 gave <code>open-when</code> its <code>container:</code> ruler,
+3.2.1 shipped the file it lives in to source importers, and 3.3.0 taught the walk the
+select — against an older one the select stands as a second tab stop the arrows step past.
 <code>&lt;media-player&gt;</code> imports the
 disclosure for you. A page that blocks the script has no control row at all; one whose
 disclosure never defines gets the four controls sitting in the open — plus the caret, a
@@ -1333,7 +1333,7 @@ the sprite&#39;s natural size, which is unknown until the image loads, and a box
 itself mid-hover is a bubble jumping under a still pointer. Cut the frames at the size the box
 should be.</p>
 <p>Cutting them is one command:
-<a href="https://github.com/stamat/media-player/blob/main/script/thumbs"><code>script/thumbs</code></a> in this
+<a href="https://github.com/stamat/media-player-element/blob/main/script/thumbs"><code>script/thumbs</code></a> in this
 repository, a bash script over <code>ffmpeg</code> and <code>ffprobe</code>, which wrote both sprites the players
 above hover. The twelve-minute film cuts to 147 frames in a 637 KiB sheet. Each frame comes
 from the middle of its cue rather than the start, so a hover is never more than half an
@@ -1503,7 +1503,7 @@ usable on its own and documented separately:</p>
 <tr>
 <td>Control row</td>
 <td><a href="https://stamat.github.io/book-of-elementals/elementals/toolbar.html"><code>&lt;toolbar-elemental&gt;</code></a></td>
-<td>one tab stop, arrow keys between the buttons</td>
+<td>one tab stop, arrow keys between the controls — the speed <code>&lt;select&gt;</code> included, which keeps ↑/↓ for its own list</td>
 </tr>
 <tr>
 <td>Control tooltips</td>
@@ -1654,8 +1654,12 @@ and <code>key=&quot;ArrowRight&quot;</code> on its skip buttons,
 <code>tabindex=&quot;0&quot;</code> so the player is a Tab stop and a click on the bar leaves focus inside. Tab to
 one, or put focus anywhere in it — the scrubber, the picture, the row — and <kbd>Space</kbd>
 plays and pauses, except on a button, where it presses the button. The sideways arrows skip
-and the vertical ones move the volume, except on the scrubber and the volume slider, which
-keep their own arrows.</p>
+and the vertical ones move the volume — from the picture, the overlay or the player itself.
+Inside the control row every arrow is the row&#39;s: the walk between the buttons, the ends it
+refuses to wrap past, the cross axis it leaves to the page&#39;s scroll, and the sliders&#39; own
+steps — none of them a press a <code>key</code> may take, or the row&#39;s ends would seek and
+<kbd>↑</kbd> over any button would move the volume under a reader who was only walking
+the bar.</p>
 <p>No sample binds the page-wide form. Not because it would misbehave here — a preview runs in
 its own frame, so a <kbd>k</kbd> claimed inside one never reaches this page — but because the
 markup a sample hands you is markup you paste, and page-wide is a decision to make once, on
@@ -1669,8 +1673,8 @@ your own page, with the scroll key in mind.</p>
 </tr>
 </thead>
 <tbody><tr>
-<td>The arrows, <kbd>Home</kbd>, <kbd>End</kbd> or a Page key with a slider or a radio group focused</td>
-<td>the focused control — a slider spends them on its own value, a radio group on its own walk. Everywhere else an arrow is free to claim: <code>key=&quot;ArrowRight&quot;</code> on the skip button skips while the player holds focus, and still nudges the scrubber by one second when focus is on it. The control row&#39;s arrows land in the already-handled line below</td>
+<td>The arrows, <kbd>Home</kbd>, <kbd>End</kbd> or a Page key with a slider or a radio group focused, or pressed anywhere inside a <code>role=&quot;toolbar&quot;</code></td>
+<td>the focused control or the row around it — a slider spends them on its own value, a radio group on its own walk, and the toolbar owns its arrows whole: the steps its walk takes, the ends it refuses to wrap past, and the cross axis it leaves to the page&#39;s scroll. Everywhere else an arrow is free to claim: <code>key=&quot;ArrowRight&quot;</code> on the skip button skips while the player holds focus</td>
 </tr>
 <tr>
 <td><kbd>Space</kbd> or <kbd>Enter</kbd> with a button, a checkbox, a link or a <code>&lt;summary&gt;</code> focused</td>
@@ -2396,7 +2400,7 @@ HLS natively, and in Chrome, which reaches it through hls.js. In both, the first
 element saw was <code>Infinity</code>, so <code>is-live</code> came on rather than latching a bogus number; the
 window drove the scrubber; skipping backwards landed inside it and stayed. The DASH figure
 above came out of the same check, in Chrome, against two dynamic manifests.
-<a href="https://github.com/stamat/media-player/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> says how
+<a href="https://github.com/stamat/media-player-element/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> says how
 to run that check yourself. It is not run on every release, so if it breaks for you, file an
 issue.</p>
 <h2 id="what-it-does-not-do">What it does not do<a class="heading-anchor" href="#what-it-does-not-do" tabindex="-1" aria-hidden="true"></a></h2>
@@ -2565,7 +2569,7 @@ renders it. What this project does not ship is a wrapper component for any of th
 contract is <code>on</code> and <code>bind</code> attributes, and those are attributes wherever they are written.</p>
 </details>
 </accordion-elemental><h2 id="license">License<a class="heading-anchor" href="#license" tabindex="-1" aria-hidden="true"></a></h2>
-<p><a href="https://github.com/stamat/media-player/blob/main/LICENSE">MIT</a> ©
+<p><a href="https://github.com/stamat/media-player-element/blob/main/LICENSE">MIT</a> ©
   <a href="https://github.com/stamat">Stamat</a>. The icons in the samples are
   <a href="https://lucide.dev">Lucide</a>, ISC — except the CC badge on the captions button,
   which is drawn here because Lucide has no lettered one.</p>
@@ -2574,7 +2578,7 @@ contract is <code>on</code> and <code>bind</code> attributes, and those are attr
 
     </article>
     <footer class="page-footer">
-  <a href="https://stamat.github.io/media-player/" target="_blank" rel="noopener">media-player</a> v2.0.0 —
+  <a href="https://stamat.github.io/media-player-element/" target="_blank" rel="noopener">media-player</a> v2.0.0 —
   MIT &copy; <a href="https://github.com/stamat" target="_blank" rel="noopener">@stamat</a>.
   Built with <span aria-hidden="true">💩</span> <a href="https://github.com/stamat/poops" target="_blank" rel="noopener">Poops</a>, <a href="https://github.com/stamat/poops-docs-theme" target="_blank" rel="noopener">poops-docs-theme</a> and <a href="https://github.com/stamat/code-preview-element" target="_blank" rel="noopener">code-preview-element</a>.
   
