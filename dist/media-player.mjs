@@ -58,6 +58,7 @@ function parseAttributeEntry(entry) {
 function pairKey({ event, where, name }) {
   return `${event}@${where || ""}:${name}`;
 }
+var LISTENER_OPTIONS = /* @__PURE__ */ new Set(["passive", "once", "capture"]);
 function deepFreeze(value) {
   if (value === null || typeof value !== "object") return value;
   for (const key of Object.keys(value)) deepFreeze(value[key]);
@@ -374,16 +375,23 @@ var _HgElement = class _HgElement extends HTMLElement {
     const wired = /* @__PURE__ */ new Map();
     const collect = (el) => {
       if (!this._scope(el)) return;
-      const keys = this._wireHandlers(el);
-      if (keys.length) wired.set(el, new Set(keys));
+      const from = this._listeners.length;
+      this._wireHandlers(el);
+      const keys = /* @__PURE__ */ new Set();
+      for (let i = from; i < this._listeners.length; i++) keys.add(this._listeners[i].key);
+      if (keys.size) wired.set(el, keys);
     };
     collect(this);
     this.querySelectorAll("[on],[data-on]").forEach(collect);
     this._scanWires(wired);
   }
-  // The pair grammar — `event[@window|@document]:name`, `;`-separated — parsed
-  // in one place for the `on` attribute and `static wires` both, so the two
-  // cannot fork. A malformed pair warns and is skipped; its neighbours still wire.
+  // The pair grammar — `event[@window|@document][|passive|once|capture]:name`,
+  // `;`-separated — parsed in one place for the `on` attribute and
+  // `static wires` both, so the two cannot fork. A malformed pair warns and is
+  // skipped; its neighbours still wire. Modifiers ride `|` rather than the
+  // `.` other frameworks use, because an event type is any string and dotted
+  // custom events exist in the wild — jQuery taught a generation to namespace
+  // with dots — while `|` is already this library's separator on `bind`.
   _parseHandlers(raw) {
     const entries = [];
     for (const part of raw.split(";")) {
@@ -394,8 +402,21 @@ var _HgElement = class _HgElement extends HTMLElement {
         console.warn(`hydrargyri: unknown handler "${trimmed}" \u2014 expected event:name`);
         continue;
       }
-      let event = trimmed.slice(0, colon).trim();
+      const pipes = trimmed.slice(0, colon).split("|");
+      let event = pipes[0].trim();
       const name = trimmed.slice(colon + 1).trim();
+      let options = null;
+      for (const mod of pipes.slice(1)) {
+        const option = mod.trim();
+        if (!LISTENER_OPTIONS.has(option)) {
+          console.warn(`hydrargyri: unknown handler option "${trimmed}" \u2014 expected |passive, |once or |capture`);
+          options = false;
+          break;
+        }
+        if (!options) options = {};
+        options[option] = true;
+      }
+      if (options === false) continue;
       let where = null;
       const at = event.lastIndexOf("@");
       if (at !== -1) {
@@ -406,33 +427,29 @@ var _HgElement = class _HgElement extends HTMLElement {
         }
         event = event.slice(0, at);
       }
-      entries.push({ event, where, name });
+      entries.push({ event, where, name, options });
     }
     return entries;
   }
   // resize@window / click@document put the listener on the global while the
   // handler stays this element's; stored in _listeners like any other, so
   // disconnect unhooks it and nothing can leak.
-  _wireEntry(el, { event, where, name }) {
+  _wireEntry(el, entry) {
+    const { event, where, name, options } = entry;
     const target = where === "window" ? window : where === "document" ? document : el;
     const listener = (e) => this._handle(name, e);
-    target.addEventListener(event, listener);
-    this._listeners.push({ el: target, event, listener });
+    if (options) target.addEventListener(event, listener, options);
+    else target.addEventListener(event, listener);
+    this._listeners.push({ el: target, event, listener, options, key: pairKey(entry) });
   }
   // One node's `on`/`data-on` parsed and wired — the unit _scanHandlers sweeps
   // with, callable alone for nodes that arrive after the scan (hydrargyri-each
   // wires fresh rows with it, without rescanning the standing ones). Scope is
   // the caller's to check; calling twice on one node doubles its listeners.
-  // Returns the wired pair keys, which is what lets wires skip them.
   _wireHandlers(el) {
     const raw = el.getAttribute("on") || el.getAttribute("data-on");
-    if (!raw) return [];
-    const keys = [];
-    for (const entry of this._parseHandlers(raw)) {
-      this._wireEntry(el, entry);
-      keys.push(pairKey(entry));
-    }
-    return keys;
+    if (!raw) return;
+    for (const entry of this._parseHandlers(raw)) this._wireEntry(el, entry);
   }
   // Class-declared listeners on the nodes a selector names — the plumbing a
   // subclass needs in every instance, wired without the author writing it.
@@ -465,7 +482,10 @@ var _HgElement = class _HgElement extends HTMLElement {
     }
   }
   _teardownHandlers() {
-    for (const { el, event, listener } of this._listeners) el.removeEventListener(event, listener);
+    for (const { el, event, listener, options } of this._listeners) {
+      if (options) el.removeEventListener(event, listener, options);
+      else el.removeEventListener(event, listener);
+    }
     this._listeners = [];
   }
   _subscribe(key, value) {
@@ -1729,6 +1749,77 @@ function slide(element, from, open, callback) {
   setTransitionTimer(element, "height", duration + TRANSITION_TIMER_GRACE, done);
 }
 
+// node_modules/book-of-elementals/src/watch-query.js
+var probeCount = 0;
+var CONTAINER = "container:";
+var KEYWORDS = ["not", "and", "or"];
+var UNHEARD = /(^|[\s(])(style|scroll-state)\s*\(/;
+function watchQuery(element, query) {
+  const condition = query ? query.trim() : "";
+  if (!condition) return null;
+  if (!condition.startsWith(CONTAINER)) {
+    return window.matchMedia ? window.matchMedia(condition) : null;
+  }
+  return watchContainer(element, condition.slice(CONTAINER.length).trim());
+}
+function unwatchQuery(query, listener) {
+  if (!query) return null;
+  query.removeEventListener("change", listener);
+  if (query.stop) query.stop();
+  return null;
+}
+function watchContainer(element, condition) {
+  if (!window.ResizeObserver) return null;
+  if (UNHEARD.test(condition)) return null;
+  const id = String(++probeCount);
+  element.dataset.elementalProbe = id;
+  const subject = '[data-elemental-probe="' + id + '"]';
+  const style = document.createElement("style");
+  style.textContent = subject + "{--elemental-probe:no}@container " + condition + "{" + subject + "{--elemental-probe:yes}}";
+  document.head.append(style);
+  const container = nearestContainer(element, condition);
+  let listener = null;
+  const observer = new window.ResizeObserver(() => {
+    if (listener) listener(query);
+  });
+  const query = {
+    get matches() {
+      return window.getComputedStyle(element).getPropertyValue("--elemental-probe").trim() === "yes";
+    },
+    addEventListener(type, fn) {
+      listener = fn;
+      if (container) observer.observe(container);
+    },
+    removeEventListener() {
+      listener = null;
+      observer.disconnect();
+    },
+    stop() {
+      listener = null;
+      observer.disconnect();
+      style.remove();
+      delete element.dataset.elementalProbe;
+    }
+  };
+  return query;
+}
+function containerName(condition) {
+  const match = /^([^\s(]+)\s/.exec(condition);
+  if (!match) return "";
+  return KEYWORDS.indexOf(match[1]) === -1 ? match[1] : "";
+}
+function nearestContainer(element, condition) {
+  const name = containerName(condition);
+  let node = element.parentElement;
+  while (node) {
+    const style = window.getComputedStyle(node);
+    const type = style.containerType;
+    if (type && type !== "normal" && (!name || (style.containerName || "").split(" ").indexOf(name) !== -1)) return node;
+    node = node.parentElement;
+  }
+  return null;
+}
+
 // node_modules/book-of-elementals/src/elementals/disclosure/index.js
 function disclosureState(open) {
   return {
@@ -1797,8 +1888,7 @@ var DisclosureElemental = class extends ElementBase {
   disconnectedCallback() {
     if (!this.initialized) return;
     this.removeEventListener("click", this.onClick);
-    if (this.query) this.query.removeEventListener("change", this.onMediaChange);
-    this.query = null;
+    this.query = unwatchQuery(this.query, this.onMediaChange);
     delete this.dataset.mode;
     const region = this.region;
     if (region) {
@@ -1844,9 +1934,8 @@ var DisclosureElemental = class extends ElementBase {
   /** Start watching whatever `open-when` names now, and stop watching whatever it named
    * before. Both halves matter: the attribute can be rewritten at runtime. */
   watchMedia() {
-    if (this.query) this.query.removeEventListener("change", this.onMediaChange);
-    const media = this.getAttribute("open-when");
-    this.query = media && window.matchMedia ? window.matchMedia(media) : null;
+    this.query = unwatchQuery(this.query, this.onMediaChange);
+    this.query = watchQuery(this, this.getAttribute("open-when"));
     if (this.query) this.query.addEventListener("change", this.onMediaChange);
   }
   /**
@@ -1861,6 +1950,11 @@ var DisclosureElemental = class extends ElementBase {
     this.reflectMode();
     const pinned = mediaOpen(this.query);
     if (pinned === null) return;
+    if (!pinned) {
+      const region = this.region;
+      const button = this.button;
+      if (region && button && region.contains(document.activeElement)) button.focus();
+    }
     this.instant = true;
     this.open = pinned;
     this.instant = false;
@@ -2067,7 +2161,6 @@ var MediaPlayer = class extends HgElement {
     this.isBuffering = true;
     this.playLabel = "Play";
     this.muteLabel = "Mute";
-    this.moreLabel = "More controls";
     this.captionsLabel = "Enable captions";
     this.timeFormatter = formatTime;
     this.findCaptions();
@@ -2130,7 +2223,7 @@ var MediaPlayer = class extends HgElement {
     if (!duration || Number.isNaN(duration)) return;
     this.isLive = duration >= LIVE_DURATION;
     this.duration = this.isLive ? 0 : duration;
-    this.remaining = this.duration;
+    this.remaining = Math.ceil(this.duration);
     this.isReady = true;
     this.isBuffering = false;
     if (this.isError) {
@@ -2172,7 +2265,7 @@ var MediaPlayer = class extends HgElement {
    * it cannot also be what pauses. One gesture cannot mean both, and a row that comes back
    * only by stopping the video is a row you have to break playback to reach. A tap starts a
    * stopped video and otherwise leaves playback alone, the reveal having already happened on
-   * the `touchstart` the markup wires to `showControls`.
+   * the `pointerdown` the markup wires to `showControls`.
    *
    * Asked of the pointer rather than of the user agent, and asked at the click rather than
    * once at upgrade: a laptop with a touchscreen hovers, and a window dragged to a second
@@ -2180,7 +2273,10 @@ var MediaPlayer = class extends HgElement {
    * hover, which is what every version before this one did.
    */
   pictureToggle() {
-    if (!this.media?.paused && window.matchMedia?.("(hover: none)")?.matches) return;
+    if (!this.media?.paused && window.matchMedia?.("(hover: none)")?.matches) {
+      this.showControls();
+      return;
+    }
     this.togglePlay();
   }
   // PLAYBACK
@@ -2433,7 +2529,7 @@ var MediaPlayer = class extends HgElement {
    */
   paint(seconds) {
     this.currentTime = seconds;
-    this.remaining = this.isLive ? 0 : Math.max((this.media?.duration || 0) - seconds, 0);
+    this.remaining = this.isLive ? 0 : Math.ceil(Math.max((this.media?.duration || 0) - seconds, 0));
     this.scrubber?.apply?.();
   }
   /**
@@ -2474,16 +2570,6 @@ var MediaPlayer = class extends HgElement {
       if (this.linger) clearTimeout(this.linger);
       this.controlsShown = true;
     }
-  }
-  /**
-   * The fold's button names its action, the way the mute button does: "More controls"
-   * closed, "Fewer controls" open. Wired in the markup — `on="disclosure-toggle:onMoreToggle"`
-   * on the disclosure — so a row without a fold never runs it. `aria-expanded` is the
-   * disclosure's own and already carries the state for a screen reader; this is for the
-   * tooltip and the label, which read words rather than state.
-   */
-  onMoreToggle(event) {
-    this.moreLabel = event?.detail?.open ? "Fewer controls" : "More controls";
   }
   /**
    * Playback reached the end.
@@ -3141,7 +3227,6 @@ __publicField(MediaPlayer, "properties", [
   "volumePercent",
   "playLabel",
   "muteLabel",
-  "moreLabel",
   "captionsLabel",
   "captionText",
   "playbackRate",

@@ -22,31 +22,41 @@ for the person who wrote the code.
   markup's order. Below it the button owns the region, and opening it swaps the line under
   the scrubber instead of growing the bar: the transport, the clock and the mute step out,
   the four unfurl into their space the way a search field expands, and the caret slides
-  along with them — turned around while open, offering "Fewer controls" through the new
-  `moreLabel` bind, named to its tooltip by `for` because the disclosure wants its button
-  as a direct child and a wrapper would take that from it. Whatever control the row ends
+  along with them — turned around while open, which with the disclosure's own
+  `aria-expanded` is the whole of the state: the button keeps the `aria-label` you wrote,
+  named to its tooltip by `for` because the disclosure wants its button as a direct child
+  and a wrapper would take that from it. Whatever control the row ends
   with — fullscreen in the samples — keeps its corner in both states, and the scrubber
-  never leaves. A menu floating over the picture was the version that did not survive:
-  inside the player's own `overflow: hidden` it clips on any ratio shorter than 16:9,
-  which the manual's own 2.4:1 player is. A fold worth one control is not folded at all:
+  never leaves. The samples write the breakpoint as
+  `open-when="container:(min-width: 30rem)"` — the disclosure's `container:` notation, so
+  the fold arranges by the player's width the way the volume drop and the clock swap do,
+  and a 400px player embedded in a desktop page folds like the phone it is as wide as; it
+  needs a book-of-elementals with `container:` support, and against an older one the fold
+  stays with its button at every width. A menu floating over the picture was the version
+  that did not survive: inside the player's own `overflow: hidden` it clips on any ratio
+  shorter than 16:9, which the manual's own 2.4:1 player is. A fold worth one control is
+  not folded at all:
   the button would take the slot that control gave up and charge a tap for it, so the
   element counts the region on connect and rewrites `open-when` to `all` where it holds one
   or none, which pins it at every width. The count is the markup's — a control you hide at
   some width, or on `no-airplay`, is still one of the fold's — and the attribute goes back
   as you wrote it if the player leaves the page.
 
-  **Markup:** new, and yours to copy — nothing folds unless you write it; the disclosure
-  wires `disclosure-toggle:onMoreToggle`, both new public names. **CSS:**
+  **Markup:** new, and yours to copy — nothing folds unless you write it. **CSS:**
   `.media-player-more` and `.media-player-more-region` are the hooks, `data-mode` and
   `[open]` the states. **DOM:** the module imports book-of-elementals' disclosure and the
-  structure bundle carries its sheet, about 1.5 kB gzipped measured on its own; the arrows
-  skip a folded control, which is book-of-elementals **3.1.1**, now the floor. Folding the
+  structure bundle carries its sheet, 0.4 kB gzipped measured on its own; the arrows
+  skip a folded control, and `container:` is the disclosure's own ruler — both
+  book-of-elementals **3.2.1**, now the floor: 3.2.0 introduced the ruler, 3.2.1 ships the
+  file it lives in to source importers. Folding the
   AirPlay button is what pins the row's width: a control that appears by network weather no
   longer decides whether the row wraps.
 
 - **The clock counts down where there is room for only one number.** Below 21.25rem of
   player width the `current / duration` pair hands the line to a single remaining-time
-  figure, ending on zero when the track does — `remaining` was always there to bind; new is
+  figure, ending on zero when the track does — `remaining` is ceiled whole seconds now, the
+  countdown convention, since floored it read 00:00 for the last fraction of a second with
+  audio still playing; it was always there to bind, and new is
   the pair of spans the swap needs. **Markup:** the clock in the samples is two spans now,
   `.media-player-elapsed` around the pair and `.media-player-remaining` for the countdown;
   copy the new clock if you took the old one. **CSS:** the swap lives in `style.css`, keyed
@@ -231,17 +241,36 @@ for the person who wrote the code.
   control findable. `--slider-elemental-thumb: var(--slider-elemental-fill)` on
   `media-player slider-elemental` puts the old behaviour back in one declaration.
 
-- **book-of-elementals moved to 3.x.** It left 0.x, then 1.x, then 2.x while this element sat
-  on `^1.0.0`, so the install block's `@0.11` patch pin — right while a 0.x minor could break
-  — was withholding fixes rather than refusing breakage. Neither major since touches the four
-  elementals loaded here: the 2.0 break is a slider that turns down the page with
-  `writing-mode`, which renamed arguments on functions this element does not call and added
-  attributes to a bubble it does not style, and the 3.0 break drops a deprecated attribute
-  from the disclosure, menu and navbar and redraws the splitter's seam, neither of which this
-  package loads. The custom properties, the element names and the SCSS entry points are the
-  same ones, so nothing on the page changes shape.
+- **book-of-elementals moved to 3.x, from the `^2.0.1` of 2.0.0.** The 3.0 break drops a
+  deprecated attribute from the disclosure, menu and navbar and redraws the splitter's seam,
+  none of which this package loads. The custom properties, the element names and the SCSS
+  entry points are the same ones, so nothing on the page changes shape.
 
 ### Fixed
+
+- **The fold's unfurl actually plays.** The 0.2s width animation rode `@starting-style`,
+  which only applies to a box returning from unrendered — and in every current stable
+  browser `hidden="until-found"` keeps the closed region's box rendered, so the fold
+  snapped open everywhere and the animation had only ever played in the browsers between
+  `@starting-style` shipping and `until-found` shipping. The closed width now sits at
+  `max-width: 0` on the rendered box and the reveal is a plain transition;
+  `@starting-style` stays for the browsers on the `display: none` fallback. **CSS output:**
+  one added rule on `.media-player-more-region[data-mode="free"][hidden]`.
+
+- **Find-in-page can reach the fold again: `hidden="until-found"` is no longer flattened to
+  `display: none`.** The structure sheet's `media-player [hidden] { display: none
+  !important }` — there so hydrargyri's `if`/`unless` binds out-hide any author `display` —
+  also caught the disclosure's closed region, whose `until-found` value exists precisely so
+  find-in-page and fragment links still reach what is inside; `display: none` made the
+  region unsearchable and the disclosure's `beforematch` reveal dead code. The plain-hidden
+  rule now excludes `until-found`, which instead gets the UA's own `content-visibility:
+  hidden` restated with weight — hiding it just as firmly in browsers that know
+  `content-visibility` but not `until-found` (Safari 18–26.1, Firefox ESR 128), where the
+  attribute reads as plain hidden and the region's own `display` would have leaked it into
+  the row — plus `position: absolute`, because the kept box is a flex item that would
+  otherwise charge one `gap` beside the caret. Browsers with neither (Safari 17) fall back
+  to `display: none`: closed and unfindable beats standing in the row. **CSS output:** the
+  one `[hidden]` rule in `media-player.css` is three rules now.
 
 - **The video controls fade out on a desktop too: one press of play no longer pins them up
   for the rest of the film.** The row was held by `.media-player-controls:focus-within`,
@@ -273,11 +302,17 @@ for the person who wrote the code.
   playback.** The row fades in on `mousemove`, which a touch device never sends, so five
   seconds into playback it was gone and the only way back was a tap on the picture — which
   paused the video to do it, that tap being the play toggle. **Markup:** the video samples wire
-  `touchstart:showControls` beside the mouse one; copy the new `on=` if you took the old one.
-  **DOM:** where the pointer cannot hover, a click on the picture starts a stopped video and
-  otherwise leaves playback alone, so the first tap reveals and the second presses what it
-  revealed. Asked of `(hover: none)` at the click rather than of the user agent at upgrade, so
-  a touchscreen laptop keeps the toggle it can drive.
+  `pointerdown:showControls` beside the mouse one — `pointerdown` and not `touchstart`,
+  which would be a scroll-blocking listener the binding cannot mark `passive`; copy the new
+  `on=` if you took the old one. **DOM:** where the pointer cannot hover, a click on the
+  picture starts a stopped video, otherwise reveals the row and leaves playback alone — so
+  the first tap reveals, even in markup that wires no reveal of its own, and the second
+  presses what it revealed. Asked of `(hover: none)` at the click rather than of the user
+  agent at upgrade, so a touchscreen laptop keeps the toggle it can drive. **CSS:** the
+  faded row also takes `pointer-events: none` — opacity alone left an invisible row fully
+  tappable, and the reveal tap could seek, mute or fullscreen blind on whatever sat under
+  the finger; `visibility` would have done it by locking keyboard users out of the
+  `:focus-visible` pin that holds the row up.
 
 - **The captions badge is the size of the buttons beside it.** Both states carried a viewBox
   cropped to the glyph, `1 3 22 18`, on the theory that a wide short icon in a square box is
@@ -299,7 +334,7 @@ for the person who wrote the code.
   button does nothing — so on every browser but Safari, where `no-airplay` takes the AirPlay
   button out of the row, a right arrow from picture-in-picture moved nothing and fullscreen
   was off the keyboard altogether, the bar's roving `tabindex` having already taken it out of
-  Tab's reach. Fixed in book-of-elementals 3.1.1, which is the floor this release now asks
+  Tab's reach. Fixed in book-of-elementals 3.1.1, inside the 3.2.1 floor this release asks
   for; nothing in this repository changed.
 
 - **The scrubber's value bubble no longer gets a slice cut off it at either end of the

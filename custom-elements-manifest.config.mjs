@@ -44,8 +44,7 @@ export const PUBLIC = new Set([
   'onFullscreenChange',
   'onPipChange',
   'onRateChange',
-  'onKeyDown',
-  'onMoreToggle'
+  'onKeyDown'
 ]);
 
 /**

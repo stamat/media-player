@@ -354,29 +354,39 @@ standing near a receiver is no longer the one phone whose row wraps. What is lef
 row that keeps its second line down to 340px of player width.
 
 ```html
-<disclosure-elemental class="media-player-more" open-when="(min-width: 30rem)" on="disclosure-toggle:onMoreToggle">
-  <button type="button" aria-label="More controls" bind="moreLabel:attr#aria-label">…</button>
+<disclosure-elemental class="media-player-more" open-when="container:(min-width: 30rem)">
+  <button type="button" aria-label="More controls">…</button>
   <div class="media-player-more-region">
     <!-- speed, captions, picture-in-picture, play on a device -->
   </div>
 </disclosure-elemental>
 ```
 
-`open-when` is the whole arrangement, and the breakpoint is written once. Above it the region
-is held open and the element reflects `data-mode="pinned"`, which `style.css` reads to take
-the button away and give the region `display: contents` — so a wide row is the row it always
-was, in the markup's own order, with no extra box in the middle.
+`open-when` is the whole arrangement, and the breakpoint is written once. `container:` in
+front makes it measure the player rather than the viewport — the disclosure's own notation,
+resolved against the same containment the volume drop and the clock swap read — because a
+400px player in a wide desktop page crowds exactly like a phone, and a plain media query
+cannot see that. Above the breakpoint the region is held open and the element reflects
+`data-mode="pinned"`, which `style.css` reads to take the button away and give the region
+`display: contents` — so a wide row is the row it always was, in the markup's own order,
+with no extra box in the middle. It needs the disclosure's `container:` support; against an
+older book-of-elementals the query reads as no query at all and the fold stays with its
+button at every width — everything still reachable, one press further away.
 
 Below it the button owns the region. Opening it swaps the line rather than growing the bar:
 the transport, the clock and the mute step out, the four unfurl into their space, and the
-caret slides along with them — turned around while open, and offering "Fewer controls"
-through the same `moreLabel` its tooltip reads. Whatever control ends the row, fullscreen
+caret slides along with them — turned around while open. The turn is the visible state and
+the disclosure's own `aria-expanded` the announced one, so the button keeps the one name
+written on it: a label that flipped to "Fewer controls" would tell a screen reader twice
+what `aria-expanded` already said once. Whatever control ends the row, fullscreen
 here, keeps its corner in both states, and the scrubber never leaves: seeking is not the
 fold's to take away. A menu floating over the picture was rejected: inside the player's
 `overflow: hidden` it clips on any ratio shorter than 16:9, and the player at the top of this
 page is 2.4:1. The button comes first in the disclosure and the region after it, so the
 sequence reads the way the row does. The tooltip cannot wrap this one button, because the
-disclosure wants it as a direct child, so it names it with `for` instead.
+disclosure wants it as a direct child, so it names it with `for` instead — which makes
+`more-controls` the one `id` in these samples: a page with two players renames it in one of
+them, or both tooltips find the first.
 
 Width is not the only thing that can make a fold pointless. One control behind the button
 saves nothing — the button takes the slot the control gave up and charges a tap for what used
@@ -395,10 +405,13 @@ clears.
 
 The arrows skip what is folded, so a closed region is not a stretch of dead arrow presses:
 `<toolbar-elemental>` walks only the controls that are on screen, which needs
-book-of-elementals 3.1.1, the floor this version asks for. `<media-player>` imports the
+book-of-elementals 3.2.1, the floor this version asks for — 3.2.0 gave `open-when` its
+`container:` ruler, and 3.2.1 the tarball that actually ships it to a source importer.
+`<media-player>` imports the
 disclosure for you. A page that blocks the script has no control row at all; one whose
-disclosure never defines gets the four controls sitting in the open, which is the row this
-section started with.
+disclosure never defines gets the four controls sitting in the open — plus the caret, a
+button that toggles nothing, since only the upgrade wires it and only the `data-mode` it
+reflects hides it. The row this section started with, with one dead control in it.
 
 The scrubber is moved in the markup rather than with `order` for the same reason. Reordering
 a flex line visually leaves the tab sequence in the old order, and a keyboard user would read
@@ -469,7 +482,7 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
   role="region"
   aria-label="Video player"
   keys="ArrowUp:volumeUp;ArrowDown:volumeDown"
-  on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown"
+  on="mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown"
 >
   <video
     controls
@@ -749,11 +762,11 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
          four controls right after it in the sequence. Unfolding still reads like a search
          field expanding — the caret slides left and the controls follow out of it — and
          the caret points at the fold, turning around while it is open. -->
-    <disclosure-elemental class="media-player-more" open-when="(min-width: 30rem)" on="disclosure-toggle:onMoreToggle">
+    <disclosure-elemental class="media-player-more" open-when="container:(min-width: 30rem)">
       <!-- The one control whose tooltip cannot wrap it: the disclosure wants its button as
            a direct child and its region as the button's next sibling, so the tooltip sits
            after the region and names the button by `for` instead. -->
-      <button type="button" id="more-controls" aria-label="More controls" bind="moreLabel:attr#aria-label">
+      <button type="button" id="more-controls" aria-label="More controls">
         <svg
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
@@ -872,7 +885,7 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
       </div>
 
       <tooltip-elemental for="more-controls">
-        <span bind="moreLabel">More controls</span>
+        <span>More controls</span>
       </tooltip-elemental>
     </disclosure-elemental>
     <tooltip-elemental>
@@ -924,11 +937,14 @@ The three handlers on the `<media-player>` itself are the video half's housekeep
 the pointer moves, gone five seconds after it stops, and always up while the video is paused
 or a focus ring is inside the row. A ring, not focus: a mouse click leaves focus on the button
 it pressed, and a row pinned by that never fades once you have pressed play.
-`touchstart:showControls` is the same for a pointer that cannot hover, and it is not optional
-there — a touch sends no `mousemove`, so without it the row goes five seconds into playback
-and only a tap on the picture brings it back, which pauses the video to do it. With it, the
-first tap reveals and the second presses what it lands on: the element will not pause on a tap
-while the pointer cannot hover, for the same reason.
+`pointerdown:showControls` is the same for a pointer that cannot hover — a touch sends no
+`mousemove` — and it reveals on the finger landing rather than lifting: the first tap
+reveals and the second presses what it lands on, because the element will not pause on a tap
+while the pointer cannot hover, and a row faded out takes no taps until it is back. Without
+the wire the element still reveals on the tap's click, one beat later. `pointerdown` and not
+`touchstart`, because a `touchstart` listener is one the browser must wait on before it may
+scroll a page that starts the gesture on the player; a pointer listener never blocks the
+scroll, with no option needed to say so.
 `fullscreenchange@document:onFullscreenChange` keeps `is-fullscreen` honest when
 <kbd>Escape</kbd> leaves fullscreen without the button being pressed. A fourth would bind the
 keyboard — [Keys the buttons carry](#keys-the-buttons-carry) — which no sample on this page
@@ -974,7 +990,7 @@ paragraph are the measurement.
   media-player video-background { background-size: cover; background-position: center; }
 </style>
 
-<media-player tabindex="0" role="region" aria-label="YouTube player" media-title="Family Guy: McStroke (Clip)" artist="TBS" on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange">
+<media-player tabindex="0" role="region" aria-label="YouTube player" media-title="Family Guy: McStroke (Clip)" artist="TBS" on="mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange">
   <video-background class="media-player-media" unstyled fit-box load-background lazyloading pause-offscreen="false" autoplay="false" loop="false" muted="false" src="https://www.youtube.com/watch?v=UIyoNvInzCI"></video-background>
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
@@ -1023,7 +1039,7 @@ platform's link over the `src` to watch that happen:
   media-player video-background { background-size: cover; background-position: center; }
 </style>
 
-<media-player tabindex="0" role="region" aria-label="Vimeo player" media-title="Minions: Paint" artist="Vimeo Staff Picks" on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange">
+<media-player tabindex="0" role="region" aria-label="Vimeo player" media-title="Minions: Paint" artist="Vimeo Staff Picks" on="mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange">
   <video-background class="media-player-media" unstyled fit-box load-background lazyloading pause-offscreen="false" autoplay="false" loop="false" muted="false" src="https://vimeo.com/137250145"></video-background>
   <button class="media-player-overlay" on="click:togglePlay" aria-label="Play"></button>
   <toolbar-elemental class="media-player-controls" aria-label="Playback" bind="isReady:if">
@@ -1108,7 +1124,7 @@ media API on it, each dropped in the same slot and marked the same way.
 ```html
 <script type="module" src="https://cdn.jsdelivr.net/npm/youtube-video-element@1/+esm"></script>
 
-<media-player tabindex="0" on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange">
+<media-player tabindex="0" on="mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange">
   <youtube-video
     class="media-player-media"
     controls
@@ -1191,7 +1207,7 @@ is left is a plain `<video controls>`, so
 <!-- One line, and it has to be: the whole opening tag of an unknown element must sit on a
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
-<media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
+<media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
   <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg">
     <track kind="captions" src="sample/tears-of-steel.en.vtt" srclang="en" label="English" />
     <track kind="metadata" src="sample/tears-of-steel-thumbs.vtt" />
@@ -1227,8 +1243,8 @@ is left is a plain `<video controls>`, so
          where the row runs out of width; `open-when` puts them back in the row above 30rem.
          Captions moved up beside them, so the four the button carries are the four written
          together. -->
-    <disclosure-elemental class="media-player-more" open-when="(min-width: 30rem)" on="disclosure-toggle:onMoreToggle">
-      <button type="button" id="more-controls" aria-label="More controls" bind="moreLabel:attr#aria-label"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+    <disclosure-elemental class="media-player-more" open-when="container:(min-width: 30rem)">
+      <button type="button" id="more-controls" aria-label="More controls"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
       <div class="media-player-more-region">
         <tooltip-elemental>
           <select class="media-player-rate" aria-label="Speed" disabled bind="playbackRate:prop#value" on="change:setRate"><option value="0.5">0.5&times;</option><option value="1" selected>1&times;</option><option value="1.25">1.25&times;</option><option value="1.5">1.5&times;</option><option value="2">2&times;</option></select>
@@ -1247,7 +1263,7 @@ is left is a plain `<video controls>`, so
           <span>Play on a device</span>
         </tooltip-elemental>
       </div>
-      <tooltip-elemental for="more-controls"><span bind="moreLabel">More controls</span></tooltip-elemental>
+      <tooltip-elemental for="more-controls"><span>More controls</span></tooltip-elemental>
     </disclosure-elemental>
     <tooltip-elemental>
       <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -1671,9 +1687,9 @@ speed `<select>`, which is where hover, focus, <kbd>Escape</kbd> to dismiss and 
 to ignore touch already live. The `<select>` is not a button and needs the bubble most:
 closed, it reads `1×` and says nothing about what it changes.
 
-Three of the bubbles bind rather than state: the play, mute and fold ones carry `playLabel`,
-`muteLabel` and `moreLabel`, the same state the buttons announce themselves by, so the words
-in the bubble and the words a screen reader hears cannot drift apart.
+Three of the bubbles bind rather than state: the play, mute and captions ones carry
+`playLabel`, `muteLabel` and `captionsLabel`, the same state the buttons announce themselves
+by, so the words in the bubble and the words a screen reader hears cannot drift apart.
 
 ```html
 <tooltip-elemental>
@@ -1869,7 +1885,6 @@ wired is skipped, never doubled.
 | `click:togglePictureInPicture`                  | the floating window the browser keeps above everything else; video only, and it warns rather than going quiet when the browser refuses — a request with no user gesture behind it is the usual reason |
 | `click:showAirplayPicker`                       | the system device picker, off the standard [Remote Playback API](https://w3c.github.io/remote-playback/) — AirPlay in Safari, Chromecast in Chrome. Audio as well as video, and not a toggle: the picker is the way back to the device as well as the way out, so the platform owns that half. It needs a gesture behind it, does nothing at all while `no-airplay` is set, and warns on a refusal that is not simply someone closing the picker |
 | `change:setRate`                                | playback speed, off the control's own `value` — a `<select>`'s in the samples; anything that is not a positive, finite number is dropped |
-| `disclosure-toggle:onMoreToggle`                | on the fold's `<disclosure-elemental>`: flips `moreLabel` between "More controls" and "Fewer controls", so the caret's name and its tooltip say what pressing it does next — `aria-expanded` is the disclosure's own and carries the state either way |
 
 **On `<media-player>` itself:**
 
@@ -1877,7 +1892,7 @@ wired is skipped, never doubled.
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `keydown:onKeyDown`, `keydown@document:onKeyDown` | a press clicks the control whose `key` claims it — the two scopes are [Keys the buttons carry](#keys-the-buttons-carry)        |
 | `mousemove:showControls`                          | video only: bring the faded control row back, and start the timer that takes it away again                                     |
-| `touchstart:showControls`                         | the same for a pointer that cannot hover, which sends no `mousemove` — without it the row goes mid-playback and only a pause brings it back |
+| `pointerdown:showControls`                         | the same for a pointer that cannot hover, which sends no `mousemove` — the reveal lands on the finger's touch rather than a beat later on its click |
 | `fullscreenchange@document:onFullscreenChange`    | keeps `is-fullscreen` honest when the browser leaves fullscreen without going through your button — <kbd>Escape</kbd>, usually |
 
 Two names never appear in an `on=`: `seekTo(seconds)` and `seekBy(seconds)` take a number,
@@ -1894,7 +1909,7 @@ which is the pair of them behind one control.
 | `seekableStart`, `seekableEnd`            | the reachable window of a live stream, in absolute seconds — a scrubber's `min` and `max` on a stream with a rewind window          |
 | `behindLive`                              | seconds between playback and the live edge; `0` at the edge                                                                         |
 | `volumePercent`                           | `0`–`100`, for a volume slider's `value`                                                                                            |
-| `playLabel`, `muteLabel`, `captionsLabel`, `moreLabel` | what the button should say it does next                                                                                |
+| `playLabel`, `muteLabel`, `captionsLabel` | what the button should say it does next                                                                                             |
 | `captionText`                             | the active cue                                                                                                                      |
 | `playbackRate`                            | the speed the media is playing at, `1` being normal — bound to a `<select>`'s `value` in the samples, and it follows the media element rather than the control, so a rate changed anywhere else lands on it |
 | `timeFormatter`                           | the `formatTime` function itself — hand it to the scrubber's `prop#format` and the value bubble reads `01:12` instead of `72`       |
@@ -1907,10 +1922,11 @@ for markup written against an earlier version.
 
 ## Labels in another language
 
-`playLabel`, `muteLabel`, `captionsLabel` and `moreLabel` speak English. To localize, skip the
-bind and let the button name itself from its content: the attribute hooks already swap which
-half is visible, and `display: none` takes the hidden half out of the accessible name with
-it.
+`playLabel`, `muteLabel` and `captionsLabel` speak English. To localize, skip the bind and
+let the button name itself from its content: the attribute hooks already swap which half is
+visible, and `display: none` takes the hidden half out of the accessible name with it. The
+fold's button never binds a label — the `aria-label` you write on it is the name it keeps,
+in whatever language you wrote it.
 
 ```html
 <button on="click:togglePlay" disabled>
@@ -2178,10 +2194,11 @@ import 'media-player-element';
 ```
 
 The elementals ride along: importing `media-player-element` defines the slider, the progress
-bar, the toolbar and the tooltip too. Their stylesheets do not — each elemental draws its own
-track, thumb, bar or bubble, so every one of those sheets would otherwise be a `<link>` of its
-own. Two bundles carry them instead: `bundle.css` is this element's `style.css` with the four
-elemental structure sheets folded in, and `bundle-theme.css` is its `theme.css` with theirs.
+bar, the toolbar, the tooltip and the disclosure too. Their stylesheets do not — each
+elemental draws its own track, thumb, bar, bubble or fold, so every one of those sheets would
+otherwise be a `<link>` of its own. Two bundles carry them instead: `bundle.css` is this
+element's `style.css` with the five elemental structure sheets folded in, and
+`bundle-theme.css` is its `theme.css` with theirs.
 The rest of this page names the two halves unbundled, which is the same CSS.
 
 ```html
@@ -2231,26 +2248,26 @@ compiled in:
 
 ```html
 <script type="module">
-  import 'https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs';
+  import 'https://cdn.jsdelivr.net/npm/media-player-element@2/dist/media-player.min.mjs';
 </script>
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.bundle.min.css"
+  href="https://cdn.jsdelivr.net/npm/media-player-element@2/dist/media-player.bundle.min.css"
 />
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player-theme.bundle.min.css"
+  href="https://cdn.jsdelivr.net/npm/media-player-element@2/dist/media-player-theme.bundle.min.css"
 /><!-- the look; optional -->
 ```
 
-That pin takes fixes and refuses breakage: `@1` follows every 1.x release and stops at the
+That pin takes fixes and refuses breakage: `@2` follows every 2.x release and stops at the
 next major.
 
 Every sheet is published on its own either way — this package's `style.css` and `theme.css`,
 and `style.css`/`theme.css` under each elemental in
 [book-of-elementals](https://github.com/stamat/book-of-elementals) — so a page wanting only
-some of them links those. For a page wanting all of them, the bundles turn nine `<link>`s into
-two and 6.0KB of gzip into 4.4KB, because nine files each compress alone and share no window
+some of them links those. For a page wanting all of them, the bundles turn ten `<link>`s into
+two and 7.2KB of gzip into 5.3KB, because ten files each compress alone and share no window
 with the next.
 
 ## What editors read

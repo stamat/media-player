@@ -201,7 +201,7 @@
                 "text": "array"
               },
               "static": true,
-              "default": "[ 'currentTime', 'remaining', 'duration', 'seekableStart', 'seekableEnd', 'behindLive', 'buffered', 'volumePercent', 'playLabel', 'muteLabel', 'moreLabel', 'captionsLabel', 'captionText', 'playbackRate', 'timeFormatter' ]",
+              "default": "[ 'currentTime', 'remaining', 'duration', 'seekableStart', 'seekableEnd', 'behindLive', 'buffered', 'volumePercent', 'playLabel', 'muteLabel', 'captionsLabel', 'captionText', 'playbackRate', 'timeFormatter' ]",
               "description": "State that never reaches the DOM.\n\n`currentTime` moves sixty times a second while playing. Reflected to an attribute that\nwould be sixty `setAttribute` calls a second, every one of them waking anything watching\nthe subtree — so the values that move fast live here, and only the flags CSS needs are\nattributes.",
               "privacy": "private"
             },
@@ -278,7 +278,7 @@
             {
               "kind": "method",
               "name": "pictureToggle",
-              "description": "What a click on the picture does, from either shape of it.\n\nWhere nothing hovers, a tap is the only thing that brings a hidden control row back — so\nit cannot also be what pauses. One gesture cannot mean both, and a row that comes back\nonly by stopping the video is a row you have to break playback to reach. A tap starts a\nstopped video and otherwise leaves playback alone, the reveal having already happened on\nthe `touchstart` the markup wires to `showControls`.\n\nAsked of the pointer rather than of the user agent, and asked at the click rather than\nonce at upgrade: a laptop with a touchscreen hovers, and a window dragged to a second\nscreen can stop hovering. Where there is no `matchMedia` to ask, the pointer is taken to\nhover, which is what every version before this one did.",
+              "description": "What a click on the picture does, from either shape of it.\n\nWhere nothing hovers, a tap is the only thing that brings a hidden control row back — so\nit cannot also be what pauses. One gesture cannot mean both, and a row that comes back\nonly by stopping the video is a row you have to break playback to reach. A tap starts a\nstopped video and otherwise leaves playback alone, the reveal having already happened on\nthe `pointerdown` the markup wires to `showControls`.\n\nAsked of the pointer rather than of the user agent, and asked at the click rather than\nonce at upgrade: a laptop with a touchscreen hovers, and a window dragged to a second\nscreen can stop hovering. Where there is no `matchMedia` to ask, the pointer is taken to\nhover, which is what every version before this one did.",
               "privacy": "private"
             },
             {
@@ -419,16 +419,6 @@
             {
               "kind": "method",
               "name": "onPause"
-            },
-            {
-              "kind": "method",
-              "name": "onMoreToggle",
-              "parameters": [
-                {
-                  "name": "event"
-                }
-              ],
-              "description": "The fold's button names its action, the way the mute button does: \"More controls\"\nclosed, \"Fewer controls\" open. Wired in the markup — `on=\"disclosure-toggle:onMoreToggle\"`\non the disclosure — so a row without a fold never runs it. `aria-expanded` is the\ndisclosure's own and already carries the state for a screen reader; this is for the\ntooltip and the label, which read words rather than state."
             },
             {
               "kind": "method",

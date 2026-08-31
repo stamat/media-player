@@ -349,6 +349,20 @@ describe('the wiring the element carries itself', () => {
     expect(media.paused).toBe(false);
   });
 
+  test('a tap on the picture reveals the controls even in markup that wires no reveal of its own', () => {
+    // Markup written against 2.0.0 has no `pointerdown:showControls`, so the swallowed tap
+    // is the only gesture that arrives — the element heals the missing wire rather than
+    // going dead under the finger.
+    jest.useFakeTimers();
+    const media = fakeMedia('video', { paused: false });
+    const player = mount(media);
+    jest.advanceTimersByTime(CONTROLS_LINGER * 2);
+    withoutHover(() => media.dispatchEvent(new Event('click')));
+    expect(player.hasAttribute('controls-shown')).toBe(true);
+    expect(media.paused).toBe(false);
+    jest.useRealTimers();
+  });
+
   test('a tap on the picture still starts a stopped video, which is the half with nowhere else to go', () => {
     // Stopped, the overlay is over the picture and its button is the one being pressed — but
     // the picture answers the same way, because a guard that refused both directions would be
@@ -791,6 +805,17 @@ describe('time', () => {
     player.paint(30);
     expect(player.currentTime).toBe(30);
     expect(player.remaining).toBe(70);
+  });
+
+  test('the countdown reads zero only at the moment the track ends, never a second early', () => {
+    // Ceiled, the countdown convention: floored it would sit on 00:00 for the last fraction
+    // of a second with audio still playing — and floor(elapsed) + ceil(remaining) is the
+    // pair that agrees with the duration whenever fractional time is on screen.
+    const player = mount(fakeMedia('audio', { duration: 100 }));
+    player.paint(99.4);
+    expect(player.remaining).toBe(1);
+    player.paint(100);
+    expect(player.remaining).toBe(0);
   });
 
   test('a skip past either end stops at the end rather than seeking outside the media', () => {
@@ -1270,7 +1295,7 @@ describe('the step under the hand', () => {
  * attribute the player writes on the disclosure — which side of the query it lands on is the
  * disclosure's own, and a browser's to show.
  */
-function mountFold(count, { openWhen = '(min-width: 30rem)' } = {}) {
+function mountFold(count, { openWhen = 'container:(min-width: 30rem)' } = {}) {
   const more = document.createElement('disclosure-elemental');
   more.className = 'media-player-more';
   if (openWhen) more.setAttribute('open-when', openWhen);
@@ -1287,7 +1312,7 @@ describe('a fold only pays for itself past one control', () => {
 
   test('two controls behind the button buy a slot back, so the breakpoint the markup wrote stands', () => {
     const { more } = mountFold(2);
-    expect(more.getAttribute('open-when')).toBe('(min-width: 30rem)');
+    expect(more.getAttribute('open-when')).toBe('container:(min-width: 30rem)');
   });
 
   test('a fold written with no breakpoint at all is still pinned open over its one control', () => {
@@ -1298,7 +1323,7 @@ describe('a fold only pays for itself past one control', () => {
   test('the markup is handed back as it was written when the player leaves the page', () => {
     const { player, more } = mountFold(1);
     player.remove();
-    expect(more.getAttribute('open-when')).toBe('(min-width: 30rem)');
+    expect(more.getAttribute('open-when')).toBe('container:(min-width: 30rem)');
 
     const bare = mountFold(1, { openWhen: null });
     bare.player.remove();
@@ -1317,18 +1342,6 @@ describe('the labels a button announces itself by', () => {
     player.onPause();
     expect(player.playLabel).toBe('Play');
     expect(player.hasAttribute('is-playing')).toBe(false);
-  });
-
-  test('the fold button offers fewer controls once they are out, and more again after', () => {
-    const media = fakeMedia();
-    const player = mount(media);
-    // Initialised, not left for the first toggle: the aria-label bind renders null by
-    // removing the attribute, and that is a nameless button.
-    expect(player.moreLabel).toBe('More controls');
-    player.onMoreToggle({ detail: { open: true } });
-    expect(player.moreLabel).toBe('Fewer controls');
-    player.onMoreToggle({ detail: { open: false } });
-    expect(player.moreLabel).toBe('More controls');
   });
 
   test('the mute button says which way it goes, and follows a volume change it did not make', () => {

@@ -373,26 +373,36 @@ to 385px. Two have to go, and the button costs a slot of its own — folding two
 different reason: it appears only when there is a device on the network, and folded, a phone
 standing near a receiver is no longer the one phone whose row wraps. What is left is a 324px
 row that keeps its second line down to 340px of player width.</p>
-<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">disclosure-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-more&quot;</span> <span class="hljs-attr">open-when</span>=<span class="hljs-string">&quot;(min-width: 30rem)&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;disclosure-toggle:onMoreToggle&quot;</span>&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;More controls&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;moreLabel:attr#aria-label&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">disclosure-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-more&quot;</span> <span class="hljs-attr">open-when</span>=<span class="hljs-string">&quot;container:(min-width: 30rem)&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;More controls&quot;</span>&gt;</span>…<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-more-region&quot;</span>&gt;</span>
     <span class="hljs-comment">&lt;!-- speed, captions, picture-in-picture, play on a device --&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">disclosure-elemental</span>&gt;</span></code></pre>
-<p><code>open-when</code> is the whole arrangement, and the breakpoint is written once. Above it the region
-is held open and the element reflects <code>data-mode=&quot;pinned&quot;</code>, which <code>style.css</code> reads to take
-the button away and give the region <code>display: contents</code> — so a wide row is the row it always
-was, in the markup&#39;s own order, with no extra box in the middle.</p>
+<p><code>open-when</code> is the whole arrangement, and the breakpoint is written once. <code>container:</code> in
+front makes it measure the player rather than the viewport — the disclosure&#39;s own notation,
+resolved against the same containment the volume drop and the clock swap read — because a
+400px player in a wide desktop page crowds exactly like a phone, and a plain media query
+cannot see that. Above the breakpoint the region is held open and the element reflects
+<code>data-mode=&quot;pinned&quot;</code>, which <code>style.css</code> reads to take the button away and give the region
+<code>display: contents</code> — so a wide row is the row it always was, in the markup&#39;s own order,
+with no extra box in the middle. It needs the disclosure&#39;s <code>container:</code> support; against an
+older book-of-elementals the query reads as no query at all and the fold stays with its
+button at every width — everything still reachable, one press further away.</p>
 <p>Below it the button owns the region. Opening it swaps the line rather than growing the bar:
 the transport, the clock and the mute step out, the four unfurl into their space, and the
-caret slides along with them — turned around while open, and offering &quot;Fewer controls&quot;
-through the same <code>moreLabel</code> its tooltip reads. Whatever control ends the row, fullscreen
+caret slides along with them — turned around while open. The turn is the visible state and
+the disclosure&#39;s own <code>aria-expanded</code> the announced one, so the button keeps the one name
+written on it: a label that flipped to &quot;Fewer controls&quot; would tell a screen reader twice
+what <code>aria-expanded</code> already said once. Whatever control ends the row, fullscreen
 here, keeps its corner in both states, and the scrubber never leaves: seeking is not the
 fold&#39;s to take away. A menu floating over the picture was rejected: inside the player&#39;s
 <code>overflow: hidden</code> it clips on any ratio shorter than 16:9, and the player at the top of this
 page is 2.4:1. The button comes first in the disclosure and the region after it, so the
 sequence reads the way the row does. The tooltip cannot wrap this one button, because the
-disclosure wants it as a direct child, so it names it with <code>for</code> instead.</p>
+disclosure wants it as a direct child, so it names it with <code>for</code> instead — which makes
+<code>more-controls</code> the one <code>id</code> in these samples: a page with two players renames it in one of
+them, or both tooltips find the first.</p>
 <p>Width is not the only thing that can make a fold pointless. One control behind the button
 saves nothing — the button takes the slot the control gave up and charges a tap for what used
 to be one press — so the element counts the region on connect, and a fold holding one or none
@@ -408,10 +418,13 @@ that ends on zero when the track does. <code>.media-player-elapsed</code> holds 
 clears.</p>
 <p>The arrows skip what is folded, so a closed region is not a stretch of dead arrow presses:
 <code>&lt;toolbar-elemental&gt;</code> walks only the controls that are on screen, which needs
-book-of-elementals 3.1.1, the floor this version asks for. <code>&lt;media-player&gt;</code> imports the
+book-of-elementals 3.2.1, the floor this version asks for — 3.2.0 gave <code>open-when</code> its
+<code>container:</code> ruler, and 3.2.1 the tarball that actually ships it to a source importer.
+<code>&lt;media-player&gt;</code> imports the
 disclosure for you. A page that blocks the script has no control row at all; one whose
-disclosure never defines gets the four controls sitting in the open, which is the row this
-section started with.</p>
+disclosure never defines gets the four controls sitting in the open — plus the caret, a
+button that toggles nothing, since only the upgrade wires it and only the <code>data-mode</code> it
+reflects hides it. The row this section started with, with one dead control in it.</p>
 <p>The scrubber is moved in the markup rather than with <code>order</code> for the same reason. Reordering
 a flex line visually leaves the tab sequence in the old order, and a keyboard user would read
 the bar top-to-bottom while tabbing it bottom-to-top.</p>
@@ -476,7 +489,7 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
   <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;region&quot;</span>
   <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Video player&quot;</span>
   <span class="hljs-attr">keys</span>=<span class="hljs-string">&quot;ArrowUp:volumeUp;ArrowDown:volumeDown&quot;</span>
-  <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown&quot;</span>
+  <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown&quot;</span>
 &gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">video</span>
     <span class="hljs-attr">controls</span>
@@ -756,11 +769,11 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
          four controls right after it in the sequence. Unfolding still reads like a search
          field expanding — the caret slides left and the controls follow out of it — and
          the caret points at the fold, turning around while it is open. --&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">disclosure-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-more&quot;</span> <span class="hljs-attr">open-when</span>=<span class="hljs-string">&quot;(min-width: 30rem)&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;disclosure-toggle:onMoreToggle&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">disclosure-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-more&quot;</span> <span class="hljs-attr">open-when</span>=<span class="hljs-string">&quot;container:(min-width: 30rem)&quot;</span>&gt;</span>
       <span class="hljs-comment">&lt;!-- The one control whose tooltip cannot wrap it: the disclosure wants its button as
            a direct child and its region as the button&#x27;s next sibling, so the tooltip sits
            after the region and names the button by `for` instead. --&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;more-controls&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;More controls&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;moreLabel:attr#aria-label&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;more-controls&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;More controls&quot;</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">svg</span>
           <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>
           <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://www.w3.org/2000/svg&quot;</span>
@@ -879,7 +892,7 @@ picture, captions, fullscreen, controls that fade out while playing — only whe
       <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
 
       <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span> <span class="hljs-attr">for</span>=<span class="hljs-string">&quot;more-controls&quot;</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;moreLabel&quot;</span>&gt;</span>More controls<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>More controls<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
       <span class="hljs-tag">&lt;/<span class="hljs-name">tooltip-elemental</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">disclosure-elemental</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
@@ -925,11 +938,14 @@ wrote it: enough to prove the CC wiring, no more.</p>
 the pointer moves, gone five seconds after it stops, and always up while the video is paused
 or a focus ring is inside the row. A ring, not focus: a mouse click leaves focus on the button
 it pressed, and a row pinned by that never fades once you have pressed play.
-<code>touchstart:showControls</code> is the same for a pointer that cannot hover, and it is not optional
-there — a touch sends no <code>mousemove</code>, so without it the row goes five seconds into playback
-and only a tap on the picture brings it back, which pauses the video to do it. With it, the
-first tap reveals and the second presses what it lands on: the element will not pause on a tap
-while the pointer cannot hover, for the same reason.
+<code>pointerdown:showControls</code> is the same for a pointer that cannot hover — a touch sends no
+<code>mousemove</code> — and it reveals on the finger landing rather than lifting: the first tap
+reveals and the second presses what it lands on, because the element will not pause on a tap
+while the pointer cannot hover, and a row faded out takes no taps until it is back. Without
+the wire the element still reveals on the tap&#39;s click, one beat later. <code>pointerdown</code> and not
+<code>touchstart</code>, because a <code>touchstart</code> listener is one the browser must wait on before it may
+scroll a page that starts the gesture on the player; a pointer listener never blocks the
+scroll, with no option needed to say so.
 <code>fullscreenchange@document:onFullscreenChange</code> keeps <code>is-fullscreen</code> honest when
 <kbd>Escape</kbd> leaves fullscreen without the button being pressed. A fourth would bind the
 keyboard — <a href="#keys-the-buttons-carry">Keys the buttons carry</a> — which no sample on this page
@@ -966,7 +982,7 @@ paragraph are the measurement.</p>
   media-player <span class="hljs-selector-tag">video</span>-<span class="hljs-attribute">background</span> { <span class="hljs-attribute">background-size</span>: cover; <span class="hljs-attribute">background-position</span>: center; }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
 
-<span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;region&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;YouTube player&quot;</span> <span class="hljs-attr">media-title</span>=<span class="hljs-string">&quot;Family Guy: McStroke (Clip)&quot;</span> <span class="hljs-attr">artist</span>=<span class="hljs-string">&quot;TBS&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;region&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;YouTube player&quot;</span> <span class="hljs-attr">media-title</span>=<span class="hljs-string">&quot;Family Guy: McStroke (Clip)&quot;</span> <span class="hljs-attr">artist</span>=<span class="hljs-string">&quot;TBS&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">video-background</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-media&quot;</span> <span class="hljs-attr">unstyled</span> <span class="hljs-attr">fit-box</span> <span class="hljs-attr">load-background</span> <span class="hljs-attr">lazyloading</span> <span class="hljs-attr">pause-offscreen</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">autoplay</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">loop</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">muted</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://www.youtube.com/watch?v=UIyoNvInzCI&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video-background</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-overlay&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Play&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">toolbar-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Playback&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isReady:if&quot;</span>&gt;</span>
@@ -1007,7 +1023,7 @@ platform&#39;s link over the <code>src</code> to watch that happen:</p>
   media-player <span class="hljs-selector-tag">video</span>-<span class="hljs-attribute">background</span> { <span class="hljs-attribute">background-size</span>: cover; <span class="hljs-attribute">background-position</span>: center; }
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
 
-<span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;region&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Vimeo player&quot;</span> <span class="hljs-attr">media-title</span>=<span class="hljs-string">&quot;Minions: Paint&quot;</span> <span class="hljs-attr">artist</span>=<span class="hljs-string">&quot;Vimeo Staff Picks&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">role</span>=<span class="hljs-string">&quot;region&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Vimeo player&quot;</span> <span class="hljs-attr">media-title</span>=<span class="hljs-string">&quot;Minions: Paint&quot;</span> <span class="hljs-attr">artist</span>=<span class="hljs-string">&quot;Vimeo Staff Picks&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">video-background</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-media&quot;</span> <span class="hljs-attr">unstyled</span> <span class="hljs-attr">fit-box</span> <span class="hljs-attr">load-background</span> <span class="hljs-attr">lazyloading</span> <span class="hljs-attr">pause-offscreen</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">autoplay</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">loop</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">muted</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://vimeo.com/137250145&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">video-background</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-overlay&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Play&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">toolbar-elemental</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-controls&quot;</span> <span class="hljs-attr">aria-label</span>=<span class="hljs-string">&quot;Playback&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;isReady:if&quot;</span>&gt;</span>
@@ -1079,7 +1095,7 @@ platform, <code>&lt;youtube-video&gt;</code>, <code>&lt;vimeo-video&gt;</code>, 
 media API on it, each dropped in the same slot and marked the same way.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/youtube-video-element@1/+esm&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 
-<span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">media-player</span> <span class="hljs-attr">tabindex</span>=<span class="hljs-string">&quot;0&quot;</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange&quot;</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">youtube-video</span>
     <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-media&quot;</span>
     <span class="hljs-attr">controls</span>
@@ -1185,7 +1201,7 @@ is left is a plain <code>&lt;video controls&gt;</code>, so
 <!-- One line, and it has to be: the whole opening tag of an unknown element must sit on a
      line of its own or markdown prints it instead of rendering it. Same trap as code-preview
      above, and the reason this player's attributes are not broken up for readability. -->
-<media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;touchstart:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
+<media-player tabindex="0" role="region" aria-label="Video player" keys="ArrowUp:volumeUp;ArrowDown:volumeDown" media-title="Tears of Steel" artist="Blender Foundation" on="mousemove:showControls;pointerdown:showControls;fullscreenchange@document:onFullscreenChange;keydown:onKeyDown">
   <video controls playsinline preload="metadata" src="https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov" poster="sample/tears-of-steel.jpg">
     <track kind="captions" src="sample/tears-of-steel.en.vtt" srclang="en" label="English" />
     <track kind="metadata" src="sample/tears-of-steel-thumbs.vtt" />
@@ -1221,8 +1237,8 @@ is left is a plain <code>&lt;video controls&gt;</code>, so
          where the row runs out of width; `open-when` puts them back in the row above 30rem.
          Captions moved up beside them, so the four the button carries are the four written
          together. -->
-    <disclosure-elemental class="media-player-more" open-when="(min-width: 30rem)" on="disclosure-toggle:onMoreToggle">
-      <button type="button" id="more-controls" aria-label="More controls" bind="moreLabel:attr#aria-label"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+    <disclosure-elemental class="media-player-more" open-when="container:(min-width: 30rem)">
+      <button type="button" id="more-controls" aria-label="More controls"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
       <div class="media-player-more-region">
         <tooltip-elemental>
           <select class="media-player-rate" aria-label="Speed" disabled bind="playbackRate:prop#value" on="change:setRate"><option value="0.5">0.5&times;</option><option value="1" selected>1&times;</option><option value="1.25">1.25&times;</option><option value="1.5">1.5&times;</option><option value="2">2&times;</option></select>
@@ -1241,7 +1257,7 @@ is left is a plain <code>&lt;video controls&gt;</code>, so
           <span>Play on a device</span>
         </tooltip-elemental>
       </div>
-      <tooltip-elemental for="more-controls"><span bind="moreLabel">More controls</span></tooltip-elemental>
+      <tooltip-elemental for="more-controls"><span>More controls</span></tooltip-elemental>
     </disclosure-elemental>
     <tooltip-elemental>
       <button on="click:toggleFullscreen" aria-label="Fullscreen" bind="isFullscreen:attr#aria-pressed|pressed" disabled><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -1681,9 +1697,9 @@ taken. A page with one of those wants the focused binding.</p>
 speed <code>&lt;select&gt;</code>, which is where hover, focus, <kbd>Escape</kbd> to dismiss and the decision
 to ignore touch already live. The <code>&lt;select&gt;</code> is not a button and needs the bubble most:
 closed, it reads <code>1×</code> and says nothing about what it changes.</p>
-<p>Three of the bubbles bind rather than state: the play, mute and fold ones carry <code>playLabel</code>,
-<code>muteLabel</code> and <code>moreLabel</code>, the same state the buttons announce themselves by, so the words
-in the bubble and the words a screen reader hears cannot drift apart.</p>
+<p>Three of the bubbles bind rather than state: the play, mute and captions ones carry
+<code>playLabel</code>, <code>muteLabel</code> and <code>captionsLabel</code>, the same state the buttons announce themselves
+by, so the words in the bubble and the words a screen reader hears cannot drift apart.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">tooltip-elemental</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">bind</span>=<span class="hljs-string">&quot;playLabel:attr#aria-label&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
     …
@@ -2005,10 +2021,6 @@ wired is skipped, never doubled.</p>
 <td><code>change:setRate</code></td>
 <td>playback speed, off the control&#39;s own <code>value</code> — a <code>&lt;select&gt;</code>&#39;s in the samples; anything that is not a positive, finite number is dropped</td>
 </tr>
-<tr>
-<td><code>disclosure-toggle:onMoreToggle</code></td>
-<td>on the fold&#39;s <code>&lt;disclosure-elemental&gt;</code>: flips <code>moreLabel</code> between &quot;More controls&quot; and &quot;Fewer controls&quot;, so the caret&#39;s name and its tooltip say what pressing it does next — <code>aria-expanded</code> is the disclosure&#39;s own and carries the state either way</td>
-</tr>
 </tbody></table>
 <p><strong>On <code>&lt;media-player&gt;</code> itself:</strong></p>
 <table>
@@ -2027,8 +2039,8 @@ wired is skipped, never doubled.</p>
 <td>video only: bring the faded control row back, and start the timer that takes it away again</td>
 </tr>
 <tr>
-<td><code>touchstart:showControls</code></td>
-<td>the same for a pointer that cannot hover, which sends no <code>mousemove</code> — without it the row goes mid-playback and only a pause brings it back</td>
+<td><code>pointerdown:showControls</code></td>
+<td>the same for a pointer that cannot hover, which sends no <code>mousemove</code> — the reveal lands on the finger&#39;s touch rather than a beat later on its click</td>
 </tr>
 <tr>
 <td><code>fullscreenchange@document:onFullscreenChange</code></td>
@@ -2068,7 +2080,7 @@ which is the pair of them behind one control.</p>
 <td><code>0</code>–<code>100</code>, for a volume slider&#39;s <code>value</code></td>
 </tr>
 <tr>
-<td><code>playLabel</code>, <code>muteLabel</code>, <code>captionsLabel</code>, <code>moreLabel</code></td>
+<td><code>playLabel</code>, <code>muteLabel</code>, <code>captionsLabel</code></td>
 <td>what the button should say it does next</td>
 </tr>
 <tr>
@@ -2090,10 +2102,11 @@ the captions, picture-in-picture and fullscreen buttons in the video sample use 
 pipes <code>|floor</code> any more, since the scrubber&#39;s <code>step=&quot;any&quot;</code> wants the fraction, but it stays
 for markup written against an earlier version.</p>
 <h2 id="labels-in-another-language">Labels in another language<a class="heading-anchor" href="#labels-in-another-language" tabindex="-1" aria-hidden="true"></a></h2>
-<p><code>playLabel</code>, <code>muteLabel</code>, <code>captionsLabel</code> and <code>moreLabel</code> speak English. To localize, skip the
-bind and let the button name itself from its content: the attribute hooks already swap which
-half is visible, and <code>display: none</code> takes the hidden half out of the accessible name with
-it.</p>
+<p><code>playLabel</code>, <code>muteLabel</code> and <code>captionsLabel</code> speak English. To localize, skip the bind and
+let the button name itself from its content: the attribute hooks already swap which half is
+visible, and <code>display: none</code> takes the hidden half out of the accessible name with it. The
+fold&#39;s button never binds a label — the <code>aria-label</code> you write on it is the name it keeps,
+in whatever language you wrote it.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">on</span>=<span class="hljs-string">&quot;click:togglePlay&quot;</span> <span class="hljs-attr">disabled</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-player-play-icon&quot;</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">aria-hidden</span>=<span class="hljs-string">&quot;true&quot;</span>&gt;</span>▶<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;visually-hidden&quot;</span>&gt;</span>Pusti<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
@@ -2407,10 +2420,11 @@ letters on every page that never asked for them.</li>
 <pre><code class="hljs language-bash">npm install media-player-element</code></pre>
 <pre><code class="hljs language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;media-player-element&#x27;</span>;</code></pre>
 <p>The elementals ride along: importing <code>media-player-element</code> defines the slider, the progress
-bar, the toolbar and the tooltip too. Their stylesheets do not — each elemental draws its own
-track, thumb, bar or bubble, so every one of those sheets would otherwise be a <code>&lt;link&gt;</code> of its
-own. Two bundles carry them instead: <code>bundle.css</code> is this element&#39;s <code>style.css</code> with the four
-elemental structure sheets folded in, and <code>bundle-theme.css</code> is its <code>theme.css</code> with theirs.
+bar, the toolbar, the tooltip and the disclosure too. Their stylesheets do not — each
+elemental draws its own track, thumb, bar, bubble or fold, so every one of those sheets would
+otherwise be a <code>&lt;link&gt;</code> of its own. Two bundles carry them instead: <code>bundle.css</code> is this
+element&#39;s <code>style.css</code> with the five elemental structure sheets folded in, and
+<code>bundle-theme.css</code> is its <code>theme.css</code> with theirs.
 The rest of this page names the two halves unbundled, which is the same CSS.</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;media-player-element/bundle.css&quot;</span> /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
@@ -2449,23 +2463,23 @@ declares.</p>
 URLs, no install and no build step, and the module beside them is one file with the elementals
 compiled in:</p>
 <pre><code class="hljs language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
-  <span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.min.mjs&#x27;</span>;
+  <span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;https://cdn.jsdelivr.net/npm/media-player-element@2/dist/media-player.min.mjs&#x27;</span>;
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player.bundle.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@2/dist/media-player.bundle.min.css&quot;</span>
 /&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">link</span>
   <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span>
-  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@1/dist/media-player-theme.bundle.min.css&quot;</span>
+  <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/media-player-element@2/dist/media-player-theme.bundle.min.css&quot;</span>
 /&gt;</span><span class="hljs-comment">&lt;!-- the look; optional --&gt;</span></code></pre>
-<p>That pin takes fixes and refuses breakage: <code>@1</code> follows every 1.x release and stops at the
+<p>That pin takes fixes and refuses breakage: <code>@2</code> follows every 2.x release and stops at the
 next major.</p>
 <p>Every sheet is published on its own either way — this package&#39;s <code>style.css</code> and <code>theme.css</code>,
 and <code>style.css</code>/<code>theme.css</code> under each elemental in
 <a href="https://github.com/stamat/book-of-elementals">book-of-elementals</a> — so a page wanting only
-some of them links those. For a page wanting all of them, the bundles turn nine <code>&lt;link&gt;</code>s into
-two and 6.0KB of gzip into 4.4KB, because nine files each compress alone and share no window
+some of them links those. For a page wanting all of them, the bundles turn ten <code>&lt;link&gt;</code>s into
+two and 7.2KB of gzip into 5.3KB, because ten files each compress alone and share no window
 with the next.</p>
 <h2 id="what-editors-read">What editors read<a class="heading-anchor" href="#what-editors-read" tabindex="-1" aria-hidden="true"></a></h2>
 <p>The package ships a

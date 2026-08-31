@@ -409,7 +409,6 @@ export class MediaPlayer extends HgElement {
     'volumePercent',
     'playLabel',
     'muteLabel',
-    'moreLabel',
     'captionsLabel',
     'captionText',
     'playbackRate',
@@ -586,9 +585,6 @@ export class MediaPlayer extends HgElement {
     this.isBuffering = true;
     this.playLabel = 'Play';
     this.muteLabel = 'Mute';
-    // Not left for the first toggle to set: the button's `attr#aria-label` bind renders
-    // null by removing the attribute, and that is a nameless button, not a default.
-    this.moreLabel = 'More controls';
     this.captionsLabel = 'Enable captions';
     // Handed to the scrubber's `<slider-elemental>` through a `prop#format` bind, so the
     // value bubble reads `01:12` rather than `72`. A property rather than a `querySelector`
@@ -673,7 +669,7 @@ export class MediaPlayer extends HgElement {
 
     this.isLive = duration >= LIVE_DURATION;
     this.duration = this.isLive ? 0 : duration;
-    this.remaining = this.duration;
+    this.remaining = Math.ceil(this.duration);
     this.isReady = true;
     this.isBuffering = false;
     // A source fixed after a failure: the error hook comes off and the controls come back
@@ -728,7 +724,7 @@ export class MediaPlayer extends HgElement {
    * it cannot also be what pauses. One gesture cannot mean both, and a row that comes back
    * only by stopping the video is a row you have to break playback to reach. A tap starts a
    * stopped video and otherwise leaves playback alone, the reveal having already happened on
-   * the `touchstart` the markup wires to `showControls`.
+   * the `pointerdown` the markup wires to `showControls`.
    *
    * Asked of the pointer rather than of the user agent, and asked at the click rather than
    * once at upgrade: a laptop with a touchscreen hovers, and a window dragged to a second
@@ -736,7 +732,14 @@ export class MediaPlayer extends HgElement {
    * hover, which is what every version before this one did.
    */
   pictureToggle() {
-    if (!this.media?.paused && window.matchMedia?.('(hover: none)')?.matches) return;
+    if (!this.media?.paused && window.matchMedia?.('(hover: none)')?.matches) {
+      // Markup written against 2.0.0 wires no reveal of its own, and this click is then the
+      // only gesture that arrives at all — so the reveal happens here too, and the element
+      // heals the missing wire instead of going dead under the tap. With the wire present
+      // it lands second and re-arms the same linger: harmless.
+      this.showControls();
+      return;
+    }
     this.togglePlay();
   }
 
@@ -1025,7 +1028,11 @@ export class MediaPlayer extends HgElement {
    */
   paint(seconds) {
     this.currentTime = seconds;
-    this.remaining = this.isLive ? 0 : Math.max((this.media?.duration || 0) - seconds, 0);
+    // Ceiled, not floored: a countdown reads zero only at the moment the track ends —
+    // floored it sits on 00:00 for the last fraction of a second while audio still plays —
+    // and floor(elapsed) + ceil(remaining) is the pair that keeps agreeing with the
+    // duration whenever fractional time is on screen.
+    this.remaining = this.isLive ? 0 : Math.ceil(Math.max((this.media?.duration || 0) - seconds, 0));
     // The write above lands in the scrubber's range input, and a value written from script
     // fires no event — slider-elemental cannot see it, and its fill would stay wherever the
     // last real drag left it. apply() is that element's public catch-up for exactly this.
@@ -1078,17 +1085,6 @@ export class MediaPlayer extends HgElement {
       if (this.linger) clearTimeout(this.linger);
       this.controlsShown = true;
     }
-  }
-
-  /**
-   * The fold's button names its action, the way the mute button does: "More controls"
-   * closed, "Fewer controls" open. Wired in the markup — `on="disclosure-toggle:onMoreToggle"`
-   * on the disclosure — so a row without a fold never runs it. `aria-expanded` is the
-   * disclosure's own and already carries the state for a screen reader; this is for the
-   * tooltip and the label, which read words rather than state.
-   */
-  onMoreToggle(event) {
-    this.moreLabel = event?.detail?.open ? 'Fewer controls' : 'More controls';
   }
 
   /**
