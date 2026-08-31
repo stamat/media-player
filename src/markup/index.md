@@ -4,7 +4,7 @@ title: Media Player
 description: A media player you write in HTML — one custom element over the <audio> or <video> you already wrote.
 ---
 
-# ▶ media-player
+# ▶ `<media-player>`
 
 Most media player libraries take the player away from you. You hand over a `<video>` and a
 config object, and get back someone else's control bar — their button order, their icons,

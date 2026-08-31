@@ -1,4 +1,4 @@
-# ▶ media-player [![npm version](https://img.shields.io/npm/v/media-player-element)](https://www.npmjs.com/package/media-player-element) [![ci](https://img.shields.io/github/actions/workflow/status/stamat/media-player-element/ci.yml?branch=main&label=ci)](https://github.com/stamat/media-player-element/actions/workflows/ci.yml) [![gzip size](https://img.badgesize.io/stamat/media-player-element/main/dist/media-player.min.mjs?compression=gzip&label=gzip)](https://github.com/stamat/media-player-element/blob/main/dist/media-player.min.mjs) [![license mit](https://img.shields.io/badge/license-MIT-green)](https://github.com/stamat/media-player-element/blob/main/LICENSE)
+# ▶ `<media-player>` [![npm version](https://img.shields.io/npm/v/media-player-element)](https://www.npmjs.com/package/media-player-element) [![ci](https://img.shields.io/github/actions/workflow/status/stamat/media-player-element/ci.yml?branch=main&label=ci)](https://github.com/stamat/media-player-element/actions/workflows/ci.yml) [![gzip size](https://img.badgesize.io/stamat/media-player-element/main/dist/media-player.min.mjs?compression=gzip&label=gzip)](https://github.com/stamat/media-player-element/blob/main/dist/media-player.min.mjs) [![license mit](https://img.shields.io/badge/license-MIT-green)](https://github.com/stamat/media-player-element/blob/main/LICENSE)
 
 > A media player you write in HTML — one custom element over the `<audio>` or `<video>` you already wrote.
 
@@ -79,16 +79,19 @@ the child, so there is one class and one tag.
 npm install media-player-element
 ```
 
+The package and the repository are `media-player-element`; the element they define is
+`<media-player>`.
+
 Stylesheets are separate, and bundled: `bundle.css` is the structure, `bundle-theme.css` the
 optional look, each with the elemental sheets folded in. The
-[manual](https://stamat.github.io/media-player-element/#install) has the CDN block and the à-la-carte
-sheets.
+[manual](https://stamat.github.io/media-player-element/#install) has the CDN block and the
+à-la-carte sheets.
 
 ## Everything else
 
-**<https://stamat.github.io/media-player-element/>** — the whole reference, the comparison against
-Plyr, media-chrome, Vidstack and Video.js, and what this deliberately does not do. This README
-is the pitch; that page is the manual.
+**<https://stamat.github.io/media-player-element/>** — the whole reference, the comparison
+against Plyr, media-chrome, Vidstack and Video.js, and what this deliberately does not do.
+This README is the pitch; that page is the manual.
 
 ## Development
 
